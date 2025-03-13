@@ -60,50 +60,60 @@ export default class extends Controller {
 
     // Met à jour l'interface utilisateur
     updateUI(data) {
-          const char1HP = data.battleState.char1.hp;
-    const char2HP = data.battleState.char2.hp;
+        const char1HP = data.battleState.char1.hp;
+        const char2HP = data.battleState.char2.hp;
+        const char1Stamina = data.battleState.char1.stamina;
+        const char2Stamina = data.battleState.char2.stamina;
 
-    console.log("🔄 Mise à jour HP :", { char1HP, char2HP });
+        console.log("🔄 Mise à jour HP & Stamina :", { char1HP, char2HP, char1Stamina, char2Stamina });
 
-    // Mise à jour du texte HP principal (en haut de la barre de vie)
-    const hpTextChar1 = document.getElementById("hp-char1-text");
-    const hpTextChar2 = document.getElementById("hp-char2-text");
+        // ✅ Mise à jour du texte HP principal (au-dessus de la barre de vie)
+        const hpTextChar1 = document.getElementById("hp-char1-text");
+        const hpTextChar2 = document.getElementById("hp-char2-text");
 
-    if (hpTextChar1) {
-        hpTextChar1.textContent = `${char1HP}/100`;
-    }
-    if (hpTextChar2) {
-        hpTextChar2.textContent = `${char2HP}/100`;
-    }
+        if (hpTextChar1) hpTextChar1.textContent = `${char1HP}/100`;
+        if (hpTextChar2) hpTextChar2.textContent = `${char2HP}/100`;
 
-    // Mise à jour de la barre de vie
-    const healthBarChar1 = document.getElementById("health-bar-char1");
-    const healthBarChar2 = document.getElementById("health-bar-char2");
+        // ✅ Mise à jour des barres de vie
+        const healthBarChar1 = document.getElementById("health-bar-char1");
+        const healthBarChar2 = document.getElementById("health-bar-char2");
 
-    if (healthBarChar1) {
-        healthBarChar1.style.width = `${(char1HP / 100) * 100}%`;
-        this.updateHealthBarColor(healthBarChar1, char1HP);
-
-        // ✅ Mise à jour du texte dans la barre de vie
-        const healthTextChar1 = healthBarChar1.querySelector(".health-text");
-        if (healthTextChar1) {
-            healthTextChar1.textContent = `${char1HP}/100`;
+        if (healthBarChar1) {
+            healthBarChar1.style.width = `${(char1HP / 100) * 100}%`;
+            this.updateHealthBarColor(healthBarChar1, char1HP);
+            const healthTextChar1 = healthBarChar1.querySelector(".health-text");
+            if (healthTextChar1) healthTextChar1.textContent = `${char1HP}/100`;
         }
-    }
 
-    if (healthBarChar2) {
-        healthBarChar2.style.width = `${(char2HP / 100) * 100}%`;
-        this.updateHealthBarColor(healthBarChar2, char2HP);
-
-        // ✅ Mise à jour du texte dans la barre de vie
-        const healthTextChar2 = healthBarChar2.querySelector(".health-text");
-        if (healthTextChar2) {
-            healthTextChar2.textContent = `${char2HP}/100`;
+        if (healthBarChar2) {
+            healthBarChar2.style.width = `${(char2HP / 100) * 100}%`;
+            this.updateHealthBarColor(healthBarChar2, char2HP);
+            const healthTextChar2 = healthBarChar2.querySelector(".health-text");
+            if (healthTextChar2) healthTextChar2.textContent = `${char2HP}/100`;
         }
-    }
-        this.updateHealthBarColor(document.getElementById("health-bar-char1"), char1HP);
-        this.updateHealthBarColor(document.getElementById("health-bar-char2"), char2HP)
-        // Gestion des logs
+
+        // ✅ Mise à jour du texte Stamina
+        const staminaTextChar1 = document.getElementById("stamina-char1-text");
+        const staminaTextChar2 = document.getElementById("stamina-char2-text");
+
+        if (staminaTextChar1) staminaTextChar1.textContent = `${char1Stamina}/100`;
+        if (staminaTextChar2) staminaTextChar2.textContent = `${char2Stamina}/100`;
+
+        // ✅ Mise à jour des barres de stamina
+        const staminaBarChar1 = document.getElementById("stamina-bar-char1");
+        const staminaBarChar2 = document.getElementById("stamina-bar-char2");
+
+        if (staminaBarChar1) {
+            staminaBarChar1.style.width = `${(char1Stamina / 100) * 100}%`;
+            this.updateStaminaBarColor(staminaBarChar1, char1Stamina);
+        }
+
+        if (staminaBarChar2) {
+            staminaBarChar2.style.width = `${(char2Stamina / 100) * 100}%`;
+            this.updateStaminaBarColor(staminaBarChar2, char2Stamina);
+        }
+
+        // Logs de combat
         if (data.battleState.logs.length > 0) {
             const lastLog = data.battleState.logs[data.battleState.logs.length - 1];
             const logEl = document.createElement("div");
@@ -112,41 +122,6 @@ export default class extends Controller {
 
             document.getElementById("log-messages").appendChild(logEl);
             document.getElementById("log-messages").scrollTop = document.getElementById("log-messages").scrollHeight;
-
-            // Mise à jour du compteur de tours
-            if (lastLog.includes("Round") || lastLog.includes("tour")) {
-                this.turnCount++;
-                document.getElementById("turn-counter").textContent = `TURN ${this.turnCount}`;
-            }
-        }
-
-        // Animation de dégâts et effet de hit
-        if (data.lastAttacker && data.damage > 0) {
-            let targetPanel, damageEffect;
-
-            if (data.lastAttacker === "char1") {
-                targetPanel = document.getElementById("char2-panel");
-                damageEffect = document.getElementById("damage-char2");
-
-                document.getElementById("turn-char1").style.display = "none";
-                document.getElementById("turn-char2").style.display = "block";
-            } else {
-                targetPanel = document.getElementById("char1-panel");
-                damageEffect = document.getElementById("damage-char1");
-
-                document.getElementById("turn-char1").style.display = "block";
-                document.getElementById("turn-char2").style.display = "none";
-            }
-
-            targetPanel.classList.add("hit-effect");
-            setTimeout(() => {
-                targetPanel.classList.remove("hit-effect");
-            }, 400);
-
-            damageEffect.textContent = `-${data.damage}`;
-            damageEffect.classList.remove("damage-anim");
-            void damageEffect.offsetWidth;
-            damageEffect.classList.add("damage-anim");
         }
 
         // Vérifier la fin du combat
@@ -163,17 +138,24 @@ export default class extends Controller {
             document.getElementById("btn-start").style.display = "inline-block";
         }
     }
+    updateStaminaBarColor(bar, stamina) {
+        if (stamina < 20) {
+            bar.style.backgroundColor = "#cc0000"; // Rouge foncé si très bas
+        } else if (stamina < 50) {
+            bar.style.backgroundColor = "#ffcc00"; // Jaune si moyen
+        } else {
+            bar.style.backgroundColor = "#00cc66"; // Vert si élevé
+        }
+    }
     startAutoAttack() {
         if (this.isPaused || this.isGameOver || this.isAttacking) return;
-
-        this.isAttacking = true; // Active le flag
+        this.isAttacking = true;
         this.autoAttack();
     }
     
     stopAutoAttack() {
-        this.isAttacking = false; // Désactive le flag pour arrêter les attaques
+        this.isAttacking = false;
     }
-    
 
     autoAttack() {
         if (this.isPaused || this.isGameOver || !this.isAttacking) return;
@@ -187,7 +169,7 @@ export default class extends Controller {
             .catch(error => console.error("Erreur lors de l'attaque:", error))
             .finally(() => {
                 if (this.isAttacking) {
-                    setTimeout(() => this.autoAttack(), 1500); // Attente de 1.5 sec avant la prochaine attaque
+                    setTimeout(() => this.autoAttack(), 1500);
                 }
             });
     }

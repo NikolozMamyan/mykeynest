@@ -33,14 +33,28 @@
                 </div>
                 <div class="character-info">
                     <div class="character-name">{{ battleState.char1.name }}</div>
+                    
+                    <!-- HP Bar -->
                     <div class="health-label">
                         <span>HP</span>
-                        <span id="hp-char1-text">{{ battleState.char1.hp }}/{{ battleState.char1.hp }}</span>
+                        <span id="hp-char1-text">{{ battleState.char1.hp }}/100</span>
                     </div>
                     <div class="health-bar-container">
-                        {% set ratioChar1 = (battleState.char1.hp / 100) * 100 %}
-                        <div class="health-bar" id="health-bar-char1" style="width: {{ ratioChar1 }}%;">
-                            <div class="health-text">{{ battleState.char1.hp }}/{{ battleState.char1.hp }}</div>
+                        {% set ratioChar1Hp = (battleState.char1.hp / 100) * 100 %}
+                        <div class="health-bar" id="health-bar-char1" style="width: {{ ratioChar1Hp }}%;">
+                            <div class="health-text">{{ battleState.char1.hp }}/100</div>
+                        </div>
+                    </div>
+
+                    <!-- Stamina Bar -->
+                    <div class="stamina-label">
+                        <span>Stamina</span>
+                        
+                    </div>
+                    <div class="stamina-bar-container">
+                        {% set ratioChar1Stamina = (battleState.char1.stamina / 100) * 100 %}
+                        <div class="stamina-bar" id="stamina-bar-char1" style="width: {{ ratioChar1Stamina }}%;">
+                            <span id="stamina-char1-text">{{ battleState.char1.stamina }}/100</span>
                         </div>
                     </div>
                     
@@ -70,17 +84,31 @@
                 </div>
                 <div class="character-info">
                     <div class="character-name">{{ battleState.char2.name }}</div>
+                    
+                    <!-- HP Bar -->
                     <div class="health-label">
                         <span>HP</span>
-                        <span id="hp-char2-text">{{ battleState.char2.hp }}/{{ battleState.char2.hp }}</span>
+                        <span id="hp-char2-text">{{ battleState.char2.hp }}/100</span>
                     </div>
                     <div class="health-bar-container">
-                        {% set ratioChar2 = (battleState.char2.hp / 100) * 100 %}
-                        <div class="health-bar" id="health-bar-char2" style="width: {{ ratioChar2 }}%;">
-                            <div class="health-text">{{ battleState.char2.hp }}/{{ battleState.char2.hp }}</div>
+                        {% set ratioChar2Hp = (battleState.char2.hp / 100) * 100 %}
+                        <div class="health-bar" id="health-bar-char2" style="width: {{ ratioChar2Hp }}%;">
+                            <div class="health-text">{{ battleState.char2.hp }}/100</div>
                         </div>
                     </div>
-                    
+
+                    <!-- Stamina Bar -->
+                    <div class="stamina-label">
+                        <span>Stamina</span>
+                        
+                    </div>
+                    <div class="stamina-bar-container">
+                        {% set ratioChar2Stamina = (battleState.char2.stamina / 100) * 100 %}
+                        <div class="stamina-bar" id="stamina-bar-char2" style="width: {{ ratioChar2Stamina }}%;">
+                            <span id="stamina-char2-text">{{ battleState.char2.stamina }}/100</span>
+                        </div>
+                    </div>
+
                     <div class="stats-grid">
                         <div class="stat-box">
                             <div class="stat-value">9</div>
@@ -118,6 +146,4 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}

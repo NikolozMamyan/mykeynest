@@ -26,6 +26,14 @@ class Character
     #[ORM\Column]
     private int $defense = 0;
 
+    #[ORM\Column]
+    private int $speed = 0; // Ajout de speed
+
+    #[ORM\Column]
+    private int $agility = 0; // Ajout de agility
+    #[ORM\Column]
+    private int $stamina = 100;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -73,6 +81,37 @@ class Character
     public function setDefense(int $defense): self
     {
         $this->defense = $defense;
+        return $this;
+    }
+    public function getSpeed(): int
+    {
+        return $this->speed;
+    }
+
+    public function setSpeed(int $speed): self
+    {
+        $this->speed = $speed;
+        return $this;
+    }
+
+    public function getAgility(): int
+    {
+        return $this->agility;
+    }
+
+    public function setAgility(int $agility): self
+    {
+        $this->agility = $agility;
+        return $this;
+    }
+    public function getStamina(): int
+    {
+        return $this->stamina;
+    }
+
+    public function setStamina(int $stamina): self
+    {
+        $this->stamina = $stamina;
         return $this;
     }
 
