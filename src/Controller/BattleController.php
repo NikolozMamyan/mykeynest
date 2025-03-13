@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Character;
 use App\Service\BattleService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -13,28 +16,34 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class BattleController extends AbstractController
 {
     #[Route('/init', name: 'battle_init')]
-    public function init(SessionInterface $session): Response
+    public function init(EntityManagerInterface $entityManager, SessionInterface $session , RequestStack $requestStack): Response
     {
-        // On initialise les caractéristiques des personnages en session
+        $char1 = $entityManager->getRepository(Character::class)->find(13);
+        $char2 = $entityManager->getRepository(Character::class)->find(15);
+
+        if (!$char1 || !$char2) {
+            throw $this->createNotFoundException('Personnage(s) introuvable(s).');
+        }
         $battleState = [
             'char1' => [
-                'name'     => 'Boxeur',
-                'hp'       => 100,
-                'strength' => 6,  
-                'defense'  => 5,
+                'name'     => $char1->getName(),
+                'hp'       => $char1->getHp(),
+                'strength' => $char1->getStrength(),
+                'defense'  => $char1->getDefense(),
             ],
             'char2' => [
-                'name'     => 'Karateka',
-                'hp'       => 100,
-                'strength' => 7,  
-                'defense'  => 3,
+                'name'     => $char2->getName(),
+                'hp'       => $char2->getHp(),
+                'strength' => $char2->getStrength(),
+                'defense'  => $char2->getDefense(),
             ],
             'logs'   => [],
             'isOver' => false,
             'turn'   => 'char1', // Premier attaquant
         ];
 
-        // On stocke l'état du combat en session
+        // Stockage de l'état du combat en session
+        $session = $requestStack->getSession();
         $session->set('battle_state', $battleState);
 
         return $this->render('battle/fight.html.twig', [

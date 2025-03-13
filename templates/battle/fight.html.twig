@@ -1,187 +1,900 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Combat RPG{% endblock %}
+{% block title %}Pixel Combat RPG{% endblock %}
 
 {% block body %}
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+    :root {
+        --primary-color: #ff7f50;
+        --secondary-color: #4169e1;
+        --dark-color: #2a2a2a;
+        --light-color: #f0f0f0;
+        --health-color: #32cd32;
+        --damage-color: #ff4757;
+        --pixel-border: 4px;
+    }
+
     body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background: #fafafa;
-        color: #333;
+        font-family: 'VT323', monospace;
+        margin: 0;
+        padding: 0;
+        background-color: #121212;
+        color: #fff;
+        background-image: 
+            linear-gradient(rgba(18, 18, 18, 0.9), rgba(18, 18, 18, 0.9)),
+            url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVQImWNgYGD4z4AE/gMADwMB/414xEUAAAAASUVORK5CYII=');
+        background-repeat: repeat;
+        min-height: 100vh;
+        font-size: 20px;
+        line-height: 1.4;
+    }
+
+    .pixel-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
     }
 
     h1 {
+        font-family: 'Press Start 2P', cursive;
         text-align: center;
-    }
-
-    /* Cartes des personnages */
-    .character-card {
-        display: inline-block;
-        width: 200px;
-        height: 200px;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        margin: 10px;
-        background-color: #fff;
+        margin: 30px 0;
+        font-size: 2.2rem;
+        color: var(--primary-color);
+        text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+        letter-spacing: 2px;
         position: relative;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    .character-name {
-        text-align: center;
-        font-weight: bold;
-        margin-top: 10px;
-        font-size: 1.1em;
+    .pixel-border {
+        position: relative;
+        border: var(--pixel-border) solid #000;
+        box-shadow: 
+            0 0 0 2px rgba(255, 255, 255, 0.2),
+            inset 0 0 0 2px rgba(255, 255, 255, 0.2);
     }
 
-    /* Barre de vie */
-    .health-bar-container {
-        width: 80%;
-        margin: 10px auto;
-        background-color: #eee;
-        height: 20px;
-        border-radius: 10px;
+    .pixel-border::before {
+        content: '';
+        position: absolute;
+        background-color: transparent;
+        left: calc(-1 * var(--pixel-border));
+        top: calc(-1 * var(--pixel-border));
+        width: calc(100% + 2 * var(--pixel-border));
+        height: calc(100% + 2 * var(--pixel-border));
+        z-index: -1;
+    }
+
+    .battle-screen {
+        position: relative;
+        background: linear-gradient(to bottom, #333, #111);
+        padding: 30px;
+        border-radius: 2px;
+        margin-bottom: 30px;
         overflow: hidden;
     }
 
-    .health-bar {
+    /* Background grid pattern */
+    .battle-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
         height: 100%;
-        background-color: #e74c3c; /* Rouge */
-        text-align: center;
-        color: #fff;
-        font-weight: bold;
-        line-height: 20px;
-        transition: width 0.5s ease;
+        background-image: 
+            linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        pointer-events: none;
+        z-index: 0;
     }
 
-    /* Effet popup de dégâts */
-    .damage-popup {
+    .battle-arena {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        margin: 20px 0 40px;
+    }
+
+    /* VS symbol */
+    .battle-arena::after {
+        content: 'VS';
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: #e74c3c;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.5rem;
         color: #fff;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: bold;
-        animation: damageAnim 1s forwards;
+        text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+        padding: 10px;
+        width: 70px;
+        height: 70px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 20px rgba(255, 127, 80, 0.5);
+        animation: pulse 2s infinite;
     }
 
-    @keyframes damageAnim {
+    @keyframes pulse {
+        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    /* Character Cards */
+    .character-panel {
+        width: 280px;
+        background-color: rgba(0, 0, 0, 0.7);
+        position: relative;
+        transition: all 0.3s ease;
+        padding: 15px;
+    }
+
+    .character-panel.pixel-border {
+        border-width: 6px;
+        position: relative;
+    }
+
+    .char-1 {
+        border-color: var(--primary-color);
+    }
+
+    .char-2 {
+        border-color: var(--secondary-color);
+    }
+
+    .character-sprite {
+        height: 150px;
+        width: 150px;
+        margin: 0 auto 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .character-sprite::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+        pointer-events: none;
+    }
+
+    .sprite-placeholder {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 3rem;
+        color: #fff;
+        text-shadow: 3px 3px 0 #000;
+        padding: 15px;
+    }
+
+    .character-info {
+        text-align: center;
+    }
+
+    .character-name {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 0 #000;
+        color: #fff;
+    }
+
+    .char-1 .character-name {
+        color: var(--primary-color);
+    }
+
+    .char-2 .character-name {
+        color: var(--secondary-color);
+    }
+
+    /* Health Bars */
+    .health-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        color: #999;
+    }
+
+    .health-bar-container {
+        width: 100%;
+        height: 24px;
+        background-color: #000;
+        border: 2px solid #333;
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .health-bar {
+        height: 100%;
+        background-color: var(--health-color);
+        transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+        position: relative;
+    }
+
+    .health-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 5px,
+            rgba(0, 0, 0, 0.1) 5px,
+            rgba(0, 0, 0, 0.1) 10px
+        );
+    }
+
+    .health-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.7rem;
+        text-shadow: 1px 1px 0 #000;
+        white-space: nowrap;
+    }
+
+    /* Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .stat-box {
+        background-color: rgba(0, 0, 0, 0.5);
+        border: 2px solid #333;
+        padding: 5px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: bold;
+        font-family: 'Press Start 2P', cursive;
+        color: #fff;
+    }
+
+    .stat-name {
+        font-size: 0.8rem;
+        color: #999;
+        text-transform: uppercase;
+    }
+
+    /* Damage Effect */
+    .damage-effect {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: 'Press Start 2P', cursive;
+        color: var(--damage-color);
+        font-size: 1.8rem;
+        text-shadow: 2px 2px 0 #000;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .damage-anim {
+        animation: damageFloat 1.5s forwards;
+    }
+
+    @keyframes damageFloat {
         0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        10% {
             opacity: 1;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+        30% {
+            transform: translate(-50%, -50%) scale(1);
         }
         100% {
             opacity: 0;
-            transform: translate(-50%, -150%);
+            transform: translate(-50%, -180%) scale(0.8);
         }
     }
 
-    /* Zone des logs */
-    #logs {
-        margin-top: 20px;
-        max-width: 600px;
-        margin: 20px auto;
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
+    .hit-effect {
+        animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
     }
-    #logs p {
-        margin: 5px 0;
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-10px); }
+        40%, 80% { transform: translateX(10px); }
+    }
+
+    /* Battle Log */
+    .battle-log {
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        margin-top: 30px;
+        max-height: 250px;
+    }
+
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 15px;
+    }
+
+    .log-title {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1rem;
+        color: #fff;
+    }
+
+    .turn-counter {
+        background-color: rgba(0, 0, 0, 0.5);
+        border: 2px solid #333;
+        padding: 5px 10px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.7rem;
+        color: #fff;
+    }
+
+    .log-messages {
+        max-height: 180px;
+        overflow-y: auto;
+        font-size: 1.1rem;
+        padding-right: 5px;
+    }
+
+    .log-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .log-messages::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .log-messages::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(0, 0, 0, 0.3);
+    }
+
+    .log-message {
+        padding: 8px 5px;
+        border-left: 3px solid #333;
+        margin-bottom: 8px;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .log-player1 {
+        border-left-color: var(--primary-color);
+    }
+
+    .log-player2 {
+        border-left-color: var(--secondary-color);
+    }
+
+    .log-system {
+        border-left-color: #fff;
+        color: #ccc;
+    }
+
+    .log-critical {
+        border-left-color: var(--damage-color);
+        color: var(--damage-color);
+        font-weight: bold;
+    }
+
+    /* Combat Controls */
+    .battle-controls {
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+        gap: 15px;
+    }
+
+    .pixel-button {
+        background-color: #000;
+        border: none;
+        color: #fff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.8rem;
+        padding: 10px 20px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.1s;
+        text-transform: uppercase;
+        min-width: 150px;
+    }
+
+    .pixel-button::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: transparent;
+        border: 4px solid #fff;
+        box-sizing: border-box;
+        transition: all 0.1s;
+    }
+
+    .pixel-button:hover::before {
+        transform: translate(-4px, -4px);
+    }
+
+    .pixel-button:active {
+        transform: translate(2px, 2px);
+    }
+
+    .btn-start {
+        background-color: var(--primary-color);
+    }
+
+    .btn-pause {
+        background-color: var(--secondary-color);
+    }
+
+    /* Active turn indicator */
+    .active-turn {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ffd700;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.6rem;
+        color: #000;
+        padding: 5px 10px;
+        border: 2px solid #000;
+        display: none;
+    }
+
+    /* Game over message */
+    .game-over {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border: 6px solid #ffd700;
+        z-index: 100;
+        display: none;
+        text-align: center;
+        min-width: 300px;
+    }
+
+    .game-over-title {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.5rem;
+        color: #ffd700;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+
+    .winner-name {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2rem;
+        color: #fff;
+        margin-bottom: 20px;
+    }
+
+    /* Scanlines effect */
+    .scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.025) 50%,
+            rgba(0, 0, 0, 0.025)
+        );
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 999;
+        opacity: 0.2;
+    }
+
+    /* Floating pixels effect */
+    .pixel-dust {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background-color: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+        animation: float 10s linear infinite;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.8;
+        }
+        90% {
+            opacity: 0.8;
+        }
+        100% {
+            transform: translateY(-100vh) translateX(50px);
+            opacity: 0;
+        }
     }
 </style>
 
-<h1>Combat RPG</h1>
+<div class="scanlines"></div>
 
-<!-- Affichage des personnages -->
-<div class="character-card">
-    <div class="character-name">{{ battleState.char1.name }}</div>
-    <div class="health-bar-container">
-        {% set ratioChar1 = (battleState.char1.hp / 100) * 100 %}
-        <div class="health-bar" id="health-bar-char1" style="width: {{ ratioChar1 }}%;">
-            <span id="hp-char1">{{ battleState.char1.hp }}</span> / 100
+<div class="pixel-container">
+    <h1>PIXEL COMBAT RPG</h1>
+
+    <div class="battle-screen pixel-border">
+        <div class="battle-grid"></div>
+        
+        <!-- Pixel dust animation -->
+        <div id="pixel-dust-container"></div>
+
+        <!-- Game over message -->
+        <div class="game-over" id="game-over">
+            <div class="game-over-title">Game Over</div>
+            <div class="winner-name" id="winner-name">Player 1 Wins!</div>
+        </div>
+
+        <div class="battle-arena">
+            <!-- Character 1 -->
+            <div class="character-panel pixel-border char-1" id="char1-panel">
+                <div class="active-turn" id="turn-char1">TOUR</div>
+                <div class="character-sprite pixel-border">
+                    <div class="sprite-placeholder">{{ battleState.char1.name|slice(0, 1) }}</div>
+                </div>
+                <div class="character-info">
+                    <div class="character-name">{{ battleState.char1.name }}</div>
+                    <div class="health-label">
+                        <span>HP</span>
+                        <span id="hp-char1-text">{{ battleState.char1.hp }}/100</span>
+                    </div>
+                    <div class="health-bar-container">
+                        {% set ratioChar1 = (battleState.char1.hp / 100) * 100 %}
+                        <div class="health-bar" id="health-bar-char1" style="width: {{ ratioChar1 }}%;">
+                            <div class="health-text">{{ battleState.char1.hp }}/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value">7</div>
+                            <div class="stat-name">ATK</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">5</div>
+                            <div class="stat-name">SPD</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">8</div>
+                            <div class="stat-name">DEF</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="damage-effect" id="damage-char1">-10</div>
+            </div>
+
+            <!-- Character 2 -->
+            <div class="character-panel pixel-border char-2" id="char2-panel">
+                <div class="active-turn" id="turn-char2">TOUR</div>
+                <div class="character-sprite pixel-border">
+                    <div class="sprite-placeholder">{{ battleState.char2.name|slice(0, 1) }}</div>
+                </div>
+                <div class="character-info">
+                    <div class="character-name">{{ battleState.char2.name }}</div>
+                    <div class="health-label">
+                        <span>HP</span>
+                        <span id="hp-char2-text">{{ battleState.char2.hp }}/100</span>
+                    </div>
+                    <div class="health-bar-container">
+                        {% set ratioChar2 = (battleState.char2.hp / 100) * 100 %}
+                        <div class="health-bar" id="health-bar-char2" style="width: {{ ratioChar2 }}%;">
+                            <div class="health-text">{{ battleState.char2.hp }}/100</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value">9</div>
+                            <div class="stat-name">ATK</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">4</div>
+                            <div class="stat-name">SPD</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">6</div>
+                            <div class="stat-name">DEF</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="damage-effect" id="damage-char2">-10</div>
+            </div>
+        </div>
+
+        <div class="battle-controls">
+            <button class="pixel-button btn-start" id="btn-start">START</button>
+            <button class="pixel-button btn-pause" id="btn-pause" style="display: none;">PAUSE</button>
         </div>
     </div>
-    <div class="damage-popup" id="damage-popup-char1" style="display: none;"></div>
-</div>
 
-<div class="character-card">
-    <div class="character-name">{{ battleState.char2.name }}</div>
-    <div class="health-bar-container">
-        {% set ratioChar2 = (battleState.char2.hp / 100) * 100 %}
-        <div class="health-bar" id="health-bar-char2" style="width: {{ ratioChar2 }}%;">
-            <span id="hp-char2">{{ battleState.char2.hp }}</span> / 100
+    <div class="battle-log pixel-border">
+        <div class="log-header">
+            <div class="log-title">COMBAT LOG</div>
+            <div class="turn-counter" id="turn-counter">TURN 1</div>
+        </div>
+        <div class="log-messages" id="log-messages">
+            {% for log in battleState.logs %}
+                <div class="log-message log-system">{{ log }}</div>
+            {% endfor %}
         </div>
     </div>
-    <div class="damage-popup" id="damage-popup-char2" style="display: none;"></div>
-</div>
-
-<hr>
-
-<!-- Zone des logs -->
-<div id="logs">
-    <h3>Historique du combat :</h3>
-    {% for log in battleState.logs %}
-        <p>{{ log }}</p>
-    {% endfor %}
 </div>
 
 <script>
+    // Configuration
+    let battleInterval;
+    let isPaused = false;
+    let turnCount = 1;
+    let isGameOver = false;
+    
+    // Créer des particules de pixel pour l'effet visuel
+    function createPixelDust() {
+        const container = document.getElementById('pixel-dust-container');
+        for (let i = 0; i < 15; i++) {
+            const pixelDust = document.createElement('div');
+            pixelDust.classList.add('pixel-dust');
+            pixelDust.style.left = Math.random() * 100 + '%';
+            pixelDust.style.top = Math.random() * 100 + '%';
+            pixelDust.style.animationDelay = Math.random() * 5 + 's';
+            pixelDust.style.animationDuration = Math.random() * 10 + 5 + 's';
+            container.appendChild(pixelDust);
+        }
+    }
+
+    // Fonction pour déterminer la classe de message de log
+    function getLogClass(message) {
+        if (message.includes('CRITIQUE') || message.includes('critique') || message.includes('Critique')) {
+            return 'log-critical';
+        } else if (message.includes('Round') || message.includes('tour') || message.includes('commence')) {
+            return 'log-system';
+        } else if (message.includes(document.querySelector('#char1-panel .character-name').textContent)) {
+            return 'log-player1';
+        } else {
+            return 'log-player2';
+        }
+    }
+
+    // Mettre à jour l'interface utilisateur
     function updateUI(data) {
-    // Mise à jour des HP et des barres de vie
-    document.getElementById("hp-char1").textContent = data.battleState.char1.hp;
-    document.getElementById("hp-char2").textContent = data.battleState.char2.hp;
-    document.getElementById("health-bar-char1").style.width = (data.battleState.char1.hp / 100) * 100 + "%";
-    document.getElementById("health-bar-char2").style.width = (data.battleState.char2.hp / 100) * 100 + "%";
-
-    // Affichage du dernier log
-    if (data.battleState.logs.length > 0) {
-        let lastLog = data.battleState.logs[data.battleState.logs.length - 1];
-        document.getElementById("logs").innerHTML += `<p>${lastLog}</p>`;
-    }
-
-    // Détermination du défenseur pour afficher les dégâts
-    let damagePopup;
-    if (data.lastAttacker === 'char1') {
-        damagePopup = document.getElementById("damage-popup-char2"); // char1 a attaqué char2
-    } else {
-        damagePopup = document.getElementById("damage-popup-char1"); // char2 a attaqué char1
-    }
-
-    // Vérification pour éviter un affichage de "undefined"
-    if (typeof data.damage !== 'undefined') {
-        damagePopup.textContent = "- " + data.damage;
-        damagePopup.style.display = "block";
-        setTimeout(() => { damagePopup.style.display = "none"; }, 1000);
-    }
-}
-
-function autoAttack() {
-    fetch('{{ path("battle_tick") }}')
-        .then(response => response.json())
-        .then(data => {
-            console.log("Réponse du serveur:", data);
-            updateUI(data);
-
-            // Si le combat n'est pas terminé, continuer
-            if (!data.battleState.isOver) {
-                setTimeout(autoAttack, 1000);
+        // Mise à jour des HP et des barres de vie
+        const char1HP = data.battleState.char1.hp;
+        const char2HP = data.battleState.char2.hp;
+        
+        document.getElementById('hp-char1-text').textContent = char1HP + '/100';
+        document.getElementById('hp-char2-text').textContent = char2HP + '/100';
+        
+        document.querySelector('#health-bar-char1 .health-text').textContent = char1HP + '/100';
+        document.querySelector('#health-bar-char2 .health-text').textContent = char2HP + '/100';
+        
+        const hp1Ratio = (char1HP / 100) * 100;
+        const hp2Ratio = (char2HP / 100) * 100;
+        
+        document.getElementById('health-bar-char1').style.width = hp1Ratio + '%';
+        document.getElementById('health-bar-char2').style.width = hp2Ratio + '%';
+        
+        // Changer les couleurs des barres de santé en fonction du niveau
+        function updateHealthBarColor(bar, ratio) {
+            if (ratio < 20) {
+                bar.style.backgroundColor = '#ff0000'; // Rouge vif
+            } else if (ratio < 50) {
+                bar.style.backgroundColor = '#ff8c00'; // Orange
             } else {
-                alert("Combat terminé !");
+                bar.style.backgroundColor = '#32cd32'; // Vert
             }
-        })
-        .catch(error => console.error(error));
-}
+        }
+        
+        updateHealthBarColor(document.getElementById('health-bar-char1'), hp1Ratio);
+        updateHealthBarColor(document.getElementById('health-bar-char2'), hp2Ratio);
 
-// Lancer l'auto-attaque au chargement
-window.onload = function() {
-    setTimeout(autoAttack, 1000);
-};
+        // Affichage des nouveaux logs
+        if (data.battleState.logs.length > 0) {
+            const lastLog = data.battleState.logs[data.battleState.logs.length - 1];
+            const logEl = document.createElement('div');
+            logEl.classList.add('log-message');
+            logEl.classList.add(getLogClass(lastLog));
+            logEl.textContent = lastLog;
+            
+            document.getElementById('log-messages').appendChild(logEl);
+            document.getElementById('log-messages').scrollTop = document.getElementById('log-messages').scrollHeight;
+            
+            // Mise à jour du compteur de tours
+            if (lastLog.includes('Round') || lastLog.includes('tour')) {
+                turnCount++;
+                document.getElementById('turn-counter').textContent = 'TURN ' + turnCount;
+            }
+        }
 
+        // Animation de dégâts et effet de hit
+        if (data.lastAttacker && data.damage > 0) {
+            let targetPanel, damageEffect;
+            
+            if (data.lastAttacker === 'char1') {
+                targetPanel = document.getElementById('char2-panel');
+                damageEffect = document.getElementById('damage-char2');
+                
+                // Indiquer le tour actif
+                document.getElementById('turn-char1').style.display = 'none';
+                document.getElementById('turn-char2').style.display = 'block';
+            } else {
+                targetPanel = document.getElementById('char1-panel');
+                damageEffect = document.getElementById('damage-char1');
+                
+                // Indiquer le tour actif
+                document.getElementById('turn-char1').style.display = 'block';
+                document.getElementById('turn-char2').style.display = 'none';
+            }
+            
+            // Effet de hit sur le personnage
+            targetPanel.classList.add('hit-effect');
+            setTimeout(() => { targetPanel.classList.remove('hit-effect'); }, 400);
+            
+            // Animation de dégâts
+            damageEffect.textContent = '-' + data.damage;
+            damageEffect.classList.remove('damage-anim');
+            void damageEffect.offsetWidth; // Force reflow pour réinitialiser l'animation
+            damageEffect.classList.add('damage-anim');
+        }
+
+        // Vérifier si le combat est terminé
+        if (data.battleState.isOver && !isGameOver) {
+            isGameOver = true;
+            clearInterval(battleInterval);
+            
+            // Déterminer le vainqueur
+            const winner = char1HP <= 0 ? battleState.char2.name : battleState.char1.name;
+            document.getElementById('winner-name').textContent = winner + ' Wins!';
+            document.getElementById('game-over').style.display = 'block';
+            
+            // Changer les boutons
+            document.getElementById('btn-pause').style.display = 'none';
+            document.getElementById('btn-start').textContent = 'RESTART';
+            document.getElementById('btn-start').style.display = 'inline-block';
+        }
+    }
+
+    // Fonction pour l'attaque automatique
+    function autoAttack() {
+        if (isPaused || isGameOver) return;
+        
+        fetch('{{ path("battle_tick") }}')
+            .then(response => response.json())
+            .then(data => {
+                updateUI(data);
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'attaque:', error);
+            });
+    }
+
+    // Gérer le démarrage et la pause du combat
+    function toggleBattle() {
+        const startBtn = document.getElementById('btn-start');
+        const pauseBtn = document.getElementById('btn-pause');
+        
+        if (startBtn.textContent === 'RESTART') {
+            // Redémarrer le combat
+            window.location.reload();
+            return;
+        }
+        
+        if (isPaused || !battleInterval) {
+            // Démarrer le combat
+            isPaused = false;
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+            
+            // Cacher le message de fin de combat s'il était affiché
+            document.getElementById('game-over').style.display = 'none';
+            
+            // Activer les attaques automatiques
+            autoAttack(); // Première attaque immédiate
+            battleInterval = setInterval(autoAttack, 1500); // Puis toutes les 1.5 secondes
+            
+            // Afficher l'indicateur de tour initial
+            document.getElementById('turn-char1').style.display = 'block';
+        }
+    }
+
+function togglePause() {
+        const pauseBtn = document.getElementById('btn-pause');
+        
+        if (isPaused) {
+            // Reprendre le combat
+            isPaused = false;
+            pauseBtn.textContent = 'PAUSE';
+            autoAttack(); // Relancer immédiatement
+        } else {
+            // Mettre en pause
+            isPaused = true;
+            pauseBtn.textContent = 'RESUME';
+        }
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        createPixelDust();
+        
+        // Configuration des boutons
+        document.getElementById('btn-start').addEventListener('click', toggleBattle);
+        document.getElementById('btn-pause').addEventListener('click', togglePause);
+        
+        // Variables pour accéder plus facilement aux données du jeu
+        window.battleState = {
+            char1: {
+                name: '{{ battleState.char1.name }}',
+                hp: {{ battleState.char1.hp }}
+            },
+            char2: {
+                name: '{{ battleState.char2.name }}',
+                hp: {{ battleState.char2.hp }}
+            }
+        };
+        
+        // Pré-initialiser les tours
+        if (!document.querySelector('.log-message')) {
+            // S'il n'y a pas encore de logs, ajouter un message initial
+            const initialLog = document.createElement('div');
+            initialLog.classList.add('log-message', 'log-system');
+            initialLog.textContent = 'Le combat va commencer. Appuyez sur START!';
+            document.getElementById('log-messages').appendChild(initialLog);
+        }
+        
+        // Effet CRT aléatoire
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                document.querySelector('.scanlines').style.opacity = Math.random() * 0.5;
+                setTimeout(() => {
+                    document.querySelector('.scanlines').style.opacity = 0.2;
+                }, 100);
+            }
+        }, 2000);
+    });
 </script>
-
 {% endblock %}
