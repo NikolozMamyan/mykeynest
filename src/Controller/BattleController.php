@@ -54,9 +54,12 @@ final class BattleController extends AbstractController
     #[Route('/tick', name: 'battle_tick')]
     public function tick(SessionInterface $session, BattleService $battleService): JsonResponse
     {
+        // Ajout d'un délai de 1.5 seconde
+        usleep(1500000); 
+    
         // 1) Récupération du state depuis la session
         $battleState = $session->get('battle_state');
-
+    
         // 2) Vérification
         if (!$battleState) {
             return new JsonResponse(['error' => 'No battle in progress'], 400);
@@ -64,17 +67,17 @@ final class BattleController extends AbstractController
         if ($battleState['isOver']) {
             return new JsonResponse($battleState);
         }
-
+    
         // 3) Détermination de l'attaquant et du défenseur
         $attackerKey = $battleState['turn'];
         $defenderKey = ($attackerKey === 'char1') ? 'char2' : 'char1';
-
+    
         // 4) Exécuter l’attaque via BattleService
         $result = $battleService->attack($battleState[$attackerKey], $battleState[$defenderKey]);
-
+    
         // 5) Enregistrement du log
         $battleState['logs'][] = $result['log'];
-
+    
         // 6) Vérification KO
         if ($result['isKo']) {
             $battleState['isOver'] = true;
@@ -82,10 +85,10 @@ final class BattleController extends AbstractController
             // 7) Passer le tour au prochain
             $battleState['turn'] = $defenderKey;
         }
-
+    
         // 8) Sauvegarde de l’état en session
         $session->set('battle_state', $battleState);
-
+    
         // 9) On renvoie l'état mis à jour
         return new JsonResponse([
             'battleState' => $battleState,
@@ -93,4 +96,5 @@ final class BattleController extends AbstractController
             'lastAttacker' => $attackerKey
         ]);
     }
+    
 }
