@@ -58,17 +58,21 @@
                         </div>
                     </div>
                     
-                    <div class="stats-grid">
+                     <div class="stats-grid">
                         <div class="stat-box">
-                            <div class="stat-value">7</div>
+                            <div class="stat-value">{{ battleState.char1.strength }}</div>
                             <div class="stat-name">ATK</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value">5</div>
+                            <div class="stat-value">{{ battleState.char1.speed }}</div>
                             <div class="stat-name">SPD</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value">8</div>
+                            <div class="stat-value">{{ battleState.char1.agility }}</div>
+                            <div class="stat-name">AGY</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">{{ battleState.char1.defense }}</div>
                             <div class="stat-name">DEF</div>
                         </div>
                     </div>
@@ -111,15 +115,19 @@
 
                     <div class="stats-grid">
                         <div class="stat-box">
-                            <div class="stat-value">9</div>
+                            <div class="stat-value">{{ battleState.char2.strength }}</div>
                             <div class="stat-name">ATK</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value">4</div>
+                            <div class="stat-value">{{ battleState.char2.speed }}</div>
                             <div class="stat-name">SPD</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value">6</div>
+                            <div class="stat-value">{{ battleState.char2.agility }}</div>
+                            <div class="stat-name">AGY</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">{{ battleState.char2.defense }}</div>
                             <div class="stat-name">DEF</div>
                         </div>
                     </div>

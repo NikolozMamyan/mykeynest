@@ -112,6 +112,30 @@ export default class extends Controller {
             staminaBarChar2.style.width = `${(char2Stamina / 100) * 100}%`;
             this.updateStaminaBarColor(staminaBarChar2, char2Stamina);
         }
+        // Animation de dégâts et effet de hit
+if (data.lastAttacker && data.damage > 0) {
+    let targetPanel, damageEffect;
+    if (data.lastAttacker === "char1") {
+        targetPanel = document.getElementById("char2-panel");
+        damageEffect = document.getElementById("damage-char2");
+        document.getElementById("turn-char1").style.display = "none";
+        document.getElementById("turn-char2").style.display = "block";
+    } else {
+        targetPanel = document.getElementById("char1-panel");
+        damageEffect = document.getElementById("damage-char1");
+        document.getElementById("turn-char1").style.display = "block";
+        document.getElementById("turn-char2").style.display = "none";
+    }
+    targetPanel.classList.add("hit-effect");
+    setTimeout(() => {
+        targetPanel.classList.remove("hit-effect");
+    }, 400);
+    damageEffect.textContent = `-${data.damage}`;
+    damageEffect.classList.remove("damage-anim");
+    void damageEffect.offsetWidth;
+    damageEffect.classList.add("damage-anim");
+}
+
 
         // Logs de combat
         if (data.battleState.logs.length > 0) {
