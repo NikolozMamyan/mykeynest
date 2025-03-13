@@ -1,0 +1,187 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Combat RPG{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #fafafa;
+        color: #333;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    /* Cartes des personnages */
+    .character-card {
+        display: inline-block;
+        width: 200px;
+        height: 200px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        margin: 10px;
+        background-color: #fff;
+        position: relative;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .character-name {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 10px;
+        font-size: 1.1em;
+    }
+
+    /* Barre de vie */
+    .health-bar-container {
+        width: 80%;
+        margin: 10px auto;
+        background-color: #eee;
+        height: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .health-bar {
+        height: 100%;
+        background-color: #e74c3c; /* Rouge */
+        text-align: center;
+        color: #fff;
+        font-weight: bold;
+        line-height: 20px;
+        transition: width 0.5s ease;
+    }
+
+    /* Effet popup de dégâts */
+    .damage-popup {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #e74c3c;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        animation: damageAnim 1s forwards;
+    }
+
+    @keyframes damageAnim {
+        0% {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(-50%, -150%);
+        }
+    }
+
+    /* Zone des logs */
+    #logs {
+        margin-top: 20px;
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+    #logs p {
+        margin: 5px 0;
+    }
+</style>
+
+<h1>Combat RPG</h1>
+
+<!-- Affichage des personnages -->
+<div class="character-card">
+    <div class="character-name">{{ battleState.char1.name }}</div>
+    <div class="health-bar-container">
+        {% set ratioChar1 = (battleState.char1.hp / 100) * 100 %}
+        <div class="health-bar" id="health-bar-char1" style="width: {{ ratioChar1 }}%;">
+            <span id="hp-char1">{{ battleState.char1.hp }}</span> / 100
+        </div>
+    </div>
+    <div class="damage-popup" id="damage-popup-char1" style="display: none;"></div>
+</div>
+
+<div class="character-card">
+    <div class="character-name">{{ battleState.char2.name }}</div>
+    <div class="health-bar-container">
+        {% set ratioChar2 = (battleState.char2.hp / 100) * 100 %}
+        <div class="health-bar" id="health-bar-char2" style="width: {{ ratioChar2 }}%;">
+            <span id="hp-char2">{{ battleState.char2.hp }}</span> / 100
+        </div>
+    </div>
+    <div class="damage-popup" id="damage-popup-char2" style="display: none;"></div>
+</div>
+
+<hr>
+
+<!-- Zone des logs -->
+<div id="logs">
+    <h3>Historique du combat :</h3>
+    {% for log in battleState.logs %}
+        <p>{{ log }}</p>
+    {% endfor %}
+</div>
+
+<script>
+    function updateUI(data) {
+    // Mise à jour des HP et des barres de vie
+    document.getElementById("hp-char1").textContent = data.battleState.char1.hp;
+    document.getElementById("hp-char2").textContent = data.battleState.char2.hp;
+    document.getElementById("health-bar-char1").style.width = (data.battleState.char1.hp / 100) * 100 + "%";
+    document.getElementById("health-bar-char2").style.width = (data.battleState.char2.hp / 100) * 100 + "%";
+
+    // Affichage du dernier log
+    if (data.battleState.logs.length > 0) {
+        let lastLog = data.battleState.logs[data.battleState.logs.length - 1];
+        document.getElementById("logs").innerHTML += `<p>${lastLog}</p>`;
+    }
+
+    // Détermination du défenseur pour afficher les dégâts
+    let damagePopup;
+    if (data.lastAttacker === 'char1') {
+        damagePopup = document.getElementById("damage-popup-char2"); // char1 a attaqué char2
+    } else {
+        damagePopup = document.getElementById("damage-popup-char1"); // char2 a attaqué char1
+    }
+
+    // Vérification pour éviter un affichage de "undefined"
+    if (typeof data.damage !== 'undefined') {
+        damagePopup.textContent = "- " + data.damage;
+        damagePopup.style.display = "block";
+        setTimeout(() => { damagePopup.style.display = "none"; }, 1000);
+    }
+}
+
+function autoAttack() {
+    fetch('{{ path("battle_tick") }}')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Réponse du serveur:", data);
+            updateUI(data);
+
+            // Si le combat n'est pas terminé, continuer
+            if (!data.battleState.isOver) {
+                setTimeout(autoAttack, 1000);
+            } else {
+                alert("Combat terminé !");
+            }
+        })
+        .catch(error => console.error(error));
+}
+
+// Lancer l'auto-attaque au chargement
+window.onload = function() {
+    setTimeout(autoAttack, 1000);
+};
+
+</script>
+
+{% endblock %}

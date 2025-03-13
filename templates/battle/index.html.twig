@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello BattleController!{% endblock %}
+
+{% block body %}
+<style>
+        .characters-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+        }
+        .character-box {
+            border: 2px solid #ccc;
+            padding: 1rem;
+            width: 200px;
+            text-align: center;
+        }
+        .battle-logs {
+            border-top: 2px solid #ccc;
+            padding-top: 1rem;
+        }
+        .battle-log-entry {
+            margin: 0.3rem 0;
+        }
+</style>
+
+   <h1>Combat : {{ character1.name }} vs {{ character2.name }}</h1>
+
+    <div class="characters-container">
+        <div class="character-box">
+            <h2>{{ character1.name }}</h2>
+            <p>HP : {{ character1.hp }}</p>
+            {# 
+              Si on avait d'autres stats (force, défense...), on pourrait les afficher ici 
+            #}
+        </div>
+        <div class="character-box">
+            <h2>{{ character2.name }}</h2>
+            <p>HP : {{ character2.hp }}</p>
+        </div>
+    </div>
+
+    <div class="battle-logs">
+        <h3>Historique des actions</h3>
+        {% if logs is not empty %}
+            {% for log in logs %}
+                <div class="battle-log-entry">
+                    {{ log }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Aucune action enregistrée pour le moment.</p>
+        {% endif %}
+    </div>
+{% endblock %}
