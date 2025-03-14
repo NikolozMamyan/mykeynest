@@ -181,22 +181,71 @@ if (data.lastAttacker && data.damage > 0) {
         this.isAttacking = false;
     }
 
-    autoAttack() {
-        if (this.isPaused || this.isGameOver || !this.isAttacking) return;
+// Ajouter cette méthode à ton battle_controller.js
+autoAttack() {
+    if (this.isPaused || this.isGameOver || !this.isAttacking) return;
 
-        fetch(this.battleUrlValue)
-            .then(response => response.json())
-            .then(data => {
-                console.log("🛠️ Données reçues :", data);
-                this.updateUI(data);
-            })
-            .catch(error => console.error("Erreur lors de l'attaque:", error))
-            .finally(() => {
-                if (this.isAttacking) {
-                    setTimeout(() => this.autoAttack(), 1500);
-                }
-            });
-    }
+    fetch(this.battleUrlValue)
+    .then(response => response.json())
+    .then(data => {
+        console.log("🛠️ Données reçues :", data);
+        this.updateUI(data);
+
+        // Vérifier si le round est en pause
+        if (data.pauseForInventory) {
+            this.pauseForInventory(data.battleState);
+        }
+
+        return data; // ✅ On retourne `data`
+    })
+    .catch(error => {
+        console.error("Erreur lors de l'attaque:", error);
+        return null; // ✅ Retourne `null` pour éviter l'erreur
+    })
+    .then(data => { // ✅ On utilise un `then()` pour récupérer `data` avant `finally()`
+        if (this.isAttacking && data && !data.pauseForInventory) {
+            setTimeout(() => this.autoAttack(), 1500);
+        }
+    });
+
+}
+
+pauseForInventory(battleState) {
+    console.log("Pause pour l'inventaire! ⏸️");
+    this.isPaused = true;
+    this.isAttacking = false;
+
+    // Créer un événement pour notifier le contrôleur d'inventaire
+    const pauseEvent = new CustomEvent("round-pause", {
+        detail: {
+            roundNumber: battleState.round.current,
+            battleState: battleState
+        }
+    });
+
+    console.log("📢 Dispatch de l'événement round-pause...");
+    document.dispatchEvent(pauseEvent);
+    console.log("✅ Événement round-pause dispatché !");
+}
+
+
+// Ajouter cette méthode pour redémarrer après la pause
+startNewRound(battleState) {
+    console.log("Démarrage du nouveau round!");
+    this.isPaused = false;
+    this.isAttacking = true;
+    this.updateUI({ battleState });
+    this.autoAttack();
+}
+
+// Ajouter cette méthode pour les logs
+addLogMessage(message) {
+    const logEl = document.createElement("div");
+    logEl.classList.add("log-message", this.getLogClass(message));
+    logEl.textContent = message;
+    document.getElementById("log-messages").appendChild(logEl);
+    document.getElementById("log-messages").scrollTop = document.getElementById("log-messages").scrollHeight;
+}
 
 
     toggleBattle() {

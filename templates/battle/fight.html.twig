@@ -10,138 +10,117 @@
      data-battle-battle-url-value="{{ path('battle_tick') }}"
      data-battle-char1-hp-value="{{ battleState.char1.hp }}"
      data-battle-char2-hp-value="{{ battleState.char2.hp }}">
+
     <h1>PIXEL COMBAT RPG</h1>
 
-     <div class="battle-screen pixel-border">
+    <div class="battle-screen pixel-border">
         <div class="battle-grid"></div>
         
-        <!-- Pixel dust animation -->
+        <!-- Animation de poussière pixelisée -->
         <div id="pixel-dust-container"></div>
 
-        <!-- Game over message -->
+        <!-- Message de fin de jeu -->
         <div class="game-over" id="game-over">
             <div class="game-over-title">Game Over</div>
             <div class="winner-name" id="winner-name">Player 1 Wins!</div>
         </div>
 
-        <div class="battle-arena">
-            <!-- Character 1 -->
-            <div class="character-panel pixel-border char-1" id="char1-panel">
-                <div class="active-turn" id="turn-char1">TOUR</div>
-                <div class="character-sprite pixel-border">
-                    <div class="sprite-placeholder">{{ battleState.char1.name|slice(0, 1) }}</div>
-                </div>
-                <div class="character-info">
-                    <div class="character-name">{{ battleState.char1.name }}</div>
-                    
-                    <!-- HP Bar -->
-                    <div class="health-label">
-                        <span>HP</span>
-                        <span id="hp-char1-text">{{ battleState.char1.hp }}/100</span>
-                    </div>
-                    <div class="health-bar-container">
-                        {% set ratioChar1Hp = (battleState.char1.hp / 100) * 100 %}
-                        <div class="health-bar" id="health-bar-char1" style="width: {{ ratioChar1Hp }}%;">
-                            <div class="health-text">{{ battleState.char1.hp }}/100</div>
-                        </div>
-                    </div>
+        <!-- Interface de pause entre les rounds -->
+        <div class="round-pause" id="round-pause" 
+             style="display: none"
+             data-controller="inventory"
+             data-inventory-battle-url-value="{{ path('battle_tick') }}"
+             data-inventory-inventory-url-value="{{ path('battle_inventory', { 'characterKey': battleState.char1.key }) }}"
+             data-inventory-equip-url-value="{{ path('battle_equip_perk', { 'characterKey': battleState.char1.key, 'slotId': 0, 'perkId': 0 }) }}"
+             data-inventory-ready-url-value="{{ path('battle_ready', { 'characterKey': battleState.char1.key }) }}"
+             data-inventory-character-key-value="{{ battleState.char1.key }}">
 
-                    <!-- Stamina Bar -->
-                    <div class="stamina-label">
-                        <span>Stamina</span>
-                        
-                    </div>
-                    <div class="stamina-bar-container">
-                        {% set ratioChar1Stamina = (battleState.char1.stamina / 100) * 100 %}
-                        <div class="stamina-bar" id="stamina-bar-char1" style="width: {{ ratioChar1Stamina }}%;">
-                            <span id="stamina-char1-text">{{ battleState.char1.stamina }}/100</span>
-                        </div>
-                    </div>
-                    
-                     <div class="stats-grid">
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char1.strength }}</div>
-                            <div class="stat-name">ATK</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char1.speed }}</div>
-                            <div class="stat-name">SPD</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char1.agility }}</div>
-                            <div class="stat-name">AGY</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char1.defense }}</div>
-                            <div class="stat-name">DEF</div>
-                        </div>
-                    </div>
+            <div class="round-pause-content pixel-border">
+                <h2 id="round-number" class="round-title">Round terminé</h2>
+                <p id="pause-instructions" class="pause-text">Équipez vos objets et préparez-vous pour le prochain round !</p>
+                
+                <div class="pause-buttons">
+                    <button id="btn-inventory" class="pixel-button">INVENTAIRE</button>
+                    <button id="btn-ready" class="pixel-button">PRÊT</button>
                 </div>
-                <div class="damage-effect" id="damage-char1">-10</div>
             </div>
-
-            <!-- Character 2 -->
-            <div class="character-panel pixel-border char-2" id="char2-panel">
-                <div class="active-turn" id="turn-char2">TOUR</div>
-                <div class="character-sprite pixel-border">
-                    <div class="sprite-placeholder">{{ battleState.char2.name|slice(0, 1) }}</div>
+            
+            <!-- Panneau d'inventaire -->
+            <div id="inventory-panel" class="inventory-panel pixel-border" style="display: none;">
+                <div class="inventory-header">
+                    <h3>INVENTAIRE</h3>
+                    <button id="btn-close-inventory" class="pixel-button small">X</button>
                 </div>
-                <div class="character-info">
-                    <div class="character-name">{{ battleState.char2.name }}</div>
-                    
-                    <!-- HP Bar -->
-                    <div class="health-label">
-                        <span>HP</span>
-                        <span id="hp-char2-text">{{ battleState.char2.hp }}/100</span>
+                <div class="inventory-content">
+                    <div class="inventory-section">
+                        <h4 class="section-title">Perks disponibles</h4>
+                        <div id="perks-list" class="perks-list"></div>
                     </div>
-                    <div class="health-bar-container">
-                        {% set ratioChar2Hp = (battleState.char2.hp / 100) * 100 %}
-                        <div class="health-bar" id="health-bar-char2" style="width: {{ ratioChar2Hp }}%;">
-                            <div class="health-text">{{ battleState.char2.hp }}/100</div>
-                        </div>
-                    </div>
-
-                    <!-- Stamina Bar -->
-                    <div class="stamina-label">
-                        <span>Stamina</span>
-                        
-                    </div>
-                    <div class="stamina-bar-container">
-                        {% set ratioChar2Stamina = (battleState.char2.stamina / 100) * 100 %}
-                        <div class="stamina-bar" id="stamina-bar-char2" style="width: {{ ratioChar2Stamina }}%;">
-                            <span id="stamina-char2-text">{{ battleState.char2.stamina }}/100</span>
-                        </div>
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char2.strength }}</div>
-                            <div class="stat-name">ATK</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char2.speed }}</div>
-                            <div class="stat-name">SPD</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char2.agility }}</div>
-                            <div class="stat-name">AGY</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">{{ battleState.char2.defense }}</div>
-                            <div class="stat-name">DEF</div>
-                        </div>
+                    <div class="inventory-section">
+                        <h4 class="section-title">Slots d'équipement</h4>
+                        <div id="perk-slots" class="perk-slots"></div>
                     </div>
                 </div>
-                <div class="damage-effect" id="damage-char2">-10</div>
             </div>
         </div>
 
-        <div class="battle-controls">
+        <!-- Arène de combat -->
+        <div class="battle-arena">
+            {% for charKey, char in {'char1': battleState.char1, 'char2': battleState.char2} %}
+                <div class="character-panel pixel-border {{ charKey }}" id="{{ charKey }}-panel">
+                    <div class="active-turn" id="turn-{{ charKey }}">TOUR</div>
+                    <div class="character-sprite pixel-border">
+                        <div class="sprite-placeholder">{{ char.name|slice(0, 1) }}</div>
+                    </div>
+                    <div class="character-info">
+                        <div class="character-name">{{ char.name }}</div>
+                        
+                        <!-- Barre de vie -->
+                        <div class="health-label">
+                            <span>HP</span>
+                            <span id="hp-{{ charKey }}-text">{{ char.hp }}/100</span>
+                        </div>
+                        <div class="health-bar-container">
+                            {% set hpRatio = (char.hp / 100) * 100 %}
+                            <div class="health-bar" id="health-bar-{{ charKey }}" style="width: {{ hpRatio }}%;">
+                                <div class="health-text">{{ char.hp }}/100</div>
+                            </div>
+                        </div>
+
+                        <!-- Barre de stamina -->
+                        <div class="stamina-label">
+                            <span>Stamina</span>
+                        </div>
+                        <div class="stamina-bar-container">
+                            {% set staminaRatio = (char.stamina / 100) * 100 %}
+                            <div class="stamina-bar" id="stamina-bar-{{ charKey }}" style="width: {{ staminaRatio }}%;">
+                                <span id="stamina-{{ charKey }}-text">{{ char.stamina }}/100</span>
+                            </div>
+                        </div>
+
+                        <!-- Statistiques -->
+                        <div class="stats-grid">
+                            {% for stat, value in {'strength': char.strength, 'speed': char.speed, 'agility': char.agility, 'defense': char.defense} %}
+                                <div class="stat-box">
+                                    <div class="stat-value">{{ value }}</div>
+                                    <div class="stat-name">{{ stat|upper }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="damage-effect" id="damage-{{ charKey }}">-10</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Contrôles de combat -->
+        <div class="battle-controls" id="battle-controls">
             <button class="pixel-button btn-start" id="btn-start">START</button>
             <button class="pixel-button btn-pause" id="btn-pause" style="display: none;">PAUSE</button>
         </div>
     </div>
 
+    <!-- Logs du combat -->
     <div class="battle-log pixel-border">
         <div class="log-header">
             <div class="log-title">COMBAT LOG</div>

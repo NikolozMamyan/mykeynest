@@ -500,3 +500,143 @@
     animation: float 10s linear infinite;
 }
 
+/*inventory test*/
+/* Styles pour l'interface de pause */
+.round-pause {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.round-pause-content {
+    background-color: #222;
+    padding: 20px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.round-title {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #ff6b6b;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.pause-text {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.pause-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Styles pour l'inventaire */
+.inventory-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 0;
+    z-index: 101;
+}
+
+.inventory-header {
+    background-color: #444;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inventory-header h3 {
+    margin: 0;
+    color: #7ff;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.inventory-content {
+    display: flex;
+    padding: 15px;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .inventory-content {
+        flex-direction: column;
+    }
+}
+
+.inventory-section {
+    flex: 1;
+}
+
+.section-title {
+    color: #ff6;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 0 #000;
+    text-align: center;
+}
+
+.perks-list, .perk-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.perk-item, .perk-slot {
+    background-color: #222;
+    padding: 8px;
+    border: 2px solid #444;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.perk-item:hover, .perk-slot:hover {
+    background-color: #333;
+    border-color: #666;
+}
+
+.perk-item.selected {
+    background-color: #253542;
+    border-color: #4c7ecf;
+}
+
+.perk-item h4, .perk-slot h4 {
+    margin: 0 0 5px 0;
+    color: #7ff;
+}
+
+.perk-item p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+.slot-content {
+    color: #aaa;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* Bouton small pour fermer l'inventaire */
+.pixel-button.small {
+    padding: 2px 8px;
+    font-size: 12px;
+}
