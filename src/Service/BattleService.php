@@ -30,91 +30,96 @@ class BattleService
     }
 
     public function attack(array &$attacker, array &$defender): array
-{
-    // ✅ S'assurer que `stamina` est bien défini
-    if (!isset($attacker['stamina'])) {
-        $attacker['stamina'] = 100;
-    }
-    if (!isset($defender['stamina'])) {
-        $defender['stamina'] = 100;
-    }
-
-    // 1) Vérifier si le défenseur esquive
-    if ($this->evadeAttack($defender)) {
+    {
+        // ✅ S'assurer que `stamina` est bien défini
+        if (!isset($attacker['stamina'])) {
+            $attacker['stamina'] = 100;
+        }
+        if (!isset($defender['stamina'])) {
+            $defender['stamina'] = 100;
+        }
+    
+        // 1) Vérifier si le défenseur esquive
+        if ($this->evadeAttack($defender)) {
+            return [
+                'damage' => 0,
+                'log'    => sprintf('%s esquive l’attaque de %s !', $defender['name'], $attacker['name']),
+                'isKo'   => false,
+            ];
+        }
+    
+        // 2) Calcul des dégâts subis
+        $damage = $this->calculateDamage($attacker, $defender);
+    
+        // 3) Appliquer les dégâts
+        $defender['hp'] -= $damage;
+        $defender['stamina'] = max(0, $defender['stamina'] - 1); // ✅ Évite que ça descende sous 0
+    
+        // 4) Vérifier que les HP ne descendent pas sous 0
+        if ($defender['hp'] < 0) {
+            $defender['hp'] = 0;
+        }
+    
+        // 5) Calculer la consommation de stamina en fonction de la force
+        $staminaCost = max(1, ceil($attacker['strength'] * 1.2)); // ✅ Empêche une consommation trop faible
+        $attacker['stamina'] = max(0, $attacker['stamina'] - $staminaCost);
+    
+        // 6) Régénération de stamina du défenseur en fonction de sa vitesse
+        $regenFactor = max(1, ceil($defender['speed'] / 2)); // ✅ Régénération plus équilibrée
+    
+        // ✅ Vérifier si la stamina est <= 15 pour booster la régénération une seule fois
+        if ($defender['stamina'] <= 15) {
+            $regenFactor = ceil($regenFactor * 1.3); // ✅ Boost de 30% correctement appliqué
+        }
+    
+        // Appliquer la régénération
+        $defender['stamina'] += $regenFactor;
+    
+        // Empêcher la stamina de dépasser 100
+        if ($defender['stamina'] > 100) {
+            $defender['stamina'] = 100;
+        }
+    
+        // 7) Vérifier KO
+        $isKo = ($defender['hp'] <= 0);
+    
+        // 8) Générer un log
+        $log = sprintf(
+            '%s inflige %d dégâts à %s. %s a maintenant %d de stamina (coût: -%d).',
+            $attacker['name'],
+            $damage,
+            $defender['name'],
+            $attacker['name'],
+            $attacker['stamina'],
+            $staminaCost
+        );
+    
+        if ($isKo) {
+            $log .= sprintf(' %s est K.O. !', $defender['name']);
+        }
+    
         return [
-            'damage' => 0,
-            'log'    => sprintf('%s esquive l’attaque de %s !', $defender['name'], $attacker['name']),
-            'isKo'   => false,
+            'damage' => $damage,
+            'log'    => $log,
+            'isKo'   => $isKo,
         ];
     }
-
-    // 2) Calcul des dégâts subis
-    $damage = $this->calculateDamage($attacker, $defender);
-
-    // 3) Appliquer les dégâts
-    $defender['hp'] -= $damage;
-
-    // 4) Vérifier que les HP ne descendent pas sous 0
-    if ($defender['hp'] < 0) {
-        $defender['hp'] = 0;
-    }
-
-    // 5) Calculer la consommation de stamina en fonction de la force
-    $staminaCost = ceil($attacker['strength'] * 1.5);
-    $attacker['stamina'] -= $staminaCost;
-
-    // 6) S'assurer que la stamina ne soit pas négative
-    if ($attacker['stamina'] < 0) {
-        $attacker['stamina'] = 0;
-    }
-
-    // 7) Régénérer un peu de stamina du défenseur (5 points)
-    $defender['stamina'] += 1;
-    if ($defender['stamina'] > 100) {
-        $defender['stamina'] = 100;
-    }
-
-    // 8) Vérifier KO
-    $isKo = ($defender['hp'] <= 0);
-
-    // 9) Générer un log
-    $log = sprintf(
-        '%s inflige %d dégâts à %s (tirage %d - défense %d). %s a %d de stamina (coût: -%d).',
-        $attacker['name'],
-        $damage,
-        $defender['name'],
-        $this->lastAttackDamage,
-        $this->lastDefenseValue,
-        $attacker['name'],
-        $attacker['stamina'],
-        $staminaCost
-    );
-
-    if ($isKo) {
-        $log .= sprintf(' %s est K.O. !', $defender['name']);
-    }
-
-    return [
-        'damage' => $damage,
-        'log'    => $log,
-        'isKo'   => $isKo,
-    ];
-}
+    
     private function calculateDamage(array $attacker, array $defender): int
     {
         // 1) Calcul de la fourchette de dégâts aléatoires
         $minDamage = max(1, $attacker['strength'] - 4);
         $maxDamage = $attacker['strength'];
 
-        // 2) Si la stamina est faible (< 20), la force diminue de 30%
+        // 2) Si la stamina est faible (< 30), la force diminue de 30%
         if ($attacker['stamina'] < 30) {
             $maxDamage = (int) round($maxDamage * 0.7);
         }
 
         $randomDamage = random_int($minDamage, $maxDamage);
 
-        // 3) Appliquer le bonus de 15% à l'attaque de base
-        $boostedDamage = (int) round($randomDamage * 1.15);
+        // 3) Appliquer le bonus de 9% à l'attaque de base
+        $boostedDamage = (int) round($randomDamage * 0.9);
         $this->lastAttackDamage = $boostedDamage; // Stocker pour le log
 
         // 4) Calcul de la défense aléatoire
@@ -141,9 +146,22 @@ class BattleService
         }
     }
 
-    private function evadeAttack(array $defender): bool
+    private function evadeAttack(array &$defender): bool
     {
         $chanceToEvade = min(50, $defender['agility'] * 2); // Max 50% d’esquive
-        return random_int(1, 100) <= $chanceToEvade;
+        $evadeSuccess = random_int(1, 100) <= $chanceToEvade;
+    
+        if ($evadeSuccess) {
+            // Ajouter 4 points de stamina si l'esquive réussit
+            $defender['stamina'] += 4;
+    
+            // S'assurer que la stamina ne dépasse pas 100
+            if ($defender['stamina'] > 100) {
+                $defender['stamina'] = 100;
+            }
+        }
+    
+        return $evadeSuccess;
     }
+    
 }

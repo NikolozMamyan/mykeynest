@@ -18,8 +18,8 @@ final class BattleController extends AbstractController
     #[Route('/init', name: 'battle_init')]
     public function init(EntityManagerInterface $entityManager, SessionInterface $session , RequestStack $requestStack): Response
     {
-        $char1 = $entityManager->getRepository(Character::class)->find(1);
-        $char2 = $entityManager->getRepository(Character::class)->find(3);
+        $char1 = $entityManager->getRepository(Character::class)->find(13);
+        $char2 = $entityManager->getRepository(Character::class)->find(15);
 
         if (!$char1 || !$char2) {
             throw $this->createNotFoundException('Personnage(s) introuvable(s).');
