@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Entity\Character;
+use App\Service\RoundService;
 use App\Repository\InventoryRepository;
 
 class BattleService
@@ -116,7 +117,9 @@ class BattleService
             $maxDamage = (int) round($maxDamage * 0.7);
         }
 
+        $maxDamage = max($minDamage, $maxDamage);
         $randomDamage = random_int($minDamage, $maxDamage);
+        
 
         // 3) Appliquer le bonus de 9% à l'attaque de base
         $boostedDamage = (int) round($randomDamage * 0.9);
@@ -163,5 +166,34 @@ class BattleService
     
         return $evadeSuccess;
     }
+    public function processRound(array $battleState, RoundService $roundService): array
+{
+    // Récupérer les stats modifiées
+    $char1Stats = $roundService->getCharacterStatsWithPerks($battleState['char1']);
+    $char2Stats = $roundService->getCharacterStatsWithPerks($battleState['char2']);
+
+    // Tour du premier attaquant
+    $result1 = $this->attack($char1Stats, $char2Stats);
+    $battleState['char2']['hp'] -= $result1['damage'];
+    $battleState['logs'][] = $result1['log'];
+
+    // Vérifier KO
+    if ($result1['isKo']) {
+        $battleState['isOver'] = true;
+        return $battleState;
+    }
+
+    // Tour du deuxième attaquant
+    $result2 = $this->attack($char2Stats, $char1Stats);
+    if ($result2['isKo']) {
+        $battleState['isOver'] = true;
+    }
+
+    $battleState['logs'][] = $result1['log'];
+    $battleState['logs'][] = $result2['log'];
+
+    return $battleState;
+}
+
     
 }

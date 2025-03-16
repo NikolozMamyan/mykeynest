@@ -70,60 +70,93 @@ export default class extends Controller {
     
     async toggleInventory() {
         const inventoryPanel = document.getElementById("inventory-panel");
-
+    
         if (this.isInventoryOpen) {
             inventoryPanel.style.display = "none";
             this.isInventoryOpen = false;
             return;
         }
-
+    
         try {
             const response = await fetch(`${this.inventoryUrlValue}`);
             const data = await response.json();
-
-            if (data.error) {
-                console.error("❌ Erreur lors de l'ouverture de l'inventaire :", data.error);
+    
+            if (!data || data.error) {
+                console.error("❌ Erreur lors de l'ouverture de l'inventaire :", data?.error || "Réponse invalide");
                 return;
             }
+    
+            // Correction : on accède à `data.inventory.perks` et `data.inventory.slots`
+            if (!data.inventory || !Array.isArray(data.inventory.perks)) {
+                console.error("❌ Erreur : l'inventaire reçu n'est pas valide.", data);
+                return;
+            }
+    
+            if (!data.inventory.slots || !Array.isArray(data.inventory.slots)) {
+                console.warn("⚠️ Attention : Les slots ne sont pas définis correctement.", data);
+            }
+            console.log("📊 Stats après perks :", data.inventory.modifiedStats);
 
-            this.renderInventory(data.inventory);
+            // Correction : Passer `data.inventory.perks` et `data.inventory.slots`
+            this.renderInventory(data.inventory.perks, data.inventory.slots);
             inventoryPanel.style.display = "block";
             this.isInventoryOpen = true;
         } catch (error) {
             console.error("❌ Erreur réseau :", error);
         }
     }
-
-    renderInventory(inventory) {
+    
+    
+    renderInventory(perks, slots) {
         const perksContainer = document.getElementById("perks-list");
         const slotsContainer = document.getElementById("perk-slots");
-
+    
         if (!perksContainer || !slotsContainer) {
             console.error("❌ Impossible de rendre l'inventaire : éléments HTML introuvables.");
             return;
         }
-
+    
         perksContainer.innerHTML = "";
         slotsContainer.innerHTML = "";
-
-        inventory.perks.forEach(perk => {
+    
+        // 🔹 Affichage des perks
+        perks.forEach(perk => {
+            if (!perk || !perk.name || !perk.value || !perk.type) {
+                console.warn("⚠️ Perk invalide détecté :", perk);
+                return;
+            }
+    
             const perkElement = document.createElement("div");
             perkElement.classList.add("perk-item");
             perkElement.dataset.perkId = perk.id;
-            perkElement.innerHTML = `<h4>${perk.name}</h4><p>${perk.effect}</p>`;
+    
+            perkElement.innerHTML = `
+                <h4>${perk.name}</h4>
+                <p>Type: ${perk.type}</p>
+                <p>Valeur: ${perk.value}</p>
+            `;
+    
             perkElement.addEventListener("click", () => this.selectPerk(perk.id));
             perksContainer.appendChild(perkElement);
         });
-
-        inventory.slots.forEach(slot => {
+    
+        // 🔹 Affichage des slots
+        slots.forEach(slot => {
             const slotElement = document.createElement("div");
             slotElement.classList.add("perk-slot");
             slotElement.dataset.slotId = slot.id;
-            slotElement.innerHTML = `<h4>${slot.name}</h4><div class="slot-content">${slot.perkId ? `Perk #${slot.perkId}` : "Vide"}</div>`;
+    
+            slotElement.innerHTML = `
+                <h4>${slot.name}</h4>
+                <div class="slot-content">${slot.perkId ? `Perk #${slot.perkId}` : "Vide"}</div>
+            `;
+    
             slotElement.addEventListener("click", () => this.selectSlot(slot.id));
             slotsContainer.appendChild(slotElement);
         });
     }
+    
+    
 
     selectPerk(perkId) {
         document.querySelectorAll(".perk-item").forEach(el => el.classList.remove("selected"));

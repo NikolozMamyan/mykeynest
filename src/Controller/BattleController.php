@@ -211,6 +211,7 @@ public function openInventory(string $characterKey, RequestStack $requestStack, 
     }
     
     $inventory = $roundService->getInventory($battleState[$characterKey]);
+   
     
     return new JsonResponse([
         'battleState' => $battleState,

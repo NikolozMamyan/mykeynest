@@ -11,9 +11,55 @@
      data-battle-char1-hp-value="{{ battleState.char1.hp }}"
      data-battle-char2-hp-value="{{ battleState.char2.hp }}">
 
-    <h1>PIXEL COMBAT RPG</h1>
 
+
+    
     <div class="battle-screen pixel-border">
+    <div class="flex" >
+    
+{% for charKey, char in {'char1': battleState.char1, 'char2': battleState.char2} %}
+    
+ 
+                            <div class="character-info" >
+                        <div class="character-name">{{ char.name }}</div>
+
+                        <!-- Barre de vie -->
+                        <div class="health-label">
+                            <span>HP</span>
+                            <span id="hp-{{ charKey }}-text">{{ char.hp }}/100</span>
+                        </div>
+                        <div class="health-bar-container">
+                            {% set hpRatio = (char.hp / 100) * 100 %}
+                            <div class="health-bar" id="health-bar-{{ charKey }}" style="width: {{ hpRatio }}%;">
+                                <div class="health-text">{{ char.hp }}/100</div>
+                            </div>
+                        </div>
+
+                        <!-- Barre de stamina -->
+                        <div class="stamina-label">
+                            <span>Stamina</span>
+                        </div>
+                        <div class="stamina-bar-container">
+                            {% set staminaRatio = (char.stamina / 100) * 100 %}
+                            <div class="stamina-bar" id="stamina-bar-{{ charKey }}" style="width: {{ staminaRatio }}%;">
+                                <span id="stamina-{{ charKey }}-text">{{ char.stamina }}/100</span>
+                            </div>
+                        </div>
+
+                        <!-- Statistiques -->
+                        <div class="stats-grid">
+                            {% for stat, value in {'strength': char.strength, 'speed': char.speed, 'agility': char.agility, 'defense': char.defense} %}
+                                <div class="stat-box">
+                                    <div class="stat-value">{{ value }}</div>
+                                    <div class="stat-name">{{ stat|upper }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                      {% endfor %}
+                      
+                      </div>
         <div class="battle-grid"></div>
         
         <!-- Animation de poussière pixelisée -->
@@ -63,64 +109,30 @@
                 </div>
             </div>
         </div>
-
-        <!-- Arène de combat -->
+       <div class="battle-controls" id="battle-controls">
+            <button class="pixel-button btn-start" id="btn-start">START</button>
+            <button class="pixel-button btn-pause" id="btn-pause" style="display: none;">PAUSE</button>
+        </div>
         <div class="battle-arena">
             {% for charKey, char in {'char1': battleState.char1, 'char2': battleState.char2} %}
-                <div class="character-panel pixel-border {{ charKey }}" id="{{ charKey }}-panel">
+                <div class="{{ charKey }}" id="{{ charKey }}-panel">
                     <div class="active-turn" id="turn-{{ charKey }}">TOUR</div>
-                    <div class="character-sprite pixel-border">
+                     <div class="character-sprite ">
+                     <img src="/images/character_solo.png" alt="{{ char.name }}" class="character-image">
                         <div class="sprite-placeholder">{{ char.name|slice(0, 1) }}</div>
                     </div>
-                    <div class="character-info">
-                        <div class="character-name">{{ char.name }}</div>
-                        
-                        <!-- Barre de vie -->
-                        <div class="health-label">
-                            <span>HP</span>
-                            <span id="hp-{{ charKey }}-text">{{ char.hp }}/100</span>
-                        </div>
-                        <div class="health-bar-container">
-                            {% set hpRatio = (char.hp / 100) * 100 %}
-                            <div class="health-bar" id="health-bar-{{ charKey }}" style="width: {{ hpRatio }}%;">
-                                <div class="health-text">{{ char.hp }}/100</div>
-                            </div>
-                        </div>
 
-                        <!-- Barre de stamina -->
-                        <div class="stamina-label">
-                            <span>Stamina</span>
-                        </div>
-                        <div class="stamina-bar-container">
-                            {% set staminaRatio = (char.stamina / 100) * 100 %}
-                            <div class="stamina-bar" id="stamina-bar-{{ charKey }}" style="width: {{ staminaRatio }}%;">
-                                <span id="stamina-{{ charKey }}-text">{{ char.stamina }}/100</span>
-                            </div>
-                        </div>
-
-                        <!-- Statistiques -->
-                        <div class="stats-grid">
-                            {% for stat, value in {'strength': char.strength, 'speed': char.speed, 'agility': char.agility, 'defense': char.defense} %}
-                                <div class="stat-box">
-                                    <div class="stat-value">{{ value }}</div>
-                                    <div class="stat-name">{{ stat|upper }}</div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
                     <div class="damage-effect" id="damage-{{ charKey }}">-10</div>
                 </div>
             {% endfor %}
         </div>
-
         <!-- Contrôles de combat -->
-        <div class="battle-controls" id="battle-controls">
-            <button class="pixel-button btn-start" id="btn-start">START</button>
-            <button class="pixel-button btn-pause" id="btn-pause" style="display: none;">PAUSE</button>
-        </div>
+       
     </div>
 
     <!-- Logs du combat -->
+
+</div>
     <div class="battle-log pixel-border">
         <div class="log-header">
             <div class="log-title">COMBAT LOG</div>
@@ -132,5 +144,4 @@
             {% endfor %}
         </div>
     </div>
-</div>
 {% endblock %}

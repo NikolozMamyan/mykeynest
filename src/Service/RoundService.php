@@ -1,13 +1,20 @@
 <?php
 namespace App\Service;
 
+use App\Repository\CharacterRepository;
+use App\Repository\InventoryRepository;
+
 class RoundService
 {
     private $battleService;
+    private CharacterRepository $characterRepository;
+    private InventoryRepository $inventoryRepository;
     
-    public function __construct(BattleService $battleService)
+    public function __construct(BattleService $battleService, CharacterRepository $characterRepository, InventoryRepository $inventoryRepository)
     {
         $this->battleService = $battleService;
+        $this->characterRepository = $characterRepository;
+        $this->inventoryRepository = $inventoryRepository;
     }
     
     public function initRound(array $battleState): array
@@ -17,7 +24,7 @@ class RoundService
             $battleState['round'] = [
                 'current' => 1,
                 'status' => 'active',
-                'remainingTicks' => 15, // 15 ticks par round
+                'remainingTicks' => 5, // 15 ticks par round
                 'readyStatus' => [
                     'char1' => false,
                     'char2' => false
@@ -102,33 +109,183 @@ class RoundService
     
     public function getInventory(array $characterData): array
     {
-        // Ici, tu pourrais implémenter la logique pour récupérer l'inventaire réel du personnage
-        // Pour l'exemple, renvoie un inventaire factice
+        if (!isset($characterData['key'])) {
+            return ['error' => 'Character data is invalid'];
+        }
+    
+        $character = $this->characterRepository->findOneBy(['name' => $characterData['name']]);
+    
+        if (!$character) {
+            return ['error' => 'Character not found'];
+        }
+    
+        $inventory = $this->inventoryRepository->findOneBy(['character' => $character]);
+    
+        if (!$inventory) {
+            return ['perks' => [], 'slots' => []];
+        }
+    
+        // 🔹 Récupérer les perks
+        $perks = $inventory->getPerks()->map(function ($perk) {
+            return [
+                'id' => $perk->getId(),
+                'name' => $perk->getName(),
+                'value' => $perk->getValue(),
+                'type' => $perk->getType(),
+            ];
+        })->toArray();
+    
+        // 🔹 Appliquer les effets des perks aux stats du personnage
+        $modifiedStats = [
+            'hp' => $character->getHp(),
+            'strength' => $character->getStrength(),
+            'defense' => $character->getDefense(),
+            'speed' => $character->getSpeed(),
+            'agility' => $character->getAgility(),
+            'stamina' => $character->getStamina(),
+        ];
+    
+        foreach ($perks as $perk) {
+            if (isset($modifiedStats[$perk['type']])) {
+                $modifiedStats[$perk['type']] += $perk['value'];
+            }
+        }
+    
+        // 🔹 Générer les slots (Exemple: Tête, Corps, Jambes)
+        $slots = [
+            ['id' => 1, 'name' => 'Tête', 'perkId' => null],
+            ['id' => 2, 'name' => 'Corps', 'perkId' => null],
+            ['id' => 3, 'name' => 'Jambes', 'perkId' => null]
+        ];
+    
         return [
-            'perks' => [
-                ['id' => 1, 'name' => 'Force accrue', 'effect' => '+5 force'],
-                ['id' => 2, 'name' => 'Agilité améliorée', 'effect' => '+3 agilité'],
-                ['id' => 3, 'name' => 'Endurance renforcée', 'effect' => '+10 stamina']
-            ],
-            'slots' => [
-                ['id' => 1, 'name' => 'Tête', 'perkId' => null],
-                ['id' => 2, 'name' => 'Corps', 'perkId' => null],
-                ['id' => 3, 'name' => 'Jambes', 'perkId' => null]
-            ]
+            'perks' => $perks,
+            'slots' => $slots, // ✅ Slots ajoutés
+            'modifiedStats' => $modifiedStats // ✅ Stats mises à jour avec les perks
         ];
     }
     
+
+    
+
+    
     public function equipPerk(array $battleState, string $characterKey, int $slotId, int $perkId): array
     {
-        // Ici, tu pourrais implémenter la logique pour équiper un perk
-        // Pour l'exemple, ajoute un bonus aléatoire
-        $stat = ['strength', 'defense', 'speed', 'agility', 'stamina'][rand(0, 4)];
-        $bonus = rand(1, 5);
-        
-        $battleState[$characterKey][$stat] += $bonus;
-        
-        $battleState['logs'][] = $battleState[$characterKey]['name'] . " équipe un perk donnant +" . $bonus . " " . $stat;
-        
+        $characterName = $battleState[$characterKey]['name'];
+        $character = $this->characterRepository->findOneBy(['name' => $characterName]);
+    
+        if (!$character) {
+            $battleState['logs'][] = "Erreur : Personnage introuvable.";
+            return $battleState;
+        }
+    
+        $inventory = $this->inventoryRepository->findOneBy(['character' => $character]);
+    
+        if (!$inventory) {
+            $battleState['logs'][] = "Erreur : Inventaire introuvable pour " . $characterName;
+            return $battleState;
+        }
+    
+        // Vérifier si le perk existe dans l'inventaire
+        $perkToEquip = null;
+        foreach ($inventory->getPerks() as $perk) {
+            if ($perk->getId() === $perkId) {
+                $perkToEquip = $perk;
+                break;
+            }
+        }
+    
+        if (!$perkToEquip) {
+            $battleState['logs'][] = "Erreur : Perk introuvable dans l'inventaire de " . $characterName;
+            return $battleState;
+        }
+    
+        // Vérifier et récupérer les slots actuels
+        if (!isset($battleState[$characterKey]['slots'])) {
+            $battleState[$characterKey]['slots'] = [
+                ['id' => 1, 'name' => 'Tête', 'perkId' => null],
+                ['id' => 2, 'name' => 'Corps', 'perkId' => null],
+                ['id' => 3, 'name' => 'Jambes', 'perkId' => null]
+            ];
+        }
+    
+        $slotFound = false;
+        foreach ($battleState[$characterKey]['slots'] as &$slot) {
+            if ($slot['id'] === $slotId) {
+                $slotFound = true;
+    
+                if ($slot['perkId'] !== null) {
+                    $battleState['logs'][] = "Erreur : Le slot " . $slot['name'] . " est déjà équipé.";
+                    return $battleState;
+                }
+    
+                // Affecter le perk au slot
+                $slot['perkId'] = $perkId;
+    
+                // Appliquer immédiatement le bonus du perk sur les stats du personnage
+                $perkType = $perkToEquip->getType();
+                $perkValue = $perkToEquip->getValue();
+    
+                if (!isset($battleState[$characterKey][$perkType])) {
+                    $battleState['logs'][] = "Erreur : Type de perk invalide.";
+                    return $battleState;
+                }
+    
+                $battleState[$characterKey][$perkType] += $perkValue;
+    
+                // Ajouter un log clair et précis
+                $battleState['logs'][] = sprintf(
+                    "%s équipe le perk '%s' sur le slot '%s' (+%d %s).",
+                    $characterName,
+                    $perkToEquip->getName(),
+                    $slot['name'],
+                    $perkValue,
+                    $perkType
+                );
+    
+                break;
+            }
+        }
+    
+        if (!$slotFound) {
+            $battleState['logs'][] = "Erreur : Slot introuvable.";
+        }
+    
         return $battleState;
     }
+    
+    // méthode qui récupère les stats après application des perks
+public function getCharacterStatsWithPerks(array $characterData): array
+{
+    $character = $this->characterRepository->findOneBy(['name' => $characterData['name']]);
+
+    if (!$character) {
+        return $characterData; // Si perso introuvable, retourne les stats originales
+    }
+
+    $inventory = $this->inventoryRepository->findOneBy(['character' => $character]);
+
+    $stats = [
+        'hp' => $character->getHp(),
+        'strength' => $character->getStrength(),
+        'defense' => $character->getDefense(),
+        'speed' => $character->getSpeed(),
+        'agility' => $character->getAgility(),
+        'stamina' => $character->getStamina(),
+    ];
+
+    if ($inventory) {
+        foreach ($inventory->getPerks() as $perk) {
+            $type = $perk->getType();
+            $value = $perk->getValue();
+            // Incrémenter la stat concernée par le perk
+            if (array_key_exists($type = $perk->getType(), $stats)) {
+                $stats[$type] += $perk->getValue();
+            }
+        }
+    }
+
+    return $stats;
+}
+
 }
