@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css");
 
 :root {
     --primary-color: #ff7f50;
@@ -8,8 +9,50 @@
     --health-color: #32cd32;
     --damage-color: #ff4757;
     --pixel-border: 4px;
-}
 
+
+    --btn-font-size: 14px;
+    --btn-padding-y: 0.4rem;
+    --btn-padding-x: 0.8rem;
+    --btn-border-radius: 4px;
+  
+    /* Couleurs principales */
+    --color-primary: #0d6efd;
+    --color-danger: #dc3545;
+  
+    /* Couleurs texte et fond */
+    --btn-bg: transparent;
+    --btn-border: currentColor;
+    --btn-text: currentColor;
+}
+.btn {
+    display: inline-block;
+    padding: var(--btn-padding-y) var(--btn-padding-x);
+    font-size: var(--btn-font-size);
+    border-radius: var(--btn-border-radius);
+    text-decoration: none;
+    border: 1px solid var(--btn-border);
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-family: inherit;
+  }
+  
+  .btn:hover {
+    opacity: 0.9;
+  }
+  
+  .btn-outline-primary {
+    --btn-border: var(--color-primary);
+    --btn-text: var(--color-primary);
+  }
+  
+  .btn-outline-danger {
+    --btn-border: var(--color-danger);
+    --btn-text: var(--color-danger);
+  }
+  
 body {
     font-family: 'VT323', monospace;
     margin: 0;

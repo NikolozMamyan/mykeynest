@@ -1,0 +1,106 @@
+.login-box,
+.register-box {
+    max-width: 420px;
+    margin: 80px auto;
+    padding: 2rem;
+    background-color: #1e1e1e;
+    border: var(--pixel-border) solid #fff;
+    box-shadow: 0 0 12px var(--primary-color);
+    font-family: 'VT323', monospace;
+}
+
+.login-box h1,
+.register-box h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.login-box label,
+.register-box label {
+    font-size: 1rem;
+    color: var(--light-color);
+}
+
+.login-box input,
+.register-box input {
+    width: 100%;
+    padding: 0.6rem;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    background-color: #2c2c2c;
+    border: 2px solid #fff;
+    color: var(--light-color);
+    margin-bottom: 1rem;
+    outline: none;
+}
+
+.login-box input:focus,
+.register-box input:focus {
+    border-color: var(--primary-color);
+}
+
+.login-box button,
+.register-box button {
+    width: 100%;
+}
+
+#login-result,
+#register-result {
+    margin-top: 1rem;
+    font-size: 1rem;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ccc;
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.auth-hint {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    color: var(--light-color);
+    text-shadow: 1px 1px 0 #000;
+}
+
+.auth-hint a {
+    color: var(--primary-color);
+    text-decoration: none;
+    border-bottom: 2px dotted var(--primary-color);
+    transition: all 0.2s ease-in-out;
+}
+
+.auth-hint a:hover {
+    color: var(--secondary-color);
+    border-bottom-color: var(--secondary-color);
+    text-shadow: 0 0 4px var(--secondary-color);
+}
+
+/*welcome menu*/
+.user-navbar {
+    display: flex;
+    align-items: center;
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    padding: 8px 14px;
+    justify-content: flex-end;
+}
+

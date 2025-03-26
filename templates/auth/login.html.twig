@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+
+
+<div  data-controller="auth" class="login-box">
+    <h1>LOGIN</h1>
+  <form data-action="submit->auth#login">
+    
+        <label for="email">Email</label>
+        <input type="email" data-auth-target="email" required>
+
+        <label for="password">Password</label>
+        <input type="password" data-auth-target="password" required>
+        <button type="submit" class="pixel-button btn-start">Start</button>
+
+       <p class="auth-hint">
+    Don't have an account? <a href="/register">Sign up</a>
+</p>
+    </form>
+
+    <div data-auth-target="result"></div>
+</div>
+
+
+
+{% endblock %}
