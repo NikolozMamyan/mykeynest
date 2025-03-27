@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use App\Entity\User;
-use App\Repository\CharacterRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CharacterRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`')]
@@ -44,7 +47,16 @@ class Character
 
     #[ORM\Column(options: ["default" => 1])]
     private int $level = 1;
-    
+
+    #[ORM\ManyToMany(targetEntity: Perk::class)]
+#[ORM\JoinTable(name: 'character_equipped_perks')]
+private Collection $equippedPerks;
+
+public function __construct()
+{
+    $this->equippedPerks = new ArrayCollection();
+
+}
 
     public function getId(): ?int
     {
@@ -162,6 +174,24 @@ public function getLevel(): int
 public function setLevel(int $level): self
 {
     $this->level = $level;
+    return $this;
+}
+public function getEquippedPerks(): Collection
+{
+    return $this->equippedPerks;
+}
+
+public function addEquippedPerk(Perk $perk): self
+{
+    if (!$this->equippedPerks->contains($perk)) {
+        $this->equippedPerks[] = $perk;
+    }
+    return $this;
+}
+
+public function removeEquippedPerk(Perk $perk): self
+{
+    $this->equippedPerks->removeElement($perk);
     return $this;
 }
 }

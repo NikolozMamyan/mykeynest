@@ -20,7 +20,7 @@ class Inventory
      * Relation OneToOne avec le Character.
      */
     #[ORM\OneToOne(targetEntity: Character::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?Character $character = null;
 
     /**

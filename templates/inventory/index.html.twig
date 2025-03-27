@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ character.name }}'s Inventory{% endblock %}
+
+{% block body %}
+
+
+<h2>Inventory for {{ character.name }}</h2>
+
+<form method="POST">
+    {% for perk in inventory.perks %}
+        <div>
+            <label>
+                <input 
+                    type="checkbox" 
+                    name="perks[]" 
+                    value="{{ perk.id }}"
+                    {% if perk in character.equippedPerks %}checked{% endif %}
+                >
+                {{ perk.name }} (+{{ perk.value }} {{ perk.type }})
+            </label>
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="pixel-button">Save Loadout</button>
+</form>
+
+
+<style>
+.perk-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 30px;
+}
+.perk-card {
+    background-color: #1e1e1e;
+    border: 3px solid var(--primary-color);
+    padding: 16px;
+    color: white;
+    width: 200px;
+    text-align: center;
+    box-shadow: 0 0 6px var(--primary-color);
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

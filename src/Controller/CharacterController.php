@@ -2,7 +2,9 @@
 namespace App\Controller;
 
 use App\Entity\Hero;
+use App\Entity\Perk;
 use App\Entity\Character;
+use App\Entity\Inventory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,6 +39,17 @@ class CharacterController extends AbstractController
 
         $em->persist($character);
         $em->flush();
+        $inventory = new Inventory();
+$inventory->setCharacter($character);
+
+// Ajouter des perks de base à chaque nouveau personnage
+$defaultPerks = $em->getRepository(Perk::class)->findAll(); // ou un sous-ensemble
+foreach ($defaultPerks as $perk) {
+    $inventory->addPerk($perk);
+}
+
+$em->persist($inventory);
+$em->flush();
 
         $this->addFlash('success', 'Character Created!');
         return $this->redirectToRoute('app_menu');

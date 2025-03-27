@@ -125,7 +125,12 @@ form {
     font-family: 'Press Start 2P', cursive;
 }
 
-
+.stat-value-create {
+    width: 30px;
+    text-align: center;
+    font-weight: bold;
+    color: black;
+}
 
 #remaining-points {
     text-align: center;

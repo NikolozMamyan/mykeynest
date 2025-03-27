@@ -153,15 +153,15 @@ class RoundService
     
         // 🔹 Générer les slots (Exemple: Tête, Corps, Jambes)
         $slots = [
-            ['id' => 1, 'name' => 'Tête', 'perkId' => null],
-            ['id' => 2, 'name' => 'Corps', 'perkId' => null],
-            ['id' => 3, 'name' => 'Jambes', 'perkId' => null]
+            ['id' => 1, 'name' => 'Slot 1', 'perkId' => null],
+            ['id' => 2, 'name' => 'Slot 2', 'perkId' => null],
+            ['id' => 3, 'name' => 'Slot 3', 'perkId' => null]
         ];
     
         return [
             'perks' => $perks,
-            'slots' => $slots, // ✅ Slots ajoutés
-            'modifiedStats' => $modifiedStats // ✅ Stats mises à jour avec les perks
+            'slots' => $slots, 
+            'modifiedStats' => $modifiedStats 
         ];
     }
     
@@ -203,9 +203,9 @@ class RoundService
         // Vérifier et récupérer les slots actuels
         if (!isset($battleState[$characterKey]['slots'])) {
             $battleState[$characterKey]['slots'] = [
-                ['id' => 1, 'name' => 'Tête', 'perkId' => null],
-                ['id' => 2, 'name' => 'Corps', 'perkId' => null],
-                ['id' => 3, 'name' => 'Jambes', 'perkId' => null]
+                ['id' => 1, 'name' => 'Slot 1', 'perkId' => null],
+                ['id' => 2, 'name' => 'Slot 2', 'perkId' => null],
+                ['id' => 3, 'name' => 'Slot 3', 'perkId' => null]
             ];
         }
     
