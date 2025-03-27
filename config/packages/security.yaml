@@ -38,6 +38,7 @@ security:
 
         # Pages HTML protégées
         - { path: ^/app/, roles: ROLE_USER }
+        - { path: ^/battle, roles: ROLE_USER }
     
 
 when@test:

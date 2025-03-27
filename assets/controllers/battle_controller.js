@@ -185,30 +185,31 @@ if (data.lastAttacker && data.damage > 0) {
 autoAttack() {
     if (this.isPaused || this.isGameOver || !this.isAttacking) return;
 
-    fetch(this.battleUrlValue)
+    fetch(this.battleUrlValue, {
+        credentials: 'include' // ✅ ESSENTIEL pour que AUTH_TOKEN soit envoyé
+    })
     .then(response => response.json())
     .then(data => {
         console.log("🛠️ Données reçues :", data);
         this.updateUI(data);
 
-        // Vérifier si le round est en pause
         if (data.pauseForInventory) {
             this.pauseForInventory(data.battleState);
         }
 
-        return data; // ✅ On retourne `data`
+        return data;
     })
     .catch(error => {
         console.error("Erreur lors de l'attaque:", error);
-        return null; // ✅ Retourne `null` pour éviter l'erreur
+        return null;
     })
-    .then(data => { // ✅ On utilise un `then()` pour récupérer `data` avant `finally()`
+    .then(data => {
         if (this.isAttacking && data && !data.pauseForInventory) {
             setTimeout(() => this.autoAttack(), 1500);
         }
     });
-
 }
+
 
 pauseForInventory(battleState) {
     console.log("Pause pour l'inventaire! ⏸️");

@@ -25,6 +25,9 @@
     --btn-border: currentColor;
     --btn-text: currentColor;
 }
+a{
+  text-decoration: none;
+}
 .btn {
     display: inline-block;
     padding: var(--btn-padding-y) var(--btn-padding-x);

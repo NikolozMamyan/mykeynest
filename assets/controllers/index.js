@@ -4,6 +4,7 @@ import BattleController from "./battle_controller.js";
 import InventoryController from "./inventory_controller.js";
 import AuthNavbarController from './auth_navbar_controller.js'
 import StatsController from './stats_controller.js'
+import StartController from './start_controller.js'
 
 
 const application = Application.start();
@@ -12,4 +13,5 @@ application.register("battle", BattleController);
 application.register("inventory", InventoryController);
 application.register('auth-navbar', AuthNavbarController)
 application.register('stats', StatsController)
+application.register('start', StartController)
 

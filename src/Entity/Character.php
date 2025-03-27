@@ -40,7 +40,10 @@ class Character
     private ?User $owner = null;
 
     #[ORM\ManyToOne]
-private ?Hero $hero = null;
+    private ?Hero $hero = null;
+
+    #[ORM\Column(options: ["default" => 1])]
+    private int $level = 1;
     
 
     public function getId(): ?int
@@ -149,6 +152,16 @@ public function getHero(): ?Hero
 public function setHero(?Hero $hero): static
 {
     $this->hero = $hero;
+    return $this;
+}
+public function getLevel(): int
+{
+    return $this->level;
+}
+
+public function setLevel(int $level): self
+{
+    $this->level = $level;
     return $this;
 }
 }

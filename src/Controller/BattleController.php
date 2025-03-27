@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Character;
+use App\Service\BotService;
 use App\Service\RoundService;
 use App\Service\BattleService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,15 +14,31 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/battle')]
+#[Route('/app/battle')]
 final class BattleController extends AbstractController
 {
-    #[Route('/init', name: 'battle_init')]
-    public function init(EntityManagerInterface $entityManager, SessionInterface $session , RequestStack $requestStack): Response
-    {
-        $char1 = $entityManager->getRepository(Character::class)->find(13);
-        $char2 = $entityManager->getRepository(Character::class)->find(15);
 
+    public function __construct(
+        private EntityManagerInterface $em,
+        private BotService $botService
+    ) {}
+
+    #[Route('/init/{id}', name: 'battle_init')]
+    public function init(
+        int $id,
+        EntityManagerInterface $entityManager,
+        SessionInterface $session,
+        RequestStack $requestStack,
+        BotService $botService
+    ): Response {
+        $char1 = $entityManager->getRepository(Character::class)->find($id);
+
+    if (!$char1 || $char1->getOwner() !== $this->getUser()) {
+        throw $this->createAccessDeniedException("You don't own this character.");
+    }
+
+    // Générer un bot dynamique (extrait de ton BotController ou injecté en service)
+    $char2 = $botService->generateBotFor($char1);
         if (!$char1 || !$char2) {
             throw $this->createNotFoundException('Personnage(s) introuvable(s).');
         }
