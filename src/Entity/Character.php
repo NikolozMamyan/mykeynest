@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\User;
 use App\Repository\CharacterRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -33,6 +34,14 @@ class Character
     private int $agility = 0; // Ajout de agility
     #[ORM\Column]
     private int $stamina = 100;
+
+    #[ORM\ManyToOne(inversedBy: 'characters')]
+    #[ORM\JoinColumn(nullable: false)] 
+    private ?User $owner = null;
+
+    #[ORM\ManyToOne]
+private ?Hero $hero = null;
+    
 
     public function getId(): ?int
     {
@@ -122,4 +131,24 @@ class Character
     {
         $this->hp = max(0, $this->hp - $damage);
     }
+    public function getOwner(): ?User
+{
+    return $this->owner;
+}
+
+public function setOwner(?User $owner): self
+{
+    $this->owner = $owner;
+    return $this;
+}
+public function getHero(): ?Hero
+{
+    return $this->hero;
+}
+
+public function setHero(?Hero $hero): static
+{
+    $this->hero = $hero;
+    return $this;
+}
 }

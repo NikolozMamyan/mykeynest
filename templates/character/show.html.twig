@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ character.name }}{% endblock %}
+
+{% block body %}
+<div class="character-profile">
+    <h1>{{ character.name }}</h1>
+
+    <img src="{{ asset(character.hero.image) }}" class="sprite-img" alt="Hero Sprite">
+
+    <ul>
+        <li><strong>Class:</strong> {{ character.hero.className }}</li>
+        <li><strong>Strength:</strong> {{ character.strength }}</li>
+        <li><strong>Defense:</strong> {{ character.defense }}</li>
+        <li><strong>Speed:</strong> {{ character.speed }}</li>
+        <li><strong>Agility:</strong> {{ character.agility }}</li>
+        <li><strong>HP:</strong> {{ character.hp }}</li>
+        <li><strong>Stamina:</strong> {{ character.stamina }}</li>
+    </ul>
+
+    <form method="POST" action="{{ path('character_delete', { id: character.id }) }}">
+        <button type="submit" class="btn-outline-danger">Delete Character</button>
+    </form>
+
+    <a href="{{ path('app_menu') }}" class="btn-outline-primary">Back to Menu</a>
+</div>
+
+<!-- Modal de confirmation -->
+<div id="confirm-modal" class="modal hidden">
+    <div class="modal-content">
+        <p>⚠️ Are you sure you want to delete your character?<br>This cannot be undone.</p>
+        <button id="confirm-yes">Yes, delete it</button>
+        <button id="confirm-no">Cancel</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form[action*="delete"]');
+    const modal = document.getElementById('confirm-modal');
+    const confirmYes = document.getElementById('confirm-yes');
+    const confirmNo = document.getElementById('confirm-no');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // stop form submission
+        modal.classList.remove('hidden'); // show modal
+    });
+
+    confirmYes.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        form.submit(); // continue submit
+    });
+
+    confirmNo.addEventListener('click', function() {
+        modal.classList.add('hidden'); // close modal
+    });
+});
+</script>
+{% endblock %}

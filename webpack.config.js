@@ -26,8 +26,9 @@ Encore
     .splitEntryChunks()
     .copyFiles({
         from: './assets/images',
-        to: '../images/[name].[ext]', // Assure que ça va bien dans public/images
+        to: 'images/[path][name].[ext]',
     })
+    
     
     
     // will require an extra script tag for runtime.js

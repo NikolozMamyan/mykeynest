@@ -15,7 +15,22 @@
     <nav data-controller="auth-navbar" class="user-navbar">
     <div data-auth-navbar-target="content"></div>
 </nav>
-
+    {% for label, messages in app.flashes %}
+    <div class="flash-message flash-{{ label }}">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endfor %}
         {% block body %}{% endblock %}
     </body>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.flash-message').forEach((el) => {
+        el.addEventListener('animationend', () => {
+            el.classList.add('hide');
+        });
+    });
+});
+</script>
 </html>

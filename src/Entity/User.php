@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Character;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,6 +39,15 @@ private ?string $apiToken = null;
 
 #[ORM\Column(type: 'datetime', nullable: true)]
 private ?\DateTimeInterface $tokenExpiresAt = null;
+
+#[ORM\OneToMany(mappedBy: 'owner', targetEntity: Character::class, orphanRemoval: true)]
+private Collection $characters;
+
+
+public function __construct()
+{
+    $this->characters = new ArrayCollection();
+}
 
     public function getId(): ?int
     {
@@ -130,6 +142,33 @@ public function getTokenExpiresAt(): ?\DateTimeInterface
 public function setTokenExpiresAt(?\DateTimeInterface $expiresAt): static
 {
     $this->tokenExpiresAt = $expiresAt;
+    return $this;
+}
+
+public function getCharacters(): Collection
+{
+    return $this->characters;
+}
+
+public function addCharacter(Character $character): self
+{
+    if (!$this->characters->contains($character)) {
+        $this->characters[] = $character;
+        $character->setOwner($this);
+    }
+
+    return $this;
+}
+
+public function removeCharacter(Character $character): self
+{
+    if ($this->characters->removeElement($character)) {
+        // Set the owning side to null (unless already changed)
+        if ($character->getOwner() === $this) {
+            $character->setOwner(null);
+        }
+    }
+
     return $this;
 }
 }

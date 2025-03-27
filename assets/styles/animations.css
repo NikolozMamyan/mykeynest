@@ -41,3 +41,21 @@
         opacity: 0;
     }
 }
+@keyframes flashSlide {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 0) translateX(-100vw);
+    }
+    10% {
+      opacity: 1;
+      transform: translate(-50%, 0) translateX(0);
+    }
+    80% {
+      opacity: 1;
+      transform: translate(-50%, 0) translateX(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, 0) translateX(100vw);
+    }
+  }
