@@ -80,28 +80,27 @@
     <h1 class="menu-title">Menu</h1>
 {% if user.characters|length > 0 %}
 {% for character in user.characters %}
-<div class="menu-character">
-    <div class="char-left">
+<div class="menu-character" >
+    <div class="char-left" >
         <img src="{{ asset(character.hero.image) }}" alt="Preview">
         <span class="char-name">{{ character.name }}</span>
     </div>
-
-    <div class="char-actions">
-        <a href="{{ path('character_show', { id: character.id }) }}" class="pixel-button btn-view">
-            View <i class="fas fa-eye"></i>
+        <div class="char-actions" >
+        <a href="{{ path('character_show', { id: character.id }) }}" class=" btn-action">
+          <i class="fas fa-eye"></i>
         </a>
-        <a href="{{ path('inventory_show', { id: character.id }) }}" class="pixel-button btn-inventory">
-    Inventory <i class="fas fa-box-open"></i>
+        <a href="{{ path('inventory_show', { id: character.id }) }}" class="btn-action">
+     <i class="fas fa-box-open"></i>
 </a>
 
         <a 
             href="#" 
-            class="pixel-button btn-start"
+            class="btn-action"
             data-controller="start"
             data-action="click->start#launch"
             data-start-character-id-value="{{ character.id }}"
         >
-              Start <i class="fas fa-play"></i></i>
+             <i class="fas fa-play"></i></i>
         </a>
     </div>
 </div>
