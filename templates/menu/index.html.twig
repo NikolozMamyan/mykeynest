@@ -93,12 +93,20 @@
      <i class="fas fa-box-open"></i>
 </a>
 
-        <a 
+        {# <a 
             href="#" 
             class="btn-action"
             data-controller="start"
             data-action="click->start#launch"
             data-start-character-id-value="{{ character.id }}"
+        >
+             <i class="fas fa-play"></i></i>
+        </a> #}
+           <a 
+            href="{{ path('app_mod_selector') }}" 
+            class="btn-action"
+         
+           
         >
              <i class="fas fa-play"></i></i>
         </a>

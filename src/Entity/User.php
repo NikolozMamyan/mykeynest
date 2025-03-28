@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use App\Entity\Character;
-use App\Repository\UserRepository;
+use App\Entity\Friendship;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -43,10 +44,18 @@ private ?\DateTimeInterface $tokenExpiresAt = null;
 #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Character::class, orphanRemoval: true)]
 private Collection $characters;
 
+#[ORM\OneToMany(mappedBy: 'requester', targetEntity: Friendship::class)]
+private Collection $friendsRequested;
+
+#[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Friendship::class)]
+private Collection $friendsReceived;
+
 
 public function __construct()
 {
     $this->characters = new ArrayCollection();
+    $this->friendsRequested = new ArrayCollection();
+    $this->friendsReceived = new ArrayCollection();
 }
 
     public function getId(): ?int
@@ -171,4 +180,64 @@ public function removeCharacter(Character $character): self
 
     return $this;
 }
+/**
+ * @return Collection<int, Friendship>
+ */
+public function getFriendsRequested(): Collection
+{
+    return $this->friendsRequested;
+}
+
+public function addFriendRequested(Friendship $friendship): self
+{
+    if (!$this->friendsRequested->contains($friendship)) {
+        $this->friendsRequested[] = $friendship;
+        $friendship->setRequester($this);
+    }
+
+    return $this;
+}
+
+public function removeFriendRequested(Friendship $friendship): self
+{
+    if ($this->friendsRequested->removeElement($friendship)) {
+        // set the owning side to null (unless already changed)
+        if ($friendship->getRequester() === $this) {
+            $friendship->setRequester(null);
+        }
+    }
+
+    return $this;
+}
+
+/**
+ * @return Collection<int, Friendship>
+ */
+public function getFriendsReceived(): Collection
+{
+    return $this->friendsReceived;
+}
+
+public function addFriendReceived(Friendship $friendship): self
+{
+    if (!$this->friendsReceived->contains($friendship)) {
+        $this->friendsReceived[] = $friendship;
+        $friendship->setReceiver($this);
+    }
+
+    return $this;
+}
+
+public function removeFriendReceived(Friendship $friendship): self
+{
+    if ($this->friendsReceived->removeElement($friendship)) {
+        // set the owning side to null (unless already changed)
+        if ($friendship->getReceiver() === $this) {
+            $friendship->setReceiver(null);
+        }
+    }
+
+    return $this;
+}
+
 }
