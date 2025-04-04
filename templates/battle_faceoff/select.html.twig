@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sélection d'un adversaire{% endblock %}
+
+{% block body %}
+    <h1>Choisissez un adversaire pour {{ myChar.name }}</h1>
+
+    {% if opponents is empty %}
+        <p>Aucun personnage d'ami disponible pour un duel.</p>
+    {% else %}
+        {% for opp in opponents %}
+            <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px;">
+                <h3>{{ opp.name }} ({{ opp.heroClass }}) – Propriétaire : {{ opp.owner }}</h3>
+                <a href="{{ path('battle_faceoff_start', { id1: myChar.id, id2: opp.id }) }}"
+                   class="btn btn-danger">Lancer le combat ⚔️</a>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

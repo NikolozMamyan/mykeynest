@@ -4,80 +4,17 @@
 
 {% block body %}
 <style>
-.menu-character {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 18px;
-    background: linear-gradient(135deg, #1c1c1c, #2d2d2d);
-    border: 4px solid var(--primary-color);
-    border-radius: 10px;
-    box-shadow: 0 0 10px var(--primary-color);
-    margin-bottom: 14px;
-    font-family: 'Press Start 2P', cursive;
-}
-
-.char-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.char-left img {
-  max-width: 60px;
-    max-height: 40px;
-    width: auto;
-    height: auto;
-    image-rendering: pixelated;
-    display: block;
-}
-
-.char-name {
-    color: var(--primary-color);
-    text-shadow: 1px 1px 0 #000;
-    font-size: 0.95rem;
-    white-space: nowrap;
-}
 
 
-
-.char-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.pixel-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    line-height: 1;
-    border: 3px solid var(--primary-color);
-    background: black;
-    color: white;
-    text-decoration: none;
-    transition: transform 0.2s ease;
-    max-width: 100%;
-    flex-shrink: 1;
-    word-break: break-word;
-}
-
-.pixel-button:hover {
-    transform: scale(1.05);
-    background: var(--primary-color);
-    color: black;
-}
-
-.pixel-button span {
-    font-size: 1rem;
-}
 
 
 </style>
+
+
+
 <div class="menu-container">
     <h1 class="menu-title">Menu</h1>
+
 {% if user.characters|length > 0 %}
 {% for character in user.characters %}
 <div class="menu-character" >
@@ -127,6 +64,10 @@
         <i class="fas fa-user-plus"></i> Create Character
     </a>
 {% endif %}
+<a href="{{ path('app_friends') }}" class="menu-link friend-link">
+    <i class="fas fa-user-friends"></i> Add a Friend
+</a>
+
     <a href="/app/lootbox" class="menu-link">
         <i class="fas fa-gift"></i> Open Loot Boxes
     </a>
@@ -141,4 +82,5 @@
         <i class="fas fa-book"></i> About Game
     </a>
 </div>
+
 {% endblock %}

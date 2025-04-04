@@ -1,44 +1,63 @@
 <?php
-// src/Controller/BattleFaceOffController.php
 
 namespace App\Controller;
 
 use App\Entity\Character;
-use App\Service\BotService;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BattleFaceOffController extends AbstractController
 {
-    #[Route('/app/battle/faceoff/{id}', name: 'battle_faceoff')]
-    public function faceoff(
-        int $id,
-        EntityManagerInterface $em,
-        BotService $botService,
-        RequestStack $requestStack
-    ): Response {
-        $char1 = $em->getRepository(Character::class)->find($id);
+    #[Route('/app/faceoff/select/{id}', name: 'battle_faceoff_select')]
+    public function selectOpponent(int $id, EntityManagerInterface $em): Response
+    {
+        $currentUser = $this->getUser();
 
-        if (!$char1 || $char1->getOwner() !== $this->getUser()) {
-            throw $this->createAccessDeniedException("You do not own this character.");
+        $userCharacter = $em->getRepository(Character::class)->find($id);
+
+        if (!$userCharacter || $userCharacter->getOwner() !== $currentUser) {
+            throw $this->createAccessDeniedException("Ce personnage ne vous appartient pas.");
         }
 
-        // Génère un bot adverse
-        $char2 = $botService->generateBotFor($char1);
+        // On suppose qu'il y a une relation User->friends (ManyToMany)
+        $friends = $currentUser->getFriends(); // méthode personnalisée dans l'entité User
 
-        // Stocke en session (optionnel pour transition vers `/battle/init`)
-        $session = $requestStack->getSession();
-        $session->set('pending_battle', [
-            'char1_id' => $char1->getId(),
-            'char2_id' => $char2->getId(),
+        $opponents = [];
+
+        foreach ($friends as $friend) {
+            foreach ($friend->getCharacters() as $char) {
+                $opponents[] = [
+                    'id' => $char->getId(),
+                    'name' => $char->getName(),
+                    'owner' => $friend->getUsername(),
+                    'heroClass' => $char->getHero()->getClassName(),
+                ];
+            }
+        }
+
+        return $this->render('battle_faceoff/select.html.twig', [
+            'myChar' => $userCharacter,
+            'opponents' => $opponents,
         ]);
+    }
 
-        return $this->render('battle/faceoff.html.twig', [
-            'char1' => $char1,
-            'char2' => $char2,
+    #[Route('/app/battle/faceoff/{id1}/{id2}', name: 'battle_faceoff_start')]
+    public function startFaceOff(int $id1, int $id2, EntityManagerInterface $em): Response
+    {
+        $char1 = $em->getRepository(Character::class)->find($id1);
+        $char2 = $em->getRepository(Character::class)->find($id2);
+
+        if (!$char1 || !$char2) {
+            throw $this->createNotFoundException("Un des personnages est introuvable.");
+        }
+
+        // TODO : Lancer logique de combat ici ou rediriger vers une vue de combat personnalisée
+        return $this->redirectToRoute('battle_init', [
+            'id' => $char1->getId(),
+            'id2' => $char2->getId()
         ]);
     }
 }

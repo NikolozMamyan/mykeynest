@@ -16,11 +16,23 @@ export default class extends Controller {
             const user = await res.json()
 
             this.contentTarget.innerHTML = `
-                <span>👾 Welcome, <strong>${user.email}</strong></span>
-                <button class="btn btn-outline-danger btn-sm" data-action="click->auth-navbar#logout" title="Logout">
+            <div class="auth-bar">
+                <div class="auth-info">
+                    <span>👾 <strong>${user.email}</strong></span>
+                    <span class="user-id-display">
+                        <i class="fas fa-id-badge"></i> ID: <strong>${user.id}</strong>
+                        <button class="copy-id-btn" title="Copy ID" data-id="${user.id}">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </span>
+                </div>
+                <button class="logout-btn" data-action="click->auth-navbar#logout" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
-            `
+            </div>
+        `
+        
+
         } catch {
             // non connecté = on affiche rien
             this.element.remove()

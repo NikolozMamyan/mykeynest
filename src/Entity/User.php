@@ -239,5 +239,29 @@ public function removeFriendReceived(Friendship $friendship): self
 
     return $this;
 }
+public function getUsername(): string
+{
+    return $this->getEmail(); // ou $this->username si tu as un champ dédié
+}
+
+public function getFriends(): array
+{
+    $friends = [];
+
+    foreach ($this->getFriendsRequested() as $friendship) {
+        if ($friendship->isAccepted()) {
+            $friends[] = $friendship->getReceiver();
+        }
+    }
+
+    foreach ($this->getFriendsReceived() as $friendship) {
+        if ($friendship->isAccepted()) {
+            $friends[] = $friendship->getRequester();
+        }
+    }
+
+    return $friends;
+}
+
 
 }

@@ -1,9 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ModSelectorController!{% endblock %}
+{% block title %}Sélection du mode de jeu{% endblock %}
 
 {% block body %}
-<pre>
-    {{ dump(user) }}
-</pre>
+    <h1>Sélection du personnage et du mode de combat</h1>
+
+    {% for char in characters %}
+        <div style="margin-bottom: 20px; border: 1px solid #ccc; padding: 10px;">
+            <h2>{{ char.name }} (Classe : {{ char.heroClass }})</h2>
+            <a href="{{ path('battle_init', { id: char.id }) }}" class="btn btn-primary">⚔️ Combattre un Bot</a>
+            <a href="{{ path('battle_faceoff_select', { id: char.id }) }}" class="btn btn-secondary">🤝 Combattre un Ami</a>
+        </div>
+    {% endfor %}
 {% endblock %}

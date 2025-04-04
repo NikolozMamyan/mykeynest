@@ -46,7 +46,9 @@ class InventoryController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Inventory updated!');
             $modifiedStats = $this->roundService->getCharacterStatsWithPerks(['name' => $character->getName()]);
-            return $this->redirectToRoute('app_menu');
+            return $this->redirectToRoute('inventory_show', [
+                'id' => $character->getId()
+            ]);
         }
     
         return $this->render('inventory/index.html.twig', [

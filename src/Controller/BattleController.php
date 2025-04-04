@@ -23,63 +23,71 @@ final class BattleController extends AbstractController
         private BotService $botService
     ) {}
 
-    #[Route('/init/{id}', name: 'battle_init')]
+    #[Route('/init/{id}/{id2?}', name: 'battle_init')]
     public function init(
         int $id,
+        ?int $id2 = null,
         EntityManagerInterface $entityManager,
         SessionInterface $session,
         RequestStack $requestStack,
-        BotService $botService
+        BotService $botService,
+        RoundService $roundService
     ): Response {
         $char1 = $entityManager->getRepository(Character::class)->find($id);
-
-    if (!$char1 || $char1->getOwner() !== $this->getUser()) {
-        throw $this->createAccessDeniedException("You don't own this character.");
-    }
-
-    // Générer un bot dynamique (extrait de ton BotController ou injecté en service)
-    $char2 = $botService->generateBotFor($char1);
-        if (!$char1 || !$char2) {
-            throw $this->createNotFoundException('Personnage(s) introuvable(s).');
+    
+        if (!$char1 || $char1->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("Ce personnage ne vous appartient pas.");
         }
-
-        // Déterminer qui attaque en premier en fonction du speed
+    
+        // Si un id2 est présent => combat contre ami
+        if ($id2 !== null) {
+            $char2 = $entityManager->getRepository(Character::class)->find($id2);
+    
+            if (!$char2) {
+                throw $this->createNotFoundException("L'adversaire est introuvable.");
+            }
+        } else {
+            // Sinon on génère un bot
+            $char2 = $botService->generateBotFor($char1);
+        }
+    
+        // Détermination de l’attaquant initial
         $firstAttacker = ($char1->getSpeed() >= $char2->getSpeed()) ? 'char1' : 'char2';
-        $secondDefender = ($firstAttacker === 'char1') ? 'char2' : 'char1';
-
+    
+        // Construction du battleState
         $battleState = [
             'char1' => [
                 'key' => 'char1',
-                'name'     => $char1->getName(),
-                'hp'       => $char1->getHp(),
+                'name' => $char1->getName(),
+                'hp' => $char1->getHp(),
                 'strength' => $char1->getStrength(),
-                'defense'  => $char1->getDefense(),
-                'speed'    => $char1->getSpeed(),
-                'agility'  => $char1->getAgility(),
-                'stamina'  => $char1->getStamina(),
+                'defense' => $char1->getDefense(),
+                'speed' => $char1->getSpeed(),
+                'agility' => $char1->getAgility(),
+                'stamina' => $char1->getStamina(),
             ],
             'char2' => [
-                'name'     => $char2->getName(),
-                'hp'       => $char2->getHp(),
+                'key' => 'char2',
+                'name' => $char2->getName(),
+                'hp' => $char2->getHp(),
                 'strength' => $char2->getStrength(),
-                'defense'  => $char2->getDefense(),
-                'speed'    => $char2->getSpeed(),
-                'agility'  => $char2->getAgility(),
-                'stamina'  => $char2->getStamina(),
+                'defense' => $char2->getDefense(),
+                'speed' => $char2->getSpeed(),
+                'agility' => $char2->getAgility(),
+                'stamina' => $char2->getStamina(),
             ],
-            'logs'   => [],
+            'logs' => [],
             'isOver' => false,
-            'turn'   => $firstAttacker, // On assigne le premier attaquant en fonction du speed
+            'turn' => $firstAttacker,
         ];
-
-        // Stockage de l'état du combat en session
-        $session = $requestStack->getSession();
+    
         $session->set('battle_state', $battleState);
-
+    
         return $this->render('battle/fight.html.twig', [
             'battleState' => $battleState,
         ]);
     }
+    
 
 
     #[Route('/tick', name: 'battle_tick')]

@@ -12,21 +12,19 @@ final class ModSelectorController extends AbstractController
     public function index(): Response
     {
         $user = $this->getUser();
-      $userChar = $user->getCharacters();
-      $charArr = [];
+        $userChar = $user->getCharacters();
+        $charArr = [];
 
+        foreach ($userChar as $char) {
+            $charArr[] = [
+                'id' => $char->getId(),
+                'name' => $char->getName(),
+                'heroClass' => $char->getHero()->getClassName(),
+            ];
+        }
 
-      foreach ($userChar as $char) {
-          $charArr[] = [
-              'id' => $char->getId(),
-              'name' => $char->getName(),
-              'heroClass' => $char->getHero()->getClassName(),
-          ];
-      }
-      
-      dd($charArr);
         return $this->render('mod_selector/index.html.twig', [
-            'user' => $user,
+            'characters' => $charArr,
         ]);
     }
 }

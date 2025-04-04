@@ -11,7 +11,15 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
+    <body >
+{% if app.user %}
+
+<a href="{{ path('app_menu') }}" class="back-button">
+    <span class="back-icon">⬅️</span>
+    <span class="back-text">Back</span>
+</a>
+{% endif %}
+
     <nav data-controller="auth-navbar" class="user-navbar">
     <div data-auth-navbar-target="content"></div>
 </nav>
@@ -23,6 +31,27 @@
     </div>
 {% endfor %}
         {% block body %}{% endblock %}
+{% if app.user %}
+<div data-controller="audio-player" class="audio-player-container">
+    <div data-audio-player-target="player" class="audio-player">
+        <div class="player-content">
+            <span class="player-title">🎵 Ambiance</span>
+            <div class="player-controls">
+                <button data-action="click->audio-player#toggleAudio" class="control-button">
+                    <span data-audio-player-target="playIcon">▶️</span>
+                    <span data-audio-player-target="pauseIcon" class="hidden">⏸️</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div data-audio-player-target="miniButton" class="audio-mini-button" data-action="click->audio-player#showPlayer">
+        🎵
+    </div>
+</div>
+{% endif %}
+        
+        
+
     </body>
     <script>
 document.addEventListener('DOMContentLoaded', () => {

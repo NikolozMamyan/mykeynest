@@ -6,6 +6,9 @@ import AuthNavbarController from './auth_navbar_controller.js';
 import StatsController from './stats_controller.js';
 import StartController from './start_controller.js';
 import FriendshipController from "./friendship_controller.js";
+import AudioPlayerController from './audio_player_controller.js';
+
+
 
 
 const application = Application.start();
@@ -16,4 +19,4 @@ application.register('auth-navbar', AuthNavbarController);
 application.register('stats', StatsController);
 application.register('start', StartController);
 application.register("friendship", FriendshipController);
-
+application.register('audio-player', AudioPlayerController);
