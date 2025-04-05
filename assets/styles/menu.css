@@ -45,125 +45,313 @@
 
 /*Caracter Create*/
 
-.character-form {
-    max-width: 900px;
-    margin: 50px auto;
-    background-color: #1e1e1e;
-    padding: 2rem;
-    border: 4px solid #fff;
-    box-shadow: 0 0 12px var(--primary-color);
-    font-family: 'VT323', monospace;
+/* hero-creation.css */
+.character-form-container {
+    padding: 20px 0;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-.character-form h1 {
-    text-align: center;
-    margin-bottom: 30px;
+.hero-creation-title {
     font-family: 'Press Start 2P', cursive;
-    color: var(--primary-color);
+    font-size: 28px;
+    text-align: center;
+    color: #ff9c00;
+    margin: 30px 0;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-.form-layout {
-    display: flex;
-    justify-content: space-between;
+.hero-creation-title::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #6a16f2, transparent);
+}
+
+.hero-form-layout {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 30px;
+    margin-bottom: 30px;
 }
 
-form {
-    flex: 1;
+@media (min-width: 768px) {
+    .hero-form-layout {
+        grid-template-columns: 3fr 2fr;
+    }
 }
 
-.sprite-preview {
-    background-color: #111;
-    padding: 20px;
-    border: 4px solid #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: 0 0 12px var(--primary-color);
-    width: 200px;
+.hero-stats-form {
+    border: 2px solid #16c6f2;
+    background: #1e1e1e;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.sprite-img {
-    max-width: 150px;
-    max-height: 150px;
-    width: auto;
-    height: auto;
-    image-rendering: pixelated;
+.hero-stats-form:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.hero-form-label {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    color: #16c6f2;
     display: block;
-}
-
-
-.sprite-label {
-    margin-top: 10px;
-    color: #fff;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.8rem;
-}
-
-.stat-control {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 10px 0;
-    font-size: 1.2rem;
-    color: #fff;
-}
-
-.stat-label {
-    flex: 1;
-}
-
-.stat-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.stat-buttons button {
-    padding: 5px 10px;
-    font-size: 1rem;
-    cursor: pointer;
-    font-family: 'Press Start 2P', cursive;
-}
-
-.stat-value-create {
-    width: 30px;
-    text-align: center;
-    font-weight: bold;
-    color: black;
-}
-
-#remaining-points {
-    text-align: center;
-    color: var(--health-color);
-    font-size: 1.1rem;
-    margin: 10px 0 20px;
-}
-.arrow-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
     margin-bottom: 10px;
 }
 
-.arrow-btn {
-    background-color: #000;
-    color: #fff;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1.2rem;
-    padding: 5px 8px;
-    border: 4px solid var(--primary-color);
-    cursor: pointer;
-    box-shadow: 0 0 8px var(--primary-color);
-    transition: transform 0.1s ease;
-    text-shadow: 1px 1px 0 #000;
-    image-rendering: pixelated;
+.hero-form-control {
+    font-family: 'VT323', monospace;
+    padding: 12px;
+    font-size: 18px;
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    color: #f0f0f0;
+    border: 2px solid #16c6f2;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
 }
 
-.arrow-btn:hover {
-    transform: scale(1.1);
-    background-color: var(--primary-color);
-    color: #000;
+.hero-form-control:focus {
+    border-color: #ff9c00;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,156,0,0.3);
+}
+
+.hero-stat-control {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.05);
+    transition: background-color 0.2s;
+}
+
+.hero-stat-control:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.hero-stat-label {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    color: #f0f0f0;
+}
+
+.hero-stat-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.hero-stat-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    background: #6a16f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.3s;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+
+.hero-stat-btn:hover {
+    background: #16c6f2;
+    transform: translateY(-2px);
+}
+
+.hero-stat-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+
+.hero-stat-value {
+    width: 40px;
+    height: 30px;
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    background: rgba(0,0,0,0.3);
+    color: #f0f0f0;
+    border: 2px solid #16c6f2;
+    border-radius: 4px;
+}
+
+/* Couleurs des stats selon la valeur */
+[data-stats-target="strength"][value="1"],
+[data-stats-target="defense"][value="1"],
+[data-stats-target="speed"][value="1"],
+[data-stats-target="agility"][value="1"] {
+    color: #ff5a5a;
+}
+
+[data-stats-target="strength"][value="3"],
+[data-stats-target="defense"][value="3"],
+[data-stats-target="speed"][value="3"],
+[data-stats-target="agility"][value="3"],
+[data-stats-target="strength"][value="2"],
+[data-stats-target="defense"][value="2"],
+[data-stats-target="speed"][value="2"],
+[data-stats-target="agility"][value="2"] {
+    color: #ffaa5a;
+}
+
+[data-stats-target="strength"][value="4"],
+[data-stats-target="defense"][value="4"],
+[data-stats-target="speed"][value="4"],
+[data-stats-target="agility"][value="4"],
+[data-stats-target="strength"][value="5"],
+[data-stats-target="defense"][value="5"],
+[data-stats-target="speed"][value="5"],
+[data-stats-target="agility"][value="5"] {
+    color: #5aff8a;
+}
+
+.hero-points-counter {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    color: #ff9c00;
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px dashed #ff9c00;
+    text-align: center;
+    border-radius: 4px;
+    background-color: rgba(255,156,0,0.1);
+}
+
+.hero-submit-button {
+    font-family: 'Press Start 2P', cursive;
+    padding: 12px 20px;
+    font-size: 14px;
+    background: #6a16f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.3s;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+    text-align: center;
+    width: 100%;
+}
+
+.hero-submit-button:hover {
+    background: #16c6f2;
+    transform: translateY(-2px);
+}
+
+.hero-submit-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+
+.hero-w-100 {
+    width: 100%;
+}
+
+.hero-mt-3 {
+    margin-top: 15px;
+}
+
+.hero-mb-3 {
+    margin-bottom: 15px;
+}
+
+.hero-sprite-preview {
+    border: 2px solid #16c6f2;
+    background: #1e1e1e;
+    padding: 25px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hero-sprite-preview:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.hero-arrow-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.hero-arrow-btn {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 20px;
+    background: transparent;
+    color: #ff9c00;
+    border: 2px solid #ff9c00;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.hero-arrow-btn:hover {
+    background: #ff9c00;
+    color: #121212;
+    transform: translateY(-2px);
+}
+
+.hero-arrow-btn:active {
+    transform: translateY(1px);
+}
+
+.hero-sprite-img {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 10px rgba(106, 22, 242, 0.5));
+    animation: hero-float 3s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.hero-sprite-label {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    color: #16c6f2;
+    margin-top: 15px;
+    text-align: center;
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    width: fit-content;
 }
 /*Character Profile*/
 
@@ -375,8 +563,8 @@ form {
 
 .audio-player-container {
     position: fixed;
-    top: 20px;
-    left: 50%;
+    bottom: 10px;
+    left: 7%;
     transform: translateX(-50%);
     z-index: 990;
     display: flex;
@@ -385,8 +573,8 @@ form {
 }
 
 .audio-player {
-    background: rgba(30, 30, 30, 0.9);
-    color: white;
+    background: #028caf;
+    color: rgb(0, 0, 0);
     padding: 12px 20px;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -462,43 +650,3 @@ form {
     display: none;
 }
 
-.back-button {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #1a1a1a;
-    border: 2px solid #ff6f1e;
-    border-radius: 8px;
-    color: #ff6f1e;
-    padding: 10px 16px;
-    text-decoration: none;
-    box-shadow: 0 0 10px rgba(255, 111, 30, 0.5);
-    transition: all 0.3s ease;
-    font-family: monospace, 'Press Start 2P', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    z-index: 1000; /* Pour s'assurer qu'il reste au-dessus des autres éléments */
-}
-
-.back-button:hover {
-    background-color: #2a2a2a;
-    transform: translateY(-2px);
-    box-shadow: 0 0 15px rgba(255, 111, 30, 0.8);
-}
-
-.back-button:active {
-    transform: translateY(1px);
-}
-
-.back-icon {
-    margin-right: 8px;
-    font-size: 18px;
-}
-
-.back-text {
-    font-size: 14px;
-    font-weight: bold;
-}

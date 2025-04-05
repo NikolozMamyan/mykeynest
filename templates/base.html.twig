@@ -12,13 +12,7 @@
         {% endblock %}
     </head>
     <body >
-{% if app.user %}
 
-<a href="{{ path('app_menu') }}" class="back-button">
-    <span class="back-icon">⬅️</span>
-    <span class="back-text">Back</span>
-</a>
-{% endif %}
 
     <nav data-controller="auth-navbar" class="user-navbar">
     <div data-auth-navbar-target="content"></div>

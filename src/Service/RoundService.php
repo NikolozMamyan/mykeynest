@@ -3,6 +3,8 @@ namespace App\Service;
 
 use App\Repository\CharacterRepository;
 use App\Repository\InventoryRepository;
+use App\Entity\Character;
+
 
 class RoundService
 {
@@ -255,13 +257,14 @@ class RoundService
     }
     
     // méthode qui récupère les stats après application des perks
-public function getCharacterStatsWithPerks(array $characterData): array
-{
-    $character = $this->characterRepository->findOneBy(['name' => $characterData['name']]);
+    public function getCharacterStatsWithPerks(Character $character): array
 
+{
     if (!$character) {
-        return $characterData; // Si perso introuvable, retourne les stats originales
+        return [];
     }
+    
+    
 
     $inventory = $this->inventoryRepository->findOneBy(['character' => $character]);
 

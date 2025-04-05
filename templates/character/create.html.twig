@@ -3,79 +3,78 @@
 {% block title %}Create your Hero{% endblock %}
 
 {% block body %}
-<div class="character-form" 
+<div class="character-form-container" 
      data-controller="stats"
      data-stats-heroes-value='{{ heroes|map(hero => {
         id: hero.id,
         className: hero.className,
         image: asset(hero.image)
      })|json_encode|escape('html_attr') }}'>
-    <h1>Create your Hero</h1>
+    <h1 class="hero-creation-title">👑 Create your Hero</h1>
 
-    <div class="form-layout">
-        <form method="POST" data-action="submit->stats#submit">
-            <label>Name</label>
-            <input type="text" name="name" required class="form-control mb-3">
+    <div class="hero-form-layout">
+        <form method="POST" data-action="submit->stats#submit" class="hero-stats-form">
+            <label class="hero-form-label">Character Name</label>
+            <input type="text" name="name" required class="hero-form-control hero-mb-3" placeholder="Enter hero name">
 
-            <div class="stat-control">
-                <span class="stat-label">Strength</span>
-                <div class="stat-buttons">
-                    <button type="button" data-action="click->stats#decrease" data-stat="strength">–</button>
-                    <input type="text" name="strength" value="1" readonly class="stat-value-create" data-stats-target="strength">
-                    <button type="button" data-action="click->stats#increase" data-stat="strength">+</button>
+            <div class="hero-stat-control">
+                <span class="hero-stat-label">Strength</span>
+                <div class="hero-stat-buttons">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#decrease" data-stat="strength">–</button>
+                    <input type="text" name="strength" value="1" readonly class="hero-stat-value" data-stats-target="strength">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#increase" data-stat="strength">+</button>
                 </div>
             </div>
 
-            <div class="stat-control">
-                <span class="stat-label">Defense</span>
-                <div class="stat-buttons">
-                    <button type="button" data-action="click->stats#decrease" data-stat="defense">–</button>
-                    <input type="text" name="defense" value="1" readonly class="stat-value-create" data-stats-target="defense">
-                    <button type="button" data-action="click->stats#increase" data-stat="defense">+</button>
+            <div class="hero-stat-control">
+                <span class="hero-stat-label">Defense</span>
+                <div class="hero-stat-buttons">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#decrease" data-stat="defense">–</button>
+                    <input type="text" name="defense" value="1" readonly class="hero-stat-value" data-stats-target="defense">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#increase" data-stat="defense">+</button>
                 </div>
             </div>
 
-            <div class="stat-control">
-                <span class="stat-label">Speed</span>
-                <div class="stat-buttons">
-                    <button type="button" data-action="click->stats#decrease" data-stat="speed">–</button>
-                    <input type="text" name="speed" value="1" readonly class="stat-value-create" data-stats-target="speed">
-                    <button type="button" data-action="click->stats#increase" data-stat="speed">+</button>
+            <div class="hero-stat-control">
+                <span class="hero-stat-label">Speed</span>
+                <div class="hero-stat-buttons">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#decrease" data-stat="speed">–</button>
+                    <input type="text" name="speed" value="1" readonly class="hero-stat-value" data-stats-target="speed">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#increase" data-stat="speed">+</button>
                 </div>
             </div>
 
-            <div class="stat-control">
-                <span class="stat-label">Agility</span>
-                <div class="stat-buttons">
-                    <button type="button" data-action="click->stats#decrease" data-stat="agility">–</button>
-                    <input type="text" name="agility" value="1" readonly class="stat-value-create" data-stats-target="agility">
-                    <button type="button" data-action="click->stats#increase" data-stat="agility">+</button>
+            <div class="hero-stat-control">
+                <span class="hero-stat-label">Agility</span>
+                <div class="hero-stat-buttons">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#decrease" data-stat="agility">–</button>
+                    <input type="text" name="agility" value="1" readonly class="hero-stat-value" data-stats-target="agility">
+                    <button type="button" class="hero-stat-btn" data-action="click->stats#increase" data-stat="agility">+</button>
                 </div>
             </div>
 
-            <div id="remaining-points" data-stats-target="remaining">Points left: 5</div>
+            <div id="remaining-points" class="hero-points-counter" data-stats-target="remaining">Points left: 5</div>
             <input type="hidden" name="hero_id" value="{{ heroes[0].id }}" data-stats-target="id">
 
-            <button type="submit" class="pixel-button btn-start w-100 mt-3">Create Character</button>
+            <button type="submit" class="hero-submit-button hero-w-100 hero-mt-3">Create Character</button>
         </form>
 
         <!-- Sprite preview -->
-<div class="sprite-preview">
-
-    <div class="arrow-buttons">
-        <button type="button" class="arrow-btn" data-action="click->stats#previous">←</button>
-
-        <img data-stats-target="image" src="{{ asset(heroes[0].image) }}" class="sprite-img" alt="Preview">
-
-        <button type="button" class="arrow-btn" data-action="click->stats#next">→</button>
+        <div class="hero-sprite-preview">
+            <div class="hero-arrow-buttons">
+                <button type="button" class="hero-arrow-btn" data-action="click->stats#previous">←</button>
+                <img data-stats-target="image" src="{{ asset(heroes[0].image) }}" class="hero-sprite-img" alt="Preview">
+                <button type="button" class="hero-arrow-btn" data-action="click->stats#next">→</button>
+            </div>
+            <div class="hero-sprite-label" data-stats-target="label">{{ heroes[0].className }}</div>
+        </div>
     </div>
-
-    <div class="sprite-label" data-stats-target="label">{{ heroes[0].className }}</div>
-
+    
+    {% include 'components/_menu_button.html.twig' with {
+        'route_name': 'app_menu',
+        'button_text': 'Back to Menu'
+    } %}
 </div>
 
-
-
-    </div>
-</div>
+<!-- Maintenant, enlevez le style intégré et utilisez un fichier CSS externe -->
 {% endblock %}

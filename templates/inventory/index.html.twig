@@ -60,7 +60,10 @@
         </div>
     </form>
 </div>
-
+        {% include 'components/_menu_button.html.twig' with {
+            'route_name': 'app_menu',
+            'button_text': 'Back to Menu'
+        } %}
 <style>
 .inventory-container {
     max-width: 1000px;

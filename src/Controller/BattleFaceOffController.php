@@ -26,17 +26,20 @@ class BattleFaceOffController extends AbstractController
         $friends = $currentUser->getFriends(); // méthode personnalisée dans l'entité User
 
         $opponents = [];
-
         foreach ($friends as $friend) {
             foreach ($friend->getCharacters() as $char) {
+                $hero = $char->getHero(); // On récupère le hero depuis le character
+        
                 $opponents[] = [
                     'id' => $char->getId(),
                     'name' => $char->getName(),
                     'owner' => $friend->getUsername(),
-                    'heroClass' => $char->getHero()->getClassName(),
+                    'image' => $hero ? $hero->getImage() : null, // si jamais le hero est null
+                    'heroClass' => $hero ? $hero->getClassName() : null,
                 ];
             }
         }
+        
 
         return $this->render('battle_faceoff/select.html.twig', [
             'myChar' => $userCharacter,

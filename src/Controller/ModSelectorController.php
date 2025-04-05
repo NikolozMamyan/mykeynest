@@ -19,6 +19,7 @@ final class ModSelectorController extends AbstractController
             $charArr[] = [
                 'id' => $char->getId(),
                 'name' => $char->getName(),
+                'image' => $char->getHero()->getImage(),
                 'heroClass' => $char->getHero()->getClassName(),
             ];
         }
