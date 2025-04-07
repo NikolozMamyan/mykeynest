@@ -115,10 +115,14 @@
         </div>
         <div class="battle-arena">
             {% for charKey, char in {'char1': battleState.char1, 'char2': battleState.char2} %}
+                  
                 <div class="{{ charKey }}" id="{{ charKey }}-panel">
                     <div class="active-turn" id="turn-{{ charKey }}">TOUR</div>
                      <div class="character-sprite ">
-                     <img src="/images/character_solo.png" alt="{{ char.name }}" class="character-image">
+                     <pre>
+             
+                     </pre>
+                     <img src="{{ asset('build/' ~ char.image) }}" alt="{{ char.name }}" class="character-image">
                         <div class="sprite-placeholder">{{ char.name|slice(0, 1) }}</div>
                     </div>
 

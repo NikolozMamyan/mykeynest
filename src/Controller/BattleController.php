@@ -53,7 +53,8 @@ final class BattleController extends AbstractController
     
         // Détermination de l’attaquant initial
         $firstAttacker = ($char1->getSpeed() >= $char2->getSpeed()) ? 'char1' : 'char2';
-    
+        $hero1 = $char1->getHero();
+        $hero2 = $char2->getHero();
         // Construction du battleState
         $battleState = [
             'char1' => [
@@ -63,6 +64,7 @@ final class BattleController extends AbstractController
                 'strength' => $char1->getStrength(),
                 'defense' => $char1->getDefense(),
                 'speed' => $char1->getSpeed(),
+                'image' => $hero1->getImage(),
                 'agility' => $char1->getAgility(),
                 'stamina' => $char1->getStamina(),
             ],
@@ -73,6 +75,7 @@ final class BattleController extends AbstractController
                 'strength' => $char2->getStrength(),
                 'defense' => $char2->getDefense(),
                 'speed' => $char2->getSpeed(),
+                'image' => $hero2->getImage(),
                 'agility' => $char2->getAgility(),
                 'stamina' => $char2->getStamina(),
             ],
