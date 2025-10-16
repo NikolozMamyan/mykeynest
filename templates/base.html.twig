@@ -3,57 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
-
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body >
-
-
-    <nav data-controller="auth-navbar" class="user-navbar">
-    <div data-auth-navbar-target="content"></div>
-</nav>
-    {% for label, messages in app.flashes %}
-    <div class="flash-message flash-{{ label }}">
-        {% for message in messages %}
-            {{ message }}
-        {% endfor %}
-    </div>
-{% endfor %}
+    <body>
         {% block body %}{% endblock %}
-{% if app.user %}
-<div data-controller="audio-player" class="audio-player-container">
-    <div data-audio-player-target="player" class="audio-player">
-        <div class="player-content">
-            <span class="player-title">🎵 Ambiance</span>
-            <div class="player-controls">
-                <button data-action="click->audio-player#toggleAudio" class="control-button">
-                    <span data-audio-player-target="playIcon">▶️</span>
-                    <span data-audio-player-target="pauseIcon" class="hidden">⏸️</span>
-                </button>
-            </div>
-        </div>
-    </div>
-    <div data-audio-player-target="miniButton" class="audio-mini-button" data-action="click->audio-player#showPlayer">
-        🎵
-    </div>
-</div>
-{% endif %}
-        
-        
-
     </body>
-    <script>
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.flash-message').forEach((el) => {
-        el.addEventListener('animationend', () => {
-            el.classList.add('hide');
-        });
-    });
-});
-</script>
 </html>

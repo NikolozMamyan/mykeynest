@@ -38,24 +38,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 64, nullable: true)]
 private ?string $apiToken = null;
 
-#[ORM\Column(type: 'datetime', nullable: true)]
-private ?\DateTimeInterface $tokenExpiresAt = null;
-
-#[ORM\OneToMany(mappedBy: 'owner', targetEntity: Character::class, orphanRemoval: true)]
-private Collection $characters;
-
-#[ORM\OneToMany(mappedBy: 'requester', targetEntity: Friendship::class)]
-private Collection $friendsRequested;
-
-#[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Friendship::class)]
-private Collection $friendsReceived;
-
 
 public function __construct()
 {
-    $this->characters = new ArrayCollection();
-    $this->friendsRequested = new ArrayCollection();
-    $this->friendsReceived = new ArrayCollection();
 }
 
     public function getId(): ?int
@@ -153,115 +138,4 @@ public function setTokenExpiresAt(?\DateTimeInterface $expiresAt): static
     $this->tokenExpiresAt = $expiresAt;
     return $this;
 }
-
-public function getCharacters(): Collection
-{
-    return $this->characters;
-}
-
-public function addCharacter(Character $character): self
-{
-    if (!$this->characters->contains($character)) {
-        $this->characters[] = $character;
-        $character->setOwner($this);
-    }
-
-    return $this;
-}
-
-public function removeCharacter(Character $character): self
-{
-    if ($this->characters->removeElement($character)) {
-        // Set the owning side to null (unless already changed)
-        if ($character->getOwner() === $this) {
-            $character->setOwner(null);
-        }
-    }
-
-    return $this;
-}
-/**
- * @return Collection<int, Friendship>
- */
-public function getFriendsRequested(): Collection
-{
-    return $this->friendsRequested;
-}
-
-public function addFriendRequested(Friendship $friendship): self
-{
-    if (!$this->friendsRequested->contains($friendship)) {
-        $this->friendsRequested[] = $friendship;
-        $friendship->setRequester($this);
-    }
-
-    return $this;
-}
-
-public function removeFriendRequested(Friendship $friendship): self
-{
-    if ($this->friendsRequested->removeElement($friendship)) {
-        // set the owning side to null (unless already changed)
-        if ($friendship->getRequester() === $this) {
-            $friendship->setRequester(null);
-        }
-    }
-
-    return $this;
-}
-
-/**
- * @return Collection<int, Friendship>
- */
-public function getFriendsReceived(): Collection
-{
-    return $this->friendsReceived;
-}
-
-public function addFriendReceived(Friendship $friendship): self
-{
-    if (!$this->friendsReceived->contains($friendship)) {
-        $this->friendsReceived[] = $friendship;
-        $friendship->setReceiver($this);
-    }
-
-    return $this;
-}
-
-public function removeFriendReceived(Friendship $friendship): self
-{
-    if ($this->friendsReceived->removeElement($friendship)) {
-        // set the owning side to null (unless already changed)
-        if ($friendship->getReceiver() === $this) {
-            $friendship->setReceiver(null);
-        }
-    }
-
-    return $this;
-}
-public function getUsername(): string
-{
-    return $this->getEmail(); // ou $this->username si tu as un champ dédié
-}
-
-public function getFriends(): array
-{
-    $friends = [];
-
-    foreach ($this->getFriendsRequested() as $friendship) {
-        if ($friendship->isAccepted()) {
-            $friends[] = $friendship->getReceiver();
-        }
-    }
-
-    foreach ($this->getFriendsReceived() as $friendship) {
-        if ($friendship->isAccepted()) {
-            $friends[] = $friendship->getRequester();
-        }
-    }
-
-    return $friends;
-}
-
-
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Front;
 
 use App\Service\TokenCleaner;
 use App\Repository\UserRepository;
@@ -20,6 +20,11 @@ class AuthPageController extends AbstractController
     
         // 💣 Nettoie le token même si pas authentifié dans "main"
         $cleaner->clearTokenFromRequest($request, $response);
+
+          $user = $this->getUser(); 
+        if($user) {
+              $security->logout(true);
+        }
     
         $response->setContent(
             $this->renderView('auth/login.html.twig')
@@ -35,6 +40,11 @@ class AuthPageController extends AbstractController
     
         // 💣 Nettoie le token même si pas authentifié dans "main"
         $cleaner->clearTokenFromRequest($request, $response);
+
+          $user = $this->getUser(); 
+        if($user) {
+              $security->logout(false);
+        }
     
         $response->setContent(
             $this->renderView('auth/register.html.twig')
