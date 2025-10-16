@@ -50,6 +50,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $prenom = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $apiExtensionToken = null;
+
 
 public function __construct()
 {
@@ -184,6 +187,18 @@ public function setPrenom(?string $prenom): static
 {
     $this->prenom = $prenom;
 
+    return $this;
+}
+
+public function getApiExtensionToken(): ?string
+{
+    return $this->apiExtensionToken;
+}
+
+
+public function regenerateApiExtensionToken(): static
+{
+    $this->apiExtensionToken = bin2hex(random_bytes(32)); // 64 caractères hexadécimaux
     return $this;
 }
 }
