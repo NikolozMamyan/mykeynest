@@ -36,7 +36,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 64, nullable: true)]
-private ?string $apiToken = null;
+    private ?string $apiToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $tokenExpiresAt = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $company = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $prenom = null;
 
 
 public function __construct()
@@ -136,6 +148,42 @@ public function getTokenExpiresAt(): ?\DateTimeInterface
 public function setTokenExpiresAt(?\DateTimeInterface $expiresAt): static
 {
     $this->tokenExpiresAt = $expiresAt;
+    return $this;
+}
+
+public function getCompany(): ?string
+{
+    return $this->company;
+}
+
+public function setCompany(string $company): static
+{
+    $this->company = $company;
+
+    return $this;
+}
+
+public function getNom(): ?string
+{
+    return $this->nom;
+}
+
+public function setNom(?string $nom): static
+{
+    $this->nom = $nom;
+
+    return $this;
+}
+
+public function getPrenom(): ?string
+{
+    return $this->prenom;
+}
+
+public function setPrenom(?string $prenom): static
+{
+    $this->prenom = $prenom;
+
     return $this;
 }
 }

@@ -1,0 +1,157 @@
+:root {
+  /* Couleurs principales */
+  --color-primary: #059669;
+  --color-primary-hover: rgba(16, 185, 129, 0.3);
+
+  /* Couleurs de base */
+  --color-white: #ffffff;
+  --color-bg-light: #f8fafc;
+  --color-bg-hover: #f1f5f9;
+
+  /* Couleurs du texte */
+  --color-text-dark: #1e293b;
+  --color-text-medium: #475569;
+  --color-text-muted: #64748b;
+  --color-text-light: #94a3b8;
+
+  /* Bordures */
+  --color-border: #e2e8f0;
+
+  /* Couleurs d’alerte / notification */
+  --color-danger-start: #ef4444;
+  --color-danger-end: #dc2626;
+
+  /* Ombres et effets */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-green: 0 4px 12px var(--color-primary-hover);
+
+  /* Divers */
+  --blur-background: blur(10px);
+}
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F8FAFC;
+            color: #0F172A;
+        }
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+/* ---- Layout ---- */
+.wrapper-layout {
+    display: flex;
+
+}
+
+.main-content{
+    margin: 50px;
+}
+[data-theme="dark"] {
+ 
+    /* Fond général */
+    --color-white: #0f172a; /* Fond sombre global */
+    --color-bg-light: #1e293b;
+    --color-bg-hover: #334155;
+
+    /* Texte */
+    --color-text-dark: #f8fafc;
+    --color-text-medium: #cbd5e1;
+    --color-text-muted: #94a3b8;
+    --color-text-light: #64748b;
+
+    /* Bordures */
+    --color-border: #334155;
+
+    /* Couleur principale (inchangée pour conserver la marque) */
+    --color-primary: #059669;
+    --color-primary-hover: rgba(16, 185, 129, 0.4);
+
+    /* Couleurs d’alerte */
+    --color-danger-start: #ef4444;
+    --color-danger-end: #dc2626;
+
+    /* Ombres et effets */
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5);
+    --shadow-green: 0 4px 14px rgba(16, 185, 129, 0.35);
+
+    /* Arrière-plan flouté */
+    --blur-background: blur(10px);
+  }
+
+  /* Ajustements visuels spécifiques */
+
+  /* Header */
+  .header_top {
+    background: linear-gradient(to bottom, var(--color-bg-light), var(--color-white));
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .burger-btn {
+    color: var(--color-text-medium);
+  }
+
+  .burger-btn:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-primary);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: linear-gradient(to bottom, var(--color-bg-light), var(--color-white));
+    border-right: 1px solid var(--color-border);
+    box-shadow: none;
+  }
+
+  .nav-item:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-dark);
+  }
+
+  .nav-item.active {
+    color: var(--color-white);
+  }
+
+  .sidebar-footer {
+    background: var(--color-bg-light);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .logout-btn {
+    background: var(--color-bg-light);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: var(--color-danger-end);
+  }
+
+  .logout-btn:hover {
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
+  }
+
+  /* Scrollbar */
+  .sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+  }
+
+  .sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+  }
+
+  /* Dividers */
+  .nav-divider {
+    background: linear-gradient(to right, transparent, var(--color-border), transparent);
+  }
+
+  /* Avatars */
+  .header_right img {
+    border-color: var(--color-border);
+  }
+
+  .user-profile:hover img {
+    box-shadow: 0 0 0 3px var(--color-primary-hover);
+  }
+
+  .company-name {
+    color: var(--color-text-medium);
+  }
+

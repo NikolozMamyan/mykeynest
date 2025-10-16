@@ -3,7 +3,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-    static targets = ['email', 'password', 'result']
+    static targets = ['email', 'company', 'password', 'result']
 
 
         connect() {
@@ -29,7 +29,7 @@ export default class extends Controller {
                 <span class="spinner"></span>
             `
             setTimeout(() => {
-                window.location.href = '/app/menu'
+                window.location.href = '/app/credential'
             }, 1200)
         } else {
             const error = await response.json()
@@ -44,13 +44,14 @@ export default class extends Controller {
     async register(event) {
         event.preventDefault()
 
+        const company = this.companyTarget.value
         const email = this.emailTarget.value
         const password = this.passwordTarget.value
 
         const response = await fetch('/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ company,email, password })
         })
 
         if (response.ok) {
@@ -61,7 +62,7 @@ export default class extends Controller {
                  <span class="spinner"></span>
             `
             setTimeout(() => {
-                window.location.href = '/app/menu'
+                window.location.href = '/app/credential'
             }, 1500)
         } else {
             const errorData = await response.json()

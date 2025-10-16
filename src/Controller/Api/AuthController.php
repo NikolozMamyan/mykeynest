@@ -32,6 +32,7 @@ final class AuthController extends AbstractController
         }
 
         $user = new User();
+        $user->setCompany($data['company']);
         $user->setEmail($data['email']);
         $user->setRoles(['ROLE_USER']);
         $user->setPassword(
@@ -58,7 +59,7 @@ final class AuthController extends AbstractController
             Cookie::create('AUTH_TOKEN')
                 ->withValue($token)
                 ->withHttpOnly(true)
-                ->withSecure(true) // en prod : true (HTTPS only)
+                ->withSecure(false) // en prod : true (HTTPS only)
                 ->withPath('/')
                 ->withExpires($expiresAt->getTimestamp())
         );
@@ -103,7 +104,7 @@ final class AuthController extends AbstractController
             Cookie::create('AUTH_TOKEN')
                 ->withValue($token)
                 ->withHttpOnly(true)
-                ->withSecure(true)
+                ->withSecure(false)
                 ->withPath('/')
                 ->withExpires($expiresAt->getTimestamp())
         );

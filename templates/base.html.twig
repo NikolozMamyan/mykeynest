@@ -1,13 +1,59 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <title>{% block title %}Welcome!{% endblock %}</title>
+
+    {% block javascripts %}
+      {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+  </head>
+
+  <body>
+    {% if app.user %}
+      {% include "./components/header.html.twig" %}
+    {% endif %}
+
+    <div class="wrapper-layout">
+      {% if app.user %}
+        {% include "./components/sidebar.html.twig" %}
+      {% endif %}
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
         {% block body %}{% endblock %}
-    </body>
+      </main>
+    </div>
+
+    <script>
+      const root = document.documentElement;
+      const themeToggle = document.getElementById('theme-toggle'); // ton bouton
+      const savedTheme = localStorage.getItem('theme');
+
+      // --- Initialisation ---
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        root.setAttribute('data-theme', savedTheme);
+      } else {
+        // auto → selon la préférence du système
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          root.setAttribute('data-theme', 'dark');
+        } else {
+          root.setAttribute('data-theme', 'light');
+        }
+      }
+
+      // --- Toggle au clic ---
+      themeToggle?.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme');
+        const newTheme = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+      });
+    </script>
+  </body>
 </html>

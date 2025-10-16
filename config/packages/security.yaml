@@ -38,7 +38,7 @@ security:
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
 
         # Pages HTML protégées
-        - { path: ^/app/, roles: [ROLE_EMPLOYEE] }
+        - { path: ^/app/, roles: [ROLE_USER] }
     
 
 when@test:
