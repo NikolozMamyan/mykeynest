@@ -43,6 +43,7 @@ final class AuthController extends AbstractController
         $expiresAt = (new \DateTime())->modify('+1 hour');
         $user->setApiToken($token);
         $user->setTokenExpiresAt($expiresAt);
+        $user->regenerateApiExtensionToken();
 
         $em->persist($user);
         $em->flush();
