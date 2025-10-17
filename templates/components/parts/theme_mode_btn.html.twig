@@ -1,0 +1,161 @@
+<style>
+/* === THEME TOGGLE BUTTON === */
+.theme-btn {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  font-size: 18px;
+  color: var(--color-text-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 10px;
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: var(--color-primary);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.theme-btn:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.theme-btn:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-green);
+}
+
+.theme-btn:hover i {
+  color: var(--color-white);
+  position: relative;
+  z-index: 1;
+}
+
+.theme-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Animation de rotation lors du changement de thème */
+.theme-btn.switching {
+  animation: themeSwitch 0.5s ease;
+}
+
+@keyframes themeSwitch {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Icône du soleil pour le mode clair */
+.theme-btn .fa-sun {
+  color: #f59e0b;
+}
+
+/* Icône de la lune pour le mode sombre */
+.theme-btn .fa-moon {
+  color: #6366f1;
+}
+
+/* === MODIFICATION DU HEADER === */
+.header_right {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Réduit l'espace pour plus de cohésion */
+  margin-left: auto;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .theme-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .header_right {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+  
+  .header_right {
+    gap: 8px;
+  }
+}
+</style>
+
+    <!-- Bouton thème - PLACÉ ICI pour une meilleure cohérence -->
+    <button id="theme-toggle" class="theme-btn" aria-label="Changer le thème">
+      <i class="fas fa-moon"></i>
+    </button>
+
+
+    
+<script>
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('theme-toggle');
+  const icon = themeToggle.querySelector('i');
+
+  // --- Initialisation du thème ---
+  const savedTheme = localStorage.getItem('theme');
+
+  if (savedTheme) {
+    // Appliquer le thème sauvegardé par l'utilisateur
+    root.setAttribute('data-theme', savedTheme);
+    icon.classList.toggle('fa-sun', savedTheme === 'light');
+    icon.classList.toggle('fa-moon', savedTheme === 'dark');
+  } else {
+    // Valeur par défaut (ex: clair)
+    root.setAttribute('data-theme', 'light');
+    icon.classList.add('fa-moon');
+  }
+
+  // --- Changement de thème au clic ---
+  themeToggle.addEventListener('click', function () {
+    this.classList.add('switching');
+
+    const current = root.getAttribute('data-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+
+    // Appliquer le nouveau thème
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    // Mettre à jour l'icône
+    if (newTheme === 'light') {
+      icon.classList.remove('fa-moon');
+      icon.classList.add('fa-sun');
+    } else {
+      icon.classList.remove('fa-sun');
+      icon.classList.add('fa-moon');
+    }
+
+    // Retirer l'animation après 0.5s
+    setTimeout(() => {
+      this.classList.remove('switching');
+    }, 500);
+  });
+</script>

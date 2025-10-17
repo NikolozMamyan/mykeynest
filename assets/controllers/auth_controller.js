@@ -25,8 +25,10 @@ export default class extends Controller {
 
         if (response.ok) {
             this.resultTarget.innerHTML = `
-                <div style="color: var(--health-color);">✔ Login successful... redirecting...</div>
-                <span class="spinner"></span>
+                <div style="color: var(--color-primary); font-weight: 500;">
+      ✔ Login successful... redirecting...
+      <span class="spinner"></span>
+    </div>
             `
             setTimeout(() => {
                 window.location.href = '/app/credential'
@@ -56,10 +58,10 @@ export default class extends Controller {
 
         if (response.ok) {
             this.resultTarget.innerHTML = `
-                <div style="color: var(--health-color);">
-                    ✔ Account created! You can now log in.
-                </div>
-                 <span class="spinner"></span>
+               <div style="color: var(--color-primary); font-weight: 500;">
+      ✔ Login successful... redirecting...
+      <span class="spinner"></span>
+    </div>
             `
             setTimeout(() => {
                 window.location.href = '/app/credential'

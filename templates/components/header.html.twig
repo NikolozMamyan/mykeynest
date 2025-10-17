@@ -203,6 +203,8 @@
 
 </style>
 
+
+
 <header class="header_top">
   <!-- Bouton burger pour mobile -->
   <button class="burger-btn" id="burger-btn" aria-label="Menu">
@@ -218,12 +220,10 @@
       <span class="logo-text">MykeyNest</span>
     </div>
   </div>
-{# <button id="theme-toggle" class="theme-btn" aria-label="Changer le thème">
-  <i class="fas fa-moon"></i>
-</button> #}
 
   <!-- Bloc de droite -->
   <div class="header_right">
+     {% include 'components/parts/theme_mode_btn.html.twig' %}    
     <!-- Notification -->
     <button class="notification-btn" id="notif-btn" aria-label="Notifications">
       <i class="fas fa-bell"></i>

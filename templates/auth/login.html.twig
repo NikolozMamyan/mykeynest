@@ -1,29 +1,424 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_auth.html.twig' %}
 
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
 
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, var(--color-bg-light) 0%, #e0f2fe 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-<div  data-controller="auth" class="login-box">
-    <h1>LOGIN</h1>
-  <form data-action="submit->auth#login">
+.auth-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-wrapper {
+  background: var(--color-white);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), var(--shadow-sm);
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--color-border);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Colonne gauche - Description */
+.login-hero {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--color-white);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-icon {
+  width: 72px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: var(--blur-background);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: var(--color-white);
+}
+
+.login-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.login-hero p {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  margin: 0 0 2.5rem 0;
+  opacity: 0.95;
+  font-weight: 400;
+}
+
+.hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 0.9375rem;
+  opacity: 0.9;
+}
+
+.feature-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: var(--color-white);
+  stroke-width: 2.5;
+}
+
+/* Colonne droite - Formulaire */
+.login-form-section {
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+.form-header {
+  margin-bottom: 2.5rem;
+}
+
+.form-header h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.025em;
+}
+
+.form-header p {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-medium);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  color: var(--color-text-dark);
+  background: var(--color-white);
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-hover);
+  background: var(--color-white);
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-light);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+  box-shadow: var(--shadow-green);
+}
+
+.btn-submit:hover {
+  background: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--color-primary-hover);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+.auth-hint {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.auth-hint a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.auth-hint a:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+[data-auth-target="result"] {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  display: none;
+}
+
+[data-auth-target="result"]:not(:empty) {
+  display: block;
+}
+
+[data-auth-target="result"].error {
+  background: #fef2f2;
+  color: var(--color-danger-start);
+  border: 1px solid #fecaca;
+}
+
+[data-auth-target="result"].success {
+  background: #f0fdf4;
+  color: var(--color-primary);
+  border: 1px solid #bbf7d0;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .login-wrapper {
+        display: flex;
+        flex-direction: column-reverse;
+  }
+  .login-wrapper {
+    border-radius:0px;
+  }
+    .auth-container {
+    padding: 0rem;
+  }
+  .login-hero {
+    padding: 3rem 2rem;
+  }
+  
+  .login-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .login-form-section {
+    padding: 3rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+  
+  .login-hero {
+    padding: 2rem 1.5rem;
+  }
+  
+  .login-hero h1 {
+    font-size: 1.75rem;
+  }
+  
+  .login-form-section {
+    padding: 2rem 1.5rem;
+  }
+  
+  .form-header h2 {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+<div class="auth-container">
+  <div class="login-wrapper" data-controller="auth">
     
-        <label for="email">Email</label>
-        <input type="email" data-auth-target="email" required>
+    <!-- Colonne gauche - Hero -->
+    <div class="login-hero">
+      <div class="hero-content">
+        <div class="hero-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+        </div>
+        
+        <h1>Gestionnaire de Mots de Passe</h1>
+        <p>Sécurisez tous vos mots de passe en un seul endroit. Simple, sûr et accessible partout.</p>
+        
+        <div class="hero-features">
+          <div class="feature-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+            Chiffrement de bout en bout
+          </div>
+          
+          <div class="feature-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+            </svg>
+            Synchronisation instantanée
+          </div>
+          
+          <div class="feature-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+            </svg>
+            Accessible sur tous vos appareils
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Colonne droite - Formulaire -->
+    <div class="login-form-section">
+      <div class="theme-toggle">
+        {% include 'components/parts/theme_mode_btn.html.twig' %}
+      </div>
+      
+      <div class="form-header">
+        <h2>Bon retour !</h2>
+        <p>Connectez-vous à votre compte sécurisé</p>
+      </div>
+      
+      <form class="login-form" data-action="submit->auth#login">
+        <div class="form-group">
+          <label for="email">Adresse email</label>
+          <input 
+            type="email" 
+            id="email"
+            data-auth-target="email" 
+            placeholder="vous@exemple.com"
+            required
+            autocomplete="email"
+          >
+        </div>
 
-        <label for="password">Password</label>
-        <input type="password" data-auth-target="password" required>
-        <button type="submit" class="pixel-button btn-start">Start</button>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input 
+            type="password" 
+            id="password"
+            data-auth-target="password" 
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+          >
+        </div>
 
-       <p class="auth-hint">
-    Don't have an account? <a href="/register">Sign up</a>
-</p>
-    </form>
+        <button type="submit" class="btn-submit">
+          Se connecter
+        </button>
 
-    <div data-auth-target="result"></div>
+        <p class="auth-hint">
+          Pas encore de compte ? <a href="/register">S'inscrire</a>
+        </p>
+      </form>
+
+      <div data-auth-target="result"></div>
+    </div>
+    
+  </div>
 </div>
-
-
 
 {% endblock %}
