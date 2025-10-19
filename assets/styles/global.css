@@ -20,6 +20,8 @@
   /* Couleurs d’alerte / notification */
   --color-danger-start: #ef4444;
   --color-danger-end: #dc2626;
+  --color-warning: #f59e0b;
+  --color-success: #10b981;
 
   /* Ombres et effets */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -27,6 +29,9 @@
 
   /* Divers */
   --blur-background: blur(10px);
+
+    --border-radius: 12px;
+  --border-radius-sm: 8px;
 }
         
         body {
