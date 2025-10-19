@@ -52,7 +52,7 @@
 
 .main-content {
   width: 100%;
-  max-width: 1000px; /* limite la largeur pour un effet centré et lisible */
+  max-width: 1200px;
   padding: 10px;
   background: var(--color-white);
   border-radius: 12px;
