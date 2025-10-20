@@ -75,4 +75,32 @@ export default class extends Controller {
             `
         }
     }
+
+     async logout(event) {
+    event.preventDefault()
+
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include", // important pour envoyer les cookies
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        console.error("Erreur de déconnexion :", error.error)
+        return
+      }
+
+      const data = await response.json()
+      console.log(data.message) // "Déconnexion réussie"
+
+      window.location.href = "/login"
+    } catch (err) {
+      console.error("Erreur réseau :", err)
+    }
+  }
+
 }

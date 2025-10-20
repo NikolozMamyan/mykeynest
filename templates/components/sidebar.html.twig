@@ -427,7 +427,10 @@
 
     <!-- Footer -->
     <div class="sidebar-footer">
-        <a href="" class="logout-btn">
+        <a href="" class="logout-btn"
+          data-controller="auth"
+          data-action="click->auth#logout"
+        >
             <i class="fas fa-sign-out-alt"></i>
             <span>Déconnexion</span>
         </a>
