@@ -4,256 +4,581 @@
 {% block stylesheets %}
 {{ parent() }}
 <style>
+/* ——— layout ——— */
 .page-wrapper {
-  display:grid;grid-template-columns:2fr 1fr;gap:40px;
-  padding:80px 60px;max-width:1300px;margin:0 auto;
+  display:grid;grid-template-columns:1.6fr 1fr;gap:32px;
+  margin:0 auto;
 }
-.generator-card,.sidebar-card{
-  background:var(--color-white);padding:40px;border-radius:20px;box-shadow:var(--shadow-sm);
+@media (max-width: 1050px){ .page-wrapper{grid-template-columns:1fr;} }
+
+.card{
+  background:var(--color-white);
+  border:1px solid var(--color-border);
+  border-radius:var(--border-radius);
+  box-shadow:var(--shadow-sm);
 }
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 22px;border-bottom:1px solid var(--color-border)
+}
+.card-header h1,.card-header h2{
+  margin:0;font-size:1.15rem;color:var(--color-text-dark);font-weight:800;letter-spacing:.2px;
+}
+.card-body{padding:22px}
+.helper{color:var(--color-text-muted);font-size:.95rem;margin-top:6px}
+
+/* ——— buttons ——— */
+.btn{
+  border-radius:10px;border:1px solid var(--color-border);padding:10px 14px;
+  font-weight:700;background:var(--color-bg-light);color:var(--color-text-dark);
+  cursor:pointer;transition:.18s ease;display:inline-flex;gap:8px;align-items:center
+}
+.btn:hover{background:var(--color-bg-hover)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-primary{background:var(--color-primary);border-color:transparent;color:white;box-shadow:var(--shadow-sm)}
+.btn-primary:hover{filter:brightness(.95);box-shadow:var(--shadow-green)}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-danger{border-color:transparent;background:linear-gradient(90deg,var(--color-danger-start),var(--color-danger-end));color:#fff}
+
+/* Compact icon buttons */
+.btn-icon{padding:8px 10px;border-radius:8px}
+.btn-icon-danger{padding:6px 8px;border-radius:8px;background:#fee2e2;border-color:#fecaca;color:#b91c1c}
+.btn-icon-danger:hover{background:#fecaca}
+
+/* ——— output ——— */
 .password-output{
-  background:var(--color-bg-light);border:2px solid var(--color-border);
-  border-radius:10px;padding:18px;font-size:1.5rem;text-align:center;margin-bottom:20px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--color-bg-light);border:1px dashed var(--color-border);
+  border-radius:12px;padding:18px 16px;font-size:1.35rem;font-weight:700;
+  color:var(--color-text-dark);user-select:all;letter-spacing:.5px
 }
-.switcher{display:flex;background:var(--color-bg-light);border-radius:10px;margin-bottom:15px;}
-.switcher button{flex:1;padding:10px;border:none;background:none;cursor:pointer;font-weight:700;}
-.switcher button.active{background:var(--color-primary);color:white;}
-.password-item{background:var(--color-bg-light);border:1px solid var(--color-border);
-border-radius:10px;padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
-.copy-icon,.save-draft,.convert-btn{cursor:pointer;color:var(--color-primary);border:none;background:none;}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;}
-.modal{background:white;border-radius:12px;padding:25px;width:400px;max-width:95%;}
-.modal input{width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:1px solid var(--color-border);}
-.modal-buttons{display:flex;justify-content:flex-end;gap:10px;}
+.password-output .mono{font-family: ui-monospace,SFMono-Regular,Menlo,monospace;flex:1;text-align:center}
+
+/* ——— controls ——— */
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media (max-width:700px){.controls{grid-template-columns:1fr}}
+.field{
+  background:var(--color-bg-light);border:1px solid var(--color-border);border-radius:10px;
+  padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:16px
+}
+.field label{font-weight:700;color:var(--color-text-medium)}
+.switch{--h:28px;width:48px;height:var(--h);border-radius:999px;background:#e5e7eb;position:relative;cursor:pointer;flex-shrink:0;border:1px solid var(--color-border)}
+.switch input{display:none}
+.switch .dot{position:absolute;top:50%;left:3px;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;
+  background:white;border:1px solid var(--color-border);transition:all .2s ease}
+.switch input:checked + .dot{left:23px;background:var(--color-primary);border-color:var(--color-primary)}
+.range-wrap{display:flex;align-items:center;gap:12px;width:100%}
+.range-wrap input[type="range"]{flex:1}
+.badge{padding:6px 10px;border-radius:999px;background:var(--color-bg-hover);font-weight:700;font-size:.85rem;color:var(--color-text-medium);border:1px solid var(--color-border)}
+
+/* ——— strength meter ——— */
+.meter{height:10px;border-radius:8px;background:#eef2f7;border:1px solid var(--color-border);overflow:hidden}
+.meter > div{height:100%;width:0%;transition:width .25s ease}
+.meter.weak > div{background:linear-gradient(90deg,#fecaca,#f87171)}
+.meter.medium > div{background:linear-gradient(90deg,#fde68a,#f59e0b)}
+.meter.strong > div{background:linear-gradient(90deg,#bbf7d0,#10b981)}
+.meter-label{display:flex;justify-content:space-between;color:var(--color-text-light);font-size:.85rem;margin-top:6px}
+
+/* ——— history ——— */
+.switcher{
+  display:flex;background:var(--color-bg-light);border:1px solid var(--color-border);
+  border-radius:10px;overflow:hidden
+}
+.switcher button{flex:1;padding:10px;border:none;background:none;cursor:pointer;font-weight:800;color:var(--color-text-medium)}
+.switcher button.active{background:var(--color-primary);color:white}
+.header-actions{display:flex;align-items:center;gap:10px}
+.password-item{
+  background:var(--color-bg-light);border:1px solid var(--color-border);
+  border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px
+}
+.password-item .mono{font-family:ui-monospace,Menlo,monospace}
+.item-actions{display:flex;gap:8px}
+
+/* Hauteur fixe + scroll interne (historique) */
+.history-body{height: 520px; display:flex; flex-direction:column}
+#passwordList{flex:1 1 auto; overflow:auto; padding-right:4px}
+#historyHint{flex:0 0 auto}
+
+/* ——— modals ——— */
+.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1000;
+  background:rgba(15,23,42,.45);backdrop-filter:var(--blur-background)}
+.modal{width:520px;max-width:95%;background:white;border-radius:16px;border:1px solid var(--color-border);box-shadow:var(--shadow-green);overflow:hidden}
+.modal header{padding:16px 18px;border-bottom:1px solid var(--color-border);display:flex;justify-content:space-between;align-items:center}
+.modal header h3{margin:0;font-size:1rem}
+.modal .content{padding:18px}
+.modal .content .form-group{margin-bottom:14px}
+.modal .content input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--color-border)}
+.modal footer{padding:14px 18px;border-top:1px solid var(--color-border);display:flex;justify-content:flex-end;gap:10px}
+
+/* focus */
+:focus-visible{outline:3px solid rgba(5,150,105,.4);outline-offset:2px;border-radius:8px}
+
+/* ——— toasts ——— */
+.toast-wrap{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:1200}
+.toast{background:white;border:1px solid var(--color-border);border-left:6px solid var(--color-success);
+  box-shadow:var(--shadow-sm);border-radius:12px;padding:12px 14px;min-width:260px;color:var(--color-text-dark);display:flex;gap:10px;align-items:flex-start}
+.toast.error{border-left-color:var(--color-danger-start)}
+.toast .title{font-weight:800}
+.toast .msg{color:var(--color-text-medium);font-size:.95rem}
+
+/* helpers */
+.text-center{text-align:center}
+.muted{color:var(--color-text-light)}
+.hr{height:1px;background:var(--color-border);margin:16px 0}
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="page-wrapper">
-  <div class="generator-card">
-    <h1><i class="fa-solid fa-key"></i> Générateur</h1>
-    <p>Créez un mot de passe fort et enregistrez-le.</p>
 
-    <div class="password-output" id="passwordOutput">•••••••••••••</div>
-    <div style="display:flex;gap:10px;margin-bottom:20px;">
-      <button class="btn btn-outline" id="copyBtn"><i class="fa-solid fa-copy"></i> Copier</button>
-      <button class="btn btn-primary" id="generateBtn"><i class="fa-solid fa-bolt"></i> Générer</button>
+  <!-- ====== Generator ====== -->
+  <section class="card">
+    <div class="card-header">
+      <h1><i class="fa-solid fa-key"></i> Générateur</h1>
+      <div class="helper">Créez un mot de passe fort et enregistrez-le.</div>
     </div>
 
-    <div class="options">
-      <div class="option"><label>Longueur :</label><input type="number" id="length" value="12" min="4" max="64"></div>
-      <div class="option"><label>Majuscules</label><input type="checkbox" id="uppercase" checked></div>
-      <div class="option"><label>Minuscules</label><input type="checkbox" id="lowercase" checked></div>
-      <div class="option"><label>Chiffres</label><input type="checkbox" id="numbers" checked></div>
-      <div class="option"><label>Symboles</label><input type="checkbox" id="symbols" checked></div>
-    </div>
-  </div>
+    <div class="card-body">
+      <div class="password-output" aria-live="polite">
+        <span class="mono" id="passwordOutput">•••••••••••••</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="copyBtn" title="Copier"><i class="fa-solid fa-copy"></i></button>
+          <button class="btn btn-primary" id="generateBtn"><i class="fa-solid fa-bolt"></i> Générer</button>
+        </div>
+      </div>
 
-  <div class="sidebar-card">
-    <h2><i class="fa-solid fa-clock-rotate-left"></i> Historique</h2>
-    <div class="switcher">
-      <button id="recentBtn" class="active">Récents</button>
-      <button id="savedBtn">Enregistrés</button>
+      <div class="hr"></div>
+
+      <div class="field">
+        <label for="length">Longueur</label>
+        <div class="range-wrap">
+          <input type="range" id="length" min="8" max="64" value="12" aria-label="Longueur du mot de passe">
+          <span class="badge" id="lengthValue">12</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="field">
+          <label>Majuscules</label>
+          <label class="switch" aria-label="Inclure les majuscules">
+            <input type="checkbox" id="uppercase" checked><span class="dot"></span>
+          </label>
+        </div>
+        <div class="field">
+          <label>Minuscules</label>
+          <label class="switch" aria-label="Inclure les minuscules">
+            <input type="checkbox" id="lowercase" checked><span class="dot"></span>
+          </label>
+        </div>
+        <div class="field">
+          <label>Chiffres</label>
+          <label class="switch" aria-label="Inclure les chiffres">
+            <input type="checkbox" id="numbers" checked><span class="dot"></span>
+          </label>
+        </div>
+        <div class="field">
+          <label>Symboles</label>
+          <label class="switch" aria-label="Inclure les symboles">
+            <input type="checkbox" id="symbols" checked><span class="dot"></span>
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <div class="meter" id="meter"><div></div></div>
+        <div class="meter-label">
+          <span id="entropyLabel" class="muted">Entropie : —</span>
+          <span id="strengthLabel" class="muted">Force : —</span>
+        </div>
+      </div>
     </div>
-    <div id="passwordList"></div>
-  </div>
+  </section>
+
+  <!-- ====== History ====== -->
+  <aside class="card">
+    <div class="card-header">
+      <h2><i class="fa-solid fa-clock-rotate-left"></i> Historique</h2>
+      <div class="header-actions">
+        <div class="switcher" role="tablist" aria-label="Liste des mots de passe">
+          <button id="recentBtn" class="active" role="tab" aria-selected="true">Récents</button>
+          <button id="savedBtn" role="tab" aria-selected="false">Enregistrés</button>
+        </div>
+        <button id="clearAllBtn" class="btn btn-icon btn-icon-danger" title="Tout supprimer (Récents)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+    <div class="card-body history-body">
+      <div id="passwordList"></div>
+      <p class="helper text-center" id="historyHint">Les éléments récents sont stockés localement 48h.</p>
+    </div>
+  </aside>
 </div>
 
-<!-- Modal Conversion -->
-<div class="modal-backdrop" id="convertModal">
-  <div class="modal">
-    <h3>Convertir en Credential</h3>
-    <input type="text" id="credName" placeholder="Nom">
-    <input type="text" id="credDomain" placeholder="Domaine (ex : site.com)">
-    <input type="text" id="credUsername" placeholder="Identifiant / email">
-    <div class="modal-buttons">
-      <button id="cancelConvert" class="btn btn-outline">Annuler</button>
+<!-- ====== Modal Convert ====== -->
+<div class="modal-backdrop" id="convertModal" aria-hidden="true" aria-labelledby="cTitle" role="dialog">
+  <div class="modal" role="document">
+    <header>
+      <h3 id="cTitle">Convertir en Credential</h3>
+    <button class="btn btn-ghost" data-modal-close aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="content">
+      <div class="form-group">
+        <label for="credName">Nom</label>
+        <input type="text" id="credName" placeholder="Nom">
+      </div>
+      <div class="form-group">
+        <label for="credDomain">Domaine</label>
+        <input type="text" id="credDomain" placeholder="ex : site.com">
+      </div>
+      <div class="form-group">
+        <label for="credUsername">Identifiant / email</label>
+        <input type="text" id="credUsername" placeholder="Identifiant / email">
+      </div>
+    </div>
+    <footer>
+      <button class="btn" data-modal-close>Annuler</button>
       <button id="confirmConvert" class="btn btn-primary">Convertir</button>
-    </div>
+    </footer>
   </div>
 </div>
+
+<!-- ====== Modal Save Draft ====== -->
+<div class="modal-backdrop" id="saveModal" aria-hidden="true" aria-labelledby="sTitle" role="dialog">
+  <div class="modal" role="document">
+    <header>
+      <h3 id="sTitle">Enregistrer en brouillon</h3>
+      <button class="btn btn-ghost" data-modal-close aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="content">
+      <div class="form-group">
+        <label for="saveName">Nom du mot de passe</label>
+        <input type="text" id="saveName" placeholder="Ex: Compte GitHub">
+      </div>
+    </div>
+    <footer>
+      <button class="btn" data-modal-close>Annuler</button>
+      <button id="confirmSave" class="btn btn-primary">Enregistrer</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ====== Modal Confirm (clear all) ====== -->
+<div class="modal-backdrop" id="confirmModal" aria-hidden="true" aria-labelledby="confirmTitle" role="dialog">
+  <div class="modal" role="document">
+    <header>
+      <h3 id="confirmTitle">Tout supprimer ?</h3>
+      <button class="btn btn-ghost" data-modal-close aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="content">
+      <p>Cette action efface définitivement les éléments <strong>Récents</strong> stockés localement.</p>
+    </div>
+    <footer>
+      <button class="btn" data-modal-close>Annuler</button>
+      <button id="confirmClearAll" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Supprimer tout</button>
+    </footer>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
 
 <script>
-const output = document.getElementById("passwordOutput");
-const list = document.getElementById("passwordList");
-const convertModal = document.getElementById("convertModal");
-const confirmConvert = document.getElementById("confirmConvert");
-const cancelConvert = document.getElementById("cancelConvert");
+/* ===== Refs ===== */
+const outputEl = document.getElementById('passwordOutput');
+const list = document.getElementById('passwordList');
+const recentBtn = document.getElementById('recentBtn');
+const savedBtn  = document.getElementById('savedBtn');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const meter = document.getElementById('meter');
+const meterBar = meter.querySelector('div');
+const entropyLabel = document.getElementById('entropyLabel');
+const strengthLabel = document.getElementById('strengthLabel');
+const lengthInput = document.getElementById('length');
+const lengthValue = document.getElementById('lengthValue');
+const toastWrap = document.getElementById('toastWrap');
 
-let recentPasswords = loadRecentPasswords(); // chargement depuis localStorage
+let recentPasswords = loadRecentPasswords();
 let currentDraftId = null;
+let pendingSavePassword = null;
 
-// === Génération de mot de passe ===
-function generatePassword() {
-  const len = +document.getElementById("length").value;
-  let chars = "";
-  if (uppercase.checked) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  if (lowercase.checked) chars += "abcdefghijklmnopqrstuvwxyz";
-  if (numbers.checked) chars += "0123456789";
-  if (symbols.checked) chars += "!@#$%^&*()_+-=[]{};:,.<>/?";
-  if (!chars) return;
+/* ===== Utils ===== */
+const Toast = (type, title, msg) => {
+  const el = document.createElement('div');
+  el.className = 'toast' + (type==='error' ? ' error':'');
+  el.innerHTML = `<div><div class="title">${title}</div><div class="msg">${msg}</div></div>`;
+  toastWrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='.6' }, 2500);
+  setTimeout(()=>{ el.remove() }, 4200);
+};
 
-  let p = "";
-  for (let i = 0; i < len; i++) p += chars[Math.floor(Math.random() * chars.length)];
-  output.textContent = p;
+const openModal = (id) => {
+  const m = document.getElementById(id);
+  m.style.display='flex'; m.setAttribute('aria-hidden','false');
+  const focusable = m.querySelector('input,button'); focusable && focusable.focus();
+  const onEsc = (e)=>{ if(e.key==='Escape') closeModal(id, onEsc); };
+  m.dataset.esc = true; document.addEventListener('keydown', onEsc);
+  m.addEventListener('click', (e)=>{ if(e.target===m) closeModal(id, onEsc) });
+  m.querySelectorAll('[data-modal-close]').forEach(btn => btn.onclick=()=>closeModal(id, onEsc));
+};
+const closeModal = (id, escHandler) => {
+  const m = document.getElementById(id);
+  m.style.display='none'; m.setAttribute('aria-hidden','true');
+  if(escHandler){ document.removeEventListener('keydown', escHandler); }
+};
 
-  addRecentPassword(p);
-  if (document.getElementById("recentBtn").classList.contains("active")) renderRecent();
+function entropy(bits){ return Math.round(bits*10)/10; }
+function updateMeter(pwd, pool) {
+  if(!pwd){ meter.className='meter'; meterBar.style.width='0%'; entropyLabel.textContent='Entropie : —'; strengthLabel.textContent='Force : —'; return; }
+  const H = Math.log2(pool) * pwd.length;
+  const e = entropy(H);
+  entropyLabel.textContent = `Entropie : ${e} bits`;
+  let strength='weak', pct=25;
+  if(e>=60){ strength='strong'; pct=100; }
+  else if(e>=45){ strength='medium'; pct=65; }
+  else if(e>=30){ strength='medium'; pct=45; }
+  else { strength='weak'; pct=25; }
+  meter.className = 'meter ' + strength;
+  meterBar.style.width = pct+'%';
+  strengthLabel.textContent = 'Force : ' + (strength==='strong'?'Forte':strength==='medium'?'Moyenne':'Faible');
 }
 
-// === Sauvegarde & nettoyage dans localStorage ===
-function addRecentPassword(password) {
-  const now = Date.now();
-  recentPasswords.unshift({ password, createdAt: now });
-  if (recentPasswords.length > 10) recentPasswords.pop();
+function saveRecentPasswords(){ localStorage.setItem('recentPasswords', JSON.stringify(recentPasswords)); }
+function loadRecentPasswords(){
+  const data = localStorage.getItem('recentPasswords'); if(!data) return [];
+  try{
+    const parsed = JSON.parse(data);
+    const now = Date.now();
+    const valid = parsed.filter(p => now - p.createdAt < 48*3600*1000);
+    if(valid.length !== parsed.length) localStorage.setItem('recentPasswords', JSON.stringify(valid));
+    return valid;
+  }catch{ return []; }
+}
+function addRecentPassword(password){
+  const now=Date.now(); recentPasswords.unshift({ password, createdAt: now });
+  if(recentPasswords.length>12) recentPasswords.pop();
   saveRecentPasswords();
 }
 
-function saveRecentPasswords() {
-  localStorage.setItem("recentPasswords", JSON.stringify(recentPasswords));
+/* ===== Generation ===== */
+function getCharPools(){
+  return { upper:"ABCDEFGHIJKLMNOPQRSTUVWXYZ", lower:"abcdefghijklmnopqrstuvwxyz", nums:"0123456789", syms:"!@#$%^&*()_+-=[]{};:,.<>/?" };
+}
+function secureRandom(max){ const buf = new Uint32Array(1); crypto.getRandomValues(buf); return buf[0] % max; }
+function generatePassword(){
+  const len = +lengthInput.value;
+  const pools = getCharPools();
+  const opts = {
+    upper: document.getElementById('uppercase').checked,
+    lower: document.getElementById('lowercase').checked,
+    nums:  document.getElementById('numbers').checked,
+    syms:  document.getElementById('symbols').checked
+  };
+  let chars = ''; Object.entries(opts).forEach(([k,v])=>{ if(v) chars+=pools[k]; });
+  if(!chars){ Toast('error','Options requises','Sélectionnez au moins un type de caractère.'); return; }
+
+  let pwdArr = [];
+  Object.entries(opts).forEach(([k,v])=>{ if(v) pwdArr.push(pools[k][secureRandom(pools[k].length)]); });
+  while(pwdArr.length < len){ pwdArr.push(chars[secureRandom(chars.length)]); }
+  for(let i=pwdArr.length-1;i>0;i--){ const j = secureRandom(i+1); [pwdArr[i],pwdArr[j]] = [pwdArr[j],pwdArr[i]]; }
+  const pwd = pwdArr.join('');
+
+  outputEl.textContent = pwd;
+  addRecentPassword(pwd);
+  if (recentBtn.classList.contains('active')) renderRecent();
+  updateMeter(pwd, chars.length);
 }
 
-function loadRecentPasswords() {
-  const data = localStorage.getItem("recentPasswords");
-  if (!data) return [];
-  try {
-    const parsed = JSON.parse(data);
-    const now = Date.now();
-    const valid = parsed.filter(p => now - p.createdAt < 48 * 3600 * 1000); // 48h max
-    if (valid.length !== parsed.length) {
-      localStorage.setItem("recentPasswords", JSON.stringify(valid));
+/* ===== Renderers ===== */
+function renderRecent(){
+  list.innerHTML='';
+  if(recentPasswords.length===0){
+    list.innerHTML = "<p class='text-center muted'>Aucun mot de passe généré</p>";
+    return;
+  }
+  recentPasswords.forEach((obj)=>{
+    const el = document.createElement('div');
+    el.className = 'password-item';
+    el.innerHTML = `
+      <div class="mono">${obj.password}</div>
+      <div class="item-actions">
+        <button class="btn btn-icon" data-copy="${obj.password}" title="Copier"><i class="fa-solid fa-copy"></i></button>
+        <button class="btn btn-icon" data-save="${obj.password}" title="Enregistrer en brouillon"><i class="fa-solid fa-floppy-disk"></i></button>
+        <button class="btn btn-icon-danger" data-delete="${obj.createdAt}" title="Supprimer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+async function renderDrafts(){
+  list.innerHTML = "<p class='text-center muted'>Chargement…</p>";
+  try{
+    const res = await fetch('{{ path('app_generator_list_drafts') }}');
+    const j = await res.json();
+    list.innerHTML = '';
+    if(!j.drafts?.length){
+      list.innerHTML = "<p class='text-center muted'>Aucun brouillon</p>";
+      return;
     }
-    return valid;
-  } catch {
-    return [];
-  }
-}
-
-// === Rendu des mots de passe récents ===
-function renderRecent() {
-  list.innerHTML = "";
-  if (recentPasswords.length === 0) {
-    list.innerHTML = "<p style='text-align:center;color:var(--color-text-light)'>Aucun mot de passe généré</p>";
-    return;
-  }
-
-  recentPasswords.forEach((obj) => {
-    const el = document.createElement("div");
-    el.className = "password-item";
-    el.innerHTML = `
-      <div>${obj.password}</div>
-      <div>
-        <button class="save-draft" data-pass="${obj.password}"><i class="fa-solid fa-floppy-disk"></i></button>
-        <i class="fa-solid fa-copy copy-icon" data-pass="${obj.password}"></i>
-      </div>`;
-    list.appendChild(el);
-  });
-}
-
-// === Rendu des brouillons en BDD ===
-async function renderDrafts() {
-  const res = await fetch('{{ path('app_generator_list_drafts') }}');
-  const j = await res.json();
-  list.innerHTML = "";
-  if (!j.drafts.length) {
-    list.innerHTML = "<p style='text-align:center;color:var(--color-text-light)'>Aucun brouillon</p>";
-    return;
-  }
-  j.drafts.forEach((d) => {
-    const el = document.createElement("div");
-    el.className = "password-item";
-    el.innerHTML = `
-      <div>${escapeHtml(d.name)}</div>
-      <div>
-        <button class="convert-btn" data-id="${d.id}" data-pass="${d.password}" data-name="${escapeHtml(d.name)}">
-          <i class="fa-solid fa-right-long"></i>
-        </button>
-        <i class="fa-solid fa-copy copy-icon" data-pass="${escapeHtml(d.password)}"></i>
-      </div>`;
-    list.appendChild(el);
-  });
-}
-
-// === Actions ===
-list.addEventListener("click", async (e) => {
-  // Enregistrer en brouillon
-  if (e.target.closest(".save-draft")) {
-    const pass = e.target.closest(".save-draft").dataset.pass;
-    const name = prompt("Nom du mot de passe ?");
-    if (!name) return;
-    await fetch('{{ path('app_generator_save_draft') }}', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, password: pass }),
+    j.drafts.forEach(d=>{
+      const el = document.createElement('div');
+      el.className='password-item';
+      el.innerHTML = `
+        <div class="mono">${escapeHtml(d.name)}</div>
+        <div class="item-actions">
+          <button class="btn btn-icon" data-convert data-id="${d.id}" data-pass="${escapeHtml(d.password)}" data-name="${escapeHtml(d.name)}" title="Convertir en credential">
+            <i class="fa-solid fa-right-long"></i>
+          </button>
+          <button class="btn btn-icon" data-copy="${escapeHtml(d.password)}" title="Copier"><i class="fa-solid fa-copy"></i></button>
+        </div>
+      `;
+      list.appendChild(el);
     });
-    alert("Brouillon enregistré !");
+  }catch(e){
+    list.innerHTML = "<p class='text-center' style='color:var(--color-danger-start)'>Impossible de charger les brouillons.</p>";
   }
+}
 
-  // Copier
-  if (e.target.classList.contains("copy-icon")) {
-    const p = e.target.dataset.pass;
-    navigator.clipboard.writeText(p);
-    e.target.classList.replace("fa-copy", "fa-check");
-    setTimeout(() => e.target.classList.replace("fa-check", "fa-copy"), 1200);
+/* ===== Delete helpers ===== */
+function deleteRecent(ts){
+  const before = recentPasswords.length;
+  recentPasswords = recentPasswords.filter(p => p.createdAt !== +ts);
+  saveRecentPasswords();
+  if(before !== recentPasswords.length){
+    renderRecent();
+    Toast('success','Supprimé','Élément retiré des récents.');
   }
+}
+function clearAllRecents(){
+  recentPasswords = [];
+  saveRecentPasswords();
+  renderRecent();
+  Toast('success','Nettoyage terminé','Tous les récents ont été supprimés.');
+}
 
-  // Convertir (ouvrir modal)
-  if (e.target.closest(".convert-btn")) {
-    const b = e.target.closest(".convert-btn");
-    currentDraftId = b.dataset.id;
-    document.getElementById("credName").value = b.dataset.name;
-    document.getElementById("credDomain").value = "";
-    document.getElementById("credUsername").value = "";
-    convertModal.style.display = "flex";
+/* ===== Events ===== */
+document.getElementById('generateBtn').onclick = generatePassword;
+document.getElementById('copyBtn').onclick = async () => {
+  const p = outputEl.textContent.trim();
+  if(!p || p.startsWith('•')) return;
+  await navigator.clipboard.writeText(p);
+  Toast('success','Copié','Mot de passe copié dans le presse-papiers.');
+};
+lengthInput.addEventListener('input', ()=>{ lengthValue.textContent = lengthInput.value; });
+
+document.querySelector('.card-body').addEventListener('change', ()=>{
+  const current = outputEl.textContent;
+  const pools = getCharPools();
+  const opts = {
+    upper: document.getElementById('uppercase').checked,
+    lower: document.getElementById('lowercase').checked,
+    nums:  document.getElementById('numbers').checked,
+    syms:  document.getElementById('symbols').checked
+  };
+  let chars=''; Object.entries(opts).forEach(([k,v])=>{ if(v) chars+=pools[k]; });
+  if(current && !current.startsWith('•') && chars) updateMeter(current, chars.length);
+  else updateMeter('', 0);
+});
+
+/* Liste actions */
+list.addEventListener('click', async (e)=>{
+  const copyBtn = e.target.closest('[data-copy]');
+  const saveBtn = e.target.closest('[data-save]');
+  const convertBtn = e.target.closest('[data-convert]');
+  const delBtn = e.target.closest('[data-delete]');
+
+  if(copyBtn){
+    await navigator.clipboard.writeText(copyBtn.getAttribute('data-copy'));
+    Toast('success','Copié','Mot de passe copié.');
+  }
+  if(saveBtn){
+    pendingSavePassword = saveBtn.getAttribute('data-save');
+    document.getElementById('saveName').value = '';
+    openModal('saveModal');
+  }
+  if(convertBtn){
+    const b = convertBtn;
+    currentDraftId = b.getAttribute('data-id');
+    document.getElementById('credName').value = b.getAttribute('data-name') || '';
+    document.getElementById('credDomain').value = '';
+    document.getElementById('credUsername').value = '';
+    openModal('convertModal');
+  }
+  if(delBtn){
+    deleteRecent(delBtn.getAttribute('data-delete'));
   }
 });
 
-// === Conversion du draft en Credential ===
-cancelConvert.onclick = () => (convertModal.style.display = "none");
-confirmConvert.onclick = async () => {
-  const payload = {
-    draftId: currentDraftId,
-    name: document.getElementById("credName").value,
-    domain: document.getElementById("credDomain").value,
-    username: document.getElementById("credUsername").value,
-  };
-  const res = await fetch('{{ path('app_generator_convert_draft') }}', {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  const j = await res.json();
-  if (j.success) {
-    alert("Converti en Credential !");
-    convertModal.style.display = "none";
-    renderDrafts();
-  } else alert(j.error || "Erreur");
-};
-
-// === Switcher entre Récents / Enregistrés ===
-document.getElementById("recentBtn").onclick = () => {
-  recentBtn.classList.add("active");
-  savedBtn.classList.remove("active");
+/* Tabs */
+recentBtn.onclick = ()=>{
+  recentBtn.classList.add('active'); recentBtn.setAttribute('aria-selected','true');
+  savedBtn.classList.remove('active'); savedBtn.setAttribute('aria-selected','false');
+  clearAllBtn.disabled = false; // actif pour Récents
   renderRecent();
 };
-document.getElementById("savedBtn").onclick = () => {
-  savedBtn.classList.add("active");
-  recentBtn.classList.remove("active");
+savedBtn.onclick  = ()=>{
+  savedBtn.classList.add('active'); savedBtn.setAttribute('aria-selected','true');
+  recentBtn.classList.remove('active'); recentBtn.setAttribute('aria-selected','false');
+  clearAllBtn.disabled = true; // on désactive sur Enregistrés
   renderDrafts();
 };
 
-// === Génération & copie ===
-document.getElementById("generateBtn").onclick = generatePassword;
-document.getElementById("copyBtn").onclick = () =>
-  navigator.clipboard.writeText(output.textContent);
+/* Save Draft */
+document.getElementById('confirmSave').onclick = async ()=>{
+  const name = document.getElementById('saveName').value?.trim();
+  if(!name){ Toast('error','Nom requis','Merci d’indiquer un nom.'); return; }
+  try{
+    await fetch('{{ path('app_generator_save_draft') }}', {
+      method: 'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, password: pendingSavePassword })
+    });
+    closeModal('saveModal');
+    Toast('success','Brouillon enregistré','Vous le trouverez dans l’onglet “Enregistrés”.');
+    if(savedBtn.classList.contains('active')) renderDrafts();
+  }catch(e){ Toast('error','Échec','Impossible d’enregistrer le brouillon.'); }
+};
 
-// === Utilitaire échappement HTML ===
-function escapeHtml(str) {
-  return str ? str.replace(/[&<>"]/g, (t) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[t])) : "";
-}
+/* Convert draft */
+document.getElementById('confirmConvert').onclick = async ()=>{
+  const payload = {
+    draftId: currentDraftId,
+    name: document.getElementById('credName').value,
+    domain: document.getElementById('credDomain').value,
+    username: document.getElementById('credUsername').value
+  };
+  try{
+    const res = await fetch('{{ path('app_generator_convert_draft') }}', {
+      method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const j = await res.json();
+    if(j.success){
+      closeModal('convertModal');
+      Toast('success','Conversion réussie','Le brouillon a été converti en credential.');
+      renderDrafts();
+    }else{
+      Toast('error','Erreur', j.error || 'Une erreur est survenue.');
+    }
+  }catch(e){ Toast('error','Erreur réseau','Vérifiez votre connexion.'); }
+};
 
-// === Initialisation ===
+/* Clear all récents */
+clearAllBtn.onclick = ()=>{
+  if(savedBtn.classList.contains('active')) return; // sécurité
+  openModal('confirmModal');
+};
+document.getElementById('confirmClearAll').onclick = ()=>{
+  clearAllRecents();
+  closeModal('confirmModal');
+};
+
+/* Utils */
+function escapeHtml(str){ return str ? str.replace(/[&<>"]/g,(t)=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[t])) : ""; }
+
+/* Init */
+lengthValue.textContent = lengthInput.value;
 renderRecent();
+updateMeter('',0);
+clearAllBtn.disabled = false; // on démarre sur Récents
 </script>
-
 {% endblock %}
