@@ -374,8 +374,8 @@
                 <span class="nav-item-badge">24</span>
             </a>
 
-            <a href="#"
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_subscriptions' ? 'active' : '' }}">
+            <a href="{{path('app_subscription')}}"
+               class="nav-item {{ app.request.attributes.get('_route') == 'app_subscription' ? 'active' : '' }}">
                 <i class="fas fa-receipt"></i>
                 <span>Abonnements</span>
             </a>
@@ -391,7 +391,7 @@
 
         <div class="nav-section">
             <div class="nav-section-title">Outils</div>
-            <a href=""
+            <a href="{{path('app_generator')}}"
                class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
                 <i class="fas fa-wand-magic-sparkles"></i>
                 <span>Générateur</span>

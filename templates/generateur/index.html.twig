@@ -1,0 +1,259 @@
+{% extends 'base.html.twig' %}
+{% block title %}Générateur de mots de passe{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.page-wrapper {
+  display:grid;grid-template-columns:2fr 1fr;gap:40px;
+  padding:80px 60px;max-width:1300px;margin:0 auto;
+}
+.generator-card,.sidebar-card{
+  background:var(--color-white);padding:40px;border-radius:20px;box-shadow:var(--shadow-sm);
+}
+.password-output{
+  background:var(--color-bg-light);border:2px solid var(--color-border);
+  border-radius:10px;padding:18px;font-size:1.5rem;text-align:center;margin-bottom:20px;
+}
+.switcher{display:flex;background:var(--color-bg-light);border-radius:10px;margin-bottom:15px;}
+.switcher button{flex:1;padding:10px;border:none;background:none;cursor:pointer;font-weight:700;}
+.switcher button.active{background:var(--color-primary);color:white;}
+.password-item{background:var(--color-bg-light);border:1px solid var(--color-border);
+border-radius:10px;padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.copy-icon,.save-draft,.convert-btn{cursor:pointer;color:var(--color-primary);border:none;background:none;}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;}
+.modal{background:white;border-radius:12px;padding:25px;width:400px;max-width:95%;}
+.modal input{width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:1px solid var(--color-border);}
+.modal-buttons{display:flex;justify-content:flex-end;gap:10px;}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+  <div class="generator-card">
+    <h1><i class="fa-solid fa-key"></i> Générateur</h1>
+    <p>Créez un mot de passe fort et enregistrez-le.</p>
+
+    <div class="password-output" id="passwordOutput">•••••••••••••</div>
+    <div style="display:flex;gap:10px;margin-bottom:20px;">
+      <button class="btn btn-outline" id="copyBtn"><i class="fa-solid fa-copy"></i> Copier</button>
+      <button class="btn btn-primary" id="generateBtn"><i class="fa-solid fa-bolt"></i> Générer</button>
+    </div>
+
+    <div class="options">
+      <div class="option"><label>Longueur :</label><input type="number" id="length" value="12" min="4" max="64"></div>
+      <div class="option"><label>Majuscules</label><input type="checkbox" id="uppercase" checked></div>
+      <div class="option"><label>Minuscules</label><input type="checkbox" id="lowercase" checked></div>
+      <div class="option"><label>Chiffres</label><input type="checkbox" id="numbers" checked></div>
+      <div class="option"><label>Symboles</label><input type="checkbox" id="symbols" checked></div>
+    </div>
+  </div>
+
+  <div class="sidebar-card">
+    <h2><i class="fa-solid fa-clock-rotate-left"></i> Historique</h2>
+    <div class="switcher">
+      <button id="recentBtn" class="active">Récents</button>
+      <button id="savedBtn">Enregistrés</button>
+    </div>
+    <div id="passwordList"></div>
+  </div>
+</div>
+
+<!-- Modal Conversion -->
+<div class="modal-backdrop" id="convertModal">
+  <div class="modal">
+    <h3>Convertir en Credential</h3>
+    <input type="text" id="credName" placeholder="Nom">
+    <input type="text" id="credDomain" placeholder="Domaine (ex : site.com)">
+    <input type="text" id="credUsername" placeholder="Identifiant / email">
+    <div class="modal-buttons">
+      <button id="cancelConvert" class="btn btn-outline">Annuler</button>
+      <button id="confirmConvert" class="btn btn-primary">Convertir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const output = document.getElementById("passwordOutput");
+const list = document.getElementById("passwordList");
+const convertModal = document.getElementById("convertModal");
+const confirmConvert = document.getElementById("confirmConvert");
+const cancelConvert = document.getElementById("cancelConvert");
+
+let recentPasswords = loadRecentPasswords(); // chargement depuis localStorage
+let currentDraftId = null;
+
+// === Génération de mot de passe ===
+function generatePassword() {
+  const len = +document.getElementById("length").value;
+  let chars = "";
+  if (uppercase.checked) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  if (lowercase.checked) chars += "abcdefghijklmnopqrstuvwxyz";
+  if (numbers.checked) chars += "0123456789";
+  if (symbols.checked) chars += "!@#$%^&*()_+-=[]{};:,.<>/?";
+  if (!chars) return;
+
+  let p = "";
+  for (let i = 0; i < len; i++) p += chars[Math.floor(Math.random() * chars.length)];
+  output.textContent = p;
+
+  addRecentPassword(p);
+  if (document.getElementById("recentBtn").classList.contains("active")) renderRecent();
+}
+
+// === Sauvegarde & nettoyage dans localStorage ===
+function addRecentPassword(password) {
+  const now = Date.now();
+  recentPasswords.unshift({ password, createdAt: now });
+  if (recentPasswords.length > 10) recentPasswords.pop();
+  saveRecentPasswords();
+}
+
+function saveRecentPasswords() {
+  localStorage.setItem("recentPasswords", JSON.stringify(recentPasswords));
+}
+
+function loadRecentPasswords() {
+  const data = localStorage.getItem("recentPasswords");
+  if (!data) return [];
+  try {
+    const parsed = JSON.parse(data);
+    const now = Date.now();
+    const valid = parsed.filter(p => now - p.createdAt < 48 * 3600 * 1000); // 48h max
+    if (valid.length !== parsed.length) {
+      localStorage.setItem("recentPasswords", JSON.stringify(valid));
+    }
+    return valid;
+  } catch {
+    return [];
+  }
+}
+
+// === Rendu des mots de passe récents ===
+function renderRecent() {
+  list.innerHTML = "";
+  if (recentPasswords.length === 0) {
+    list.innerHTML = "<p style='text-align:center;color:var(--color-text-light)'>Aucun mot de passe généré</p>";
+    return;
+  }
+
+  recentPasswords.forEach((obj) => {
+    const el = document.createElement("div");
+    el.className = "password-item";
+    el.innerHTML = `
+      <div>${obj.password}</div>
+      <div>
+        <button class="save-draft" data-pass="${obj.password}"><i class="fa-solid fa-floppy-disk"></i></button>
+        <i class="fa-solid fa-copy copy-icon" data-pass="${obj.password}"></i>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+// === Rendu des brouillons en BDD ===
+async function renderDrafts() {
+  const res = await fetch('{{ path('app_generator_list_drafts') }}');
+  const j = await res.json();
+  list.innerHTML = "";
+  if (!j.drafts.length) {
+    list.innerHTML = "<p style='text-align:center;color:var(--color-text-light)'>Aucun brouillon</p>";
+    return;
+  }
+  j.drafts.forEach((d) => {
+    const el = document.createElement("div");
+    el.className = "password-item";
+    el.innerHTML = `
+      <div>${escapeHtml(d.name)}</div>
+      <div>
+        <button class="convert-btn" data-id="${d.id}" data-pass="${d.password}" data-name="${escapeHtml(d.name)}">
+          <i class="fa-solid fa-right-long"></i>
+        </button>
+        <i class="fa-solid fa-copy copy-icon" data-pass="${escapeHtml(d.password)}"></i>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+// === Actions ===
+list.addEventListener("click", async (e) => {
+  // Enregistrer en brouillon
+  if (e.target.closest(".save-draft")) {
+    const pass = e.target.closest(".save-draft").dataset.pass;
+    const name = prompt("Nom du mot de passe ?");
+    if (!name) return;
+    await fetch('{{ path('app_generator_save_draft') }}', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, password: pass }),
+    });
+    alert("Brouillon enregistré !");
+  }
+
+  // Copier
+  if (e.target.classList.contains("copy-icon")) {
+    const p = e.target.dataset.pass;
+    navigator.clipboard.writeText(p);
+    e.target.classList.replace("fa-copy", "fa-check");
+    setTimeout(() => e.target.classList.replace("fa-check", "fa-copy"), 1200);
+  }
+
+  // Convertir (ouvrir modal)
+  if (e.target.closest(".convert-btn")) {
+    const b = e.target.closest(".convert-btn");
+    currentDraftId = b.dataset.id;
+    document.getElementById("credName").value = b.dataset.name;
+    document.getElementById("credDomain").value = "";
+    document.getElementById("credUsername").value = "";
+    convertModal.style.display = "flex";
+  }
+});
+
+// === Conversion du draft en Credential ===
+cancelConvert.onclick = () => (convertModal.style.display = "none");
+confirmConvert.onclick = async () => {
+  const payload = {
+    draftId: currentDraftId,
+    name: document.getElementById("credName").value,
+    domain: document.getElementById("credDomain").value,
+    username: document.getElementById("credUsername").value,
+  };
+  const res = await fetch('{{ path('app_generator_convert_draft') }}', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const j = await res.json();
+  if (j.success) {
+    alert("Converti en Credential !");
+    convertModal.style.display = "none";
+    renderDrafts();
+  } else alert(j.error || "Erreur");
+};
+
+// === Switcher entre Récents / Enregistrés ===
+document.getElementById("recentBtn").onclick = () => {
+  recentBtn.classList.add("active");
+  savedBtn.classList.remove("active");
+  renderRecent();
+};
+document.getElementById("savedBtn").onclick = () => {
+  savedBtn.classList.add("active");
+  recentBtn.classList.remove("active");
+  renderDrafts();
+};
+
+// === Génération & copie ===
+document.getElementById("generateBtn").onclick = generatePassword;
+document.getElementById("copyBtn").onclick = () =>
+  navigator.clipboard.writeText(output.textContent);
+
+// === Utilitaire échappement HTML ===
+function escapeHtml(str) {
+  return str ? str.replace(/[&<>"]/g, (t) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[t])) : "";
+}
+
+// === Initialisation ===
+renderRecent();
+</script>
+
+{% endblock %}
