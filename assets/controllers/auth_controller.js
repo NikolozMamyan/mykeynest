@@ -82,7 +82,7 @@ export default class extends Controller {
     try {
       const response = await fetch("/api/logout", {
         method: "POST",
-        credentials: "include", // important pour envoyer les cookies
+        credentials: "include",
         headers: {
           "X-Requested-With": "XMLHttpRequest",
         },
@@ -91,6 +91,7 @@ export default class extends Controller {
       if (!response.ok) {
         const error = await response.json()
         console.error("Erreur de déconnexion :", error.error)
+        window.location.href = "/login"
         return
       }
 

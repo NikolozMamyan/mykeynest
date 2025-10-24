@@ -16,13 +16,17 @@
     {% block stylesheets %}{% endblock %}
   </head>
 
-  <body>
+  <body data-controller="layout">
     {% if app.user %}
       {% include "./components/header.html.twig" %}
     {% endif %}
       {% if app.user %}
         {% include "./components/sidebar.html.twig" %}
       {% endif %}
+        <!-- Backdrop -->
+  <div class="sidebar-backdrop"
+       data-layout-target="backdrop"
+       data-action="click->layout#closeSidebar"></div>
     <div class="wrapper-layout">
 
 

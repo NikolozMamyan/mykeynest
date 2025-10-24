@@ -46,4 +46,14 @@ class CredentialRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function countByUser($user): int
+{
+    return $this->createQueryBuilder('c')
+        ->select('COUNT(c.id)')
+        ->where('c.user = :user')
+        ->setParameter('user', $user)
+        ->getQuery()
+        ->getSingleScalarResult();
+}
 }

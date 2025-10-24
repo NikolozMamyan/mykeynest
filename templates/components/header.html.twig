@@ -207,11 +207,13 @@
 
 <header class="header_top">
   <!-- Bouton burger pour mobile -->
-  <button class="burger-btn" id="burger-btn" aria-label="Menu">
+  <button class="burger-btn"
+          aria-label="Menu"
+          data-action="click->layout#toggleSidebar">
     <i class="fas fa-bars"></i>
   </button>
 
-  <!-- Logo (visible uniquement sur mobile) -->
+  <!-- Logo -->
   <div class="header-logo">
     <div class="logo-container">
       <div class="logo">
@@ -221,15 +223,16 @@
     </div>
   </div>
 
-  <!-- Bloc de droite -->
+  <!-- Partie droite -->
   <div class="header_right">
-     {% include 'components/parts/theme_mode_btn.html.twig' %}    
-    <!-- Notification -->
-    <button class="notification-btn" id="notif-btn" aria-label="Notifications">
+    {% include 'components/parts/theme_mode_btn.html.twig' %}
+
+    <!-- Notifications -->
+    <button class="notification-btn" aria-label="Notifications">
       <i class="fas fa-bell"></i>
       <span class="notification-badge"></span>
     </button>
-    
+
     <!-- Profil utilisateur -->
     <div class="user-profile">
       <div class="avatar-wrapper">

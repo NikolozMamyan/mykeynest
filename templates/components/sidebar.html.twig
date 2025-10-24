@@ -344,125 +344,98 @@
 
 </style>
 
+
+
 <!-- === SIDEBAR === -->
-<aside class="sidebar">
-    <!-- Logo -->
-    <div class="sidebar-header">
-        <div class="logo-container">
-            <div class="logo">
-                <i class="fas fa-shield-halved"></i>
-            </div>
-            <span class="logo-text">MykeyNest</span>
-        </div>
+<aside class="sidebar"
+       data-layout-target="sidebar">
+
+  <!-- Header du logo (mobile) -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <div class="logo">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <span class="logo-text">MykeyNest</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Principal</div>
+
+      <a href="{{ path('app_dashboard') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_dashboard' ? 'active' : '' }}">
+        <i class="fas fa-house"></i>
+        <span>Tableau de bord</span>
+      </a>
+
+      <a href="{{ path('app_credential') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_credential' ? 'active' : '' }}">
+        <i class="fas fa-key"></i>
+        <span>Mots de passe</span>
+        <span class="nav-item-badge"
+              data-layout-target="passLength"></span>
+      </a>
+
+      <a href="{{ path('app_subscription') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_subscription' ? 'active' : '' }}">
+        <i class="fas fa-receipt"></i>
+        <span>Abonnements</span>
+      </a>
+
+      <a href=""
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_notes' ? 'active' : '' }}">
+        <i class="fas fa-note-sticky"></i>
+        <span>Notes sécurisées</span>
+      </a>
     </div>
 
-    <!-- Navigation -->
-    <nav class="sidebar-nav">
-        <div class="nav-section">
-            <div class="nav-section-title">Principal</div>
+    <div class="nav-divider"></div>
 
-            <a href="{{ path('app_dashboard') }}"
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_dashboard' ? 'active' : '' }}">
-                <i class="fas fa-house"></i>
-                <span>Tableau de bord</span>
-            </a>
-
-            <a href="{{ path('app_credential') }}"
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_credential' ? 'active' : '' }}">
-                <i class="fas fa-key"></i>
-                <span>Mots de passe</span>
-                <span class="nav-item-badge">24</span>
-            </a>
-
-            <a href="{{path('app_subscription')}}"
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_subscription' ? 'active' : '' }}">
-                <i class="fas fa-receipt"></i>
-                <span>Abonnements</span>
-            </a>
-
-            <a href=""
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_notes' ? 'active' : '' }}">
-                <i class="fas fa-note-sticky"></i>
-                <span>Notes sécurisées</span>
-            </a>
-        </div>
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <div class="nav-section-title">Outils</div>
-            <a href="{{path('app_generator')}}"
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
-                <i class="fas fa-wand-magic-sparkles"></i>
-                <span>Générateur</span>
-            </a>
-            <a href=""
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
-                <i class="fas fa-shield-heart"></i>
-                <span>Vérificateur de sécurité</span>
-            </a>
-            <a href=""
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_folders' ? 'active' : '' }}">
-                <i class="fas fa-folder"></i>
-                <span>Dossiers</span>
-            </a>
-        </div>
-
-        <div class="nav-divider"></div>
-
-        <div class="nav-section">
-            <div class="nav-section-title">Paramètres</div>
-            <a href=""
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_preferences' ? 'active' : '' }}">
-                <i class="fas fa-gear"></i>
-                <span>Préférences</span>
-            </a>
-            <a href=""
-               class="nav-item {{ app.request.attributes.get('_route') == 'app_security' ? 'active' : '' }}">
-                <i class="fas fa-shield"></i>
-                <span>Sécurité</span>
-            </a>
-        </div>
-    </nav>
-
-    <!-- Footer -->
-    <div class="sidebar-footer">
-        <a href="" class="logout-btn"
-          data-controller="auth"
-          data-action="click->auth#logout"
-        >
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Déconnexion</span>
-        </a>
+    <div class="nav-section">
+      <div class="nav-section-title">Outils</div>
+      <a href="{{path('app_generator')}}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
+        <i class="fas fa-wand-magic-sparkles"></i>
+        <span>Générateur</span>
+      </a>
+      <a href=""
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
+        <i class="fas fa-shield-heart"></i>
+        <span>Vérificateur de sécurité</span>
+      </a>
+      <a href=""
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_folders' ? 'active' : '' }}">
+        <i class="fas fa-folder"></i>
+        <span>Dossiers</span>
+      </a>
     </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Paramètres</div>
+      <a href=""
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_preferences' ? 'active' : '' }}">
+        <i class="fas fa-gear"></i>
+        <span>Préférences</span>
+      </a>
+      <a href=""
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_security' ? 'active' : '' }}">
+        <i class="fas fa-shield"></i>
+        <span>Sécurité</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="" class="logout-btn"
+       data-controller="auth"
+       data-action="click->auth#logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Déconnexion</span>
+    </a>
+  </div>
 </aside>
-
-<!-- Backdrop -->
-<div class="sidebar-backdrop"></div>
-
-<!-- === SCRIPT === -->
-<script>
-    const burgerBtn = document.getElementById('burger-btn');
-    const sidebar = document.querySelector('.sidebar');
-    const backdrop = document.querySelector('.sidebar-backdrop');
-
-    // Toggle sidebar
-    burgerBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        backdrop.classList.toggle('active');
-    });
-
-    // Close on backdrop click
-    backdrop.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        backdrop.classList.remove('active');
-    });
-
-    // Close on ESC key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            backdrop.classList.remove('active');
-        }
-    });
-</script>
