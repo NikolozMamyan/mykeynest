@@ -595,7 +595,6 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  display: none;
   align-items: center;
   justify-content: center;
   z-index: 1000;
@@ -612,6 +611,7 @@
 .modal {
   width: 520px;
   max-width: 95%;
+  margin:200px auto;
   background: white;
   border-radius: 16px;
   border: 1px solid var(--color-border);
@@ -670,7 +670,8 @@
 .modal .content input {
   width: 100%;
   padding: 12px 14px;
-  border-radius: 10px;
+  margin-top: 15px;
+  border-radius: 7px;
   border: 1px solid var(--color-border);
   font-size: 0.95rem;
   transition: all 0.2s ease;
@@ -794,15 +795,13 @@
 {% endblock %}
 
 {% block body %}
-<div class="page-wrapper">
+<div class="page-wrapper" data-controller="generator">
 
   <!-- ====== Generator ====== -->
   <section class="card">
     <div class="card-header">
       <div class="card-header-left">
-        <div class="card-icon">
-          <i class="fa-solid fa-key"></i>
-        </div>
+        <div class="card-icon"><i class="fa-solid fa-key"></i></div>
         <div>
           <h1>Générateur</h1>
           <div class="helper">Créez un mot de passe fort et enregistrez-le.</div>
@@ -812,13 +811,13 @@
 
     <div class="card-body">
       <div class="password-output-wrapper">
-        <div class="password-output" aria-live="polite" id="passwordOutputContainer">
-          <span class="mono" id="passwordOutput">•••••••••••••</span>
+        <div class="password-output" aria-live="polite" data-generator-target="outputContainer">
+          <span class="mono" data-generator-target="output"></span>
           <div class="password-actions">
-            <button class="btn btn-icon" id="copyBtn" title="Copier">
+            <button class="btn btn-icon" title="Copier" data-action="click->generator#copyPassword">
               <i class="fa-solid fa-copy"></i>
             </button>
-            <button class="btn btn-primary" id="generateBtn">
+            <button class="btn btn-primary" data-action="click->generator#generatePassword">
               <i class="fa-solid fa-bolt"></i> Générer
             </button>
           </div>
@@ -828,487 +827,170 @@
       <div class="hr"></div>
 
       <div class="length-control">
-        <label for="length">Longueur du mot de passe</label>
+        <label>Longueur du mot de passe</label>
         <div class="range-wrap">
-          <input type="range" id="length" min="8" max="64" value="12" aria-label="Longueur du mot de passe">
-          <span class="badge" id="lengthValue">12</span>
+          <input type="range" min="8" max="64" value="12" data-generator-target="lengthInput" data-action="input->generator#updateLength">
+          <span class="badge" data-generator-target="lengthValue">12</span>
         </div>
       </div>
 
       <div class="controls">
         <div class="field">
-          <label for="uppercase">Majuscules (A-Z)</label>
-          <label class="switch" aria-label="Inclure les majuscules">
-            <input type="checkbox" id="uppercase" checked><span class="dot"></span>
-          </label>
+          <label>Majuscules (A-Z)</label>
+          <label class="switch"><input type="checkbox" checked data-generator-target="uppercase"><span class="dot"></span></label>
         </div>
         <div class="field">
-          <label for="lowercase">Minuscules (a-z)</label>
-          <label class="switch" aria-label="Inclure les minuscules">
-            <input type="checkbox" id="lowercase" checked><span class="dot"></span>
-          </label>
+          <label>Minuscules (a-z)</label>
+          <label class="switch"><input type="checkbox" checked data-generator-target="lowercase"><span class="dot"></span></label>
         </div>
         <div class="field">
-          <label for="numbers">Chiffres (0-9)</label>
-          <label class="switch" aria-label="Inclure les chiffres">
-            <input type="checkbox" id="numbers" checked><span class="dot"></span>
-          </label>
+          <label>Chiffres (0-9)</label>
+          <label class="switch"><input type="checkbox" checked data-generator-target="numbers"><span class="dot"></span></label>
         </div>
         <div class="field">
-          <label for="symbols">Symboles (!@#$...)</label>
-          <label class="switch" aria-label="Inclure les symboles">
-            <input type="checkbox" id="symbols" checked><span class="dot"></span>
-          </label>
+          <label>Symboles (!@#$...)</label>
+          <label class="switch"><input type="checkbox" checked data-generator-target="symbols"><span class="dot"></span></label>
         </div>
       </div>
 
       <div class="strength-section">
-        <div class="meter" id="meter"><div></div></div>
+        <div class="meter" data-generator-target="meter"><div></div></div>
         <div class="meter-label">
-          <span id="entropyLabel">
-            <i class="fa-solid fa-shield-halved"></i>
-            Entropie : —
-          </span>
+          <span id="entropyLabel"><i class="fa-solid fa-shield-halved"></i> Entropie : —</span>
           <span id="strengthLabel">Force : —</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ====== History ====== -->
+  <!-- ====== Historique ====== -->
   <aside class="card">
     <div class="card-header">
       <div class="card-header-left">
-        <div class="card-icon">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-        </div>
+        <div class="card-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
         <div>
           <h2>Historique</h2>
           <div class="helper">Gérez vos mots de passe</div>
         </div>
       </div>
       <div class="header-actions">
-        <div class="switcher" role="tablist" aria-label="Liste des mots de passe">
-          <button id="recentBtn" class="active" role="tab" aria-selected="true">
-            <i class="fa-solid fa-clock"></i> Récents
-          </button>
-          <button id="savedBtn" role="tab" aria-selected="false">
-            <i class="fa-solid fa-bookmark"></i> Enregistrés
-          </button>
+        <div class="switcher" role="tablist">
+          <button class="active" data-action="click->generator#showRecents">Récents</button>
+          <button data-action="click->generator#showDrafts">Enregistrés</button>
         </div>
-        <button id="clearAllBtn" class="btn btn-icon btn-icon-danger" title="Tout supprimer (Récents)">
+        <button class="btn btn-icon btn-icon-danger" title="Tout supprimer" data-action="click->generator#confirmClearAll">
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
     </div>
+    <style>
+    .info-hover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  cursor: default;
+}
+
+/* infobulle */
+.info-hover .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 130%; /* au-dessus du ⓘ */
+  left: 60%;
+  transform: translateX(-50%);
+  width: 280px;
+  background: var(--color-white);
+  color: var(--color-text-dark);
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 10px 12px;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 2000;
+}
+
+/* petite flèche */
+.info-hover .tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 95%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #fff transparent transparent transparent;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+/* affichage au survol */
+.info-hover:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+    </style>
     <div class="card-body history-body">
-      <div id="passwordList"></div>
-      <p class="helper text-center" id="historyHint">
-        <i class="fa-solid fa-info-circle"></i>
-        Les éléments récents sont stockés localement 48h.
-      </p>
+      <p class="helper text-center info-hover">
+  <i class="fa-solid fa-info-circle"></i>
+  <span class="tooltip">
+    Vous pouvez transformer vos brouillons en mots de passe permanents
+    dans votre coffre — simples à retrouver et protégés.
+  </span>
+</p>
+
+      <div data-generator-target="list"></div>
+   
     </div>
   </aside>
-</div>
 
-<!-- ====== Modal Convert ====== -->
-<div class="modal-backdrop" id="convertModal" aria-hidden="true" aria-labelledby="cTitle" role="dialog">
-  <div class="modal" role="document">
-    <header>
-      <h3 id="cTitle"><i class="fa-solid fa-right-long"></i> Convertir en Credential</h3>
-      <button class="btn btn-ghost" data-modal-close aria-label="Fermer">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </header>
-    <div class="content">
-      <div class="form-group">
-        <label for="credName"><i class="fa-solid fa-tag"></i> Nom</label>
-        <input type="text" id="credName" placeholder="Ex: Mon compte GitHub">
+  <!-- Toasts -->
+  <div class="toast-wrap" data-generator-target="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Modales -->
+  <div class="modal-backdrop" id="saveModal" hidden>
+    <div class="modal">
+      <header><h3><i class="fa-solid fa-floppy-disk"></i> Enregistrer</h3></header>
+      <div class="content">
+        <input type="text" placeholder="Nom du brouillon" data-generator-target="saveName">
       </div>
-      <div class="form-group">
-        <label for="credDomain"><i class="fa-solid fa-globe"></i> Domaine</label>
-<input type="text" id="credDomain" placeholder="ex : github.com">
-</div>
-<div class="form-group">
-<label for="credUsername"><i class="fa-solid fa-user"></i> Identifiant / email</label>
-<input type="text" id="credUsername" placeholder="votre@email.com">
-</div>
-</div>
-<footer>
-<button class="btn" data-modal-close>Annuler</button>
-<button id="confirmConvert" class="btn btn-primary">
-<i class="fa-solid fa-check"></i> Convertir
-</button>
-</footer>
-  </div>
-</div>
-<!-- ====== Modal Save Draft ====== -->
-<div class="modal-backdrop" id="saveModal" aria-hidden="true" aria-labelledby="sTitle" role="dialog">
-  <div class="modal" role="document">
-    <header>
-      <h3 id="sTitle"><i class="fa-solid fa-floppy-disk"></i> Enregistrer en brouillon</h3>
-      <button class="btn btn-ghost" data-modal-close aria-label="Fermer">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </header>
-    <div class="content">
-      <div class="form-group">
-        <label for="saveName"><i class="fa-solid fa-pencil"></i> Nom du mot de passe</label>
-        <input type="text" id="saveName" placeholder="Ex: Compte GitHub">
-      </div>
+      <footer>
+        <button class="btn" data-action="click->generator#closeModal">Annuler</button>
+        <button class="btn btn-primary" data-action="click->generator#saveDraft">Enregistrer</button>
+      </footer>
     </div>
-    <footer>
-      <button class="btn" data-modal-close>Annuler</button>
-      <button id="confirmSave" class="btn btn-primary">
-        <i class="fa-solid fa-check"></i> Enregistrer
-      </button>
-    </footer>
   </div>
-</div>
-<!-- ====== Modal Confirm (clear all) ====== -->
-<div class="modal-backdrop" id="confirmModal" aria-hidden="true" aria-labelledby="confirmTitle" role="dialog">
-  <div class="modal" role="document">
-    <header>
-      <h3 id="confirmTitle"><i class="fa-solid fa-triangle-exclamation"></i> Tout supprimer ?</h3>
-      <button class="btn btn-ghost" data-modal-close aria-label="Fermer">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </header>
-    <div class="content">
-      <p>Cette action efface définitivement les éléments <strong>Récents</strong> stockés localement.</p>
-      <p class="helper">Cette action est irréversible.</p>
-    </div>
-    <footer>
-      <button class="btn" data-modal-close>Annuler</button>
-      <button id="confirmClearAll" class="btn btn-danger">
-        <i class="fa-solid fa-trash"></i> Supprimer tout
-      </button>
-    </footer>
-  </div>
-</div>
-<!-- Toasts -->
-<div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
-<script>
-/* ===== Refs ===== */
-const outputEl = document.getElementById('passwordOutput');
-const outputContainer = document.getElementById('passwordOutputContainer');
-const list = document.getElementById('passwordList');
-const recentBtn = document.getElementById('recentBtn');
-const savedBtn  = document.getElementById('savedBtn');
-const clearAllBtn = document.getElementById('clearAllBtn');
-const meter = document.getElementById('meter');
-const meterBar = meter.querySelector('div');
-const entropyLabel = document.getElementById('entropyLabel');
-const strengthLabel = document.getElementById('strengthLabel');
-const lengthInput = document.getElementById('length');
-const lengthValue = document.getElementById('lengthValue');
-const toastWrap = document.getElementById('toastWrap');
 
-let recentPasswords = loadRecentPasswords();
-let currentDraftId = null;
-let pendingSavePassword = null;
-
-/* ===== Utils ===== */
-const Toast = (type, title, msg) => {
-  const el = document.createElement('div');
-  el.className = 'toast' + (type==='error' ? ' error':'');
-  el.innerHTML = `<div><div class="title">${title}</div><div class="msg">${msg}</div></div>`;
-  toastWrap.appendChild(el);
-  setTimeout(()=>{ el.style.opacity='.6' }, 2500);
-  setTimeout(()=>{ el.remove() }, 4200);
-};
-
-const openModal = (id) => {
-  const m = document.getElementById(id);
-  m.style.display='flex'; m.setAttribute('aria-hidden','false');
-  const focusable = m.querySelector('input,button'); focusable && focusable.focus();
-  const onEsc = (e)=>{ if(e.key==='Escape') closeModal(id, onEsc); };
-  m.dataset.esc = true; document.addEventListener('keydown', onEsc);
-  m.addEventListener('click', (e)=>{ if(e.target===m) closeModal(id, onEsc) });
-  m.querySelectorAll('[data-modal-close]').forEach(btn => btn.onclick=()=>closeModal(id, onEsc));
-};
-const closeModal = (id, escHandler) => {
-  const m = document.getElementById(id);
-  m.style.display='none'; m.setAttribute('aria-hidden','true');
-  if(escHandler){ document.removeEventListener('keydown', escHandler); }
-};
-
-function entropy(bits){ return Math.round(bits*10)/10; }
-function updateMeter(pwd, pool) {
-  if(!pwd){ 
-    meter.className='meter'; 
-    meterBar.style.width='0%'; 
-    entropyLabel.innerHTML='<i class="fa-solid fa-shield-halved"></i> Entropie : —'; 
-    strengthLabel.textContent='Force : —'; 
-    return; 
-  }
-  const H = Math.log2(pool) * pwd.length;
-  const e = entropy(H);
-  entropyLabel.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Entropie : ${e} bits`;
-  let strength='weak', pct=25;
-  if(e>=60){ strength='strong'; pct=100; }
-  else if(e>=45){ strength='medium'; pct=65; }
-  else if(e>=30){ strength='medium'; pct=45; }
-  else { strength='weak'; pct=25; }
-  meter.className = 'meter ' + strength;
-  meterBar.style.width = pct+'%';
-  strengthLabel.textContent = 'Force : ' + (strength==='strong'?'Forte':strength==='medium'?'Moyenne':'Faible');
-}
-
-function saveRecentPasswords(){ localStorage.setItem('recentPasswords', JSON.stringify(recentPasswords)); }
-function loadRecentPasswords(){
-  const data = localStorage.getItem('recentPasswords'); if(!data) return [];
-  try{
-    const parsed = JSON.parse(data);
-    const now = Date.now();
-    const valid = parsed.filter(p => now - p.createdAt < 48*3600*1000);
-    if(valid.length !== parsed.length) localStorage.setItem('recentPasswords', JSON.stringify(valid));
-    return valid;
-  }catch{ return []; }
-}
-function addRecentPassword(password){
-  const now=Date.now(); recentPasswords.unshift({ password, createdAt: now });
-  if(recentPasswords.length>12) recentPasswords.pop();
-  saveRecentPasswords();
-}
-
-/* ===== Generation ===== */
-function getCharPools(){
-  return { upper:"ABCDEFGHIJKLMNOPQRSTUVWXYZ", lower:"abcdefghijklmnopqrstuvwxyz", nums:"0123456789", syms:"!@#$%^&*()_+-=[]{};:,.<>/?" };
-}
-function secureRandom(max){ const buf = new Uint32Array(1); crypto.getRandomValues(buf); return buf[0] % max; }
-function generatePassword(){
-  const len = +lengthInput.value;
-  const pools = getCharPools();
-  const opts = {
-    upper: document.getElementById('uppercase').checked,
-    lower: document.getElementById('lowercase').checked,
-    nums:  document.getElementById('numbers').checked,
-    syms:  document.getElementById('symbols').checked
-  };
-  let chars = ''; Object.entries(opts).forEach(([k,v])=>{ if(v) chars+=pools[k]; });
-  if(!chars){ Toast('error','Options requises','Sélectionnez au moins un type de caractère.'); return; }
-
-  let pwdArr = [];
-  Object.entries(opts).forEach(([k,v])=>{ if(v) pwdArr.push(pools[k][secureRandom(pools[k].length)]); });
-  while(pwdArr.length < len){ pwdArr.push(chars[secureRandom(chars.length)]); }
-  for(let i=pwdArr.length-1;i>0;i--){ const j = secureRandom(i+1); [pwdArr[i],pwdArr[j]] = [pwdArr[j],pwdArr[i]]; }
-  const pwd = pwdArr.join('');
-
-  outputEl.textContent = pwd;
-  outputContainer.classList.add('generated');
-  setTimeout(() => outputContainer.classList.remove('generated'), 500);
-  
-  addRecentPassword(pwd);
-  if (recentBtn.classList.contains('active')) renderRecent();
-  updateMeter(pwd, chars.length);
-}
-
-/* ===== Renderers ===== */
-function renderRecent(){
-  list.innerHTML='';
-  if(recentPasswords.length===0){
-    list.innerHTML = "<p class='text-center muted'><i class='fa-solid fa-inbox'></i><br><br>Aucun mot de passe généré</p>";
-    return;
-  }
-  recentPasswords.forEach((obj)=>{
-    const el = document.createElement('div');
-    el.className = 'password-item';
-    el.innerHTML = `
-      <div class="mono">${escapeHtml(obj.password)}</div>
-      <div class="item-actions">
-        <button class="btn btn-icon" data-copy="${escapeHtml(obj.password)}" title="Copier">
-          <i class="fa-solid fa-copy"></i>
-        </button>
-        <button class="btn btn-icon" data-save="${escapeHtml(obj.password)}" title="Enregistrer en brouillon">
-          <i class="fa-solid fa-floppy-disk"></i>
-        </button>
-        <button class="btn btn-icon-danger" data-delete="${obj.createdAt}" title="Supprimer">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+  <div class="modal-backdrop" id="convertModal" hidden>
+    <div class="modal">
+      <header><h3><i class="fa-solid fa-right-long"></i> Convertir</h3></header>
+      <div class="content">
+        <input type="text" placeholder="Nom" data-generator-target="credName">
+        <input type="text" placeholder="Domaine" data-generator-target="credDomain">
+        <input type="text" placeholder="Identifiant" data-generator-target="credUsername">
       </div>
-    `;
-    list.appendChild(el);
-  });
-}
+      <footer>
+        <button class="btn" data-action="click->generator#closeModal">Annuler</button>
+        <button class="btn btn-primary" data-action="click->generator#convertDraft">Convertir</button>
+      </footer>
+    </div>
+  </div>
 
-async function renderDrafts(){
-  list.innerHTML = "<p class='text-center muted'><i class='fa-solid fa-spinner fa-spin'></i><br><br>Chargement…</p>";
-  try{
-    const res = await fetch('{{ path('app_generator_list_drafts') }}');
-    const j = await res.json();
-    list.innerHTML = '';
-    if(!j.drafts?.length){
-      list.innerHTML = "<p class='text-center muted'><i class='fa-solid fa-inbox'></i><br><br>Aucun brouillon</p>";
-      return;
-    }
-    j.drafts.forEach(d=>{
-      const el = document.createElement('div');
-      el.className='password-item';
-      el.innerHTML = `
-        <div class="mono">${escapeHtml(d.name)}</div>
-        <div class="item-actions">
-          <button class="btn btn-icon" data-convert data-id="${d.id}" data-pass="${escapeHtml(d.password)}" data-name="${escapeHtml(d.name)}" title="Convertir en credential">
-            <i class="fa-solid fa-right-long"></i>
-          </button>
-          <button class="btn btn-icon" data-copy="${escapeHtml(d.password)}" title="Copier">
-            <i class="fa-solid fa-copy"></i>
-          </button>
-        </div>
-      `;
-      list.appendChild(el);
-    });
-  }catch(e){
-    list.innerHTML = "<p class='text-center' style='color:var(--color-danger-start)'><i class='fa-solid fa-triangle-exclamation'></i><br><br>Impossible de charger les brouillons.</p>";
-  }
-}
+  <div class="modal-backdrop" id="confirmModal" hidden>
+    <div class="modal">
+      <header><h3><i class="fa-solid fa-triangle-exclamation"></i> Tout supprimer ?</h3></header>
+      <div class="content"><p>Supprimer tous les récents ?</p></div>
+      <footer>
+        <button class="btn" data-action="click->generator#closeModal">Annuler</button>
+        <button class="btn btn-danger" data-action="click->generator#clearAllRecents">Confirmer</button>
+      </footer>
+    </div>
+  </div>
 
-/* ===== Delete helpers ===== */
-function deleteRecent(ts){
-  const before = recentPasswords.length;
-  recentPasswords = recentPasswords.filter(p => p.createdAt !== +ts);
-  saveRecentPasswords();
-  if(before !== recentPasswords.length){
-    renderRecent();
-    Toast('success','Supprimé','Élément retiré des récents.');
-  }
-}
-function clearAllRecents(){
-  recentPasswords = [];
-  saveRecentPasswords();
-  renderRecent();
-  Toast('success','Nettoyage terminé','Tous les récents ont été supprimés.');
-}
-
-/* ===== Events ===== */
-document.getElementById('generateBtn').onclick = generatePassword;
-document.getElementById('copyBtn').onclick = async () => {
-  const p = outputEl.textContent.trim();
-  if(!p || p.startsWith('•')) return;
-  await navigator.clipboard.writeText(p);
-  Toast('success','Copié','Mot de passe copié dans le presse-papiers.');
-};
-lengthInput.addEventListener('input', ()=>{ lengthValue.textContent = lengthInput.value; });
-
-document.querySelector('.card-body').addEventListener('change', ()=>{
-  const current = outputEl.textContent;
-  const pools = getCharPools();
-  const opts = {
-    upper: document.getElementById('uppercase').checked,
-    lower: document.getElementById('lowercase').checked,
-    nums:  document.getElementById('numbers').checked,
-    syms:  document.getElementById('symbols').checked
-  };
-  let chars=''; Object.entries(opts).forEach(([k,v])=>{ if(v) chars+=pools[k]; });
-  if(current && !current.startsWith('•') && chars) updateMeter(current, chars.length);
-  else updateMeter('', 0);
-});
-
-/* Liste actions */
-list.addEventListener('click', async (e)=>{
-  const copyBtn = e.target.closest('[data-copy]');
-  const saveBtn = e.target.closest('[data-save]');
-  const convertBtn = e.target.closest('[data-convert]');
-  const delBtn = e.target.closest('[data-delete]');
-
-  if(copyBtn){
-    await navigator.clipboard.writeText(copyBtn.getAttribute('data-copy'));
-    Toast('success','Copié','Mot de passe copié.');
-  }
-  if(saveBtn){
-    pendingSavePassword = saveBtn.getAttribute('data-save');
-    document.getElementById('saveName').value = '';
-    openModal('saveModal');
-  }
-  if(convertBtn){
-    const b = convertBtn;
-    currentDraftId = b.getAttribute('data-id');
-    document.getElementById('credName').value = b.getAttribute('data-name') || '';
-    document.getElementById('credDomain').value = '';
-    document.getElementById('credUsername').value = '';
-    openModal('convertModal');
-  }
-  if(delBtn){
-    deleteRecent(delBtn.getAttribute('data-delete'));
-  }
-});
-
-/* Tabs */
-recentBtn.onclick = ()=>{
-  recentBtn.classList.add('active'); recentBtn.setAttribute('aria-selected','true');
-  savedBtn.classList.remove('active'); savedBtn.setAttribute('aria-selected','false');
-  clearAllBtn.disabled = false;
-  renderRecent();
-};
-savedBtn.onclick  = ()=>{
-  savedBtn.classList.add('active'); savedBtn.setAttribute('aria-selected','true');
-  recentBtn.classList.remove('active'); recentBtn.setAttribute('aria-selected','false');
-  clearAllBtn.disabled = true;
-  renderDrafts();
-};
-
-/* Save Draft */
-document.getElementById('confirmSave').onclick = async () => {
-  const name = document.getElementById('saveName').value?.trim();
-  if (!name) {
-    Toast('error', 'Nom requis', "Merci d'indiquer un nom.");
-    return;
-  }
-  try {
-    await fetch('{{ path('app_generator_save_draft') }}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, password: pendingSavePassword })
-    });
-    closeModal('saveModal');
-    Toast('success', 'Brouillon enregistré', 'Vous le trouverez dans l’onglet Enregistrés.');
-    if (savedBtn.classList.contains('active')) renderDrafts();
-  } catch (e) {
-    Toast('error', 'Échec', "Impossible d'enregistrer le brouillon.");
-  }
-};
-
-
-/* Convert draft */
-document.getElementById('confirmConvert').onclick = async ()=>{
-  const payload = {
-    draftId: currentDraftId,
-    name: document.getElementById('credName').value,
-    domain: document.getElementById('credDomain').value,
-    username: document.getElementById('credUsername').value
-  };
-  try{
-    const res = await fetch('{{ path('app_generator_convert_draft') }}', {
-      method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
-    });
-    const j = await res.json();
-    if(j.success){
-      closeModal('convertModal');
-      Toast('success','Conversion réussie','Le brouillon a été converti en credential.');
-      renderDrafts();
-    }else{
-      Toast('error','Erreur', j.error || 'Une erreur est survenue.');
-    }
-  }catch(e){ Toast('error','Erreur réseau','Vérifiez votre connexion.'); }
-};
-
-/* Clear all récents */
-clearAllBtn.onclick = ()=>{
-  if(savedBtn.classList.contains('active')) return;
-  openModal('confirmModal');
-};
-document.getElementById('confirmClearAll').onclick = ()=>{
-  clearAllRecents();
-  closeModal('confirmModal');
-};
-
-/* Utils */
-function escapeHtml(str){ return str ? String(str).replace(/[&<>"']/g,(t)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[t])) : ""; }
-
-/* Init */
-lengthValue.textContent = lengthInput.value;
-renderRecent();
-updateMeter('',0);
-clearAllBtn.disabled = false;
-</script>
+</div>
 {% endblock %}

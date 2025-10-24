@@ -402,14 +402,14 @@
         <span>Générateur</span>
       </a>
       <a href=""
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_folders' ? 'active' : '' }}">
+        <i class="fas fa-users"></i>
+        <span>Equipe</span>
+      </a>
+      <a href=""
          class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
         <i class="fas fa-shield-heart"></i>
         <span>Vérificateur de sécurité</span>
-      </a>
-      <a href=""
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_folders' ? 'active' : '' }}">
-        <i class="fas fa-folder"></i>
-        <span>Dossiers</span>
       </a>
     </div>
 
