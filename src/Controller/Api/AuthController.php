@@ -3,12 +3,15 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
+use App\Entity\Notification;
+use Psr\Log\LoggerInterface;
 use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -19,6 +22,8 @@ final class AuthController extends AbstractController
         Request $request,
         UserRepository $userRepository,
         UserPasswordHasherInterface $passwordHasher,
+        NotificationService $notificationService,
+        LoggerInterface $logger,
         EntityManagerInterface $em
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
@@ -48,6 +53,24 @@ final class AuthController extends AbstractController
         $em->persist($user);
         $em->flush();
 
+try {
+       $notificationService->createEntityNotification(
+        $user,
+        'Bienvenue parmi nous',
+        $user,
+        'Nous sommes ravis de vous accueillir ! Complétez votre profil pour profiter pleinement de l\'application.',
+        Notification::TYPE_SUCCESS,
+        '/app/settings',
+        'fa-hands-clapping',
+        Notification::PRIORITY_LOW
+    );
+}
+catch  (\Exception $e) {
+        $logger->error('Failed to create registration notification', [
+            'userId' => $user->getId(),
+            'error' => $e->getMessage()
+        ]);
+        }
         $response = new JsonResponse([
             'message' => 'Inscription réussie',
             'user' => [
