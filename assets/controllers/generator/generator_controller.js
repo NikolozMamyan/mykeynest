@@ -70,7 +70,7 @@ async showDrafts(e) {
   if (e && e.currentTarget) this.setActiveTab(e.currentTarget);
   this.listTarget.innerHTML = "<p>Chargement...</p>";
   try {
-    const res = await fetch("/app/generator/list-drafts");
+    const res = await fetch("/api/generator/list-drafts");
     const data = await res.json();
     this.listTarget.innerHTML = "";
     if (!data.drafts?.length) {
@@ -118,7 +118,7 @@ async showDrafts(e) {
     const name = this.saveNameTarget.value.trim();
     if(!name) return this.toast("error","Nom requis","Merci d'indiquer un nom.");
     try {
-      await fetch("/app/generator/save-draft", {
+      await fetch("/api/generator/save-draft", {
         method:"POST",
         headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({ name, password: this.pendingSavePassword })
@@ -139,7 +139,7 @@ async showDrafts(e) {
       username: this.credUsernameTarget.value
     };
     try {
-      const res = await fetch("/app/generator/convert-draft", {
+      const res = await fetch("/api/generator/convert-draft", {
         method:"POST",
         headers:{ "Content-Type":"application/json" },
         body: JSON.stringify(payload)

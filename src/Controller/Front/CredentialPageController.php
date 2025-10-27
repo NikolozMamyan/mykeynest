@@ -84,6 +84,7 @@ final class CredentialPageController extends AbstractController
         return $this->render('credential/edit.html.twig', [
             'form' => $form,
             'heading' => 'Mes accès',
+            'credential' => $credential
         ]);
     }
 
