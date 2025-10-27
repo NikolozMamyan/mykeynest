@@ -2,6 +2,7 @@
   /* Couleurs principales */
   --color-primary: #059669;
   --color-primary-hover: rgba(16, 185, 129, 0.3);
+  --background-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
 
   /* Couleurs de base */
   --color-white: #ffffff;
@@ -98,6 +99,7 @@
     /* Couleur principale (inchangée pour conserver la marque) */
     --color-primary: #059669;
     --color-primary-hover: rgba(16, 185, 129, 0.4);
+    --background-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 
     /* Couleurs d’alerte */
     --color-danger-start: #ef4444;

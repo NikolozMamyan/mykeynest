@@ -67,7 +67,7 @@ export default class extends Controller {
   // === Onglets
   showRecents(e) { this.setActiveTab(e.currentTarget); this.renderRecent(); }
 async showDrafts(e) {
-  this.setActiveTab(e.currentTarget);
+  if (e && e.currentTarget) this.setActiveTab(e.currentTarget);
   this.listTarget.innerHTML = "<p>Chargement...</p>";
   try {
     const res = await fetch("/app/generator/list-drafts");
@@ -95,6 +95,7 @@ async showDrafts(e) {
     this.listTarget.innerHTML = "<p style='color:red'>Erreur de chargement.</p>";
   }
 }
+
 
   // === Modales
   openModal(id) {
