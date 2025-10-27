@@ -379,16 +379,16 @@
               data-layout-target="passLength"></span>
       </a>
 
-      <a href="{{ path('app_subscription') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_subscription' ? 'active' : '' }}">
-        <i class="fas fa-receipt"></i>
-        <span>Abonnements</span>
+      <a href="{{ path('shared_access_index') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'shared_access_index' ? 'active' : '' }}">
+        <i class="fas fa-share-alt"></i>
+        <span>Partages sécurisées</span>
       </a>
 
       <a href=""
          class="nav-item {{ app.request.attributes.get('_route') == 'app_notes' ? 'active' : '' }}">
-        <i class="fas fa-note-sticky"></i>
-        <span>Notes sécurisées</span>
+        <i class="fas fa-plug"></i>
+        <span>Extension navigateur</span>
       </a>
     </div>
 
@@ -407,6 +407,11 @@
         <span>Equipe</span>
       </a>
       <a href=""
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_notes' ? 'active' : '' }}">
+        <i class="fas fa-note-sticky"></i>
+        <span>Notes sécurisées</span>
+      </a>
+      <a href=""
          class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
         <i class="fas fa-shield-heart"></i>
         <span>Vérificateur de sécurité</span>
@@ -417,6 +422,11 @@
 
     <div class="nav-section">
       <div class="nav-section-title">Paramètres</div>
+      <a href="{{ path('app_subscription') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_subscription' ? 'active' : '' }}">
+        <i class="fas fa-receipt"></i>
+        <span>Abonnements</span>
+      </a>
       <a href=""
          class="nav-item {{ app.request.attributes.get('_route') == 'app_preferences' ? 'active' : '' }}">
         <i class="fas fa-gear"></i>

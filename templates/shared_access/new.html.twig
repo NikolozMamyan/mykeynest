@@ -1,0 +1,669 @@
+{# templates/shared_access/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Partager des identifiants{% endblock %}
+
+{% block body %}
+<div class="content-container">
+  <div class="page-header">
+    <a href="{{ path('shared_access_index') }}" class="back-btn">
+      <i class="fas fa-arrow-left"></i>
+      <span>Retour</span>
+    </a>
+  </div>
+
+  {% for message in app.flashes('error') %}
+    <div class="alert alert-danger">
+      <i class="fas fa-exclamation-circle alert-icon"></i>
+      <span>{{ message }}</span>
+      <button class="close-btn"><i class="fas fa-times"></i></button>
+    </div>
+  {% endfor %}
+
+  {% if credentials is empty %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-lock"></i>
+      </div>
+      <h3 class="empty-title">Aucun identifiant à partager</h3>
+      <p class="empty-text">Vous n'avez aucun identifiant que vous pouvez partager. Créez d'abord des identifiants.</p>
+      <a href="{{ path('credential_new') }}" class="primary-btn">
+        <i class="fas fa-plus"></i>
+        <span>Ajouter un identifiant</span>
+      </a>
+    </div>
+  {% else %}
+    <form method="post" action="{{ path('shared_access_new') }}" class="share-form">
+      <div class="form-sections">
+        <div class="form-section user-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <h2>1. Sélectionnez un utilisateur</h2>
+          </div>
+          
+          <div class="form-content">
+            <div class="form-group">
+              <label for="email">Adresse email de l'utilisateur</label>
+              <div class="input-group">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="email" name="email" required placeholder="exemple@domaine.com" class="form-control">
+              </div>
+              <small class="form-text">L'utilisateur doit avoir un compte sur cette plateforme.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="connector">
+          <div class="connector-line"></div>
+        </div>
+
+        <div class="form-section credentials-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <i class="fas fa-key"></i>
+            </div>
+            <h2>2. Sélectionnez les identifiants à partager</h2>
+          </div>
+          
+          <div class="form-content">
+            <div class="search-container">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" id="credentialSearch" class="search-input" placeholder="Rechercher un identifiant...">
+            </div>
+            
+            <div class="credentials-container">
+              <div class="credentials-header">
+                <div class="credentials-count">
+                  <span id="selected-count">0</span> identifiant(s) sélectionné(s)
+                </div>
+                <button type="button" id="select-all" class="text-btn">Tout sélectionner</button>
+              </div>
+              
+              <div class="credentials-grid">
+                {% for credential in credentials %}
+                  <div class="credential-card" data-name="{{ credential.name|lower }}" data-domain="{{ credential.domain|lower }}">
+                    <div class="credential-checkbox">
+                      <input type="checkbox" id="credential-{{ credential.id }}" name="credentials[]" value="{{ credential.id }}" class="credential-checkbox-input">
+                      <label for="credential-{{ credential.id }}" class="checkbox-label"></label>
+                    </div>
+                    <div class="credential-info">
+                      <div class="credential-icon color-{{ loop.index % 5 }}">{{ credential.name|first|upper }}</div>
+                      <div class="credential-details">
+                        <h3 class="credential-name">{{ credential.name }}</h3>
+                        <div class="credential-meta">
+                          <span class="credential-domain"><i class="fas fa-globe"></i> {{ credential.domain }}</span>
+                          <span class="credential-username"><i class="fas fa-user"></i> {{ credential.username }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ path('shared_access_index') }}" class="secondary-btn">Annuler</a>
+        <button type="submit" id="share-button" class="primary-btn" disabled>
+          <i class="fas fa-share-alt"></i>
+          <span>Partager les identifiants sélectionnés</span>
+        </button>
+      </div>
+    </form>
+  {% endif %}
+</div>
+
+<style>
+  /* Variables pour cohérence visuelle */
+
+  
+
+  
+  /* Couleurs prédéfinies pour les avatars et icônes */
+  .color-0 { background-color: var(--color-0); }
+  .color-1 { background-color: var(--color-1); }
+  .color-2 { background-color: var(--color-2); }
+  .color-3 { background-color: var(--color-3); }
+  .color-4 { background-color: var(--color-4); }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+  
+  .page-header h1 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.8rem;
+  }
+  
+  .subtitle {
+    color: var(--text-secondary);
+    margin: 0.5rem 0 0 0;
+    font-size: 1rem;
+  }
+  
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    border:1px solid var(--text-color);
+  }
+  
+  .back-btn:hover {
+    background-color: var(--light-gray);
+    color: var(--text-primary);
+  }
+  
+  /* Alertes */
+  .alert {
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    animation: slideDown 0.3s ease;
+  }
+  
+  .alert-danger {
+    background-color: rgba(234, 67, 53, 0.1);
+    border-left: 4px solid var(--danger-color);
+    color: var(--danger-color);
+  }
+  
+  .alert-icon {
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+  }
+  
+  .close-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    transition: var(--transition);
+  }
+  
+  .close-btn:hover {
+    opacity: 1;
+  }
+  
+  /* États vides */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background-color: var(--light-gray);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+  }
+  
+  .empty-icon {
+    font-size: 2.5rem;
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+  }
+  
+  .empty-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+  
+  .empty-text {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Formulaire */
+  .share-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .form-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+  }
+  
+  .section-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--medium-gray);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+  
+  .section-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+  }
+  
+  .form-content {
+    padding: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  
+  .input-group {
+    position: relative;
+  }
+  
+  .input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dark-gray);
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  }
+  
+  .form-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  
+  /* Connecteur entre sections */
+  .connector {
+    display: flex;
+    justify-content: center;
+    height: 30px;
+  }
+  
+  .connector-line {
+    width: 2px;
+    height: 100%;
+    background-color: var(--medium-gray);
+  }
+  
+  /* Recherche */
+  .search-container {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dark-gray);
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+  }
+  
+  /* Liste des identifiants */
+  .credentials-container {
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius);
+  }
+  
+  .credentials-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--light-gray);
+    border-bottom: 1px solid var(--medium-gray);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+  }
+  
+  .credentials-count {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+  
+  #selected-count {
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+  
+  .text-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .text-btn:hover {
+    text-decoration: underline;
+  }
+  
+  .credentials-grid {
+    display: flex;
+    flex-direction: column;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .credential-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--medium-gray);
+    transition: var(--transition);
+  }
+  
+  .credential-card:last-child {
+    border-bottom: none;
+  }
+  
+  .credential-card:hover {
+    background-color: var(--light-gray);
+  }
+  
+  .credential-checkbox {
+    margin-right: 1rem;
+  }
+  
+  .credential-checkbox-input {
+    display: none;
+  }
+  
+  .checkbox-label {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--medium-gray);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .credential-checkbox-input:checked + .checkbox-label {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .credential-checkbox-input:checked + .checkbox-label::after {
+    content: '\2714';
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .credential-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+  }
+  
+  .credential-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: white;
+  }
+  
+  .credential-details {
+    flex-grow: 1;
+  }
+  
+  .credential-name {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+  }
+  
+  .credential-meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+  
+  .credential-domain, .credential-username {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  /* Actions du formulaire */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  
+  .primary-btn:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+  }
+  
+  .primary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .secondary-btn {
+    background-color: var(--light-gray);
+    color: var(--text-primary);
+    border: 1px solid var(--medium-gray);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  
+  .secondary-btn:hover {
+    background-color: var(--medium-gray);
+  }
+  
+  /* Animations */
+  @keyframes slideDown {
+    from { 
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .back-btn {
+      align-self: flex-start;
+    }
+    
+    .form-actions {
+      flex-direction: column-reverse;
+    }
+    
+    .form-actions > * {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des cases à cocher et du compteur
+    const checkboxes = document.querySelectorAll('.credential-checkbox-input');
+    const selectedCount = document.getElementById('selected-count');
+    const shareButton = document.getElementById('share-button');
+    const selectAllBtn = document.getElementById('select-all');
+    let allSelected = false;
+    
+    function updateSelectedCount() {
+      const checkedCount = document.querySelectorAll('.credential-checkbox-input:checked').length;
+      selectedCount.textContent = checkedCount;
+      
+      // Activer/désactiver le bouton de partage
+      if (checkedCount > 0 && document.getElementById('email').value.trim() !== '') {
+        shareButton.disabled = false;
+      } else {
+        shareButton.disabled = true;
+      }
+      
+      // Mettre à jour le texte du bouton "Tout sélectionner"
+      if (checkedCount === checkboxes.length) {
+        selectAllBtn.textContent = 'Tout désélectionner';
+        allSelected = true;
+      } else {
+        selectAllBtn.textContent = 'Tout sélectionner';
+        allSelected = false;
+      }
+    }
+    
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateSelectedCount);
+    });
+    
+    // Validation de l'email
+    document.getElementById('email').addEventListener('input', updateSelectedCount);
+    
+    // Bouton "Tout sélectionner/désélectionner"
+    selectAllBtn.addEventListener('click', function() {
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = !allSelected;
+      });
+      updateSelectedCount();
+    });
+    
+    // Recherche d'identifiants
+    document.getElementById('credentialSearch').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.credential-card');
+      
+      cards.forEach(card => {
+        const name = card.dataset.name;
+        const domain = card.dataset.domain;
+        
+        if (searchTerm === '' || name.includes(searchTerm) || domain.includes(searchTerm)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+    
+    // Animation pour fermer les alertes
+    document.querySelectorAll('.close-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const alert = this.parentElement;
+        alert.style.opacity = '0';
+        alert.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+          alert.style.display = 'none';
+        }, 300);
+      });
+    });
+    
+    // État initial du bouton de partage
+    updateSelectedCount();
+  });
+</script>
+{% endblock %}

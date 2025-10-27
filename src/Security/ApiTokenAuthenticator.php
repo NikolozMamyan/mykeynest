@@ -41,37 +41,50 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
     }
     
 
-    public function authenticate(Request $request): Passport
-    {
-        $token = null;
+public function authenticate(Request $request): Passport
+{
+    $token = null;
 
-        $authHeader = $request->headers->get('Authorization');
-        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
-            $token = substr($authHeader, 7);
-        }
-
-        if (!$token && $request->cookies->has('AUTH_TOKEN')) {
-            $token = $request->cookies->get('AUTH_TOKEN');
-        }
-
-        if (!$token) {
-            throw new CustomUserMessageAuthenticationException('No token provided');
-        }
-
-        return new SelfValidatingPassport(new UserBadge($token, function (string $token) {
-            $user = $this->userRepository->findOneBy(['apiToken' => $token]);
-
-            if (!$user) {
-                throw new CustomUserMessageAuthenticationException('Invalid API Token');
-            }
-
-            if ($user->getTokenExpiresAt() < new \DateTime()) {
-                throw new CustomUserMessageAuthenticationException('Token expired');
-            }
-
-            return $user;
-        }));
+    $authHeader = $request->headers->get('Authorization');
+    if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+        $token = substr($authHeader, 7);
     }
+
+    if (!$token && $request->cookies->has('AUTH_TOKEN')) {
+        $token = $request->cookies->get('AUTH_TOKEN');
+    }
+
+    if (!$token) {
+        throw new CustomUserMessageAuthenticationException('No token provided');
+    }
+
+    // Récupération du repo pour usage dans la closure
+    $userRepository = $this->userRepository;
+
+    return new SelfValidatingPassport(new UserBadge($token, function (string $token) use ($userRepository) {
+        $user = $userRepository->findOneBy(['apiToken' => $token]);
+
+        if (!$user) {
+            throw new CustomUserMessageAuthenticationException('Invalid API Token');
+        }
+
+        if ($user->getTokenExpiresAt() < new \DateTime()) {
+            throw new CustomUserMessageAuthenticationException('Token expired');
+        }
+
+        // 🔄 Prolonger la durée du token à chaque requête
+        $user->setTokenExpiresAt((new \DateTime())->modify('+1 hour'));
+        // À l’intérieur de ta closure :
+$em = $userRepository->getEntityManager();
+$user->setTokenExpiresAt((new \DateTime())->modify('+1 hour'));
+$em->persist($user);
+$em->flush();
+
+
+        return $user;
+    }));
+}
+
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {

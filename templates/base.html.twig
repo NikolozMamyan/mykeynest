@@ -28,12 +28,16 @@
        data-layout-target="backdrop"
        data-action="click->layout#closeSidebar"></div>
     <div class="wrapper-layout">
+    <!-- MAIN CONTENT -->
+<main class="main-content">
+{% set currentRoute = app.request.attributes.get('_route') %}
+{% set breadcrumbItems = breadcrumb_map()[currentRoute] ?? [] %}
+
+{% include './components/parts/_breadcrumb.html.twig' with { items: breadcrumbItems } %}
+{% block body %}{% endblock %}
+</main>
 
 
-      <!-- MAIN CONTENT -->
-      <main class="main-content">
-        {% block body %}{% endblock %}
-      </main>
     </div>
   </body>
 </html>

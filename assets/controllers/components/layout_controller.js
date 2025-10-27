@@ -39,7 +39,7 @@ export default class extends Controller {
   // --- FETCH du nombre de credentials ---
   async loadCredentialCount() {
     try {
-      const response = await fetch("/api/credentials/length")
+      const response = await fetch("/api/credentials/length", {credentials: "include", headers: { 'Content-Type': 'application/json' },},)
       if (!response.ok) throw new Error("Erreur réseau")
       const data = await response.json()
       if (this.hasPassLengthTarget) {

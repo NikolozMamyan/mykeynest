@@ -79,6 +79,21 @@
     max-width: 100%;
   }
 }
+@media (max-width: 500px) {
+  .page-title-wrapper h1 {
+    font-size: 22px;
+  }
+
+  /* Simplifier le breadcrumb sur mobile */
+  .breadcrumb-item:not(:first-child):not(:last-child) {
+    display: none;
+  }
+
+  .breadcrumb-separator:not(:last-of-type) {
+    display: none;
+  }
+}
+
 
 [data-theme="dark"] {
  

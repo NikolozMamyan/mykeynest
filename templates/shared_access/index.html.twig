@@ -1,0 +1,1258 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Identifiants partagés{% endblock %}
+
+{% block body %}
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Gestion des accès partagés</h1>
+        <p class="hero-subtitle">Partagez vos identifiants en toute sécurité et gérez les accès en temps réel.</p>
+      </div>
+      <a href="{{ path('shared_access_new') }}" class="btn-primary">
+        <i class="fas fa-share-alt"></i>
+        <span>Nouveau partage</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alerts-container">
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success">
+        <div class="alert-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <span class="alert-message">{{ message }}</span>
+        <button class="alert-close"><i class="fas fa-times"></i></button>
+      </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+      <div class="alert alert-danger">
+        <div class="alert-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <span class="alert-message">{{ message }}</span>
+        <button class="alert-close"><i class="fas fa-times"></i></button>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-wrapper">
+    <div class="tabs-header">
+      <button class="tab-btn active" data-tab="shared-by-me">
+        <i class="fas fa-share-alt"></i>
+        <span>Partagés par moi</span>
+        <span class="tab-badge">{{ sharedByMe|length }}</span>
+      </button>
+      <button class="tab-btn" data-tab="shared-with-me">
+        <i class="fas fa-inbox"></i>
+        <span>Partagés avec moi</span>
+        <span class="tab-badge">{{ sharedWithMe|length }}</span>
+      </button>
+    </div>
+    
+    <!-- Tab Content: Shared by me -->
+    <div id="shared-by-me" class="tab-panel active">
+      {% if sharedByMe is empty %}
+        <div class="empty-state">
+          <div class="empty-illustration">
+            <div class="empty-icon-wrapper">
+              <i class="fas fa-share-alt"></i>
+            </div>
+          </div>
+          <h3 class="empty-title">Aucun partage effectué</h3>
+          <p class="empty-description">Commencez à partager vos identifiants avec d'autres utilisateurs de manière sécurisée.</p>
+          <a href="{{ path('shared_access_new') }}" class="btn-primary-outline">
+            <i class="fas fa-plus"></i>
+            <span>Créer mon premier partage</span>
+          </a>
+        </div>
+      {% else %}
+        <div class="access-grid">
+          {% for access in sharedByMe %}
+            <div class="access-card">
+              <div class="card-content">
+                <!-- Header -->
+                <div class="card-top">
+                  <div class="credential-avatar color-{{ loop.index % 5 }}">
+                    <span>{{ access.credential.name|first|upper }}</span>
+                  </div>
+                  <div class="credential-details">
+                    <h3 class="credential-title">{{ access.credential.name }}</h3>
+                    <div class="credential-meta">
+                      <i class="fas fa-globe"></i>
+                      <span>{{ access.credential.domain }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body">
+                  <div class="info-row">
+                    <span class="info-label">Partagé avec</span>
+                    <div class="user-badge">
+                      <div class="user-avatar-sm color-{{ (loop.index * 3) % 5 }}">
+                        {{ access.guest.email|first|upper }}
+                      </div>
+                      <div class="user-details">
+                        <span class="user-name">{{ access.guest.company }}</span>
+                        <span class="user-email">{{ access.guest.email }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="info-row">
+                    <span class="info-label">Date de partage</span>
+                    <div class="date-badge">
+                      <i class="far fa-calendar-alt"></i>
+                      <span>{{ access.createdAt|date('d/m/Y') }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer">
+                  <form method="post" action="{{ path('shared_access_revoke', {'id': access.id}) }}" class="revoke-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('revoke' ~ access.id) }}">
+                    <button type="button" class="btn-danger revoke-btn" data-id="{{ access.id }}">
+                      <i class="fas fa-user-slash"></i>
+                      <span>Révoquer l'accès</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Tab Content: Shared with me -->
+    <div id="shared-with-me" class="tab-panel">
+      {% if sharedWithMe is empty %}
+        <div class="empty-state">
+          <div class="empty-illustration">
+            <div class="empty-icon-wrapper">
+              <i class="fas fa-inbox"></i>
+            </div>
+          </div>
+          <h3 class="empty-title">Aucun identifiant reçu</h3>
+          <p class="empty-description">Vous n'avez pas encore reçu d'identifiants partagés par d'autres utilisateurs.</p>
+        </div>
+      {% else %}
+        <div class="access-grid">
+          {% for access in sharedWithMe %}
+            <div class="access-card">
+              <div class="card-content">
+                <!-- Header -->
+                <div class="card-top">
+                  <div class="credential-avatar color-{{ loop.index % 5 }}">
+                    <span>{{ access.credential.name|first|upper }}</span>
+                  </div>
+                  <div class="credential-details">
+                    <h3 class="credential-title">{{ access.credential.name }}</h3>
+                    <div class="credential-meta">
+                      <i class="fas fa-globe"></i>
+                      <span>{{ access.credential.domain }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body">
+                  <div class="info-row">
+                    <span class="info-label">Partagé par</span>
+                    <div class="user-badge">
+                      <div class="user-avatar-sm color-{{ (loop.index * 3) % 5 }}">
+                        {{ access.owner.email|first|upper }}
+                      </div>
+                      <div class="user-details">
+                        <span class="user-name">{{ access.owner.company }}</span>
+                        <span class="user-email">{{ access.owner.email }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="info-row">
+                    <span class="info-label">Date de partage</span>
+                    <div class="date-badge">
+                      <i class="far fa-calendar-alt"></i>
+                      <span>{{ access.createdAt|date('d/m/Y') }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer">
+                  <a href="{{ path('shared_access_view_credential', {'id': access.id}) }}" class="btn-view">
+                    <i class="fas fa-key"></i>
+                    <span>Voir les identifiants</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+
+<!-- Revoke Modal -->
+<div id="revoke-modal" class="modal">
+  <div class="modal-overlay"></div>
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3 class="modal-title">Confirmer la révocation</h3>
+      <button class="modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="warning-box">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <p class="warning-title">Attention : Action irréversible</p>
+          <p class="warning-text">Êtes-vous sûr de vouloir révoquer cet accès partagé ? L'utilisateur perdra immédiatement l'accès à ces identifiants.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="cancel-revoke" class="btn-secondary">Annuler</button>
+      <button id="confirm-revoke" class="btn-danger-confirm">
+        <i class="fas fa-user-slash"></i>
+        <span>Confirmer la révocation</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+
+
+
+  /* Hero Section */
+  .hero-section {
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .hero-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.025em;
+  }
+
+  .hero-subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-medium);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.875rem 1.75rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-green);
+  }
+
+  .btn-primary:hover {
+    background: #047857;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--color-primary-hover);
+  }
+
+  .btn-primary-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: transparent;
+    color: var(--color-primary);
+    padding: 0.875rem 1.75rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    border: 2px solid var(--color-primary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-primary-outline:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-green);
+  }
+
+  .btn-view {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .btn-view:hover {
+    background: #047857;
+    transform: translateX(4px);
+  }
+
+  .btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--color-danger-start), var(--color-danger-end));
+    color: var(--color-white);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .btn-danger:hover {
+    background: linear-gradient(135deg, var(--color-danger-end), #b91c1c);
+    transform: translateX(4px);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-bg-light);
+    color: var(--color-text-dark);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-bg-hover);
+  }
+
+  .btn-danger-confirm {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--color-danger-start), var(--color-danger-end));
+    color: var(--color-white);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-danger-confirm:hover {
+    background: linear-gradient(135deg, var(--color-danger-end), #b91c1c);
+  }
+
+  /* Alerts */
+  .alerts-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 1rem;
+    animation: slideInDown 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .alert-success {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-left: 4px solid var(--color-success);
+  }
+
+  .alert-danger {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-left: 4px solid var(--color-danger-start);
+  }
+
+  .alert-icon {
+    font-size: 1.5rem;
+  }
+
+  .alert-success .alert-icon {
+    color: var(--color-success);
+  }
+
+  .alert-danger .alert-icon {
+    color: var(--color-danger-start);
+  }
+
+  .alert-message {
+    flex: 1;
+    color: var(--color-text-dark);
+    font-weight: 500;
+  }
+
+  .alert-close {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0.25rem;
+    transition: all 0.2s ease;
+  }
+
+  .alert-close:hover {
+    color: var(--color-text-dark);
+  }
+
+  /* Tabs */
+  .tabs-wrapper {
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .tabs-header {
+    display: flex;
+    border-bottom: 2px solid var(--color-border);
+    background: var(--color-bg-light);
+  }
+
+  .tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-primary);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .tab-btn:hover {
+    color: var(--color-text-dark);
+    background: var(--color-white);
+  }
+
+  .tab-btn.active {
+    color: var(--color-primary);
+    background: var(--color-white);
+  }
+
+  .tab-btn.active::after {
+    transform: scaleX(1);
+  }
+
+  .tab-badge {
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 1.75rem;
+    text-align: center;
+  }
+
+  .tab-btn:not(.active) .tab-badge {
+    background: var(--color-text-light);
+  }
+
+  .tab-panel {
+    display: none;
+    padding: 2rem;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .empty-illustration {
+    margin-bottom: 2rem;
+  }
+
+  .empty-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    background: var(--background-gradient);
+    border-radius: 50%;
+    font-size: 3rem;
+    color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .empty-description {
+    font-size: 1rem;
+    color: var(--color-text-medium);
+    margin: 0 0 2rem 0;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Access Grid */
+  .access-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Access Card */
+  .access-card {
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .access-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--color-bg-light), var(--color-white));
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .credential-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--color-white);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .credential-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .credential-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0 0 0.375rem 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .credential-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .credential-meta i {
+    font-size: 0.75rem;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .info-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--color-bg-light);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+  }
+
+  .user-avatar-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-white);
+    flex-shrink: 0;
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .user-name {
+    font-weight: 600;
+    color: var(--color-text-dark);
+    font-size: 0.9375rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .user-email {
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .date-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: var(--color-bg-light);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-medium);
+    font-size: 0.875rem;
+    font-weight: 500;
+    width: fit-content;
+  }
+
+  .date-badge i {
+    color: var(--color-primary);
+  }
+
+  .card-footer {
+    padding: 1rem 1.5rem;
+    background: var(--color-bg-light);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Colors */
+  .color-0 { background-color: var(--color-0); }
+  .color-1 { background-color: var(--color-1); }
+  .color-2 { background-color: var(--color-2); }
+  .color-3 { background-color: var(--color-3); }
+  .color-4 { background-color: var(--color-4); }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: var(--blur-background);
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-dialog {
+    position: relative;
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
+  }
+
+  .modal-close:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-dark);
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .warning-box {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-left: 4px solid var(--color-danger-start);
+    border-radius: var(--border-radius-sm);
+  }
+
+  .warning-box i {
+    font-size: 1.5rem;
+    color: var(--color-danger-start);
+    flex-shrink: 0;
+  }
+
+  .warning-title {
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9375rem;
+  }
+
+  .warning-text {
+    color: var(--color-text-medium);
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--color-bg-light);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+
+
+    .hero-section {
+      padding: 1.5rem;
+    }
+
+    .hero-content {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .hero-title {
+      font-size: 1.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .tabs-header {
+      flex-direction: column;
+    }
+
+    .tab-btn {
+      justify-content: flex-start;
+      padding: 1rem 1.5rem;
+    }
+
+    .tab-btn::after {
+      bottom: 0;
+      top: 0;
+      left: auto;
+      right: -2px;
+      width: 3px;
+      height: auto;
+    }
+
+    .tab-panel {
+      padding: 1.5rem 1rem;
+    }
+
+    .access-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .empty-state {
+      padding: 3rem 1rem;
+    }
+
+    .empty-icon-wrapper {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5rem;
+    }
+
+    .empty-title {
+      font-size: 1.25rem;
+    }
+
+    .modal-dialog {
+      margin: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .card-top {
+      padding: 1.25rem;
+    }
+
+    .credential-avatar {
+      width: 48px;
+      height: 48px;
+      font-size: 1.25rem;
+    }
+
+    .credential-title {
+      font-size: 1rem;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    .modal-header,
+    .modal-body {
+      padding: 1.25rem;
+    }
+
+    .modal-footer {
+      flex-direction: column-reverse;
+    }
+
+    .modal-footer button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Focus states for accessibility */
+  button:focus-visible,
+  a:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Loading state (optional) */
+  .loading {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* Hover effects enhancement */
+  .access-card:hover .credential-avatar {
+    transform: scale(1.05);
+  }
+
+  .access-card:hover .credential-title {
+    color: var(--color-primary);
+  }
+
+  /* Print styles */
+  @media print {
+    .hero-section,
+    .tabs-header,
+    .card-footer,
+    .btn-primary,
+    .modal {
+      display: none !important;
+    }
+
+    .tab-panel {
+      display: block !important;
+    }
+
+    .access-card {
+      break-inside: avoid;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab System
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetTab = this.dataset.tab;
+
+        // Remove active class from all tabs and panels
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanels.forEach(panel => panel.classList.remove('active'));
+
+        // Add active class to clicked tab and corresponding panel
+        this.classList.add('active');
+        document.getElementById(targetTab).classList.add('active');
+
+        // Store active tab in localStorage
+        localStorage.setItem('activeTab', targetTab);
+      });
+    });
+
+    // Restore active tab from localStorage
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab) {
+      const savedButton = document.querySelector(`[data-tab="${savedTab}"]`);
+      if (savedButton) {
+        savedButton.click();
+      }
+    }
+
+    // Alert System
+    const alertCloseButtons = document.querySelectorAll('.alert-close');
+    
+    alertCloseButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const alert = this.closest('.alert');
+        alert.style.animation = 'slideInDown 0.3s ease reverse';
+        
+        setTimeout(() => {
+          alert.remove();
+        }, 300);
+      });
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    document.querySelectorAll('.alert').forEach(alert => {
+      setTimeout(() => {
+        const closeBtn = alert.querySelector('.alert-close');
+        if (closeBtn) {
+          closeBtn.click();
+        }
+      }, 5000);
+    });
+
+    // Modal System
+    const modal = document.getElementById('revoke-modal');
+    const revokeButtons = document.querySelectorAll('.revoke-btn');
+    const modalClose = document.querySelector('.modal-close');
+    const cancelButton = document.getElementById('cancel-revoke');
+    const confirmButton = document.getElementById('confirm-revoke');
+    const modalOverlay = document.querySelector('.modal-overlay');
+    let currentForm = null;
+
+    // Open modal
+    revokeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        currentForm = this.closest('.revoke-form');
+        openModal();
+      });
+    });
+
+    function openModal() {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      
+      // Focus trap
+      setTimeout(() => {
+        confirmButton.focus();
+      }, 100);
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+      currentForm = null;
+    }
+
+    // Close modal events
+    modalClose.addEventListener('click', closeModal);
+    cancelButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', closeModal);
+
+    // Confirm revocation
+    confirmButton.addEventListener('click', function() {
+      if (currentForm) {
+        // Add loading state
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Révocation en cours...</span>';
+        
+        currentForm.submit();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal.style.display === 'flex') {
+        closeModal();
+      }
+    });
+
+    // Prevent modal close when clicking inside dialog
+    document.querySelector('.modal-dialog').addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    // Add loading state to buttons on form submit
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', function() {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('loading');
+        }
+      });
+    });
+
+    // Smooth scroll to top when switching tabs
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Add intersection observer for card animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }, index * 50);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // Observe all cards
+    document.querySelectorAll('.access-card').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(card);
+    });
+
+    // Add ripple effect to buttons (optional enhancement)
+    document.querySelectorAll('button, .btn-primary, .btn-view').forEach(button => {
+      button.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple-effect');
+
+        this.appendChild(ripple);
+
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+  });
+
+  // Ripple effect styles
+  const rippleStyle = document.createElement('style');
+  rippleStyle.textContent = `
+    button, .btn-primary, .btn-view {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(0);
+      animation: ripple 0.6s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(rippleStyle);
+</script>
+{% endblock %}
