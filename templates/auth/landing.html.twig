@@ -6,38 +6,6 @@
 
 <style>
 /* === ANIMATIONS GLOBALES === */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.1); opacity: 0.8; }
-}
-
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -49,10 +17,31 @@
   }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -60,19 +49,6 @@
   }
 }
 
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(5, 150, 105, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(5, 150, 105, 0.6);
-  }
-}
-
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
 
 /* === NAVIGATION === */
 .landing-nav {
@@ -80,22 +56,22 @@
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: var(--blur-background);
-  padding: 1.25rem 2rem;
-  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 0;
   z-index: 1000;
   transition: all 0.3s ease;
 }
 
 .landing-nav.scrolled {
-  padding: 0.875rem 2rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
+  padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -104,26 +80,21 @@
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 1.5rem;
+  gap: 0.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-text-dark);
   text-decoration: none;
-  transition: transform 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .nav-logo:hover {
-  transform: scale(1.05);
+  opacity: 0.8;
 }
 
 .nav-logo i {
   color: var(--color-primary);
-  font-size: 1.75rem;
-  transition: transform 0.3s ease;
-}
-
-.nav-logo:hover i {
-  transform: rotate(360deg);
+  font-size: 1.5rem;
 }
 
 .nav-links {
@@ -136,396 +107,231 @@
   color: var(--color-text-medium);
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
   position: relative;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: -5px;
-  left: 50%;
-  background: var(--color-primary);
-  transition: all 0.3s ease;
-  transform: translateX(-50%);
 }
 
 .nav-link:hover {
   color: var(--color-primary);
 }
 
-.nav-link:hover::after {
-  width: 100%;
-}
-
 .nav-cta {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.625rem 1.25rem;
   border-radius: var(--border-radius-sm);
   font-weight: 600;
+  font-size: 0.9rem;
   text-decoration: none;
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
-  font-size: 0.95rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn:hover::before {
-  width: 300px;
-  height: 300px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .btn-outline {
-  color: var(--color-primary);
+  color: var(--color-text-dark);
   background: transparent;
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-border);
 }
 
 .btn-outline:hover {
-  background: var(--color-primary);
-  color: var(--color-white);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-green);
+  background: var(--color-bg-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .btn-primary {
   background: var(--color-primary);
   color: var(--color-white);
+  border: 1px solid var(--color-primary);
 }
 
 .btn-primary:hover {
   background: #047857;
-  transform: translateY(-2px);
   box-shadow: var(--shadow-green);
 }
 
 /* === HERO SECTION === */
 .hero-section {
-  padding: 10rem 2rem 6rem;
-  max-width: 1200px;
+  padding: 8rem 2rem 4rem;
+  max-width: 1280px;
   margin: 0 auto;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Particules décoratives */
-.hero-section::before,
-.hero-section::after {
-  content: '';
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  opacity: 0.05;
-  pointer-events: none;
-}
-
-.hero-section::before {
-  background: var(--color-primary);
-  top: -200px;
-  left: -200px;
-  animation: pulse 8s ease-in-out infinite;
-}
-
-.hero-section::after {
-  background: var(--color-primary-light);
-  bottom: -200px;
-  right: -200px;
-  animation: pulse 10s ease-in-out infinite;
-  animation-delay: 2s;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
 }
 
 .hero-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.1fr 1fr;
   gap: 4rem;
   align-items: center;
-  position: relative;
-  z-index: 1;
+  width: 100%;
 }
 
 .hero-text {
-  animation: slideInFromLeft 0.8s ease-out;
+  animation: fadeInUp 0.8s ease-out;
 }
 
 .hero-text h1 {
   font-size: 3.5rem;
   font-weight: 800;
   color: var(--color-text-dark);
-  line-height: 1.2;
+  line-height: 1.1;
   margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
 }
 
 .hero-text h1 .highlight {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
   position: relative;
-  display: inline-block;
 }
 
-.hero-text h1 .highlight::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--color-primary), transparent);
-  border-radius: 2px;
-  animation: glow 2s ease-in-out infinite;
-}
-
-.hero-text p {
+.hero-text .subtitle {
   font-size: 1.25rem;
   color: var(--color-text-medium);
   line-height: 1.6;
   margin-bottom: 2rem;
+  max-width: 600px;
 }
 
 .hero-cta {
   display: flex;
   gap: 1rem;
   align-items: center;
+  margin-bottom: 2rem;
 }
 
 .btn-large {
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
 }
 
-.btn-large i {
-  transition: transform 0.3s ease;
-}
-
-.btn-large:hover i {
-  transform: translateX(5px);
-}
-
-.trust-badges {
+.trust-indicators {
   display: flex;
   gap: 2rem;
-  margin-top: 3rem;
+  align-items: center;
   padding-top: 2rem;
   border-top: 1px solid var(--color-border);
-  animation: fadeInUp 1s ease-out 0.3s backwards;
+  margin-top: 2rem;
 }
 
-.badge-item {
+.trust-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   color: var(--color-text-medium);
-  cursor: default;
-  transition: transform 0.3s ease;
+  font-size: 0.9rem;
 }
 
-.badge-item:hover {
-  transform: translateY(-3px);
-}
-
-.badge-item i {
+.trust-item i {
   color: var(--color-success);
-  font-size: 1.25rem;
-  animation: scaleIn 0.5s ease-out;
+  font-size: 1.1rem;
 }
 
 .hero-visual {
   position: relative;
-  animation: slideInFromRight 0.8s ease-out;
+  animation: fadeInUp 0.8s ease-out 0.2s backwards;
 }
 
 .hero-mockup {
   background: var(--color-white);
   border-radius: var(--border-radius);
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-xl);
+  border: 1px solid var(--color-border);
   position: relative;
-  animation: float 6s ease-in-out infinite;
-  transition: transform 0.3s ease;
 }
 
-.hero-mockup:hover {
-  transform: scale(1.02);
-  box-shadow: var(--shadow-glow);
+.mockup-window {
+  background: var(--color-bg-light);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
 }
 
 .mockup-header {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .mockup-dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--color-border);
-  transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .mockup-dot:nth-child(1) { background: #ef4444; }
 .mockup-dot:nth-child(2) { background: #f59e0b; }
 .mockup-dot:nth-child(3) { background: var(--color-success); }
 
-.mockup-dot:hover {
-  transform: scale(1.3);
-  filter: brightness(1.2);
-}
-
 .mockup-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  padding: 1.5rem;
 }
 
-.credential-card {
-  background: var(--color-bg-light);
-  padding: 1.25rem;
-  border-radius: var(--border-radius-sm);
+.credential-item {
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding: 1rem;
+  background: var(--color-white);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 0.75rem;
   border: 1px solid var(--color-border);
   transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
 }
 
-.credential-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 3px;
-  height: 100%;
-  background: var(--color-primary);
-  transform: scaleY(0);
-  transition: transform 0.3s ease;
-}
-
-.credential-card:hover {
-  transform: translateX(5px);
+.credential-item:hover {
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-}
-
-.credential-card:hover::before {
-  transform: scaleY(1);
+  box-shadow: var(--shadow-sm);
 }
 
 .credential-icon {
-  width: 48px;
-  height: 48px;
-  background: var(--color-primary);
+  width: 40px;
+  height: 40px;
+  background: var(--background-gradient);
   border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-white);
+  color: var(--color-primary);
   font-size: 1.25rem;
-  transition: all 0.3s ease;
-}
-
-.credential-card:hover .credential-icon {
-  transform: rotate(360deg) scale(1.1);
 }
 
 .credential-info h4 {
-  color: var(--color-text-dark);
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-bottom: 0.25rem;
-  transition: color 0.3s ease;
-}
-
-.credential-card:hover .credential-info h4 {
-  color: var(--color-primary);
+  color: var(--color-text-dark);
+  margin-bottom: 0.125rem;
 }
 
 .credential-info p {
+  font-size: 0.85rem;
   color: var(--color-text-muted);
-  font-size: 0.875rem;
 }
 
-.floating-badge {
-  position: absolute;
-  background: var(--color-white);
-  padding: 1rem 1.5rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  animation: float 4s ease-in-out infinite;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.floating-badge:hover {
-  transform: scale(1.05) translateY(-5px);
-  box-shadow: var(--shadow-glow);
-}
-
-.floating-badge-1 {
-  top: -20px;
-  right: -30px;
-}
-
-.floating-badge-2 {
-  bottom: 40px;
-  left: -40px;
-  animation-delay: 2s;
-}
-
-.floating-badge i {
-  color: var(--color-success);
-  font-size: 1.5rem;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.floating-badge span {
-  font-weight: 600;
-  color: var(--color-text-dark);
-}
-
-/* === STATS SECTION (NOUVEAU) === */
+/* === STATS SECTION === */
 .stats-section {
-  padding: 4rem 2rem;
-  background: var(--color-white);
-  margin-top: -2rem;
-  position: relative;
-  z-index: 2;
+  padding: 3rem 2rem;
+  background: var(--background-gradient);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .stats-container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -534,53 +340,19 @@
 
 .stat-item {
   text-align: center;
-  padding: 2rem;
-  background: var(--color-bg-light);
-  border-radius: var(--border-radius);
-  transition: all 0.3s ease;
-  cursor: default;
-  position: relative;
-  overflow: hidden;
-}
-
-.stat-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.stat-item:hover::before {
-  opacity: 0.05;
-}
-
-.stat-item:hover {
-  transform: translateY(-10px);
-  box-shadow: var(--shadow-lg);
 }
 
 .stat-number {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
   display: block;
-  margin-bottom: 0.5rem;
-  position: relative;
+  margin-bottom: 0.25rem;
 }
 
 .stat-label {
   color: var(--color-text-medium);
-  font-size: 1.05rem;
-  font-weight: 500;
-  position: relative;
+  font-size: 0.95rem;
 }
 
 /* === FEATURES SECTION === */
@@ -589,31 +361,36 @@
   background: var(--color-white);
 }
 
+.section-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
 .section-header {
   text-align: center;
   max-width: 700px;
   margin: 0 auto 4rem;
 }
 
+.section-label {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--background-gradient);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 50px;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .section-header h2 {
-  font-size: 2.75rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: var(--color-text-dark);
   margin-bottom: 1rem;
-  position: relative;
-  display: inline-block;
-}
-
-.section-header h2::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
-  border-radius: 2px;
+  letter-spacing: -0.02em;
 }
 
 .section-header p {
@@ -623,506 +400,94 @@
 }
 
 .features-grid {
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
 }
 
 .feature-card {
-  background: var(--color-bg-light);
   padding: 2rem;
-  border-radius: var(--border-radius);
+  background: var(--color-white);
   border: 1px solid var(--color-border);
-  transition: all 0.4s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, var(--color-primary-hover) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.feature-card:hover::before {
-  opacity: 1;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-10px);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
   border-color: var(--color-primary);
 }
 
 .feature-icon {
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, var(--color-primary), #10b981);
+  width: 56px;
+  height: 56px;
+  background: var(--background-gradient);
   border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-white);
-  font-size: 1.75rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-  z-index: 1;
-  transition: all 0.4s ease;
-}
-
-.feature-card:hover .feature-icon {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: var(--shadow-glow);
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .feature-card h3 {
-  color: var(--color-text-dark);
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 700;
+  color: var(--color-text-dark);
   margin-bottom: 0.75rem;
-  position: relative;
-  z-index: 1;
 }
 
 .feature-card p {
   color: var(--color-text-medium);
   line-height: 1.6;
-  position: relative;
-  z-index: 1;
+  font-size: 0.95rem;
 }
 
-/* === DEMO INTERACTIVE SECTION (NOUVEAU) === */
-.demo-section {
-  padding: 6rem 2rem;
-  background: var(--background-gradient);
-  position: relative;
-  overflow: hidden;
-}
-
-.demo-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.demo-container h2 {
-  font-size: 2.75rem;
-  font-weight: 800;
-  color: var(--color-text-dark);
-  margin-bottom: 1rem;
-}
-
-.demo-container p {
-  font-size: 1.125rem;
-  color: var(--color-text-medium);
-  margin-bottom: 3rem;
-}
-
-.password-generator-demo {
-  background: var(--color-white);
-  padding: 3rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-xl);
-  max-width: 600px;
-  margin: 0 auto;
-  transition: all 0.3s ease;
-}
-
-.password-generator-demo:hover {
-  box-shadow: var(--shadow-glow);
-}
-
-.password-display {
-  background: var(--color-bg-light);
-  padding: 1.5rem;
-  border-radius: var(--border-radius-sm);
-  font-family: 'Courier New', monospace;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  margin-bottom: 2rem;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--color-border);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.password-display::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(5, 150, 105, 0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.password-display.generating::before {
-  left: 100%;
-}
-
-.strength-meter {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-.strength-bar {
-  flex: 1;
-  height: 8px;
-  background: var(--color-border);
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.strength-bar.active {
-  background: var(--color-success);
-}
-
-.generator-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.control-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: var(--color-bg-light);
-  border-radius: var(--border-radius-sm);
-  transition: all 0.3s ease;
-}
-
-.control-item:hover {
-  background: var(--color-bg-hover);
-}
-
-.control-item label {
-  font-weight: 500;
-  color: var(--color-text-dark);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.control-item input[type="range"] {
-  flex: 1;
-  margin: 0 1rem;
-}
-
-.control-item input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-.generate-btn {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-  color: var(--color-white);
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: var(--border-radius-sm);
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.generate-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
-}
-
-.generate-btn:active {
-  transform: translateY(0);
-}
-
-.generate-btn i {
-  transition: transform 0.3s ease;
-}
-
-.generate-btn:hover i {
-  transform: rotate(180deg);
-}
-
-/* === EXTENSION SECTION === */
-.extension-section {
+/* === HOW IT WORKS SECTION === */
+.how-it-works-section {
   padding: 6rem 2rem;
   background: var(--background-gradient);
 }
 
-.extension-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-}
-
-.extension-visual {
-  position: relative;
-}
-
-.browser-mockup {
-  background: var(--color-white);
-  border-radius: var(--border-radius);
-  padding: 0.5rem;
-  box-shadow: var(--shadow-xl);
-  transition: all 0.3s ease;
-}
-
-.browser-mockup:hover {
-  transform: scale(1.02);
-  box-shadow: var(--shadow-glow);
-}
-
-.browser-header {
-  background: var(--color-bg-light);
-  padding: 0.75rem 1rem;
-  border-radius: var(--border-radius-sm);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.browser-dots {
-  display: flex;
-  gap: 0.375rem;
-}
-
-.browser-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-border);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.browser-dot:nth-child(1) { background: #ef4444; }
-.browser-dot:nth-child(2) { background: #f59e0b; }
-.browser-dot:nth-child(3) { background: var(--color-success); }
-
-.browser-dot:hover {
-  transform: scale(1.3);
-}
-
-.extension-popup {
-  background: var(--color-bg-light);
-  padding: 1.5rem;
-  border-radius: var(--border-radius-sm);
-  min-height: 300px;
-}
-
-.popup-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.popup-header i {
-  color: var(--color-primary);
-  font-size: 1.5rem;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.popup-header span {
-  font-weight: 700;
-  color: var(--color-text-dark);
-}
-
-.extension-info h3 {
-  font-size: 2.25rem;
-  font-weight: 800;
-  color: var(--color-text-dark);
-  margin-bottom: 1.25rem;
-}
-
-.extension-info ul {
-  list-style: none;
-  margin-bottom: 2rem;
-}
-
-.extension-info li {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: var(--color-text-medium);
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  transition: all 0.3s ease;
-  padding: 0.5rem;
-  border-radius: var(--border-radius-sm);
-}
-
-.extension-info li:hover {
-  background: var(--color-bg-light);
-  transform: translateX(10px);
-}
-
-.extension-info li i {
-  color: var(--color-success);
-  font-size: 1.25rem;
-  transition: transform 0.3s ease;
-}
-
-.extension-info li:hover i {
-  transform: scale(1.2);
-}
-
-.browser-badges {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.browser-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: var(--color-white);
-  border-radius: var(--border-radius-sm);
-  border:1px solid var(--color-border);
-  font-weight: 600;
-  color: var(--color-text-dark);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.browser-badge:hover {
-  transform: translateY(-5px);
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-}
-
-.browser-badge i {
-  font-size: 1.25rem;
-  transition: transform 0.3s ease;
-}
-
-.browser-badge:hover i {
-  transform: scale(1.2);
-}
-
-/* === TESTIMONIALS SECTION (NOUVEAU) === */
-.testimonials-section {
-  padding: 6rem 2rem;
-  background: var(--color-white);
-}
-
-.testimonials-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.testimonials-grid {
+.steps-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: 3rem;
   margin-top: 4rem;
 }
 
-.testimonial-card {
-  background: var(--color-bg-light);
-  padding: 2rem;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-border);
-  transition: all 0.3s ease;
-  cursor: pointer;
+.step-card {
+  text-align: center;
   position: relative;
 }
 
-.testimonial-card::before {
-  content: '"';
-  position: absolute;
-  top: -20px;
-  left: 20px;
-  font-size: 5rem;
-  color: var(--color-primary);
-  opacity: 0.1;
-  font-family: Georgia, serif;
-}
-
-.testimonial-card:hover {
-  transform: translateY(-10px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--color-primary);
-}
-
-.testimonial-rating {
-  display: flex;
-  gap: 0.25rem;
-  margin-bottom: 1rem;
-}
-
-.testimonial-rating i {
-  color: var(--color-warning);
-  font-size: 1.1rem;
-}
-
-.testimonial-text {
-  color: var(--color-text-medium);
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-  font-style: italic;
-}
-
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.author-avatar {
-  width: 50px;
-  height: 50px;
+.step-number {
+  width: 64px;
+  height: 64px;
+  background: var(--color-primary);
+  color: var(--color-white);
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-white);
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 auto 1.5rem;
+  box-shadow: var(--shadow-green);
+}
+
+.step-card h3 {
+  font-size: 1.25rem;
   font-weight: 700;
-  font-size: 1.2rem;
-}
-
-.author-info h4 {
   color: var(--color-text-dark);
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
 }
 
-.author-info p {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
+.step-card p {
+  color: var(--color-text-medium);
+  line-height: 1.6;
 }
 
 /* === CTA SECTION === */
@@ -1131,158 +496,35 @@
   background: var(--color-white);
 }
 
-.cta-box {
+.cta-container {
   max-width: 900px;
   margin: 0 auto;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-  padding: 4rem 3rem;
-  border-radius: var(--border-radius);
   text-align: center;
-  box-shadow: var(--shadow-xl);
-  position: relative;
-  overflow: hidden;
+  padding: 4rem 3rem;
+  background: var(--background-gradient);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border);
 }
 
-.cta-box::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.cta-box::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
-  opacity: 0.3;
-}
-
-.cta-box h2 {
-  font-size: 2.75rem;
+.cta-container h2 {
+  font-size: 2.5rem;
   font-weight: 800;
-  color: var(--color-white);
-  margin-bottom: 1.25rem;
-  position: relative;
-  z-index: 1;
-  animation: fadeInUp 0.6s ease-out;
+  color: var(--color-text-dark);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
 }
 
-.cta-box p {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 2.5rem;
-  position: relative;
-  z-index: 1;
-  animation: fadeInUp 0.6s ease-out 0.2s backwards;
+.cta-container p {
+  font-size: 1.125rem;
+  color: var(--color-text-medium);
+  margin-bottom: 2rem;
 }
 
 .cta-buttons {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  position: relative;
-  z-index: 1;
-  animation: fadeInUp 0.6s ease-out 0.4s backwards;
-}
-
-.btn-white {
-  background: var(--color-white);
-  color: var(--color-primary);
-}
-
-.btn-white:hover {
-  background: var(--color-bg-light);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.btn-white-outline {
-  background: transparent;
-  color: var(--color-white);
-  border: 2px solid var(--color-white);
-}
-
-.btn-white-outline:hover {
-  background: var(--color-white);
-  color: var(--color-primary);
-}
-
-/* === FAQ SECTION (NOUVEAU) === */
-.faq-section {
-  padding: 6rem 2rem;
-  background: var(--background-gradient);
-}
-
-.faq-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.faq-items {
-  margin-top: 3rem;
-}
-
-.faq-item {
-  background: var(--color-white);
-  border-radius: var(--border-radius);
-  margin-bottom: 1rem;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  transition: all 0.3s ease;
-}
-
-.faq-item:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.faq-question {
-  padding: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  color: var(--color-text-dark);
-  transition: all 0.3s ease;
-}
-
-.faq-question:hover {
-  color: var(--color-primary);
-}
-
-.faq-question i {
-  color: var(--color-primary);
-  transition: transform 0.3s ease;
-  font-size: 1.2rem;
-}
-
-.faq-item.active .faq-question i {
-  transform: rotate(180deg);
-}
-
-.faq-answer {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
-  padding: 0 1.5rem;
-}
-
-.faq-item.active .faq-answer {
-  max-height: 300px;
-  padding: 0 1.5rem 1.5rem;
-}
-
-.faq-answer p {
-  color: var(--color-text-medium);
-  line-height: 1.6;
+  flex-wrap: wrap;
 }
 
 /* === FOOTER === */
@@ -1293,7 +535,7 @@
 }
 
 .footer-content {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -1303,7 +545,7 @@
 
 .footer-brand h3 {
   color: var(--color-white);
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -1312,41 +554,19 @@
 
 .footer-brand h3 i {
   color: var(--color-primary);
-  animation: pulse 3s ease-in-out infinite;
 }
 
 .footer-brand p {
   line-height: 1.6;
   margin-bottom: 1.5rem;
-}
-
-.social-links {
-  display: flex;
-  gap: 1rem;
-}
-
-.social-link {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-white);
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.social-link:hover {
-  background: var(--color-primary);
-  transform: translateY(-5px) rotate(5deg);
+  color: var(--color-text-light);
 }
 
 .footer-links h4 {
   color: var(--color-white);
-  font-size: 1.125rem;
+  font-size: 1rem;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .footer-links ul {
@@ -1354,126 +574,110 @@
 }
 
 .footer-links li {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .footer-links a {
   color: var(--color-text-light);
   text-decoration: none;
-  transition: all 0.3s ease;
-  display: inline-block;
+  transition: color 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .footer-links a:hover {
   color: var(--color-primary);
-  transform: translateX(5px);
 }
 
 .footer-bottom {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
+  color: var(--color-text-light);
+  font-size: 0.9rem;
 }
 
-/* === SCROLL TO TOP BUTTON (NOUVEAU) === */
-.scroll-to-top {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 50px;
-  height: 50px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-white);
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-lg);
-  z-index: 999;
+.footer-bottom a {
+  color: var(--color-text-light);
+  text-decoration: none;
 }
 
-.scroll-to-top.visible {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.scroll-to-top:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-glow);
-}
-
-.scroll-to-top i {
-  font-size: 1.5rem;
+.footer-bottom a:hover {
+  color: var(--color-primary);
 }
 
 /* === RESPONSIVE === */
-@media (max-width: 968px) {
-  .hero-content,
-  .extension-content {
+@media (max-width: 1024px) {
+  .hero-content {
     grid-template-columns: 1fr;
     gap: 3rem;
   }
   
   .features-grid,
-  .testimonials-grid {
+  .steps-grid {
     grid-template-columns: 1fr;
   }
   
   .stats-container {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
   
   .hero-text h1 {
     font-size: 2.5rem;
   }
   
-  .nav-links {
-    display: none;
-  }
-  
-  .footer-content {
-    grid-template-columns: 1fr;
-  }
-  
-  .cta-box {
-    padding: 3rem 2rem;
-  }
-  
-  .cta-box h2 {
+  .section-header h2 {
     font-size: 2rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-section {
-    padding: 8rem 1rem 4rem;
-  }
-  
-  .hero-text h1 {
-    font-size: 2rem;
-  }
-  
-  .hero-cta {
-    flex-direction: column;
-  }
-  
-  .trust-badges {
-    flex-direction: column;
-    gap: 1rem;
   }
   
   .stats-container {
     grid-template-columns: 1fr;
   }
   
-  .floating-badge {
-    display: none;
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .cta-container {
+    padding: 3rem 2rem;
+  }
+  
+  .hero-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-large {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-section {
+    padding: 6rem 1rem 3rem;
+    min-height: auto;
+  }
+  
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-text .subtitle {
+    font-size: 1.05rem;
+  }
+  
+  .trust-indicators {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
   }
 }
 </style>
@@ -1488,14 +692,13 @@
     
     <div class="nav-links">
       <a href="#features" class="nav-link">Fonctionnalités</a>
-      <a href="#demo" class="nav-link">Démo</a>
-      <a href="#extension" class="nav-link">Extension</a>
-      <a href="#testimonials" class="nav-link">Témoignages</a>
+      <a href="#how-it-works" class="nav-link">Comment ça marche</a>
+      <a href="#" class="nav-link">Tarifs</a>
     </div>
     
     <div class="nav-cta">
       <a href="{{ path('show_login') }}" class="btn btn-outline">Connexion</a>
-      <a href="{{ path('show_register') }}" class="btn btn-primary">Commencer gratuitement</a>
+      <a href="{{ path('show_register') }}" class="btn btn-primary">Essai gratuit</a>
     </div>
   </div>
 </nav>
@@ -1505,31 +708,31 @@
   <div class="hero-content">
     <div class="hero-text">
       <h1>
-        Vos mots de passe, <span class="highlight">sécurisés et accessibles</span> partout
+        Sécurisez tous vos mots de passe en <span class="highlight">un seul endroit</span>
       </h1>
-      <p>
-        MykeyNest protège tous vos identifiants avec un chiffrement de niveau militaire. 
-        Une seule clé maître, un accès illimité à tous vos comptes en toute sécurité.
+      <p class="subtitle">
+        MykeyNest protège vos identifiants avec un chiffrement militaire AES-256. 
+        Accédez à tous vos comptes en toute sécurité, sur tous vos appareils.
       </p>
       <div class="hero-cta">
         <a href="{{ path('show_register') }}" class="btn btn-primary btn-large">
-          <i class="fas fa-rocket"></i> Démarrer gratuitement
+          <i class="fas fa-rocket"></i> Commencer gratuitement
         </a>
         <a href="#features" class="btn btn-outline btn-large">
-          En savoir plus
+          Découvrir les fonctionnalités
         </a>
       </div>
       
-      <div class="trust-badges">
-        <div class="badge-item">
+      <div class="trust-indicators">
+        <div class="trust-item">
           <i class="fas fa-shield-check"></i>
           <span>Chiffrement AES-256</span>
         </div>
-        <div class="badge-item">
+        <div class="trust-item">
           <i class="fas fa-users"></i>
           <span>+10,000 utilisateurs</span>
         </div>
-        <div class="badge-item">
+        <div class="trust-item">
           <i class="fas fa-star"></i>
           <span>Note 4.9/5</span>
         </div>
@@ -1538,401 +741,156 @@
     
     <div class="hero-visual">
       <div class="hero-mockup">
-        <div class="mockup-header">
-          <div class="mockup-dot"></div>
-          <div class="mockup-dot"></div>
-          <div class="mockup-dot"></div>
+        <div class="mockup-window">
+          <div class="mockup-header">
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+          </div>
+          <div class="mockup-content">
+            <div class="credential-item">
+              <div class="credential-icon">
+                <i class="fab fa-google"></i>
+              </div>
+              <div class="credential-info">
+                <h4>Gmail</h4>
+                <p>email@example.com</p>
+              </div>
+            </div>
+            <div class="credential-item">
+              <div class="credential-icon">
+                <i class="fab fa-facebook"></i>
+              </div>
+              <div class="credential-info">
+                <h4>Facebook</h4>
+                <p>••••••••</p>
+              </div>
+            </div>
+            <div class="credential-item">
+              <div class="credential-icon">
+                <i class="fab fa-github"></i>
+              </div>
+              <div class="credential-info">
+                <h4>GitHub</h4>
+                <p>developer@mail.com</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="mockup-content">
-          <div class="credential-card">
-            <div class="credential-icon">
-              <i class="fab fa-google"></i>
-            </div>
-            <div class="credential-info">
-              <h4>Gmail</h4>
-              <p>email@example.com</p>
-            </div>
-          </div>
-          <div class="credential-card">
-            <div class="credential-icon">
-              <i class="fab fa-facebook"></i>
-            </div>
-            <div class="credential-info">
-              <h4>Facebook</h4>
-              <p>••••••••</p>
-            </div>
-          </div>
-          <div class="credential-card">
-            <div class="credential-icon">
-              <i class="fab fa-github"></i>
-            </div>
-            <div class="credential-info">
-              <h4>GitHub</h4>
-              <p>developer@mail.com</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="floating-badge floating-badge-1">
-        <i class="fas fa-lock"></i>
-        <span>100% Sécurisé</span>
-      </div>
-      
-      <div class="floating-badge floating-badge-2">
-        <i class="fas fa-bolt"></i>
-        <span>Accès rapide</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STATS SECTION (NOUVEAU) -->
+<!-- STATS SECTION -->
 <section class="stats-section">
   <div class="stats-container">
     <div class="stat-item">
-      <span class="stat-number" data-target="10000">0</span>
+      <span class="stat-number" data-target="10000">10,000+</span>
       <span class="stat-label">Utilisateurs actifs</span>
     </div>
     <div class="stat-item">
-      <span class="stat-number" data-target="50000">0</span>
+      <span class="stat-number" data-target="50000">50,000+</span>
       <span class="stat-label">Mots de passe sécurisés</span>
     </div>
     <div class="stat-item">
-      <span class="stat-number" data-target="99">0</span>
-      <span class="stat-label">% Temps de disponibilité</span>
+      <span class="stat-number" data-target="99">99.9%</span>
+      <span class="stat-label">Temps de disponibilité</span>
     </div>
     <div class="stat-item">
-      <span class="stat-number" data-target="24">0</span>
-      <span class="stat-label">Support 24/7</span>
+      <span class="stat-number">24/7</span>
+      <span class="stat-label">Support disponible</span>
     </div>
   </div>
 </section>
 
 <!-- FEATURES SECTION -->
 <section class="features-section" id="features">
-  <div class="section-header">
-    <h2>Tout ce dont vous avez besoin pour sécuriser vos mots de passe</h2>
-    <p>Des fonctionnalités puissantes pensées pour votre sécurité et votre tranquillité d'esprit</p>
-  </div>
-  
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-shield-halved"></i>
-      </div>
-      <h3>Chiffrement de bout en bout</h3>
-      <p>Vos données sont chiffrées avec AES-256 avant même de quitter votre appareil. Personne, même nous, ne peut accéder à vos mots de passe.</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-wand-magic-sparkles"></i>
-      </div>
-      <h3>Générateur intelligent</h3>
-      <p>Créez des mots de passe ultra-sécurisés en un clic. Notre algorithme génère des combinaisons uniques et impossibles à deviner.</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-share-nodes"></i>
-      </div>
-      <h3>Partage sécurisé</h3>
-      <p>Partagez vos identifiants avec votre équipe ou votre famille en toute sécurité, avec contrôle des accès et révocation instantanée.</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-mobile-screen"></i>
-      </div>
-      <h3>Synchronisation multi-appareils</h3>
-      <p>Accédez à vos mots de passe sur tous vos appareils : ordinateur, tablette, smartphone. Toujours à jour, partout.</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-shield-heart"></i>
-      </div>
-      <h3>Audit de sécurité</h3>
-      <p>Identifiez vos mots de passe faibles, réutilisés ou compromis. Recevez des alertes en cas de violation de données.</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">
-        <i class="fas fa-clock-rotate-left"></i>
-      </div>
-      <h3>Historique et récupération</h3>
-      <p>Accédez à l'historique de vos mots de passe et récupérez d'anciennes versions en cas de besoin.</p>
-    </div>
-  </div>
-</section>
-
-<!-- DEMO INTERACTIVE SECTION (NOUVEAU) -->
-<section class="demo-section" id="demo">
-  <div class="demo-container">
-    <h2>Essayez notre générateur de mots de passe</h2>
-    <p>Testez la puissance de notre générateur intelligent de mots de passe sécurisés</p>
-    
-    <div class="password-generator-demo">
-      <div class="password-display" id="passwordDisplay">
-        Cliquez sur "Générer" pour créer un mot de passe
-      </div>
-      
-      <div class="strength-meter">
-        <div class="strength-bar" id="strength1"></div>
-        <div class="strength-bar" id="strength2"></div>
-        <div class="strength-bar" id="strength3"></div>
-        <div class="strength-bar" id="strength4"></div>
-      </div>
-      
-      <div class="generator-controls">
-        <div class="control-item">
-          <label>
-            <i class="fas fa-ruler"></i>
-            Longueur: <span id="lengthValue">16</span>
-          </label>
-          <input type="range" id="passwordLength" min="8" max="32" value="16">
-        </div>
-        
-        <div class="control-item">
-          <label>
-            <i class="fas fa-font"></i>
-            Majuscules
-          </label>
-          <input type="checkbox" id="includeUppercase" checked>
-        </div>
-        
-        <div class="control-item">
-          <label>
-            <i class="fas fa-hashtag"></i>
-            Chiffres
-          </label>
-          <input type="checkbox" id="includeNumbers" checked>
-        </div>
-        
-        <div class="control-item">
-          <label>
-            <i class="fas fa-asterisk"></i>
-            Symboles
-          </label>
-          <input type="checkbox" id="includeSymbols" checked>
-        </div>
-      </div>
-      
-      <button class="generate-btn" id="generateBtn">
-        <i class="fas fa-rotate"></i>
-        Générer un mot de passe
-      </button>
-    </div>
-  </div>
-</section>
-
-<!-- EXTENSION SECTION -->
-<section class="extension-section" id="extension">
-  <div class="extension-content">
-    <div class="extension-visual">
-      <div class="browser-mockup">
-        <div class="browser-header">
-          <div class="browser-dots">
-            <div class="browser-dot"></div>
-            <div class="browser-dot"></div>
-            <div class="browser-dot"></div>
-          </div>
-        </div>
-        <div class="extension-popup">
-          <div class="popup-header">
-            <i class="fas fa-shield-halved"></i>
-            <span>MykeyNest</span>
-          </div>
-          <div class="credential-card">
-            <div class="credential-icon">
-              <i class="fas fa-globe"></i>
-            </div>
-            <div class="credential-info">
-              <h4>website.com</h4>
-              <p>Connexion automatique activée</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="extension-info">
-      <h3>Extension navigateur ultra-pratique</h3>
-      <p style="color: var(--color-text-medium); font-size: 1.125rem; margin-bottom: 2rem;">
-        Remplissage automatique, connexion en un clic et génération de mots de passe 
-        directement depuis votre navigateur préféré.
-      </p>
-      
-      <ul>
-        <li>
-          <i class="fas fa-check-circle"></i>
-          <span>Remplissage automatique intelligent</span>
-        </li>
-        <li>
-          <i class="fas fa-check-circle"></i>
-          <span>Capture automatique des nouveaux mots de passe</span>
-        </li>
-        <li>
-          <i class="fas fa-check-circle"></i>
-          <span>Génération instantanée de mots de passe forts</span>
-        </li>
-        <li>
-          <i class="fas fa-check-circle"></i>
-          <span>Analyse de sécurité des sites web</span>
-        </li>
-      </ul>
-      
-      <div class="browser-badges">
-        <div class="browser-badge">
-          <i class="fab fa-chrome"></i>
-          <span>Chrome</span>
-        </div>
-        <div class="browser-badge">
-          <i class="fab fa-firefox"></i>
-          <span>Firefox</span>
-        </div>
-        <div class="browser-badge">
-          <i class="fab fa-safari"></i>
-          <span>Safari</span>
-        </div>
-        <div class="browser-badge">
-          <i class="fab fa-edge"></i>
-          <span>Edge</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS SECTION (NOUVEAU) -->
-<section class="testimonials-section" id="testimonials">
-  <div class="testimonials-container">
+  <div class="section-container">
     <div class="section-header">
-      <h2>Ce que disent nos utilisateurs</h2>
-      <p>Rejoignez des milliers d'utilisateurs satisfaits qui ont choisi MykeyNest</p>
+      <span class="section-label">Fonctionnalités</span>
+      <h2>Tout ce dont vous avez besoin pour sécuriser vos mots de passe</h2>
+      <p>Des fonctionnalités puissantes conçues pour votre sécurité et votre tranquillité d'esprit</p>
     </div>
     
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="testimonial-rating">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-shield-halved"></i>
         </div>
-        <p class="testimonial-text">
-          "MykeyNest a complètement transformé ma gestion des mots de passe. Simple, sécurisé et ultra-pratique avec l'extension navigateur !"
-        </p>
-        <div class="testimonial-author">
-          <div class="author-avatar">SM</div>
-          <div class="author-info">
-            <h4>Sophie Martin</h4>
-            <p>Designer freelance</p>
-          </div>
-        </div>
+        <h3>Chiffrement de bout en bout</h3>
+        <p>Vos données sont chiffrées avec AES-256 avant même de quitter votre appareil. Personne ne peut accéder à vos mots de passe.</p>
       </div>
       
-      <div class="testimonial-card">
-        <div class="testimonial-rating">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-wand-magic-sparkles"></i>
         </div>
-        <p class="testimonial-text">
-          "Enfin un gestionnaire de mots de passe qui prend la sécurité au sérieux sans sacrifier l'expérience utilisateur. Je recommande à 100% !"
-        </p>
-        <div class="testimonial-author">
-          <div class="author-avatar">JD</div>
-          <div class="author-info">
-            <h4>Jean Dupont</h4>
-            <p>Développeur web</p>
-          </div>
-        </div>
+        <h3>Générateur intelligent</h3>
+        <p>Créez des mots de passe ultra-sécurisés en un clic. Des combinaisons uniques et impossibles à deviner.</p>
       </div>
       
-      <div class="testimonial-card">
-        <div class="testimonial-rating">
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
-          <i class="fas fa-star"></i>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-mobile-screen"></i>
         </div>
-        <p class="testimonial-text">
-          "Depuis que j'utilise MykeyNest, je n'ai plus à me soucier de mes mots de passe. L'audit de sécurité m'a aidé à identifier mes comptes à risque."
-        </p>
-        <div class="testimonial-author">
-          <div class="author-avatar">ML</div>
-          <div class="author-info">
-            <h4>Marie Leclerc</h4>
-            <p>Chef de projet</p>
-          </div>
+        <h3>Synchronisation multi-appareils</h3>
+        <p>Accédez à vos mots de passe sur tous vos appareils. Toujours à jour, partout.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-share-nodes"></i>
         </div>
+        <h3>Partage sécurisé</h3>
+        <p>Partagez vos identifiants avec votre équipe en toute sécurité, avec contrôle des accès.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-shield-heart"></i>
+        </div>
+        <h3>Audit de sécurité</h3>
+        <p>Identifiez vos mots de passe faibles ou compromis. Recevez des alertes en cas de violation.</p>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h3>Remplissage automatique</h3>
+        <p>Connectez-vous instantanément à vos sites préférés avec notre extension navigateur.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FAQ SECTION (NOUVEAU) -->
-<section class="faq-section">
-  <div class="faq-container">
+<!-- HOW IT WORKS SECTION -->
+<section class="how-it-works-section" id="how-it-works">
+  <div class="section-container">
     <div class="section-header">
-      <h2>Questions fréquentes</h2>
-      <p>Tout ce que vous devez savoir sur MykeyNest</p>
+      <span class="section-label">Simple et efficace</span>
+      <h2>Comment ça marche</h2>
+      <p>Commencez à sécuriser vos mots de passe en 3 étapes simples</p>
     </div>
     
-    <div class="faq-items">
-      <div class="faq-item">
-        <div class="faq-question">
-          <span>Comment fonctionne le chiffrement de mes données ?</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="faq-answer">
-          <p>Vos données sont chiffrées localement sur votre appareil avec AES-256 avant d'être synchronisées. Votre clé maître ne quitte jamais votre appareil, ce qui signifie que personne, même MykeyNest, ne peut accéder à vos mots de passe.</p>
-        </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Créez votre compte</h3>
+        <p>Inscrivez-vous gratuitement et créez votre clé maître. C'est le seul mot de passe que vous aurez à retenir.</p>
       </div>
       
-      <div class="faq-item">
-        <div class="faq-question">
-          <span>Que se passe-t-il si j'oublie ma clé maître ?</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="faq-answer">
-          <p>Pour des raisons de sécurité, nous ne stockons pas votre clé maître. Si vous l'oubliez, vous devrez réinitialiser votre compte. C'est pourquoi nous recommandons de la sauvegarder dans un endroit sûr.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-question">
-          <span>MykeyNest est-il compatible avec tous les navigateurs ?</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="faq-answer">
-          <p>Oui ! MykeyNest fonctionne sur Chrome, Firefox, Safari, Edge et tous les navigateurs basés sur Chromium. Notre extension est régulièrement mise à jour pour garantir une compatibilité optimale.</p>
-        </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Ajoutez vos identifiants</h3>
+        <p>Importez ou ajoutez manuellement vos mots de passe existants. Tout est chiffré automatiquement.</p>
       </div>
       
-      <div class="faq-item">
-        <div class="faq-question">
-          <span>Puis-je utiliser MykeyNest sur plusieurs appareils ?</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="faq-answer">
-          <p>Absolument ! Vos mots de passe sont synchronisés automatiquement sur tous vos appareils : ordinateurs, smartphones et tablettes. Connectez-vous simplement avec votre compte.</p>
-        </div>
-      </div>
-      
-      <div class="faq-item">
-        <div class="faq-question">
-          <span>MykeyNest est-il vraiment gratuit ?</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="faq-answer">
-          <p>Oui ! Notre version gratuite offre toutes les fonctionnalités essentielles pour une utilisation personnelle. Des plans premium sont disponibles pour les entreprises et les utilisateurs avancés.</p>
-        </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Accédez partout</h3>
+        <p>Connectez-vous à tous vos comptes en un clic, sur tous vos appareils, en toute sécurité.</p>
       </div>
     </div>
   </div>
@@ -1940,15 +898,15 @@
 
 <!-- CTA SECTION -->
 <section class="cta-section">
-  <div class="cta-box">
+  <div class="cta-container">
     <h2>Prêt à sécuriser vos mots de passe ?</h2>
     <p>Rejoignez des milliers d'utilisateurs qui ont choisi MykeyNest pour protéger leur vie numérique</p>
     <div class="cta-buttons">
-      <a href="{{ path('show_register') }}" class="btn btn-white btn-large">
-        <i class="fas fa-rocket"></i> Créer un compte gratuit
+      <a href="{{ path('show_register') }}" class="btn btn-primary btn-large">
+        <i class="fas fa-rocket"></i> Commencer gratuitement
       </a>
-      <a href="#demo" class="btn btn-white-outline btn-large">
-        Essayer la démo
+      <a href="{{ path('show_login') }}" class="btn btn-outline btn-large">
+        Se connecter
       </a>
     </div>
   </div>
@@ -1960,21 +918,15 @@
     <div class="footer-brand">
       <h3><i class="fas fa-shield-halved"></i> MykeyNest</h3>
       <p>Le gestionnaire de mots de passe qui allie sécurité maximale et simplicité d'utilisation.</p>
-      <div class="social-links">
-        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
-      </div>
     </div>
     
     <div class="footer-links">
       <h4>Produit</h4>
       <ul>
         <li><a href="#features">Fonctionnalités</a></li>
-        <li><a href="#demo">Démo</a></li>
-        <li><a href="#extension">Extension</a></li>
+        <li><a href="#">Tarifs</a></li>
         <li><a href="#">Sécurité</a></li>
+        <li><a href="#">Extension</a></li>
       </ul>
     </div>
     
@@ -1983,7 +935,6 @@
       <ul>
         <li><a href="#">À propos</a></li>
         <li><a href="#">Blog</a></li>
-        <li><a href="#">Carrières</a></li>
         <li><a href="#">Contact</a></li>
       </ul>
     </div>
@@ -1993,23 +944,17 @@
       <ul>
         <li><a href="#">Centre d'aide</a></li>
         <li><a href="#">Documentation</a></li>
-        <li><a href="#">Guides de sécurité</a></li>
-        <li><a href="#">API</a></li>
+        <li><a href="#">Guides</a></li>
       </ul>
     </div>
   </div>
   
   <div class="footer-bottom">
-    <p>&copy; 2025 MykeyNest. Tous droits réservés. | <a href="#" style="color: var(--color-text-light);">Politique de confidentialité</a> | <a href="#" style="color: var(--color-text-light);">Conditions d'utilisation</a></p>
+    <p>&copy; 2025 MykeyNest. Tous droits réservés. | 
+    <a href="#">Confidentialité</a> |
+    <a href="#">Conditions</a></p>
   </div>
-</footer>
-
-<!-- SCROLL TO TOP BUTTON -->
-<div class="scroll-to-top" id="scrollToTop">
-  <i class="fas fa-arrow-up"></i>
-</div>
-
-<script>
+</footer><script>
 // === NAVBAR SCROLL EFFECT ===
 window.addEventListener('scroll', function() {
   const navbar = document.getElementById('navbar');
@@ -2018,457 +963,83 @@ window.addEventListener('scroll', function() {
   } else {
     navbar.classList.remove('scrolled');
   }
-});
-
-// === SMOOTH SCROLL ===
+});// === SMOOTH SCROLL ===
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  });
-});
-
-// === ANIMATION OBSERVER ===
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver(function(entries) {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
-    }
-  });
-}, observerOptions);
-
-// Appliquer l'animation aux cartes
-document.addEventListener('DOMContentLoaded', function() {
-  const featureCards = document.querySelectorAll('.feature-card');
-  featureCards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-    card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-    observer.observe(card);
-  });
-  
-  const testimonialCards = document.querySelectorAll('.testimonial-card');
-  testimonialCards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-    card.style.transition = `all 0.6s ease ${index * 0.15}s`;
-    observer.observe(card);
-  });
-});
-
-// === STATS COUNTER ANIMATION ===
-const statObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const target = entry.target;
-      const finalValue = parseInt(target.getAttribute('data-target'));
-      const duration = 2000; // 2 secondes
-      const increment = finalValue / (duration / 16); // 60 FPS
-      let currentValue = 0;
-      
-      const updateCounter = () => {
-        currentValue += increment;
-        if (currentValue < finalValue) {
-          target.textContent = Math.floor(currentValue).toLocaleString();
-          requestAnimationFrame(updateCounter);
-        } else {
-          target.textContent = finalValue.toLocaleString() + (target.parentElement.querySelector('.stat-label').textContent.includes('%') ? '%' : '');
-        }
-      };
-      
-      updateCounter();
-      statObserver.unobserve(target);
-    }
-  });
-}, { threshold: 0.5 });
-
-document.querySelectorAll('.stat-number').forEach(stat => {
-  statObserver.observe(stat);
-});
-
-// === PASSWORD GENERATOR ===
-const passwordDisplay = document.getElementById('passwordDisplay');
-const generateBtn = document.getElementById('generateBtn');
-const passwordLength = document.getElementById('passwordLength');
-const lengthValue = document.getElementById('lengthValue');
-const includeUppercase = document.getElementById('includeUppercase');
-const includeNumbers = document.getElementById('includeNumbers');
-const includeSymbols = document.getElementById('includeSymbols');
-
-// Mettre à jour la valeur de longueur
-passwordLength.addEventListener('input', function() {
-  lengthValue.textContent = this.value;
-});
-
-// Fonction de génération de mot de passe
-function generatePassword() {
-  const length = parseInt(passwordLength.value);
-  let charset = 'abcdefghijklmnopqrstuvwxyz';
-  
-  if (includeUppercase.checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  if (includeNumbers.checked) charset += '0123456789';
-  if (includeSymbols.checked) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
-  
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
-  }
-  
-  return password;
-}
-
-// Fonction pour calculer la force du mot de passe
-function calculatePasswordStrength(password) {
-  let strength = 0;
-  
-  if (password.length >= 12) strength++;
-  if (password.length >= 16) strength++;
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-  if (/[0-9]/.test(password)) strength++;
-  if (/[^a-zA-Z0-9]/.test(password)) strength++;
-  
-  return Math.min(strength, 4);
-}
-
-// Mettre à jour l'indicateur de force
-function updateStrengthMeter(strength) {
-  const bars = [
-    document.getElementById('strength1'),
-    document.getElementById('strength2'),
-    document.getElementById('strength3'),
-    document.getElementById('strength4')
-  ];
-  
-  bars.forEach((bar, index) => {
-    if (index < strength) {
-      bar.classList.add('active');
-    } else {
-      bar.classList.remove('active');
-    }
-  });
-}
-
-// Générer le mot de passe au clic
-generateBtn.addEventListener('click', function() {
-  passwordDisplay.classList.add('generating');
-  
-  setTimeout(() => {
-    const password = generatePassword();
-    passwordDisplay.textContent = password;
-    passwordDisplay.classList.remove('generating');
-    
-    const strength = calculatePasswordStrength(password);
-    updateStrengthMeter(strength);
-    
-    // Animation du bouton
-    this.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      this.style.transform = 'scale(1)';
-    }, 100);
-  }, 300);
-});
-
-// Générer un mot de passe initial
-window.addEventListener('load', function() {
-  setTimeout(() => {
-    generateBtn.click();
-  }, 500);
-});
-
-// === FAQ ACCORDION ===
-document.querySelectorAll('.faq-question').forEach(question => {
-  question.addEventListener('click', function() {
-    const faqItem = this.parentElement;
-    const isActive = faqItem.classList.contains('active');
-    
-    // Fermer tous les autres items
-    document.querySelectorAll('.faq-item').forEach(item => {
-      item.classList.remove('active');
-    });
-    
-    // Ouvrir l'item cliqué si il n'était pas actif
-    if (!isActive) {
-      faqItem.classList.add('active');
-    }
-  });
-});
-
-// === SCROLL TO TOP BUTTON ===
-const scrollToTopBtn = document.getElementById('scrollToTop');
-
-window.addEventListener('scroll', function() {
-  if (window.scrollY > 500) {
-    scrollToTopBtn.classList.add('visible');
-  } else {
-    scrollToTopBtn.classList.remove('visible');
-  }
-});
-
-scrollToTopBtn.addEventListener('click', function() {
-  window.scrollTo({
-    top: 0,
+anchor.addEventListener('click', function (e) {
+e.preventDefault();
+const target = document.querySelector(this.getAttribute('href'));
+if (target) {
+const navHeight = document.querySelector('.landing-nav').offsetHeight;
+const targetPosition = target.offsetTop - navHeight - 20;  window.scrollTo({
+    top: targetPosition,
     behavior: 'smooth'
   });
-});
-
-// === CREDENTIAL CARDS ANIMATION (HERO) ===
-const credentialCards = document.querySelectorAll('.credential-card');
-let cardIndex = 0;
-
-function animateCredentialCards() {
-  credentialCards.forEach((card, index) => {
-    card.style.animation = 'none';
-    setTimeout(() => {
-      card.style.animation = `fadeInUp 0.5s ease-out ${index * 0.15}s backwards`;
-    }, 10);
-  });
 }
-
-// Animer les cartes au chargement
-window.addEventListener('load', animateCredentialCards);
-
-// === COPY PASSWORD TO CLIPBOARD ===
-passwordDisplay.addEventListener('click', function() {
-  if (this.textContent && this.textContent !== 'Cliquez sur "Générer" pour créer un mot de passe') {
-    navigator.clipboard.writeText(this.textContent).then(() => {
-      const originalText = this.textContent;
-      this.textContent = '✓ Copié !';
-      this.style.color = 'var(--color-success)';
-      
-      setTimeout(() => {
-        this.textContent = originalText;
-        this.style.color = 'var(--color-primary)';
-      }, 2000);
-    });
-  }
 });
-
-// === PARALLAX EFFECT ON HERO ===
-window.addEventListener('scroll', function() {
-  const scrolled = window.scrollY;
-  const heroVisual = document.querySelector('.hero-visual');
-  const floatingBadges = document.querySelectorAll('.floating-badge');
-  
-  if (heroVisual && scrolled < 800) {
-    heroVisual.style.transform = `translateY(${scrolled * 0.3}px)`;
-    
-    floatingBadges.forEach((badge, index) => {
-      const direction = index === 0 ? 1 : -1;
-      badge.style.transform = `translateY(${scrolled * 0.2 * direction}px)`;
-    });
-  }
-});
-
-// === MOUSE TRAIL EFFECT (optionnel - effet subtil) ===
-let mouseX = 0;
-let mouseY = 0;
-let ballX = 0;
-let ballY = 0;
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-});
-
-// === TYPED EFFECT FOR HERO SUBTITLE (optionnel) ===
-const heroSubtitles = [
-  "Une seule clé maître, un accès illimité à tous vos comptes en toute sécurité.",
-  "Protection maximale avec un chiffrement de niveau militaire AES-256.",
-  "Synchronisation automatique sur tous vos appareils en temps réel."
-];
-
-let subtitleIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-const typeSpeed = 50;
-const deleteSpeed = 30;
-const pauseTime = 3000;
-
-function typeEffect() {
-  const heroText = document.querySelector('.hero-text p');
-  if (!heroText) return;
-  
-  const currentText = heroSubtitles[subtitleIndex];
-  
-  if (isDeleting) {
-    heroText.textContent = currentText.substring(0, charIndex - 1);
-    charIndex--;
-  } else {
-    heroText.textContent = currentText.substring(0, charIndex + 1);
-    charIndex++;
-  }
-  
-  let timeout = isDeleting ? deleteSpeed : typeSpeed;
-  
-  if (!isDeleting && charIndex === currentText.length) {
-    timeout = pauseTime;
-    isDeleting = true;
-  } else if (isDeleting && charIndex === 0) {
-    isDeleting = false;
-    subtitleIndex = (subtitleIndex + 1) % heroSubtitles.length;
-  }
-  
-  setTimeout(typeEffect, timeout);
+});// === INTERSECTION OBSERVER FOR ANIMATIONS ===
+const observerOptions = {
+threshold: 0.1,
+rootMargin: '0px 0px -50px 0px'
+};const observer = new IntersectionObserver(function(entries) {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
+observer.unobserve(entry.target);
 }
-
-// Démarrer l'effet typing (commenté par défaut - décommenter pour activer)
-// window.addEventListener('load', () => {
-//   setTimeout(typeEffect, 1000);
-// });
-
-// === EASTER EGG: Konami Code ===
-let konamiCode = [];
-const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-
-document.addEventListener('keydown', (e) => {
-  konamiCode.push(e.key);
-  konamiCode = konamiCode.slice(-10);
-  
-  if (konamiCode.join(',') === konamiSequence.join(',')) {
-    // Easter egg activé !
-    document.body.style.animation = 'rainbow 3s linear infinite';
-    setTimeout(() => {
-      document.body.style.animation = '';
-    }, 3000);
-  }
 });
-
-// === PERFORMANCE: Lazy loading des images ===
+}, observerOptions);// Appliquer l'observer aux éléments
+document.addEventListener('DOMContentLoaded', function() {
+const elementsToAnimate = document.querySelectorAll('.feature-card, .step-card, .stat-item');elementsToAnimate.forEach((element, index) => {
+element.style.opacity = '0';
+element.style.animation = 'none';
+observer.observe(element);
+});
+});// === STATS ANIMATION ===
+function animateValue(element, start, end, duration) {
+let startTimestamp = null;
+const step = (timestamp) => {
+if (!startTimestamp) startTimestamp = timestamp;
+const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+const value = Math.floor(progress * (end - start) + start);
+element.textContent = value.toLocaleString() + (element.dataset.suffix || '');
+if (progress < 1) {
+window.requestAnimationFrame(step);
+}
+};
+window.requestAnimationFrame(step);
+}// Observer pour les stats
+const statsObserver = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+const statNumber = entry.target;
+const target = parseInt(statNumber.dataset.target);  if (target) {
+    animateValue(statNumber, 0, target, 2000);
+  }  statsObserver.unobserve(statNumber);
+}
+});
+}, { threshold: 0.5 });document.querySelectorAll('.stat-number[data-target]').forEach(stat => {
+statsObserver.observe(stat);
+});// === MOBILE MENU (à ajouter si nécessaire) ===
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const navLinks = document.querySelector('.nav-links');if (mobileMenuBtn) {
+mobileMenuBtn.addEventListener('click', () => {
+navLinks.classList.toggle('active');
+});
+}// === PERFORMANCE: Lazy loading ===
 if ('IntersectionObserver' in window) {
-  const imageObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        if (img.dataset.src) {
-          img.src = img.dataset.src;
-          img.classList.add('loaded');
-          observer.unobserve(img);
-        }
-      }
-    });
-  });
-  
-  document.querySelectorAll('img[data-src]').forEach(img => {
-    imageObserver.observe(img);
-  });
+const imageObserver = new IntersectionObserver((entries, observer) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+const img = entry.target;
+if (img.dataset.src) {
+img.src = img.dataset.src;
+img.classList.add('loaded');
+observer.unobserve(img);
 }
-
-// === ANALYTICS (placeholder pour Google Analytics, etc.) ===
-function trackEvent(category, action, label) {
-  // Exemple: gtag('event', action, { 'event_category': category, 'event_label': label });
-  console.log(`Event tracked: ${category} - ${action} - ${label}`);
 }
-
-// Tracker les clics sur les CTA
-document.querySelectorAll('.btn-primary').forEach(btn => {
-  btn.addEventListener('click', () => {
-    trackEvent('CTA', 'click', 'Get Started');
-  });
 });
-
-// === NOTIFICATION TOAST (optionnel) ===
-function showToast(message, type = 'success') {
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: ${type === 'success' ? 'var(--color-success)' : 'var(--color-danger-start)'};
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: var(--border-radius-sm);
-    box-shadow: var(--shadow-lg);
-    z-index: 10000;
-    animation: slideInFromRight 0.3s ease-out;
-  `;
-  
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.animation = 'slideOutToRight 0.3s ease-out';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// === PRELOADER (optionnel) ===
-window.addEventListener('load', function() {
-  const preloader = document.querySelector('.preloader');
-  if (preloader) {
-    preloader.style.opacity = '0';
-    setTimeout(() => preloader.remove(), 300);
-  }
+});document.querySelectorAll('img[data-src]').forEach(img => {
+imageObserver.observe(img);
 });
-</script>
-
-<style>
-/* Animations supplémentaires pour le JavaScript */
-@keyframes slideOutToRight {
-  to {
-    transform: translateX(400px);
-    opacity: 0;
-  }
 }
-
-@keyframes rainbow {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
-}
-
-/* Style pour le curseur personnalisé (optionnel) */
-.custom-cursor {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--color-primary);
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  transition: 0.1s;
-  transform: translate(-50%, -50%);
-}
-
-/* Amélioration des transitions */
-* {
-  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-}
-
-/* Responsive amélioré pour très petits écrans */
-@media (max-width: 480px) {
-  .hero-text h1 {
-    font-size: 1.75rem;
-  }
-  
-  .section-header h2 {
-    font-size: 2rem;
-  }
-  
-  .btn-large {
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-  }
-  
-  .password-generator-demo {
-    padding: 2rem 1.5rem;
-  }
-  
-  .password-display {
-    font-size: 1.2rem;
-  }
-}
-</style>
-
-{% endblock %}
+</script>{% endblock %}
