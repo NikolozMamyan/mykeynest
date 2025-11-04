@@ -19,7 +19,6 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "@hotwired/stimulus": "^3.2.2",
-        "@symfony/stimulus-bundle": "^2.23.0"
+        "@hotwired/stimulus": "^3.2.2"
     }
 }
