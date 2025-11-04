@@ -54,5 +54,24 @@ class AuthPageController extends AbstractController
         return $response;
     }
     
+        #[Route('/', name: 'app_landing', methods: ['GET'])]
+    public function landing(Request $request, TokenCleaner $cleaner, Security $security): Response
+    {
+        $response = new Response();
+    
+        // 💣 Nettoie le token même si pas authentifié dans "main"
+        $cleaner->clearTokenFromRequest($request, $response);
+
+          $user = $this->getUser(); 
+        if($user) {
+              $security->logout(false);
+        }
+    
+        $response->setContent(
+            $this->renderView('auth/landing.html.twig')
+        );
+    
+        return $response;
+    }
     
 }
