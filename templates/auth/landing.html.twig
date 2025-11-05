@@ -711,6 +711,77 @@
 .btn-primary:hover {
   animation: pulse 1.5s ease-in-out infinite;
 }
+/* === FAQ SECTION === */
+.faq-section {
+  padding: 6rem 2rem;
+  background: var(--color-white);
+}
+
+.faq-grid {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.faq-item:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-item summary {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: '+';
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  font-weight: 300;
+  transition: transform 0.3s ease;
+}
+
+.faq-item[open] summary::after {
+  content: '−';
+  transform: rotate(180deg);
+}
+
+.faq-item p {
+  margin-top: 1rem;
+  color: var(--color-text-medium);
+  line-height: 1.6;
+  padding-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .faq-item {
+    padding: 1.25rem;
+  }
+  
+  .faq-item summary {
+    font-size: 1rem;
+  }
+}
 </style>
 
 <!-- NAVIGATION -->
@@ -928,6 +999,52 @@
   </div>
 </section>
 
+
+<!-- FAQ SECTION pour le SEO -->
+<section class="faq-section">
+  <div class="section-container">
+    <div class="section-header">
+      <span class="section-label">Questions fréquentes</span>
+      <h2>Vos questions sur MykeyNest</h2>
+      <p>Tout ce que vous devez savoir sur notre gestionnaire de mots de passe</p>
+    </div>
+    
+    <div class="faq-grid">
+      <details class="faq-item">
+        <summary>Qu'est-ce qu'un gestionnaire de mots de passe ?</summary>
+        <p>Un gestionnaire de mots de passe est un outil de sécurité qui stocke et chiffre tous vos identifiants (noms d'utilisateur et mots de passe) dans un coffre-fort numérique. MykeyNest utilise le chiffrement AES-256 pour protéger vos données.</p>
+      </details>
+      
+      <details class="faq-item">
+        <summary>Comment fonctionne le chiffrement AES-256 ?</summary>
+        <p>L'AES-256 est un standard de chiffrement militaire utilisé par les gouvernements et les banques. Vos données sont chiffrées localement sur votre appareil avant d'être stockées, ce qui signifie que personne, même nous, ne peut accéder à vos mots de passe.</p>
+      </details>
+      
+      <details class="faq-item">
+        <summary>MykeyNest est-il gratuit ?</summary>
+        <p>Oui, MykeyNest propose une version gratuite avec toutes les fonctionnalités essentielles. Vous pouvez stocker jusqu'à 50 mots de passe gratuitement. Des plans premium sont disponibles pour les utilisateurs avancés et les équipes.</p>
+      </details>
+      
+      <details class="faq-item">
+        <summary>Mes mots de passe sont-ils synchronisés sur tous mes appareils ?</summary>
+        <p>Oui, MykeyNest synchronise automatiquement vos mots de passe sur tous vos appareils (ordinateur, smartphone, tablette). Tout changement est instantanément mis à jour partout.</p>
+      </details>
+      
+      <details class="faq-item">
+        <summary>Que se passe-t-il si j'oublie mon mot de passe maître ?</summary>
+        <p>Le mot de passe maître est la clé de votre coffre-fort. Par mesure de sécurité, nous ne le stockons pas et ne pouvons pas le récupérer. Nous recommandons de le noter dans un endroit sûr ou d'utiliser notre option de récupération d'urgence.</p>
+      </details>
+      
+      <details class="faq-item">
+        <summary>MykeyNest est-il sûr ?</summary>
+        <p>Absolument. MykeyNest utilise les mêmes technologies de sécurité que les banques : chiffrement AES-256, architecture zero-knowledge (nous ne connaissons jamais vos mots de passe), authentification à deux facteurs, et audits de sécurité réguliers.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+{% include "auth/contact/contact.html.twig" %}
+
 <!-- CTA SECTION -->
 <section class="cta-section">
   <div class="cta-container">
@@ -943,7 +1060,6 @@
     </div>
   </div>
 </section>
-
 <!-- FOOTER -->
 <footer class="footer" role="contentinfo">
   <div class="footer-content">
