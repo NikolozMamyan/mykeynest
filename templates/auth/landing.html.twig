@@ -680,10 +680,41 @@
     align-items: flex-start;
   }
 }
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Améliorer les états focus pour l'accessibilité */
+*:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Effet de pulse sur les CTA principaux */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.btn-primary:hover {
+  animation: pulse 1.5s ease-in-out infinite;
+}
 </style>
 
 <!-- NAVIGATION -->
-<nav class="landing-nav" id="navbar">
+<nav class="landing-nav" id="navbar" role="navigation" aria-label="Navigation principale">
   <div class="nav-container">
     <a href="#" class="nav-logo">
       <i class="fas fa-shield-halved"></i>
@@ -704,7 +735,7 @@
 </nav>
 
 <!-- HERO SECTION -->
-<section class="hero-section">
+<section class="hero-section" role="banner" id="main-content">
   <div class="hero-content">
     <div class="hero-text">
       <h1>
@@ -715,9 +746,10 @@
         Accédez à tous vos comptes en toute sécurité, sur tous vos appareils.
       </p>
       <div class="hero-cta">
-        <a href="{{ path('show_register') }}" class="btn btn-primary btn-large">
-          <i class="fas fa-rocket"></i> Commencer gratuitement
-        </a>
+<a href="{{ path('show_register') }}" class="btn btn-primary btn-large" aria-label="Commencer gratuitement avec MykeyNest">
+  <i class="fas fa-rocket" aria-hidden="true"></i> Commencer gratuitement
+</a>
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
         <a href="#features" class="btn btn-outline btn-large">
           Découvrir les fonctionnalités
         </a>
@@ -913,7 +945,7 @@
 </section>
 
 <!-- FOOTER -->
-<footer class="footer">
+<footer class="footer" role="contentinfo">
   <div class="footer-content">
     <div class="footer-brand">
       <h3><i class="fas fa-shield-halved"></i> MykeyNest</h3>
