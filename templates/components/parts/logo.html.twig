@@ -1,0 +1,58 @@
+     
+     <style>
+     /*logo*/
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.03em;
+  transition: all 0.3s ease;
+}
+
+.nav-logo:hover {
+  transform: translateY(-2px);
+}
+
+
+.nav-logo-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.nav-logo-text {
+  display: flex;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.logo-my {
+  color: var(--color-text-dark);
+}
+
+.logo-key {
+  color: var(--color-primary);
+  margin: 0 -0.05em;
+}
+
+.logo-nest {
+  color: var(--color-text-dark);
+}
+</style>
+      <a href="#" class="nav-logo">
+  <div class="nav-logo-icon">
+    <i class="fas fa-key"></i>
+  </div>
+  <span class="nav-logo-text">
+    <span class="logo-my">MY</span><span class="logo-key">KEY</span><span class="logo-nest">NEST</span>
+  </span>
+</a>

@@ -1,809 +1,287 @@
 {% extends 'base_auth.html.twig' %}
 
-{% block title %}MykeyNest - Gestionnaire de mots de passe sécurisé{% endblock %}
+{% block title %}MykeyNest — Gestionnaire de mots de passe sécurisé (AES-256, zero-knowledge){% endblock %}
+
+{# SEO de la page #}
+{% block description %}MykeyNest — gestionnaire de mots de passe sécurisé : chiffrement AES-256, zero-knowledge, 2FA, auto-remplissage, synchronisation multi-appareils. Essai gratuit.{% endblock %}
+{% block og_title %}MykeyNest — Gestionnaire de mots de passe sécurisé{% endblock %}
+{% block og_description %}Protégez vos identifiants avec un coffre-fort numérique chiffré AES-256. Essai gratuit.{% endblock %}
+{% block twitter_title %}MykeyNest — Gestionnaire de mots de passe sécurisé{% endblock %}
+{% block twitter_description %}Chiffrement AES-256, 2FA, audit de sécurité, auto-remplissage.{% endblock %}
 
 {% block body %}
 
 <style>
 /* === ANIMATIONS GLOBALES === */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
+@keyframes fadeInUp { from {opacity:0; transform:translateY(30px)} to {opacity:1; transform:translateY(0)} }
+@keyframes fadeIn { from {opacity:0} to {opacity:1} }
+@keyframes slideInLeft { from {opacity:0; transform:translateX(-30px)} to {opacity:1; transform:translateX(0)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes scaleIn { from {opacity:0; transform:scale(.95)} to {opacity:1; transform:scale(1)} }
 
 /* === NAVIGATION === */
-.landing-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--color-border);
-  padding: 1rem 0;
-  z-index: 1000;
-  transition: all 0.3s ease;
+.landing-nav{
+  position:fixed; inset:0 0 auto 0; height:64px;
+  background:rgba(255,255,255,.98); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--color-border); z-index:1000;
+  display:flex; align-items:center; padding:0;
+}
+.nav-container{ max-width:1280px; margin:0 auto; padding:0 1rem; display:flex; align-items:center; justify-content:space-between; width:100% }
+.landing-nav.scrolled{box-shadow:var(--shadow-sm)}
+.nav-toggle{ display:inline-flex; align-items:center; gap:.5rem; border:1px solid var(--color-border); background:#fff; border-radius:8px; padding:.5rem .75rem;  width:50px;}
+.nav-links{
+  display:none; position:fixed; left:0; right:0; top:64px;
+  background:#fff; border-bottom:1px solid var(--color-border);
+  padding:1rem 1.25rem; gap:1rem; flex-direction:column;
+  z-index:999;
+}
+.nav-links.active{ display:flex; animation:fadeIn .2s ease }
+
+/* CTA desktop visible / CTA mobile cachés par défaut */
+.nav-cta{ display:none; gap:.75rem; align-items:center }
+.nav-cta-mobile{ display:flex; gap:.75rem; margin-top:.5rem }
+
+/* Overlay fond noir léger quand le menu est ouvert */
+.nav-overlay{
+  position:fixed; inset:64px 0 0 0; background:rgba(0,0,0,.35);
+  opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:998;
 }
 
-.landing-nav.scrolled {
-  box-shadow: var(--shadow-sm);
-}
+/* Liens du menu */
+.nav-link{color:var(--color-text-medium);text-decoration:none;font-weight:500;font-size:.95rem;transition:color .3s ease;position:relative}
+.nav-link:hover{color:var(--color-primary)}
 
-.nav-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
-  text-decoration: none;
-  transition: opacity 0.3s ease;
-}
-
-.nav-logo:hover {
-  opacity: 0.8;
-}
-
-.nav-logo i {
-  color: var(--color-primary);
-  font-size: 1.5rem;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-}
-
-.nav-link {
-  color: var(--color-text-medium);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
-  transition: color 0.3s ease;
-  position: relative;
-}
-
-.nav-link:hover {
-  color: var(--color-primary);
-}
-
-.nav-cta {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.btn {
-  padding: 0.625rem 1.25rem;
-  border-radius: var(--border-radius-sm);
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-outline {
-  color: var(--color-text-dark);
-  background: transparent;
-  border: 1px solid var(--color-border);
-}
-
-.btn-outline:hover {
-  background: var(--color-bg-light);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.btn-primary {
-  background: var(--color-primary);
-  color: var(--color-white);
-  border: 1px solid var(--color-primary);
-}
-
-.btn-primary:hover {
-  background: #047857;
-  box-shadow: var(--shadow-green);
-}
+.btn{padding:.625rem 1.25rem;border-radius:var(--border-radius-sm);font-weight:600;font-size:.9rem;text-decoration:none;transition:all .3s ease;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;min-height:44px}
+.btn-outline{color:var(--color-text-dark);background:transparent;border:1px solid var(--color-border)}
+.btn-outline:hover{background:var(--color-bg-light);border-color:var(--color-primary);color:var(--color-primary)}
+.btn-primary{background:var(--color-primary);color:var(--color-white);border:1px solid var(--color-primary)}
+.btn-primary:hover{background:#047857;box-shadow:var(--shadow-green);animation:pulse 1.5s ease-in-out infinite}
 
 /* === HERO SECTION === */
-.hero-section {
-  padding: 8rem 2rem 4rem;
-  max-width: 1280px;
-  margin: 0 auto;
-  min-height: 90vh;
-  display: flex;
-  align-items: center;
-}
-
-.hero-content {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-  width: 100%;
-}
-
-.hero-text {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.hero-text h1 {
-  font-size: 3.5rem;
-  font-weight: 800;
-  color: var(--color-text-dark);
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.02em;
-}
-
-.hero-text h1 .highlight {
-  color: var(--color-primary);
-  position: relative;
-}
-
-.hero-text .subtitle {
-  font-size: 1.25rem;
-  color: var(--color-text-medium);
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  max-width: 600px;
-}
-
-.hero-cta {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.btn-large {
-  padding: 0.875rem 1.75rem;
-  font-size: 1rem;
-}
-
-.trust-indicators {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-  padding-top: 2rem;
-  border-top: 1px solid var(--color-border);
-  margin-top: 2rem;
-}
-
-.trust-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--color-text-medium);
-  font-size: 0.9rem;
-}
-
-.trust-item i {
-  color: var(--color-success);
-  font-size: 1.1rem;
-}
-
-.hero-visual {
-  position: relative;
-  animation: fadeInUp 0.8s ease-out 0.2s backwards;
-}
-
-.hero-mockup {
-  background: var(--color-white);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--color-border);
-  position: relative;
-}
-
-.mockup-window {
-  background: var(--color-bg-light);
-  border-radius: var(--border-radius-sm);
-  overflow: hidden;
-}
-
-.mockup-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: var(--color-white);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.mockup-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-border);
-}
-
-.mockup-dot:nth-child(1) { background: #ef4444; }
-.mockup-dot:nth-child(2) { background: #f59e0b; }
-.mockup-dot:nth-child(3) { background: var(--color-success); }
-
-.mockup-content {
-  padding: 1.5rem;
-}
-
-.credential-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: var(--color-white);
-  border-radius: var(--border-radius-sm);
-  margin-bottom: 0.75rem;
-  border: 1px solid var(--color-border);
-  transition: all 0.3s ease;
-}
-
-.credential-item:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-.credential-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--background-gradient);
-  border-radius: var(--border-radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-primary);
-  font-size: 1.25rem;
-}
-
-.credential-info h4 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-dark);
-  margin-bottom: 0.125rem;
-}
-
-.credential-info p {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-}
+.hero-section{padding:8rem 2rem 4rem;max-width:1280px;margin:0 auto;min-height:90vh;display:flex;align-items:center;scroll-margin-top:80px}
+.hero-content{display:grid;grid-template-columns:1.1fr 1fr;gap:4rem;align-items:center;width:100%}
+.hero-text{animation:fadeInUp .8s ease-out}
+.hero-text h1{font-size:clamp(2rem,4vw+1rem,3.5rem);font-weight:800;color:var(--color-text-dark);line-height:1.1;margin-bottom:1.5rem;letter-spacing:-.02em}
+.hero-text h1 .highlight{color:var(--color-primary);position:relative}
+.hero-text .subtitle{font-size:1.25rem;color:var(--color-text-medium);line-height:1.6;margin-bottom:2rem;max-width:600px}
+.hero-cta{display:flex;gap:1rem;align-items:center;margin-bottom:2rem;flex-wrap:wrap}
+.btn-large{padding:.875rem 1.75rem;font-size:1rem}
+.trust-indicators{display:flex;gap:2rem;align-items:center;padding-top:2rem;border-top:1px solid var(--color-border);margin-top:2rem;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:.5rem;color:var(--color-text-medium);font-size:.9rem}
+.trust-item i{color:var(--color-success);font-size:1.1rem}
+.hero-visual{position:relative;animation:fadeInUp .8s ease-out .2s backwards}
+.hero-mockup{background:var(--color-white);border-radius:var(--border-radius);padding:1.5rem;box-shadow:var(--shadow-xl);border:1px solid var(--color-border);position:relative}
+.mockup-window{background:var(--color-bg-light);border-radius:var(--border-radius-sm);overflow:hidden}
+.mockup-header{display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;background:var(--color-white);border-bottom:1px solid var(--color-border)}
+.mockup-dot{width:10px;height:10px;border-radius:50%;background:var(--color-border)}
+.mockup-dot:nth-child(1){background:#ef4444}.mockup-dot:nth-child(2){background:#f59e0b}.mockup-dot:nth-child(3){background:var(--color-success)}
+.mockup-content{padding:1.5rem}
+.credential-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--color-white);border-radius:var(--border-radius-sm);margin-bottom:.75rem;border:1px solid var(--color-border);transition:all .3s ease}
+.credential-item:hover{border-color:var(--color-primary);box-shadow:var(--shadow-sm)}
+.credential-icon{width:40px;height:40px;background:var(--background-gradient);border-radius:var(--border-radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:1.25rem}
+.credential-info h4{font-size:.95rem;font-weight:600;color:var(--color-text-dark);margin-bottom:.125rem}
+.credential-info p{font-size:.85rem;color:var(--color-text-muted)}
 
 /* === STATS SECTION === */
-.stats-section {
-  padding: 3rem 2rem;
-  background: var(--background-gradient);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
+.stats-section{padding:3rem 2rem;background:var(--background-gradient);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)}
+.stats-container{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+.stat-item{text-align:center}
+.stat-number{font-size:2.5rem;font-weight:800;color:var(--color-primary);display:block;margin-bottom:.25rem}
+.stat-label{color:var(--color-text-medium);font-size:.95rem}
 
-.stats-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-}
+/* === FEATURES SECTION — 100% responsive === */
+.features-section{padding:6rem 2rem;background:var(--color-white)}
+.section-container{max-width:1280px;margin:0 auto}
+.section-header{text-align:center;max-width:700px;margin:0 auto 3rem}
+.section-label{display:inline-block;padding:.5rem 1rem;background:var(--background-gradient);color:var(--color-primary);font-weight:600;font-size:.85rem;border-radius:50px;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em}
+.section-header h2{font-size:clamp(1.5rem,2.5vw+1rem,2.5rem);font-weight:800;color:var(--color-text-dark);margin-bottom:1rem;letter-spacing:-.02em}
+.section-header p{font-size:1.125rem;color:var(--color-text-medium);line-height:1.6}
 
-.stat-item {
-  text-align: center;
-}
-
-.stat-number {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--color-primary);
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-.stat-label {
-  color: var(--color-text-medium);
-  font-size: 0.95rem;
-}
-
-/* === FEATURES SECTION === */
-.features-section {
-  padding: 6rem 2rem;
-  background: var(--color-white);
-}
-
-.section-container {
-  max-width: 1280px;
-  margin: 0 auto;
-}
-
-.section-header {
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto 4rem;
-}
-
-.section-label {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  background: var(--background-gradient);
-  color: var(--color-primary);
-  font-weight: 600;
-  font-size: 0.85rem;
-  border-radius: 50px;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.section-header h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--color-text-dark);
-  margin-bottom: 1rem;
-  letter-spacing: -0.02em;
-}
-
-.section-header p {
-  font-size: 1.125rem;
-  color: var(--color-text-medium);
-  line-height: 1.6;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-}
-
-.feature-card {
-  padding: 2rem;
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  transition: all 0.3s ease;
-}
-
-.feature-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-5px);
-  border-color: var(--color-primary);
-}
-
-.feature-icon {
-  width: 56px;
-  height: 56px;
-  background: var(--background-gradient);
-  border-radius: var(--border-radius-sm);
+/* Nouveau grid : colonnes fluides, pas de spans rigides */
+.features-grid{
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-primary);
-  font-size: 1.5rem;
-  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center; /* centre la dernière ligne */
+}
+.feature-card{
+ flex: 1 1 260px;   /* base ~260px, s’adapte */
+  max-width: 340px;  /* évite qu’une carte s’étale trop */
+
+  padding:1.5rem;
+  background:var(--color-white);border:1px solid var(--color-border);
+  border-radius:var(--border-radius);transition:all .3s ease;
+
+}
+.feature-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-5px);border-color:var(--color-primary)}
+.feature-icon{width:56px;height:56px;background:var(--background-gradient);border-radius:var(--border-radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:1.5rem;margin-bottom:.5rem;flex:0 0 auto}
+.feature-card h3{font-size:1.1rem;font-weight:700;color:var(--color-text-dark);margin:0}
+.feature-card p{color:var(--color-text-medium);line-height:1.55;font-size:.95rem;margin:0}
+@media (max-width: 420px){
+  .features-grid{grid-template-columns: 1fr; gap:1rem}
 }
 
-.feature-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
-  margin-bottom: 0.75rem;
+/* === HOW IT WORKS — 100% responsive === */
+.how-it-works-section{padding:6rem 2rem;background:var(--background-gradient)}
+.steps-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap:1.5rem;
+  margin-top:2.5rem;
+  align-items:stretch;
+}
+.step-card{
+  text-align:center; position:relative;
+  padding:1.25rem 1rem;
+  background:var(--color-white);
+  border:1px solid var(--color-border);
+  border-radius:var(--border-radius);
+  height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+}
+.step-number{width:56px;height:56px;background:var(--color-primary);color:var(--color-white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:800;margin:0 0 1rem;box-shadow:var(--shadow-green);flex:0 0 auto}
+.step-card h3{font-size:1.1rem;font-weight:700;color:var(--color-text-dark);margin:.25rem 0 .5rem}
+.step-card p{color:var(--color-text-medium);line-height:1.55;margin:0}
+@media (max-width:420px){
+  .step-number{width:48px;height:48px;font-size:1.1rem}
 }
 
-.feature-card p {
-  color: var(--color-text-medium);
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
-/* === HOW IT WORKS SECTION === */
-.how-it-works-section {
-  padding: 6rem 2rem;
-  background: var(--background-gradient);
-}
-
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3rem;
-  margin-top: 4rem;
-}
-
-.step-card {
-  text-align: center;
-  position: relative;
-}
-
-.step-number {
-  width: 64px;
-  height: 64px;
-  background: var(--color-primary);
-  color: var(--color-white);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 0 auto 1.5rem;
-  box-shadow: var(--shadow-green);
-}
-
-.step-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
-  margin-bottom: 0.75rem;
-}
-
-.step-card p {
-  color: var(--color-text-medium);
-  line-height: 1.6;
-}
+/* === PRICING SECTION === */
+.pricing-section{padding:6rem 2rem;background:var(--color-white)}
+.pricing-grid{max-width:1100px;margin:0 auto;display:grid;gap:2rem;grid-template-columns:repeat(3,1fr)}
+.pricing-card{border:1px solid var(--color-border);border-radius:var(--border-radius);padding:2rem;background:#fff;transition:transform .2s ease, box-shadow .2s ease}
+.pricing-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.pricing-card.popular{border-color:var(--color-primary);box-shadow:var(--shadow-green)}
+.pricing-price{font-weight:800;font-size:2rem;margin:.5rem 0}
+.pricing-features{list-style:none;padding:0;margin:1rem 0}
+.pricing-features li{display:flex;gap:.5rem;align-items:flex-start;margin:.35rem 0;color:var(--color-text-medium)}
+.badge{display:inline-block;background:var(--background-gradient);color:var(--color-primary);border-radius:999px;padding:.25rem .6rem;font-size:.75rem;font-weight:700}
 
 /* === CTA SECTION === */
-.cta-section {
-  padding: 6rem 2rem;
-  background: var(--color-white);
-}
+.cta-section{padding:6rem 2rem;background:var(--color-white)}
+.cta-container{max-width:900px;margin:0 auto;text-align:center;padding:4rem 3rem;background:var(--background-gradient);border-radius:var(--border-radius);border:1px solid var(--color-border)}
+.cta-container h2{font-size:2.5rem;font-weight:800;color:var(--color-text-dark);margin-bottom:1rem;letter-spacing:-.02em}
+.cta-container p{font-size:1.125rem;color:var(--color-text-medium);margin-bottom:2rem}
+.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
 
-.cta-container {
-  max-width: 900px;
-  margin: 0 auto;
-  text-align: center;
-  padding: 4rem 3rem;
-  background: var(--background-gradient);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-border);
-}
-
-.cta-container h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--color-text-dark);
-  margin-bottom: 1rem;
-  letter-spacing: -0.02em;
-}
-
-.cta-container p {
-  font-size: 1.125rem;
-  color: var(--color-text-medium);
-  margin-bottom: 2rem;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+/* === FAQ SECTION === */
+.faq-section{padding:6rem 2rem;background:var(--color-white)}
+.faq-grid{display:grid;gap:1.5rem;max-width:900px;margin:0 auto}
+.faq-item{background:var(--color-white);border:1px solid var(--color-border);border-radius:var(--border-radius);padding:1.5rem;transition:all .3s ease;cursor:pointer}
+.faq-item:hover{border-color:var(--color-primary);box-shadow:var(--shadow-sm)}
+.faq-item summary{font-size:1.125rem;font-weight:600;color:var(--color-text-dark);list-style:none;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:'+';font-size:1.5rem;color:var(--color-primary);font-weight:300;transition:transform .3s ease}
+.faq-item[open] summary::after{content:'−';transform:rotate(180deg)}
+.faq-item p{margin-top:1rem;color:var(--color-text-medium);line-height:1.6;padding-left:.5rem}
 
 /* === FOOTER === */
-.footer {
-  background: var(--color-text-dark);
-  color: var(--color-text-light);
-  padding: 3rem 2rem 1.5rem;
+.footer {background: var(--color-bg-light);color: var(--color-text-dark);padding: 3rem 2rem 1.5rem;box-shadow: var(--shadow-sm)}
+
+.footer-content {max-width: 1280px;margin: 0 auto;display: grid;grid-template-columns: 2fr 1fr 1fr 1fr;gap: 3rem;margin-bottom: 2rem}
+
+.footer-brand h3 {color: var(--color-primary);font-size: 1.25rem;margin-bottom: 1rem;display: flex;align-items: center;gap: .5rem}
+
+.footer-brand p {line-height: 1.6;margin-bottom: 1.5rem;color: var(--color-text-medium)}
+
+.footer-links h4 {color: var(--color-text-dark);font-size: 1rem;margin-bottom: 1rem;font-weight: 600}
+
+.footer-links ul {list-style: none;}
+
+.footer-links li {margin-bottom: .5rem;}
+
+.footer-links a { color: var(--color-text-muted);text-decoration: none;transition: color .3s ease;font-size: .9rem}
+
+.footer-links a:hover {color: var(--color-primary);}
+
+.footer-bottom {max-width: 1280px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid var(--color-border);text-align: center;color: var(--color-text-muted);font-size: .9rem;}
+
+.footer-bottom a {color: var(--color-text-medium);text-decoration: none;}
+
+.footer-bottom a:hover {color: var(--color-primary)}
+
+
+/* === RESPONSIVE GLOBAL === */
+@media (min-width:1025px){
+  .nav-toggle{ display:none }
+  .nav-links{ display:flex; position:static; padding:0; flex-direction:row; gap:2rem; border:0; background:transparent }
+  .nav-cta{ display:flex }
+  .nav-cta-mobile{ display:none }
+  .nav-overlay{ display:none }
+}
+@media (max-width: 1024px){
+  .hero-content{grid-template-columns:1fr;gap:3rem}
+  .stats-container{grid-template-columns:repeat(2,1fr)}
+  .nav-links{display:none;position:fixed;inset:64px 0 auto 0;background:#fff;border-bottom:1px solid var(--color-border);padding:1rem 2rem;gap:1rem;flex-direction:column}
+  .nav-links.active{display:flex;animation:fadeIn .2s ease}
+}
+@media (max-width: 900px){
+  /* Anciennes règles supprimées (plus de grid-column span sur mobile) */
+  .pricing-grid{grid-template-columns:1fr;max-width:720px}
+}
+@media (max-width: 768px){
+  .hero-text h1{font-size:2.25rem}
+  .section-header h2{font-size:1.75rem}
+  .stats-container{grid-template-columns:1fr}
+  .footer-content{grid-template-columns:1fr}
+  .cta-container{padding:3rem 2rem}
+  .hero-cta{flex-direction:column;width:100%}
+  .btn-large{width:100%;justify-content:center}
+}
+@media (max-width: 640px){
+  .hero-section{padding:6rem 1rem 3rem;min-height:auto}
+  .hero-text h1{font-size:2rem}
+  .hero-text .subtitle{font-size:1.05rem}
+  .trust-indicators{flex-direction:column;gap:1rem;align-items:flex-start}
 }
 
-.footer-content {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 3rem;
-  margin-bottom: 2rem;
-}
+/* Skip link + Focus */
+.skip-link{position:absolute;top:-40px;left:0;background:var(--color-primary);color:#fff;padding:8px;text-decoration:none;z-index:100}
+.skip-link:focus{top:0}
+*:focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
 
-.footer-brand h3 {
-  color: var(--color-white);
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+/* Effet CTA */
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
-.footer-brand h3 i {
-  color: var(--color-primary);
-}
-
-.footer-brand p {
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-  color: var(--color-text-light);
-}
-
-.footer-links h4 {
-  color: var(--color-white);
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-.footer-links ul {
-  list-style: none;
-}
-
-.footer-links li {
-  margin-bottom: 0.5rem;
-}
-
-.footer-links a {
-  color: var(--color-text-light);
-  text-decoration: none;
-  transition: color 0.3s ease;
-  font-size: 0.9rem;
-}
-
-.footer-links a:hover {
-  color: var(--color-primary);
-}
-
-.footer-bottom {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  color: var(--color-text-light);
-  font-size: 0.9rem;
-}
-
-.footer-bottom a {
-  color: var(--color-text-light);
-  text-decoration: none;
-}
-
-.footer-bottom a:hover {
-  color: var(--color-primary);
-}
-
-/* === RESPONSIVE === */
-@media (max-width: 1024px) {
-  .hero-content {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-  
-  .features-grid,
-  .steps-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .nav-links {
-    display: none;
-  }
-  
-  .hero-text h1 {
-    font-size: 2.5rem;
-  }
-  
-  .section-header h2 {
-    font-size: 2rem;
-  }
-  
-  .stats-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .footer-content {
-    grid-template-columns: 1fr;
-  }
-  
-  .cta-container {
-    padding: 3rem 2rem;
-  }
-  
-  .hero-cta {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .btn-large {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-section {
-    padding: 6rem 1rem 3rem;
-    min-height: auto;
-  }
-  
-  .hero-text h1 {
-    font-size: 2rem;
-  }
-  
-  .hero-text .subtitle {
-    font-size: 1.05rem;
-  }
-  
-  .trust-indicators {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-}
-
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--color-primary);
-  color: white;
-  padding: 8px;
-  text-decoration: none;
-  z-index: 100;
-}
-
-.skip-link:focus {
-  top: 0;
-}
-
-/* Améliorer les états focus pour l'accessibilité */
-*:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* Effet de pulse sur les CTA principaux */
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-.btn-primary:hover {
-  animation: pulse 1.5s ease-in-out infinite;
-}
-/* === FAQ SECTION === */
-.faq-section {
-  padding: 6rem 2rem;
-  background: var(--color-white);
-}
-
-.faq-grid {
-  display: grid;
-  gap: 1.5rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.faq-item {
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.faq-item:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-.faq-item summary {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text-dark);
-  list-style: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-}
-
-.faq-item summary::-webkit-details-marker {
-  display: none;
-}
-
-.faq-item summary::after {
-  content: '+';
-  font-size: 1.5rem;
-  color: var(--color-primary);
-  font-weight: 300;
-  transition: transform 0.3s ease;
-}
-
-.faq-item[open] summary::after {
-  content: '−';
-  transform: rotate(180deg);
-}
-
-.faq-item p {
-  margin-top: 1rem;
-  color: var(--color-text-medium);
-  line-height: 1.6;
-  padding-left: 0.5rem;
-}
-
-@media (max-width: 768px) {
-  .faq-item {
-    padding: 1.25rem;
-  }
-  
-  .faq-item summary {
-    font-size: 1rem;
-  }
-}
+/* ===== UTILITAIRES ===== */
+.visually-hidden{position:absolute!important;clip:rect(1px,1px,1px,1px);padding:0;border:0;height:1px;width:1px;overflow:hidden;white-space:nowrap}
+:root{--container:max(min(92vw,1280px),320px)}
+.section-container,.nav-container,.footer-bottom,.footer-content{max-width:var(--container)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+img[loading="lazy"]{content-visibility:auto}
 </style>
+
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
 
 <!-- NAVIGATION -->
 <nav class="landing-nav" id="navbar" role="navigation" aria-label="Navigation principale">
   <div class="nav-container">
-    <a href="#" class="nav-logo">
-      <i class="fas fa-shield-halved"></i>
-      <span>MykeyNest</span>
-    </a>
-    
-    <div class="nav-links">
+    {% include 'components/parts/logo.html.twig' %}
+
+    <button class="btn nav-toggle" id="mobile-menu-btn" aria-controls="primary-nav" aria-expanded="false">
+      <i class="fas fa-bars" aria-hidden="true"></i> Menu
+    </button>
+
+    <div class="nav-links" id="primary-nav">
       <a href="#features" class="nav-link">Fonctionnalités</a>
       <a href="#how-it-works" class="nav-link">Comment ça marche</a>
-      <a href="#" class="nav-link">Tarifs</a>
+      <a href="#pricing" class="nav-link">Tarifs</a>
+
+      <div class="nav-cta nav-cta-mobile">
+        <a href="{{ path('show_login') }}" class="btn btn-outline">Connexion</a>
+        <a href="{{ path('show_register') }}" class="btn btn-primary">Essai gratuit</a>
+      </div>
     </div>
-    
+
     <div class="nav-cta">
       <a href="{{ path('show_login') }}" class="btn btn-outline">Connexion</a>
       <a href="{{ path('show_register') }}" class="btn btn-primary">Essai gratuit</a>
     </div>
   </div>
 </nav>
+
+{# Overlay pour le menu mobile #}
+<div class="nav-overlay" id="nav-overlay"></div>
 
 <!-- HERO SECTION -->
 <section class="hero-section" role="banner" id="main-content">
@@ -813,36 +291,33 @@
         Sécurisez tous vos mots de passe en <span class="highlight">un seul endroit</span>
       </h1>
       <p class="subtitle">
-        MykeyNest protège vos identifiants avec un chiffrement militaire AES-256. 
+        MykeyNest protège vos identifiants avec un chiffrement militaire AES-256 et une architecture zero-knowledge.
         Accédez à tous vos comptes en toute sécurité, sur tous vos appareils.
       </p>
       <div class="hero-cta">
-<a href="{{ path('show_register') }}" class="btn btn-primary btn-large" aria-label="Commencer gratuitement avec MykeyNest">
-  <i class="fas fa-rocket" aria-hidden="true"></i> Commencer gratuitement
-</a>
-<a href="#main-content" class="skip-link">Aller au contenu principal</a>
-        <a href="#features" class="btn btn-outline btn-large">
-          Découvrir les fonctionnalités
+        <a href="{{ path('show_register') }}" class="btn btn-primary btn-large" aria-label="Commencer gratuitement avec MykeyNest">
+          <i class="fas fa-rocket" aria-hidden="true"></i> Commencer gratuitement
         </a>
+        <a href="#features" class="btn btn-outline btn-large">Découvrir les fonctionnalités</a>
       </div>
-      
-      <div class="trust-indicators">
+
+      <div class="trust-indicators" aria-label="Indicateurs de confiance">
         <div class="trust-item">
-          <i class="fas fa-shield-check"></i>
+          <i class="fas fa-shield-check" aria-hidden="true"></i>
           <span>Chiffrement AES-256</span>
         </div>
         <div class="trust-item">
-          <i class="fas fa-users"></i>
-          <span>+10,000 utilisateurs</span>
+          <i class="fas fa-users" aria-hidden="true"></i>
+          <span>+10 000 utilisateurs</span>
         </div>
         <div class="trust-item">
-          <i class="fas fa-star"></i>
+          <i class="fas fa-star" aria-hidden="true"></i>
           <span>Note 4.9/5</span>
         </div>
       </div>
     </div>
-    
-    <div class="hero-visual">
+
+    <div class="hero-visual" aria-hidden="true">
       <div class="hero-mockup">
         <div class="mockup-window">
           <div class="mockup-header">
@@ -852,27 +327,21 @@
           </div>
           <div class="mockup-content">
             <div class="credential-item">
-              <div class="credential-icon">
-                <i class="fab fa-google"></i>
-              </div>
+              <div class="credential-icon"><i class="fab fa-google" aria-hidden="true"></i></div>
               <div class="credential-info">
                 <h4>Gmail</h4>
                 <p>email@example.com</p>
               </div>
             </div>
             <div class="credential-item">
-              <div class="credential-icon">
-                <i class="fab fa-facebook"></i>
-              </div>
+              <div class="credential-icon"><i class="fab fa-facebook" aria-hidden="true"></i></div>
               <div class="credential-info">
                 <h4>Facebook</h4>
                 <p>••••••••</p>
               </div>
             </div>
             <div class="credential-item">
-              <div class="credential-icon">
-                <i class="fab fa-github"></i>
-              </div>
+              <div class="credential-icon"><i class="fab fa-github" aria-hidden="true"></i></div>
               <div class="credential-info">
                 <h4>GitHub</h4>
                 <p>developer@mail.com</p>
@@ -886,7 +355,7 @@
 </section>
 
 <!-- STATS SECTION -->
-<section class="stats-section">
+<section class="stats-section" aria-label="Statistiques MykeyNest">
   <div class="stats-container">
     <div class="stat-item">
       <span class="stat-number" data-target="10000">10,000+</span>
@@ -897,7 +366,7 @@
       <span class="stat-label">Mots de passe sécurisés</span>
     </div>
     <div class="stat-item">
-      <span class="stat-number" data-target="99">99.9%</span>
+      <span class="stat-number" data-target="99" data-suffix=".9%">99.9%</span>
       <span class="stat-label">Temps de disponibilité</span>
     </div>
     <div class="stat-item">
@@ -913,54 +382,42 @@
     <div class="section-header">
       <span class="section-label">Fonctionnalités</span>
       <h2>Tout ce dont vous avez besoin pour sécuriser vos mots de passe</h2>
-      <p>Des fonctionnalités puissantes conçues pour votre sécurité et votre tranquillité d'esprit</p>
+      <p>Des fonctionnalités puissantes conçues pour votre sécurité et votre tranquillité d'esprit.</p>
     </div>
-    
+
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-shield-halved"></i>
-        </div>
+        <div class="feature-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
         <h3>Chiffrement de bout en bout</h3>
         <p>Vos données sont chiffrées avec AES-256 avant même de quitter votre appareil. Personne ne peut accéder à vos mots de passe.</p>
       </div>
-      
+
       <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-wand-magic-sparkles"></i>
-        </div>
+        <div class="feature-icon"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i></div>
         <h3>Générateur intelligent</h3>
         <p>Créez des mots de passe ultra-sécurisés en un clic. Des combinaisons uniques et impossibles à deviner.</p>
       </div>
-      
+
       <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-mobile-screen"></i>
-        </div>
+        <div class="feature-icon"><i class="fas fa-mobile-screen" aria-hidden="true"></i></div>
         <h3>Synchronisation multi-appareils</h3>
         <p>Accédez à vos mots de passe sur tous vos appareils. Toujours à jour, partout.</p>
       </div>
-      
+
       <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-share-nodes"></i>
-        </div>
+        <div class="feature-icon"><i class="fas fa-share-nodes" aria-hidden="true"></i></div>
         <h3>Partage sécurisé</h3>
         <p>Partagez vos identifiants avec votre équipe en toute sécurité, avec contrôle des accès.</p>
       </div>
-      
+
       <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-shield-heart"></i>
-        </div>
+        <div class="feature-icon"><i class="fas fa-shield-heart" aria-hidden="true"></i></div>
         <h3>Audit de sécurité</h3>
         <p>Identifiez vos mots de passe faibles ou compromis. Recevez des alertes en cas de violation.</p>
       </div>
-      
+
       <div class="feature-card">
-        <div class="feature-icon">
-          <i class="fas fa-bolt"></i>
-        </div>
+        <div class="feature-icon"><i class="fas fa-bolt" aria-hidden="true"></i></div>
         <h3>Remplissage automatique</h3>
         <p>Connectez-vous instantanément à vos sites préférés avec notre extension navigateur.</p>
       </div>
@@ -974,22 +431,22 @@
     <div class="section-header">
       <span class="section-label">Simple et efficace</span>
       <h2>Comment ça marche</h2>
-      <p>Commencez à sécuriser vos mots de passe en 3 étapes simples</p>
+      <p>Commencez à sécuriser vos mots de passe en 3 étapes simples.</p>
     </div>
-    
+
     <div class="steps-grid">
       <div class="step-card">
         <div class="step-number">1</div>
         <h3>Créez votre compte</h3>
-        <p>Inscrivez-vous gratuitement et créez votre clé maître. C'est le seul mot de passe que vous aurez à retenir.</p>
+        <p>Inscrivez-vous gratuitement et créez votre clé maître. C'est le seul mot de passe à retenir.</p>
       </div>
-      
+
       <div class="step-card">
         <div class="step-number">2</div>
         <h3>Ajoutez vos identifiants</h3>
         <p>Importez ou ajoutez manuellement vos mots de passe existants. Tout est chiffré automatiquement.</p>
       </div>
-      
+
       <div class="step-card">
         <div class="step-number">3</div>
         <h3>Accédez partout</h3>
@@ -999,60 +456,111 @@
   </div>
 </section>
 
+<!-- PRICING SECTION -->
+<section class="pricing-section" id="pricing" aria-label="Tarifs">
+  <div class="section-container">
+    <div class="section-header">
+      <span class="section-label">Tarifs</span>
+      <h2>Des plans simples et transparents</h2>
+      <p>Commencez gratuitement. Passez à une offre avancée quand vous en avez besoin.</p>
+    </div>
 
-<!-- FAQ SECTION pour le SEO -->
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="badge">Gratuit</div>
+        <h3>Basic</h3>
+        <p class="pricing-price">0€ <span class="stat-label">/ mois</span></p>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check" aria-hidden="true"></i> 5 mots de passe</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> 5 partages entre membres</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> Générateur sécurisé</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> Auto-remplissage</li>
+        </ul>
+        <a href="{{ path('show_register') }}" class="btn btn-outline" aria-label="Essayer gratuitement le plan Basic">Essayer</a>
+      </div>
+
+      <div class="pricing-card popular" aria-label="Offre recommandée">
+        <div class="badge">Populaire</div>
+        <h3>Pro</h3>
+        <p class="pricing-price">20€ <span class="stat-label">/ mois</span></p>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check" aria-hidden="true"></i> 20 mots de passe</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> Partages illimité entre membres</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> 2FA + Partage sécurisé</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> Audit de sécurité</li>
+        </ul>
+        <a href="{{ path('show_register') }}" class="btn btn-primary" aria-label="Choisir le plan Pro">Choisir Pro</a>
+      </div>
+
+      <div class="pricing-card">
+        <div class="badge">Équipe</div>
+        <h3>Entreprise</h3>
+        <p class="pricing-price">5,99€ <span class="stat-label">/ utilisateur / mois</span></p>
+        <ul class="pricing-features">
+          <li><i class="fas fa-check" aria-hidden="true"></i> Partage avancé & rôles</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> Journaux d’accès</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i> Support prioritaire</li>
+        </ul>
+        <a href="{{ path('show_register') }}" class="btn btn-outline" aria-label="Contacter le support pour Business">Nous contacter</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ SECTION (visible) -->
 <section class="faq-section">
   <div class="section-container">
     <div class="section-header">
       <span class="section-label">Questions fréquentes</span>
       <h2>Vos questions sur MykeyNest</h2>
-      <p>Tout ce que vous devez savoir sur notre gestionnaire de mots de passe</p>
+      <p>Tout ce que vous devez savoir sur notre gestionnaire de mots de passe.</p>
     </div>
-    
+
     <div class="faq-grid">
       <details class="faq-item">
         <summary>Qu'est-ce qu'un gestionnaire de mots de passe ?</summary>
-        <p>Un gestionnaire de mots de passe est un outil de sécurité qui stocke et chiffre tous vos identifiants (noms d'utilisateur et mots de passe) dans un coffre-fort numérique. MykeyNest utilise le chiffrement AES-256 pour protéger vos données.</p>
+        <p>Un gestionnaire de mots de passe est un outil de sécurité qui stocke et chiffre tous vos identifiants dans un coffre-fort numérique. MykeyNest utilise le chiffrement AES-256 pour protéger vos données.</p>
       </details>
-      
+
       <details class="faq-item">
         <summary>Comment fonctionne le chiffrement AES-256 ?</summary>
-        <p>L'AES-256 est un standard de chiffrement militaire utilisé par les gouvernements et les banques. Vos données sont chiffrées localement sur votre appareil avant d'être stockées, ce qui signifie que personne, même nous, ne peut accéder à vos mots de passe.</p>
+        <p>L'AES-256 est un standard utilisé par les banques. Les données sont chiffrées localement (zero-knowledge) : nous n’y avons jamais accès.</p>
       </details>
-      
+
       <details class="faq-item">
         <summary>MykeyNest est-il gratuit ?</summary>
-        <p>Oui, MykeyNest propose une version gratuite avec toutes les fonctionnalités essentielles. Vous pouvez stocker jusqu'à 50 mots de passe gratuitement. Des plans premium sont disponibles pour les utilisateurs avancés et les équipes.</p>
+        <p>Oui, une version gratuite avec l’essentiel. Des plans premium existent pour les utilisateurs avancés et les équipes.</p>
       </details>
-      
+
       <details class="faq-item">
         <summary>Mes mots de passe sont-ils synchronisés sur tous mes appareils ?</summary>
-        <p>Oui, MykeyNest synchronise automatiquement vos mots de passe sur tous vos appareils (ordinateur, smartphone, tablette). Tout changement est instantanément mis à jour partout.</p>
+        <p>Oui, synchronisation automatique sur ordinateur, smartphone et tablette.</p>
       </details>
-      
+
       <details class="faq-item">
         <summary>Que se passe-t-il si j'oublie mon mot de passe maître ?</summary>
-        <p>Le mot de passe maître est la clé de votre coffre-fort. Par mesure de sécurité, nous ne le stockons pas et ne pouvons pas le récupérer. Nous recommandons de le noter dans un endroit sûr ou d'utiliser notre option de récupération d'urgence.</p>
+        <p>Nous ne le stockons pas. Conservez-le en lieu sûr et utilisez la récupération d’urgence.</p>
       </details>
-      
+
       <details class="faq-item">
         <summary>MykeyNest est-il sûr ?</summary>
-        <p>Absolument. MykeyNest utilise les mêmes technologies de sécurité que les banques : chiffrement AES-256, architecture zero-knowledge (nous ne connaissons jamais vos mots de passe), authentification à deux facteurs, et audits de sécurité réguliers.</p>
+        <p>AES-256, zero-knowledge, 2FA, audits réguliers et bonnes pratiques de sécurité.</p>
       </details>
     </div>
   </div>
 </section>
 
+{# Section contact existante #}
 {% include "auth/contact/contact.html.twig" %}
 
 <!-- CTA SECTION -->
 <section class="cta-section">
   <div class="cta-container">
     <h2>Prêt à sécuriser vos mots de passe ?</h2>
-    <p>Rejoignez des milliers d'utilisateurs qui ont choisi MykeyNest pour protéger leur vie numérique</p>
+    <p>Rejoignez des milliers d'utilisateurs qui ont choisi MykeyNest pour protéger leur vie numérique.</p>
     <div class="cta-buttons">
       <a href="{{ path('show_register') }}" class="btn btn-primary btn-large">
-        <i class="fas fa-rocket"></i> Commencer gratuitement
+        <i class="fas fa-rocket" aria-hidden="true"></i> Commencer gratuitement
       </a>
       <a href="{{ path('show_login') }}" class="btn btn-outline btn-large">
         Se connecter
@@ -1060,24 +568,25 @@
     </div>
   </div>
 </section>
+
 <!-- FOOTER -->
 <footer class="footer" role="contentinfo">
   <div class="footer-content">
     <div class="footer-brand">
-      <h3><i class="fas fa-shield-halved"></i> MykeyNest</h3>
+         {% include 'components/parts/logo.html.twig' %}
       <p>Le gestionnaire de mots de passe qui allie sécurité maximale et simplicité d'utilisation.</p>
     </div>
-    
+
     <div class="footer-links">
       <h4>Produit</h4>
       <ul>
         <li><a href="#features">Fonctionnalités</a></li>
-        <li><a href="#">Tarifs</a></li>
-        <li><a href="#">Sécurité</a></li>
+        <li><a href="#pricing">Tarifs</a></li>
+        <li><a href="#how-it-works">Sécurité</a></li>
         <li><a href="#">Extension</a></li>
       </ul>
     </div>
-    
+
     <div class="footer-links">
       <h4>Entreprise</h4>
       <ul>
@@ -1086,7 +595,7 @@
         <li><a href="#">Contact</a></li>
       </ul>
     </div>
-    
+
     <div class="footer-links">
       <h4>Ressources</h4>
       <ul>
@@ -1096,98 +605,110 @@
       </ul>
     </div>
   </div>
-  
+
   <div class="footer-bottom">
-    <p>&copy; 2025 MykeyNest. Tous droits réservés. | 
-    <a href="#">Confidentialité</a> |
-    <a href="#">Conditions</a></p>
+    <p>&copy; {{ "now"|date("Y") }} MykeyNest. Tous droits réservés. |
+      <a href="#">Confidentialité</a> |
+      <a href="#">Conditions</a>
+    </p>
   </div>
-</footer><script>
-// === NAVBAR SCROLL EFFECT ===
-window.addEventListener('scroll', function() {
-  const navbar = document.getElementById('navbar');
-  if (window.scrollY > 50) {
-    navbar.classList.add('scrolled');
-  } else {
-    navbar.classList.remove('scrolled');
-  }
-});// === SMOOTH SCROLL ===
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-anchor.addEventListener('click', function (e) {
-e.preventDefault();
-const target = document.querySelector(this.getAttribute('href'));
-if (target) {
-const navHeight = document.querySelector('.landing-nav').offsetHeight;
-const targetPosition = target.offsetTop - navHeight - 20;  window.scrollTo({
-    top: targetPosition,
-    behavior: 'smooth'
+</footer>
+
+{# ==== SCRIPTS ACCESSIBLES & PERFORMANTS ==== #}
+<script defer>
+/* Navbar shadow on scroll */
+const navbar = document.getElementById('navbar');
+addEventListener('scroll', ()=> navbar.classList.toggle('scrolled', scrollY>50));
+
+/* Smooth scroll (respecte reduced motion) */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const id=a.getAttribute('href'); if(id==="#"||id==="#!") return;
+    const target=document.querySelector(id); if(!target) return;
+    e.preventDefault();
+    const offset=document.querySelector('.landing-nav').offsetHeight + 20;
+    const y = target.getBoundingClientRect().top + scrollY - offset;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) scrollTo(0,y);
+    else window.scrollTo({top:y,behavior:'smooth'});
+  });
+});
+
+/* Reveal animations via IntersectionObserver */
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es=>{
+  es.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.style.animation='fadeInUp .6s ease-out forwards';
+      io.unobserve(entry.target);
+    }
+  });
+},{threshold:.1, rootMargin:'0px 0px -50px 0px'}) : null;
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.feature-card,.step-card,.stat-item').forEach(el=>{
+    el.style.opacity='0'; el.style.animation='none'; io && io.observe(el);
+  });
+});
+
+/* Stats count-up */
+function animateValue(el,start,end,duration){
+  let t0=null; const step=(ts)=>{ if(!t0) t0=ts; const p=Math.min((ts-t0)/duration,1);
+    el.textContent= Math.floor(p*(end-start)+start).toLocaleString() + (el.dataset.suffix||'');
+    if(p<1) requestAnimationFrame(step);
+  }; requestAnimationFrame(step);
+}
+const statsIO = new IntersectionObserver(es=>{
+  es.forEach(entry=>{
+    if(entry.isIntersecting){
+      const n=entry.target, target=parseInt(n.dataset.target,10);
+      if(!isNaN(target)) animateValue(n,0,target,1800);
+      statsIO.unobserve(n);
+    }
+  });
+},{threshold:.5});
+document.querySelectorAll('.stat-number[data-target]').forEach(n=>statsIO.observe(n));
+
+/* Mobile menu toggle (accessibilité) */
+const toggle=document.getElementById('mobile-menu-btn');
+const nav=document.getElementById('primary-nav');
+if(toggle && nav){
+  toggle.addEventListener('click',()=>{
+    const open = nav.classList.toggle('active');
+    toggle.setAttribute('aria-expanded', String(open));
   });
 }
-});
-});// === INTERSECTION OBSERVER FOR ANIMATIONS ===
-const observerOptions = {
-threshold: 0.1,
-rootMargin: '0px 0px -50px 0px'
-};const observer = new IntersectionObserver(function(entries) {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
-observer.unobserve(entry.target);
+
+/* Lazy loading fallback pour images avec data-src */
+if('loading' in HTMLImageElement.prototype===false && 'IntersectionObserver' in window){
+  const imgIO = new IntersectionObserver(es=>{
+    es.forEach(entry=>{
+      if(entry.isIntersecting){
+        const img=entry.target;
+        if(img.dataset.src){ img.src=img.dataset.src; img.classList.add('loaded'); imgIO.unobserve(img); }
+      }
+    });
+  });
+  document.querySelectorAll('img[data-src]').forEach(img=>imgIO.observe(img));
 }
-});
-}, observerOptions);// Appliquer l'observer aux éléments
-document.addEventListener('DOMContentLoaded', function() {
-const elementsToAnimate = document.querySelectorAll('.feature-card, .step-card, .stat-item');elementsToAnimate.forEach((element, index) => {
-element.style.opacity = '0';
-element.style.animation = 'none';
-observer.observe(element);
-});
-});// === STATS ANIMATION ===
-function animateValue(element, start, end, duration) {
-let startTimestamp = null;
-const step = (timestamp) => {
-if (!startTimestamp) startTimestamp = timestamp;
-const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-const value = Math.floor(progress * (end - start) + start);
-element.textContent = value.toLocaleString() + (element.dataset.suffix || '');
-if (progress < 1) {
-window.requestAnimationFrame(step);
+</script>
+
+{# ==== JSON-LD FAQ (SEO) ==== #}
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"Qu'est-ce qu'un gestionnaire de mots de passe ?",
+     "acceptedAnswer":{"@type":"Answer","text":"Un outil qui stocke et chiffre vos identifiants dans un coffre-fort numérique. MykeyNest utilise l'AES-256."}},
+    {"@type":"Question","name":"Comment fonctionne le chiffrement AES-256 ?",
+     "acceptedAnswer":{"@type":"Answer","text":"Chiffrement côté appareil (zero-knowledge) : même MykeyNest ne peut pas lire vos données."}},
+    {"@type":"Question","name":"MykeyNest est-il gratuit ?",
+     "acceptedAnswer":{"@type":"Answer","text":"Oui, une version gratuite avec l’essentiel. Des plans premium existent pour les besoins avancés."}},
+    {"@type":"Question","name":"Synchronisation multi-appareils ?",
+     "acceptedAnswer":{"@type":"Answer","text":"Oui, vos mots de passe sont synchronisés sur ordinateur, smartphone et tablette."}},
+    {"@type":"Question","name":"Et si j'oublie mon mot de passe maître ?",
+     "acceptedAnswer":{"@type":"Answer","text":"Nous ne le stockons pas. Utilisez la récupération d’urgence et conservez-le en lieu sûr."}},
+    {"@type":"Question","name":"MykeyNest est-il sûr ?",
+     "acceptedAnswer":{"@type":"Answer","text":"AES-256, zero-knowledge, 2FA, audits réguliers et bonnes pratiques de sécurité."}}
+  ]
 }
-};
-window.requestAnimationFrame(step);
-}// Observer pour les stats
-const statsObserver = new IntersectionObserver((entries) => {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-const statNumber = entry.target;
-const target = parseInt(statNumber.dataset.target);  if (target) {
-    animateValue(statNumber, 0, target, 2000);
-  }  statsObserver.unobserve(statNumber);
-}
-});
-}, { threshold: 0.5 });document.querySelectorAll('.stat-number[data-target]').forEach(stat => {
-statsObserver.observe(stat);
-});// === MOBILE MENU (à ajouter si nécessaire) ===
-const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-const navLinks = document.querySelector('.nav-links');if (mobileMenuBtn) {
-mobileMenuBtn.addEventListener('click', () => {
-navLinks.classList.toggle('active');
-});
-}// === PERFORMANCE: Lazy loading ===
-if ('IntersectionObserver' in window) {
-const imageObserver = new IntersectionObserver((entries, observer) => {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-const img = entry.target;
-if (img.dataset.src) {
-img.src = img.dataset.src;
-img.classList.add('loaded');
-observer.unobserve(img);
-}
-}
-});
-});document.querySelectorAll('img[data-src]').forEach(img => {
-imageObserver.observe(img);
-});
-}
-</script>{% endblock %}
+</script>
+{% endblock %}
