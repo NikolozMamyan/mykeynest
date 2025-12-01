@@ -12,6 +12,15 @@
             </svg>
             Retour aux équipes
         </a>
+        
+        {% if is_granted('TEAM_DELETE', team) %}
+            <button type="button" class="btn-danger-outline" onclick="confirmDeleteTeam()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Supprimer l'équipe
+            </button>
+        {% endif %}
     </div>
 
     {# Team Info Card #}
@@ -38,6 +47,68 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    {# Credentials Section #}
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                <h2>Identifiants partagés</h2>
+                <span class="member-count">{{ team.credentials|length }}</span>
+            </div>
+            {% if is_granted('TEAM_MANAGE', team) %}
+                <button type="button" class="btn-add-small" onclick="openCredentialsModal()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Ajouter
+                </button>
+            {% endif %}
+        </div>
+
+        {% if team.credentials is empty %}
+            <div class="empty-members">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                <p>Aucun credential partagé avec cette équipe</p>
+            </div>
+        {% else %}
+            <div class="credentials-list">
+                {% for credential in team.credentials %}
+                    <div class="credential-item">
+                        <div class="credential-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                        </div>
+                        <div class="credential-info">
+                            <div class="credential-name">{{ credential.name }}</div>
+                            {% if credential.domain %}
+                                <div class="credential-url">{{ credential.domain }}</div>
+                            {% endif %}
+                        </div>
+
+                        {% if is_granted('TEAM_MANAGE', team) %}
+                            <form method="post"
+                                  action="{{ path('app_team_remove_credential', {id: team.id, credentialId: credential.id}) }}"
+                                  class="remove-credential-form"
+                                  onsubmit="return confirm('Retirer ce credential de l\'équipe ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('remove_credential_' ~ credential.id) }}">
+                                <button type="submit" class="btn-remove-member" title="Retirer ce credential">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 
     {# Members Section #}
@@ -92,58 +163,107 @@
                         </div>
 
                         {% if is_granted('TEAM_MANAGE', team) and member.role != constant('App\\Enum\\TeamRole::OWNER') %}
-<form method="post"
-                               action="{{ path('app_team_remove_member', {id: team.id, memberId: member.id}) }}"
-                               class="remove-member-form"
-                               onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce membre de l'équipe ?');">
-<input type="hidden" name="_token" value="{{ csrf_token('remove_member_' ~ member.id) }}">
-<button type="submit" class="btn-remove-member" title="Supprimer ce membre">
-<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-</svg>
-</button>
-</form>
-{% endif %}
-</div>
-{% endfor %}
-</div>
-{% endif %}
-</div>
-{# Add Member Section #}
-{% if add_member_form is defined and add_member_form %}
-    <div class="section-card">
-        <div class="section-header">
-            <div class="section-title">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                </svg>
-                <h2>Ajouter un membre</h2>
+                            <form method="post"
+                                  action="{{ path('app_team_remove_member', {id: team.id, memberId: member.id}) }}"
+                                  class="remove-member-form"
+                                  onsubmit="return confirm('Supprimer ce membre de l'équipe ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('remove_member_' ~ member.id) }}">
+                                <button type="submit" class="btn-remove-member" title="Supprimer ce membre">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
-        </div>
+        {% endif %}
+    </div>
 
-        {{ form_start(add_member_form, {'attr': {'class': 'add-member-form'}}) }}
-            <div class="form-row">
-                <div class="form-group-inline">
-                    {{ form_label(add_member_form.email, null, {'label_attr': {'class': 'form-label-inline'}}) }}
-                    {{ form_widget(add_member_form.email, {'attr': {'class': 'form-input-inline', 'placeholder': 'email@exemple.com'}}) }}
-                    {{ form_errors(add_member_form.email) }}
-                </div>
-                <div class="form-group-inline">
-                    {{ form_label(add_member_form.role, null, {'label_attr': {'class': 'form-label-inline'}}) }}
-                    {{ form_widget(add_member_form.role, {'attr': {'class': 'form-select-inline'}}) }}
-                    {{ form_errors(add_member_form.role) }}
-                </div>
-                <button type="submit" class="btn-add-member">
+    {# Add Member Section #}
+    {% if add_member_form is defined and add_member_form %}
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
-                    Ajouter
+                    <h2>Ajouter un membre</h2>
+                </div>
+            </div>
+
+            {{ form_start(add_member_form, {'attr': {'class': 'add-member-form'}}) }}
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        {{ form_label(add_member_form.email, null, {'label_attr': {'class': 'form-label-inline'}}) }}
+                        {{ form_widget(add_member_form.email, {'attr': {'class': 'form-input-inline', 'placeholder': 'email@exemple.com'}}) }}
+                        {{ form_errors(add_member_form.email) }}
+                    </div>
+                    <div class="form-group-inline">
+                        {{ form_label(add_member_form.role, null, {'label_attr': {'class': 'form-label-inline'}}) }}
+                        {{ form_widget(add_member_form.role, {'attr': {'class': 'form-select-inline'}}) }}
+                        {{ form_errors(add_member_form.role) }}
+                    </div>
+                    <button type="submit" class="btn-add-member">
+<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+</svg>
+Ajouter
+</button>
+</div>
+{{ form_end(add_member_form) }}
+</div>
+{% endif %}
+</div>
+{# Modal pour ajouter des credentials #}
+{% if add_credentials_form is defined and add_credentials_form %}
+<div id="credentialsModal" class="modal">
+    <div class="modal-overlay" onclick="closeCredentialsModal()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Ajouter des credentials</h2>
+            <button type="button" class="btn-close-modal" onclick="closeCredentialsModal()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            {{ form_start(add_credentials_form, {'attr': {'class': 'credentials-form'}}) }}
+                <div class="form-help-text-modal">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Sélectionnez les credentials à partager avec cette équipe
+                </div>
+            <div class="credentials-checkboxes">
+                {{ form_widget(add_credentials_form.credentials) }}
+                {{ form_errors(add_credentials_form.credentials) }}
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeCredentialsModal()">
+                    Annuler
+                </button>
+                <button type="submit" class="btn-primary-modal">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Ajouter les credentials
                 </button>
             </div>
-        {{ form_end(add_member_form) }}
+        {{ form_end(add_credentials_form) }}
     </div>
-{% endif %}
 </div>
+</div>
+{% endif %}
+{# Formulaire caché pour la suppression de l'équipe #}
+{% if is_granted('TEAM_DELETE', team) %}
+<form id="deleteTeamForm" method="post" action="{{ path('app_team_delete', {id: team.id}) }}" style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete_team_' ~ team.id) }}">
+</form>
+{% endif %}
 <style>
 .team-show-container {
     max-width: 900px;
@@ -155,6 +275,9 @@
 }
 
 .team-show-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 0.5rem;
 }
 
@@ -176,6 +299,33 @@
 .btn-back svg {
     width: 20px;
     height: 20px;
+}
+
+.btn-danger-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: white;
+    color: var(--color-danger-start);
+    border: 1.5px solid var(--color-danger-start);
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-danger-outline:hover {
+    background: var(--color-danger-start);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger-outline svg {
+    width: 18px;
+    height: 18px;
 }
 
 /* Team Info Card */
@@ -249,6 +399,9 @@
 .section-header {
     padding: 1.5rem 2rem;
     border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .section-title {
@@ -282,6 +435,89 @@
     border-radius: 14px;
     font-size: 0.875rem;
     font-weight: 600;
+}
+
+.btn-add-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-add-small:hover {
+    background: #047857;
+    transform: translateY(-1px);
+}
+
+.btn-add-small svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Credentials List */
+.credentials-list {
+    padding: 1rem;
+}
+
+.credential-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--border-radius-sm);
+    transition: background 0.2s ease;
+}
+
+.credential-item:hover {
+    background: var(--color-bg-light);
+}
+
+.credential-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius-sm);
+    background: var(--background-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.credential-icon svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-primary);
+}
+
+.credential-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.credential-name {
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.credential-url {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove-credential-form {
+    margin: 0;
 }
 
 /* Empty State */
@@ -485,9 +721,232 @@
     height: 18px;
 }
 
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: var(--blur-background);
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    border-radius: var(--border-radius);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--background-gradient);
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.btn-close-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-medium);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-text-dark);
+}
+
+.btn-close-modal svg {
+    width: 20px;
+    height: 20px;
+}
+
+.modal-body {
+    padding: 2rem;
+    max-height: calc(80vh - 150px);
+    overflow-y: auto;
+}
+
+.form-help-text-modal {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
+    background: var(--color-bg-light);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-medium);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.form-help-text-modal svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    color: var(--color-primary);
+}
+
+.credentials-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--color-bg-light);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 1.5rem;
+}
+
+.credentials-checkboxes > div {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
+}
+
+.credentials-checkboxes > div:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.credentials-checkboxes input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+}
+
+.credentials-checkboxes label {
+    cursor: pointer;
+    color: var(--color-text-dark);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    user-select: none;
+    flex: 1;
+}
+
+.credentials-checkboxes label:hover {
+    color: var(--color-primary);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: var(--color-text-dark);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--color-bg-light);
+    border-color: var(--color-text-medium);
+}
+
+.btn-primary-modal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-modal:hover {
+    background: #047857;
+    box-shadow: var(--shadow-green);
+}
+
+.btn-primary-modal svg {
+    width: 18px;
+    height: 18px;
+}
+
 @media (max-width: 768px) {
     .team-show-container {
         padding: 1rem;
+    }
+
+    .team-show-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .btn-danger-outline {
+        width: 100%;
+        justify-content: center;
     }
 
     .team-info-header {
@@ -508,6 +967,43 @@
     .btn-add-member {
         width: 100%;
     }
+
+    .modal-content {
+        width: 95%;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
+
+    .btn-secondary,
+    .btn-primary-modal {
+        width: 100%;
+    }
 }
 </style>
+<script>
+function openCredentialsModal() {
+    document.getElementById('credentialsModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCredentialsModal() {
+    document.getElementById('credentialsModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function confirmDeleteTeam() {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette équipe ? Cette action est irréversible et supprimera également tous les membres.')) {
+        document.getElementById('deleteTeamForm').submit();
+    }
+}
+
+// Fermer le modal avec la touche Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCredentialsModal();
+    }
+});
+</script>
 {% endblock %}
