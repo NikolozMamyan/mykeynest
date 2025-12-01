@@ -1,0 +1,331 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes équipes{% endblock %}
+
+{% block body %}
+<div class="teams-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <svg class="header-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <h1>Mes équipes</h1>
+            </div>
+            <p class="header-subtitle">Gérez vos équipes et collaborez efficacement</p>
+        </div>
+        <a href="{{ path('app_team_new') }}" class="btn-primary-action">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Nouvelle équipe
+        </a>
+    </div>
+
+    {% if teams is empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+            </div>
+            <h2>Aucune équipe pour le moment</h2>
+            <p>Créez votre première équipe pour commencer à collaborer</p>
+            <a href="{{ path('app_team_new') }}" class="btn-primary-action">
+                Créer une équipe
+            </a>
+        </div>
+    {% else %}
+        <div class="teams-grid">
+            {% for team in teams %}
+                <div class="team-card">
+                    <div class="team-card-header">
+                        <div class="team-avatar">
+                            {{ team.name|slice(0, 2)|upper }}
+                        </div>
+                        <div class="team-info">
+                            <h3 class="team-name">{{ team.name }}</h3>
+                            <div class="team-meta">
+                                <span class="meta-item">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                    </svg>
+                                    {{ team.members|length }} membre{{ team.members|length > 1 ? 's' : '' }}
+                                </span>
+                                <span class="meta-item">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    {{ team.createdAt|date('d/m/Y') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="team-card-body">
+                        <div class="owner-badge">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            {{ team.owner.email ?? 'N/A' }}
+                        </div>
+                    </div>
+
+                    <div class="team-card-footer">
+                        <a href="{{ path('app_team_show', {id: team.id}) }}" class="btn-view-team">
+                            Voir l'équipe
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.teams-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+    gap: 2rem;
+}
+
+.header-content {
+    flex: 1;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.header-icon {
+    width: 40px;
+    height: 40px;
+    color: var(--color-primary);
+}
+
+.header-title h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.header-subtitle {
+    color: var(--color-text-medium);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.btn-primary-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-green);
+    white-space: nowrap;
+}
+
+.btn-primary-action:hover {
+    background: #047857;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+.btn-primary-action svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.empty-state-icon {
+    display: inline-flex;
+    padding: 1.5rem;
+    background: var(--background-gradient);
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-icon svg {
+    width: 48px;
+    height: 48px;
+    color: var(--color-primary);
+}
+
+.empty-state h2 {
+    font-size: 1.5rem;
+    color: var(--color-text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--color-text-medium);
+    margin-bottom: 2rem;
+}
+
+/* Teams Grid */
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.team-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.team-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.team-card-header {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--background-gradient);
+}
+
+.team-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius-sm);
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.team-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.team-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin: 0 0 0.5rem 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--color-text-medium);
+    font-size: 0.875rem;
+}
+
+.meta-item svg {
+    width: 16px;
+    height: 16px;
+}
+
+.team-card-body {
+    padding: 1.25rem 1.5rem;
+}
+
+.owner-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: var(--color-bg-light);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-medium);
+    font-size: 0.875rem;
+}
+
+.owner-badge svg {
+    width: 18px;
+    height: 18px;
+    color: var(--color-primary);
+}
+
+.team-card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.btn-view-team {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-view-team:hover {
+    gap: 0.75rem;
+    color: #047857;
+}
+
+.btn-view-team svg {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+    }
+    
+    .btn-primary-action {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .teams-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

@@ -36,7 +36,10 @@ final class CredentialPageController extends AbstractController
     public function new(Request $request): Response
     {
         $credential = new Credential();
-        $form = $this->createForm(CredentialType::class, $credential);
+        $form = $this->createForm(CredentialType::class, $credential, [
+    'user' => $this->getUser(),
+]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -71,7 +74,10 @@ final class CredentialPageController extends AbstractController
         $decryptedPassword = $this->credentialManager->decryptPassword($credential);
         $credential->setPassword($decryptedPassword);
 
-        $form = $this->createForm(CredentialType::class, $credential);
+        $form = $this->createForm(CredentialType::class, $credential, [
+    'user' => $this->getUser(),
+]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

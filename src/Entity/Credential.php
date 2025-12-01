@@ -4,6 +4,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Team;
 use App\Repository\CredentialRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -43,9 +46,16 @@ class Credential
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+/**
+ * @var Collection<int, Team>
+ */
+#[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'credentials')]
+private Collection $teams;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->teams = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -141,4 +151,32 @@ class Credential
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
+
+/**
+ * @return Collection<int, Team>
+ */
+public function getTeams(): Collection
+{
+    return $this->teams;
+}
+
+public function addTeam(Team $team): static
+{
+    if (!$this->teams->contains($team)) {
+        $this->teams->add($team);
+        $team->addCredential($this); // synchro inverse
+    }
+
+    return $this;
+}
+
+public function removeTeam(Team $team): static
+{
+    if ($this->teams->removeElement($team)) {
+        $team->removeCredential($this); // synchro inverse
+    }
+
+    return $this;
+}
+
 }

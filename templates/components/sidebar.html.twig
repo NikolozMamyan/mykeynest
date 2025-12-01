@@ -393,7 +393,11 @@
         <i class="fas fa-house"></i>
         <span>Tableau de bord</span>
       </a>
-
+      <a href="{{ path('app_team_index') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_team_index' ? 'active' : '' }}">
+        <i class="fas fa-users"></i>
+        <span>Équipes</span>
+      </a>
       <a href="{{ path('app_credential') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_credential' ? 'active' : '' }}">
         <i class="fas fa-key"></i>
@@ -423,11 +427,6 @@
          class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
         <i class="fas fa-wand-magic-sparkles"></i>
         <span>Générateur</span>
-      </a>
-      <a href=""
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_folders' ? 'active' : '' }}">
-        <i class="fas fa-users"></i>
-        <span>Equipe</span>
       </a>
       <a href=""
          class="nav-item {{ app.request.attributes.get('_route') == 'app_notes' ? 'active' : '' }}">
