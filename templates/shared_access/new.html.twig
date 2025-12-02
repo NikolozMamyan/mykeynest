@@ -827,119 +827,189 @@
     gap: 1rem;
 }
 
-{# ... tout ton code précédent, inchangé ... #}
-
 .btn-secondary {
     padding: 0.75rem 1.5rem;
     background: white;
     color: var(--color-text-dark);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
+border: 1.5px solid var(--color-border);
+border-radius: var(--border-radius-sm);
+font-weight: 600;
+font-size: 0.9375rem;
+text-decoration: none;
+cursor: pointer;
+transition: all 0.2s ease;
+display: inline-flex;
+align-items: center;
 }
-
 .btn-secondary:hover {
-    background: var(--color-border);
+background: var(--color-bg-light);
+border-color: var(--color-text-medium);
 }
-
 .btn-submit {
-    padding: 0.75rem 1.5rem;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    opacity: 0.5;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 0.5rem;
+padding: 0.75rem 1.75rem;
+background: var(--color-primary);
+color: white;
+border: none;
+border-radius: var(--border-radius-sm);
+font-weight: 600;
+font-size: 0.9375rem;
+cursor: pointer;
+transition: all 0.3s ease;
 }
-
-.btn-submit:enabled {
-    opacity: 1;
+.btn-submit:not(:disabled):hover {
+background: #047857;
+transform: translateY(-2px);
+box-shadow: var(--shadow-green);
 }
-
-.btn-submit:hover:enabled {
-    background: #047857;
-    transform: translateY(-2px);
+.btn-submit:disabled {
+background: var(--color-text-light);
+cursor: not-allowed;
+opacity: 0.6;
 }
-
-/* Responsive */
+.btn-submit svg {
+width: 18px;
+height: 18px;
+}
 @media (max-width: 768px) {
-    .credentials-grid {
-        grid-template-columns: 1fr;
-    }
+.share-container {
+padding: 1rem;
+}
+.share-header {
+    padding: 1.5rem;
+}
 
-    .form-actions-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
+.share-title-wrapper {
+    flex-direction: column;
+    text-align: center;
+}
+
+.share-header h1 {
+    font-size: 1.5rem;
+}
+
+.section-header {
+    padding: 1.25rem 1.5rem;
+}
+
+.form-content {
+    padding: 1.5rem;
+}
+
+.credentials-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.search-wrapper {
+    min-width: 100%;
+}
+
+.toolbar-actions {
+    justify-content: space-between;
+}
+
+.credentials-grid {
+    grid-template-columns: 1fr;
+}
+
+.form-actions-container {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.form-actions {
+    flex-direction: column;
+}
+
+.btn-secondary,
+.btn-submit {
+    width: 100%;
+    justify-content: center;
+}
 }
 </style>
-
 <script>
-/* -----------------------------
-    Script de gestion dynamique
------------------------------- */
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.credential-checkbox');
+    const selectAllBtn = document.getElementById('select-all');
+    const shareButton = document.getElementById('share-button');
+    const selectedCount = document.getElementById('selected-count');
+    const summaryCount = document.getElementById('summary-count');
+    const searchInput = document.getElementById('credentialSearch');
+    const credentialCards = document.querySelectorAll('.credential-card');
+    const noResults = document.getElementById('no-results');
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const searchInput = document.getElementById("credentialSearch");
-    const cards = document.querySelectorAll(".credential-card");
-    const noResults = document.getElementById("no-results");
-
-    const selectAllBtn = document.getElementById("select-all");
-    const checkboxes = document.querySelectorAll(".credential-checkbox");
-
-    const selectedCount = document.getElementById("selected-count");
-    const summaryCount = document.getElementById("summary-count");
-    const shareButton = document.getElementById("share-button");
-
-    /* --- Mise à jour du compteur --- */
     function updateCount() {
-        const count = document.querySelectorAll(".credential-checkbox:checked").length;
-        selectedCount.textContent = count;
-        summaryCount.textContent = count + (count > 1 ? " identifiants sélectionnés" : " identifiant sélectionné");
-
-        shareButton.disabled = count === 0;
+        const checkedCount = document.querySelectorAll('.credential-checkbox:checked').length;
+        selectedCount.textContent = checkedCount;
+        
+        if (checkedCount === 0) {
+            summaryCount.textContent = '0 identifiant sélectionné';
+        } else if (checkedCount === 1) {
+            summaryCount.textContent = '1 identifiant sélectionné';
+        } else {
+            summaryCount.textContent = checkedCount + ' identifiants sélectionnés';
+        }
+        
+        shareButton.disabled = checkedCount === 0;
     }
 
-    /* --- Recherche --- */
-    searchInput.addEventListener("input", function () {
-        const value = this.value.trim().toLowerCase();
-        let visibleCount = 0;
-
-        cards.forEach(card => {
-            const name = card.dataset.name;
-            const domain = card.dataset.domain;
-            const username = card.dataset.username;
-
-            if (name.includes(value) || domain.includes(value) || username.includes(value)) {
-                card.style.display = "";
-                visibleCount++;
-            } else {
-                card.style.display = "none";
-            }
-        });
-
-        noResults.style.display = visibleCount === 0 ? "block" : "none";
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateCount);
     });
 
-    /* --- Tout sélectionner / désélectionner --- */
-    selectAllBtn.addEventListener("click", () => {
-        const allSelected = [...checkboxes].every(c => c.checked);
-
-        checkboxes.forEach(c => c.checked = !allSelected);
+    selectAllBtn.addEventListener('click', function() {
+        const visibleCheckboxes = Array.from(checkboxes).filter(cb => {
+            return cb.closest('.credential-card').style.display !== 'none';
+        });
+        
+        const allChecked = visibleCheckboxes.every(cb => cb.checked);
+        
+        visibleCheckboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+        });
+        
+        selectAllBtn.textContent = allChecked ? 'Tout sélectionner' : 'Tout désélectionner';
         updateCount();
     });
 
-    /* --- Mise à jour sur clic individuel --- */
-    checkboxes.forEach(cb => cb.addEventListener("change", updateCount));
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        let visibleCount = 0;
 
+        credentialCards.forEach(card => {
+            const name = card.dataset.name || '';
+            const domain = card.dataset.domain || '';
+            const username = card.dataset.username || '';
+            
+            const matches = name.includes(searchTerm) || 
+                          domain.includes(searchTerm) || 
+                          username.includes(searchTerm);
+
+            if (matches || searchTerm === '') {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        
+        // Update select all button behavior
+        const visibleCheckboxes = Array.from(checkboxes).filter(cb => {
+            return cb.closest('.credential-card').style.display !== 'none';
+        });
+        const allChecked = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
+        selectAllBtn.textContent = allChecked ? 'Tout désélectionner' : 'Tout sélectionner';
+    });
+
+    updateCount();
 });
 </script>
 {% endblock %}
