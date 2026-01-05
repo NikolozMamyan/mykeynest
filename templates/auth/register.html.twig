@@ -138,8 +138,10 @@ body {
   position: relative;
 }
 
-.theme-toggle {
+.widgets-toggles {
   position: absolute;
+  display:flex;
+  gap: 10px;
   top: 2rem;
   right: 2rem;
 }
@@ -333,7 +335,7 @@ body {
 
 <div class="auth-container">
   <div class="register-wrapper" data-controller="auth">
-    
+
     <!-- Colonne gauche - Hero -->
     <div class="register-hero">
       <div class="hero-content">
@@ -342,77 +344,78 @@ body {
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
-        
-        <h1>Rejoignez-nous</h1>
-        <p>Créez votre compte et commencez à sécuriser tous vos mots de passe en quelques minutes.</p>
-        
+
+        <h1>{{ 'auth.register.hero.title'|trans }}</h1>
+        <p>{{ 'auth.register.hero.subtitle'|trans }}</p>
+
         <div class="hero-features">
           <div class="feature-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Gratuit pour commencer
+            {{ 'auth.register.hero.features.f1'|trans }}
           </div>
-          
+
           <div class="feature-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Configuration en 2 minutes
+            {{ 'auth.register.hero.features.f2'|trans }}
           </div>
-          
+
           <div class="feature-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 0 002.25 2.25z" />
             </svg>
-            Sécurité maximale garantie
+            {{ 'auth.register.hero.features.f3'|trans }}
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Colonne droite - Formulaire -->
     <div class="register-form-section">
-      <div class="theme-toggle">
+      <div class="widgets-toggles">
         {% include 'components/parts/theme_mode_btn.html.twig' %}
+        {% include "components/parts/lang_switcher.html.twig" %}
       </div>
-      
+
       <div class="form-header">
-        <h2>Créer un compte</h2>
-        <p>Remplissez les informations ci-dessous pour commencer</p>
+        <h2>{{ 'auth.register.form.title'|trans }}</h2>
+        <p>{{ 'auth.register.form.subtitle'|trans }}</p>
       </div>
-      
+
       <form class="register-form" data-action="submit->auth#register">
         <div class="form-group">
-          <label for="company">Nom de la société</label>
-          <input 
-            type="text" 
+          <label for="company">{{ 'auth.register.form.company_label'|trans }}</label>
+          <input
+            type="text"
             id="company"
-            data-auth-target="company" 
-            placeholder="Acme Corporation"
+            data-auth-target="company"
+            placeholder="{{ 'auth.register.form.company_placeholder'|trans }}"
             required
             autocomplete="organization"
           >
         </div>
 
         <div class="form-group">
-          <label for="email">Adresse email</label>
-          <input 
-            type="email" 
+          <label for="email">{{ 'auth.register.form.email_label'|trans }}</label>
+          <input
+            type="email"
             id="email"
-            data-auth-target="email" 
-            placeholder="vous@exemple.com"
+            data-auth-target="email"
+            placeholder="{{ 'auth.register.form.email_placeholder'|trans }}"
             required
             autocomplete="email"
           >
         </div>
 
         <div class="form-group">
-          <label for="password">Mot de passe</label>
-          <input 
-            type="password" 
+          <label for="password">{{ 'auth.register.form.password_label'|trans }}</label>
+          <input
+            type="password"
             id="password"
-            data-auth-target="password" 
+            data-auth-target="password"
             placeholder="••••••••"
             required
             autocomplete="new-password"
@@ -420,18 +423,20 @@ body {
         </div>
 
         <button type="submit" class="btn-submit">
-          Créer mon compte
+          {{ 'auth.register.form.submit'|trans }}
         </button>
 
         <p class="auth-hint">
-          Déjà un compte ? <a href="/login">Se connecter</a>
+          {{ 'auth.register.form.hint'|trans }}
+          <a href="/login">{{ 'auth.register.form.hint_link'|trans }}</a>
         </p>
       </form>
 
       <div data-auth-target="result"></div>
     </div>
-    
+
   </div>
 </div>
+
 
 {% endblock %}

@@ -137,8 +137,10 @@ body {
   position: relative;
 }
 
-.theme-toggle {
+.widgets-toggles {
   position: absolute;
+  display:flex;
+  gap: 10px;
   top: 2rem;
   right: 2rem;
 }
@@ -331,7 +333,7 @@ body {
 
 <div class="auth-container">
   <div class="login-wrapper" data-controller="auth">
-    
+
     <!-- Colonne gauche - Hero -->
     <div class="login-hero">
       <div class="hero-content">
@@ -340,65 +342,66 @@ body {
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
-        
-        <h1>Gestionnaire de Mots de Passe</h1>
-        <p>Sécurisez tous vos mots de passe en un seul endroit. Simple, sûr et accessible partout.</p>
-        
+
+        <h1>{{ 'auth.login.hero.title'|trans }}</h1>
+        <p>{{ 'auth.login.hero.subtitle'|trans }}</p>
+
         <div class="hero-features">
           <div class="feature-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
             </svg>
-            Chiffrement de bout en bout
+            {{ 'auth.login.hero.features.f1'|trans }}
           </div>
-          
+
           <div class="feature-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
             </svg>
-            Synchronisation instantanée
+            {{ 'auth.login.hero.features.f2'|trans }}
           </div>
-          
+
           <div class="feature-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
             </svg>
-            Accessible sur tous vos appareils
+            {{ 'auth.login.hero.features.f3'|trans }}
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Colonne droite - Formulaire -->
     <div class="login-form-section">
-      <div class="theme-toggle">
+      <div class="widgets-toggles">
         {% include 'components/parts/theme_mode_btn.html.twig' %}
+        {% include "components/parts/lang_switcher.html.twig" %}
       </div>
-      
+
       <div class="form-header">
-        <h2>Bon retour !</h2>
-        <p>Connectez-vous à votre compte sécurisé</p>
+        <h2>{{ 'auth.login.form.title'|trans }}</h2>
+        <p>{{ 'auth.login.form.subtitle'|trans }}</p>
       </div>
-      
+
       <form class="login-form" data-action="submit->auth#login">
         <div class="form-group">
-          <label for="email">Adresse email</label>
-          <input 
-            type="email" 
+          <label for="email">{{ 'auth.login.form.email_label'|trans }}</label>
+          <input
+            type="email"
             id="email"
-            data-auth-target="email" 
-            placeholder="vous@exemple.com"
+            data-auth-target="email"
+            placeholder="{{ 'auth.login.form.email_placeholder'|trans }}"
             required
             autocomplete="email"
           >
         </div>
 
         <div class="form-group">
-          <label for="password">Mot de passe</label>
-          <input 
-            type="password" 
+          <label for="password">{{ 'auth.login.form.password_label'|trans }}</label>
+          <input
+            type="password"
             id="password"
-            data-auth-target="password" 
+            data-auth-target="password"
             placeholder="••••••••"
             required
             autocomplete="current-password"
@@ -406,17 +409,18 @@ body {
         </div>
 
         <button type="submit" class="btn-submit">
-          Se connecter
+          {{ 'auth.login.form.submit'|trans }}
         </button>
 
         <p class="auth-hint">
-          Pas encore de compte ? <a href="/register">S'inscrire</a>
+          {{ 'auth.login.form.hint'|trans }}
+          <a href="/register">{{ 'auth.login.form.hint_link'|trans }}</a>
         </p>
       </form>
 
       <div data-auth-target="result"></div>
     </div>
-    
+
   </div>
 </div>
 

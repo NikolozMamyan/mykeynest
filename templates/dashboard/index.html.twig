@@ -1,5 +1,593 @@
 {% extends 'base.html.twig' %}
 {% block title %}Gestionnaire de mots de passe{% endblock %}
 {% block body %}
-app_dashboard
+<style>
+/* ===== Dashboard Layout ===== */
+.stats-grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:16px;
+  margin: 10px 0 18px;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+
+@media (max-width: 1000px){
+  .stats-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .dashboard-grid{ grid-template-columns: 1fr; }
+}
+
+/* ===== Cards ===== */
+.dashboard-card,
+.stat-card{
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.card-header h2{
+  font-size: 16px;
+  color: var(--color-text-dark);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.card-content{ padding:16px; }
+
+/* ===== Stat Card ===== */
+.stat-card{
+  display:flex;
+  gap:14px;
+  padding:16px;
+  align-items:flex-start;
+}
+
+.stat-icon{
+  width:44px;
+  height:44px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: #fff;
+  box-shadow: var(--shadow-green);
+}
+
+.stat-content .stat-label{
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.stat-content .stat-value{
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-text-dark);
+  line-height:1;
+}
+
+.stat-change{
+  margin-top: 10px;
+  font-size: 12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color: var(--color-text-muted);
+}
+
+.stat-change.positive{ color: var(--color-success); }
+.stat-change.neutral{ color: var(--color-text-muted); }
+.stat-change.error{ color: var(--color-danger-end); }
+
+/* ===== Buttons ===== */
+.btn-link{
+  background: transparent;
+  border: 0;
+  cursor:pointer;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.btn-link:hover{ text-decoration: underline; }
+
+.btn-primary-small{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  border:0;
+  cursor:pointer;
+  padding:8px 10px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-green);
+}
+
+.btn-primary-small:hover{
+  filter: brightness(1.03);
+}
+
+/* ===== Activity ===== */
+.activity-list{ display:flex; flex-direction:column; gap:12px; }
+
+.activity-item{
+  display:flex;
+  gap:12px;
+  padding:12px;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+}
+
+.activity-icon{
+  width:38px;
+  height:38px;
+  border-radius: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: var(--color-bg-hover);
+  color: var(--color-primary);
+}
+
+.activity-icon--credential_created{ background: rgba(16,185,129,.15); color: var(--color-primary); }
+.activity-icon--share_created{ background: rgba(245,158,11,.18); color: var(--color-warning); }
+.activity-icon--draft_created{ background: rgba(59,130,246,.14); color: #3b82f6; }
+
+.activity-title{
+  font-weight: 800;
+  color: var(--color-text-dark);
+  font-size: 14px;
+}
+
+.activity-desc{
+  color: var(--color-text-medium);
+  margin-top:2px;
+  font-size: 13px;
+}
+
+.activity-time{
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* ===== Teams ===== */
+.teams-list{ display:flex; flex-direction:column; gap:12px; }
+
+.team-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+}
+
+.team-avatar{
+  width:40px;
+  height:40px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  color:#fff;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-success) 100%);
+  box-shadow: var(--shadow-green);
+}
+
+.team-name{
+  font-weight: 900;
+  color: var(--color-text-dark);
+}
+
+.team-meta{
+  display:flex;
+  gap:12px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin-top:4px;
+}
+
+.team-meta i{ margin-right:6px; }
+
+.badge{
+  margin-left:auto;
+  font-size: 12px;
+  font-weight: 800;
+  padding:6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text-medium);
+}
+
+.badge-owner{
+  border-color: rgba(16,185,129,.35);
+  background: rgba(16,185,129,.12);
+  color: var(--color-primary);
+}
+
+.badge-admin{
+  border-color: rgba(245,158,11,.35);
+  background: rgba(245,158,11,.14);
+  color: var(--color-warning);
+}
+
+.badge-member{
+  border-color: rgba(100,116,139,.35);
+  background: rgba(100,116,139,.12);
+  color: var(--color-text-medium);
+}
+
+/* ===== Quick actions ===== */
+.quick-actions{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:12px;
+}
+
+.action-btn{
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-light);
+  border-radius: var(--border-radius-sm);
+  padding:14px 12px;
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  color: var(--color-text-dark);
+  font-weight: 800;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+
+.action-btn i{
+  color: var(--color-primary);
+  font-size: 18px;
+}
+
+.action-btn:hover{
+  background: var(--color-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== Drafts ===== */
+.drafts-list{ display:flex; flex-direction:column; gap:12px; }
+
+.draft-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+}
+
+.draft-icon{
+  width:38px;
+  height:38px;
+  border-radius: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+}
+
+.draft-name{
+  font-weight: 900;
+  color: var(--color-text-dark);
+}
+
+.draft-time{
+  margin-top:4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.btn-icon{
+  margin-left:auto;
+  width:36px;
+  height:36px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: var(--color-text-medium);
+}
+
+.btn-icon:hover{
+  background: var(--color-bg-hover);
+  color: var(--color-primary);
+}
+
+/* ===== Empty state ===== */
+.empty-state{
+  padding:14px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-light);
+}
+
+.empty-title{
+  font-weight: 900;
+  color: var(--color-text-dark);
+}
+
+.empty-desc{
+  margin-top:6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+</style>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Identifiants</div>
+                        <div class="stat-value">{{ stats.credentials }}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +12 ce mois
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Équipes</div>
+                        <div class="stat-value">{{ stats.teams }}</div>
+                        <div class="stat-change neutral">
+                            <i class="fas fa-minus"></i> Stable
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Partages actifs</div>
+                        <div class="stat-value">{{ stats.shares }}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +5 cette semaine
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Brouillons</div>
+                        <div class="stat-value">{{ stats.drafts }}</div>
+                        <div class="stat-change neutral">
+                            <i class="fas fa-clock"></i> En attente
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="dashboard-grid">
+                <!-- Recent Activity -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-clock"></i>
+                            Activité récente
+                        </h2>
+                        <button class="btn-link">Voir tout</button>
+                    </div>
+                    <div class="card-content">
+<div class="activity-list">
+  {% if activity is empty %}
+    <div class="empty-state">
+      <div class="empty-title">Aucune activité</div>
+      <div class="empty-desc">Les dernières actions apparaîtront ici.</div>
+    </div>
+  {% else %}
+    {% for a in activity %}
+      <div class="activity-item">
+        <div class="activity-icon activity-icon--{{ a.type }}">
+          <i class="fas
+            {% if a.type == 'credential_created' %} fa-plus
+            {% elseif a.type == 'share_created' %} fa-share
+            {% else %} fa-file
+            {% endif %}
+          "></i>
+        </div>
+
+        <div class="activity-details">
+          <div class="activity-title">{{ a.title }}</div>
+          <div class="activity-desc">{{ a.desc }}</div>
+          <div class="activity-time">{{ a.at|date('d/m/Y H:i') }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+                    </div>
+                </div>
+
+                <!-- Teams Overview -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-users"></i>
+                            Mes équipes
+                        </h2>
+                        <button class="btn-primary-small">
+                            <i class="fas fa-plus"></i>
+                            Créer
+                        </button>
+                    </div>
+                    <div class="card-content">
+<div class="teams-list">
+  {% if teams is empty %}
+    <div class="empty-state">
+      <div class="empty-title">Aucune équipe</div>
+      <div class="empty-desc">Crée ta première équipe pour partager en toute sécurité.</div>
+    </div>
+  {% else %}
+    {% for t in teams %}
+      <div class="team-item">
+        <div class="team-avatar">{{ t.avatar }}</div>
+        <div class="team-info">
+          <div class="team-name">{{ t.name }}</div>
+          <div class="team-meta">
+            <span><i class="fas fa-users"></i> {{ t.membersCount }} membres</span>
+            <span><i class="fas fa-key"></i> {{ t.credentialsCount }} identifiants</span>
+          </div>
+        </div>
+        <span class="badge badge-{{ t.roleClass }}">{{ t.roleLabel }}</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions & Drafts -->
+            <div class="dashboard-grid">
+                <!-- Quick Actions -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-bolt"></i>
+                            Actions rapides
+                        </h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="quick-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Nouvel identifiant</span>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Inviter un membre</span>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-share-alt"></i>
+                                <span>Partager un accès</span>
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-users-cog"></i>
+                                <span>Créer une équipe</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drafts -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2>
+                            <i class="fas fa-file-alt"></i>
+                            Brouillons en attente
+                        </h2>
+                        <button class="btn-link">Voir tout</button>
+                    </div>
+                    <div class="card-content">
+<div class="drafts-list">
+  {% if drafts is empty %}
+    <div class="empty-state">
+      <div class="empty-title">Aucun brouillon</div>
+      <div class="empty-desc">Tes identifiants en attente apparaîtront ici.</div>
+    </div>
+  {% else %}
+    {% for d in drafts %}
+      <div class="draft-item">
+        <div class="draft-icon"><i class="fas fa-file"></i></div>
+        <div class="draft-info">
+          <div class="draft-name">{{ d.name ?: 'Sans nom' }}</div>
+          <div class="draft-time">Créé le {{ d.createdAt|date('d/m/Y H:i') }}</div>
+        </div>
+        <button class="btn-icon" title="Compléter">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Score -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>
+                        <i class="fas fa-shield-alt"></i>
+                        Score de sécurité
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="security-score">
+                        <div class="score-circle">
+                            <svg viewBox="0 0 200 200">
+                                <circle cx="100" cy="100" r="90" fill="none" stroke="#e2e8f0" stroke-width="20"/>
+                                <circle cx="100" cy="100" r="90" fill="none" stroke="#059669" stroke-width="20" 
+                                        stroke-dasharray="565" stroke-dashoffset="113" 
+                                        transform="rotate(-90 100 100)" stroke-linecap="round"/>
+                            </svg>
+                            <div class="score-value">80%</div>
+                        </div>
+                        <div class="score-details">
+                            <div class="score-item">
+                                <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                                <span>102 mots de passe forts</span>
+                            </div>
+                            <div class="score-item warning">
+                                <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                                <span>18 mots de passe faibles à améliorer</span>
+                            </div>
+                            <div class="score-item error">
+                                <i class="fas fa-times-circle" style="color: #ef4444;"></i>
+                                <span>8 mots de passe réutilisés</span>
+                            </div>
+                            <button class="btn-primary" style="margin-top: 20px;">
+                                Améliorer ma sécurité
+                            </button>
+                        </div>
+                    </div>
+                </div>
 {% endblock %}

@@ -53,6 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $apiExtensionToken = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isSubscribed = false;
+
 
 public function __construct()
 {
@@ -199,6 +202,16 @@ public function getApiExtensionToken(): ?string
 public function regenerateApiExtensionToken(): static
 {
     $this->apiExtensionToken = bin2hex(random_bytes(32)); // 64 caractères hexadécimaux
+    return $this;
+}
+public function isSubscribed(): bool
+{
+    return $this->isSubscribed;
+}
+
+public function setIsSubscribed(bool $isSubscribed): static
+{
+    $this->isSubscribed = $isSubscribed;
     return $this;
 }
 }

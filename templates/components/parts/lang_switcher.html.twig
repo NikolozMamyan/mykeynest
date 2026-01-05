@@ -1,0 +1,130 @@
+{% set currentLocale = app.request.locale|default('fr') %}
+
+<style>
+/* ===== Language Switcher (palette MykeyNest) ===== */
+.lang-switch{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:10px;
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+
+  /* optionnel: effet glass léger, OK en light/dark */
+  backdrop-filter: var(--blur-background);
+  -webkit-backdrop-filter: var(--blur-background);
+}
+
+.lang-switch__btn{
+  appearance:none;
+  border: 1px solid transparent;
+  cursor:pointer;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  width: 42px;
+  height: 36px;
+  border-radius:10px;
+
+  background: transparent;
+  color: var(--color-text-dark);
+
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.lang-switch__btn:hover{
+  background: var(--color-bg-hover);
+  transform: translateY(-1px);
+}
+
+.lang-switch__btn:active{
+  transform: translateY(0);
+}
+
+.lang-switch__btn:focus-visible{
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-hover);
+}
+
+/* Active state : brand green */
+.lang-switch__btn.is-active{
+  background: var(--color-primary);
+  border-color: rgba(0,0,0,.05);
+  box-shadow: var(--shadow-green);
+}
+
+.lang-switch__btn.is-active .lang-switch__flag{
+  box-shadow: 0 0 0 2px rgba(255,255,255,.45);
+}
+
+/* Flag */
+.lang-switch__flag{
+  width:22px;
+  height:16px;
+  object-fit:cover;
+  border-radius:3px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+}
+
+/* Si tu ajoutes un label plus tard */
+.lang-switch__label{
+  font-size:.85rem;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+</style>
+
+<div class="lang-switch" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
+  <button
+    type="button"
+    class="lang-switch__btn {{ currentLocale == 'fr' ? 'is-active' : '' }}"
+    data-lang="fr"
+    aria-pressed="{{ currentLocale == 'fr' ? 'true' : 'false' }}"
+    title="Français"
+  >
+    <img
+      src="{{ asset('images/flags/fr.svg') }}"
+      alt="Français"
+      class="lang-switch__flag"
+      loading="lazy"
+      width="22"
+      height="16"
+    >
+  </button>
+
+  <button
+    type="button"
+    class="lang-switch__btn {{ currentLocale == 'en' ? 'is-active' : '' }}"
+    data-lang="en"
+    aria-pressed="{{ currentLocale == 'en' ? 'true' : 'false' }}"
+    title="English"
+  >
+    <img
+      src="{{ asset('images/flags/gb.svg') }}"
+      alt="English"
+      class="lang-switch__flag"
+      loading="lazy"
+      width="22"
+      height="16"
+    >
+  </button>
+</div>
+
+<script>
+  (function () {
+    const root = document.currentScript?.previousElementSibling;
+    if (!root) return;
+
+    root.querySelectorAll('[data-lang]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', btn.dataset.lang);
+        window.location.href = url.toString();
+      });
+    });
+  })();
+</script>
