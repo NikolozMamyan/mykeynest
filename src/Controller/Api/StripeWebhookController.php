@@ -60,32 +60,49 @@ final class StripeWebhookController
 
             // 2) Paiement de la facture OK => abonnement actif => TRUE
             case 'invoice.payment_succeeded': {
-                /** @var \Stripe\Invoice $invoice */
-                $invoice = $event->data->object;
+    /** @var \Stripe\Invoice $invoice */
+    $invoice = $event->data->object;
 
-                $subId = is_string($invoice->subscription) ? $invoice->subscription : ($invoice->subscription->id ?? null);
-                $customerId = is_string($invoice->customer) ? $invoice->customer : ($invoice->customer->id ?? null);
+    $subId = is_string($invoice->subscription) ? $invoice->subscription : ($invoice->subscription->id ?? null);
+    $customerId = is_string($invoice->customer) ? $invoice->customer : ($invoice->customer->id ?? null);
 
-                if (!$subId && !$customerId) break;
+    /** @var User|null $user */
+    $user = null;
 
-                /** @var User|null $user */
-                $user = null;
+    // 1) by subscription id
+    if ($subId) {
+        $user = $users->findOneBy(['stripeSubscriptionId' => $subId]);
+    }
 
-                if ($subId) {
-                    $user = $users->findOneBy(['stripeSubscriptionId' => $subId]);
-                }
-                if (!$user && $customerId) {
-                    $user = $users->findOneBy(['stripeCustomerId' => $customerId]);
-                }
-                if (!$user) break;
+    // 2) by customer id
+    if (!$user && $customerId) {
+        $user = $users->findOneBy(['stripeCustomerId' => $customerId]);
+    }
 
-                $user->setIsSubscribed(true);
-                if ($customerId) $user->setStripeCustomerId($customerId);
-                if ($subId) $user->setStripeSubscriptionId($subId);
+    // 3) fallback by email (utile si checkout.session.completed n'a pas encore relié les IDs)
+    if (!$user) {
+        // Stripe met parfois customer_email, sinon essaye email dans customer_details
+        $email = $invoice->customer_email
+            ?? ($invoice->customer_details->email ?? null);
 
-                $em->flush();
-                break;
-            }
+        if (is_string($email) && $email !== '') {
+            $user = $users->findOneBy(['email' => $email]);
+        }
+    }
+
+    if (!$user) {
+        break;
+    }
+
+    // rattachement Stripe -> user + activation
+    if ($customerId) $user->setStripeCustomerId($customerId);
+    if ($subId) $user->setStripeSubscriptionId($subId);
+
+    $user->setIsSubscribed(true);
+
+    $em->flush();
+    break;
+}
 
             // 3) Abonnement supprimé => FALSE
             case 'customer.subscription.deleted': {
