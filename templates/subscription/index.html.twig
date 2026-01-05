@@ -148,58 +148,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== TOGGLE SWITCH PRICING ===== */
-        .pricing-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 60px;
-            animation: slideInLeft 1.4s ease;
-        }
-
-        .toggle-label {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--color-text-medium);
-            transition: all 0.3s ease;
-        }
-
-        .toggle-label.active {
-            color: var(--color-primary);
-            font-weight: 700;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 80px;
-            height: 40px;
-            background: var(--color-border);
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-
-        .toggle-switch.active {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-        }
-
-        .toggle-slider {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 32px;
-            height: 32px;
-            background: var(--color-white);
-            border-radius: 50%;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .toggle-switch.active .toggle-slider {
-            transform: translateX(40px);
-        }
-
         .savings-badge {
             position: absolute;
             top: -40px;
@@ -586,24 +534,6 @@
             color: var(--color-text-dark);
         }
 
-        .tool-badge {
-            padding: 6px 16px;
-            background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-            color: var(--color-white);
-            font-size: 0.7rem;
-            border-radius: 20px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .tool-badge.free {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-        }
-
-        .tool-badge.pro {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        }
 
         .tool-description {
             color: var(--color-text-medium);
@@ -986,15 +916,7 @@
         </div>
     </section>
 
-    <!-- ===== TOGGLE (Mensuel / Annuel) ===== -->
-    <div class="pricing-toggle">
-        <span class="toggle-label active">Mensuel</span>
-        <div class="toggle-switch" id="toggleSwitch">
-            <div class="toggle-slider"></div>
-            <span class="savings-badge">Économisez 20%</span>
-        </div>
-        <span class="toggle-label">Annuel</span>
-    </div>
+
 
     <!-- ===== CARTES PRICING ===== -->
     <section class="pricing-container">
@@ -1015,12 +937,11 @@
                 <div class="card-divider"></div>
                 <div class="card-body">
                     <ul class="features-list">
-                        <li><span class="feature-icon"><i class="fa-solid fa-check"></i></span> 3 identifiants maximum</li>
-                        <li><span class="feature-icon"><i class="fa-solid fa-check"></i></span> 3 partages entre membres</li>
+                        <li><span class="feature-icon"><i class="fa-solid fa-check"></i></span> 5 identifiants maximum</li>
+                        <li><span class="feature-icon"><i class="fa-solid fa-check"></i></span> 5 partages entre membres</li>
                         <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span> Générateur de mots de passe</li>
                         <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> Vérificateur de sécurité</li>
                     </ul>
-                    <button class="cta-button outline">Commencer</button>
                 </div>
             </div>
 
@@ -1034,7 +955,7 @@
                     </div>
                     <h3 class="plan-name">Pro</h3>
                     <div class="plan-price-wrapper">
-                        <span class="plan-price">20€</span><small>/mois</small>
+                        <span class="plan-price">2,99€</span><small>/mois</small>
                     </div>
                     <p class="plan-description">Pour les professionnels et équipes qui veulent une gestion avancée et un partage illimité.</p>
                 </div>
@@ -1046,34 +967,16 @@
                         <li><span class="feature-icon"><i class="fa-solid fa-users"></i></span> Gestion d’équipe</li>
                         <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> Générateur + vérificateur de sécurité</li>
                     </ul>
-                    <button class="cta-button">Passer en Pro</button>
+                    <a class="cta-button" href="{{ path('app_subscription_checkout_pro') }}">Passer en Pro</a>
+                    {# {% if app.user and app.user.isPro %}
+  <a class="cta-button outline" href="{{ path('app_subscription_portal') }}">Gérer mon abonnement</a>
+{% endif %} #}
+
+
                 </div>
             </div>
 
-            <!-- ENTREPRISE -->
-            <div class="pricing-card">
-                <div class="card-header">
-                    <div class="card-icon-wrapper">
-                        <div class="card-icon-bg"></div>
-                        <div class="card-icon"><i class="fa-solid fa-building"></i></div>
-                    </div>
-                    <h3 class="plan-name">Entreprise</h3>
-                    <div class="plan-price-wrapper">
-                        <span class="plan-price">40€</span><small>/mois</small>
-                    </div>
-                    <p class="plan-description">Pour les grandes structures avec un besoin d’administration, d’audit et de sécurité renforcée.</p>
-                </div>
-                <div class="card-divider"></div>
-                <div class="card-body">
-                    <ul class="features-list">
-                        <li><span class="feature-icon"><i class="fa-solid fa-infinity"></i></span> Identifiants illimités</li>
-                        <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span> Partages illimités</li>
-                        <li><span class="feature-icon"><i class="fa-solid fa-users-gear"></i></span> Gestion d’équipe complète</li>
-                        <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> Générateur + vérificateur inclus</li>
-                    </ul>
-                    <button class="cta-button outline">Contactez-nous</button>
-                </div>
-            </div>
+           
         </div>
     </section>
 
@@ -1111,7 +1014,6 @@
                         <div class="tool-icon"><i class="fa-solid fa-users-gear"></i></div>
                         <div class="tool-title">Gestion d’équipe</div>
                     </div>
-                    <span class="tool-badge pro">Pro / Entreprise</span>
                 </div>
                 <p class="tool-description">Attribuez des rôles, gérez les accès et suivez les activités de votre équipe.</p>
             </div>
@@ -1204,10 +1106,5 @@
             });
         });
 
-        const toggleSwitch = document.getElementById('toggleSwitch');
-        toggleSwitch.addEventListener('click', () => {
-            toggleSwitch.classList.toggle('active');
-            document.querySelectorAll('.toggle-label').forEach(l => l.classList.toggle('active'));
-        });
     </script>
 {% endblock %}

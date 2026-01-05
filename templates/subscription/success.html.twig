@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement réussi{% endblock %}
+
+{% block body %}
+<div class="subscription-result success">
+
+    <div class="icon">✅</div>
+
+    <h1>Paiement confirmé</h1>
+
+    <p>
+        Merci pour ton paiement 🎉  
+        Ton abonnement est en cours d’activation.
+    </p>
+
+    <p class="hint">
+        Cela peut prendre quelques secondes.  
+        Tu peux rafraîchir la page ou continuer à utiliser l’application.
+    </p>
+
+    <div class="actions">
+        <a href="{{ path('app_dashboard') }}" class="btn primary">
+            Retour au tableau de bord
+        </a>
+
+        <a href="{{ path('app/credential') }}" class="btn secondary">
+            Lets go
+        </a>
+    </div>
+
+</div>
+
+<style>
+.subscription-result {
+    max-width: 520px;
+    margin: 80px auto;
+    text-align: center;
+}
+.icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+.actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+.btn {
+    padding: 12px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.btn.primary {
+    background: #4f46e5;
+    color: white;
+}
+.btn.secondary {
+    border: 1px solid #ddd;
+    color: #333;
+}
+.hint {
+    font-size: 14px;
+    color: #666;
+}
+</style>
+{% endblock %}

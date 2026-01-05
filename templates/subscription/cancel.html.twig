@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement annulé{% endblock %}
+
+{% block body %}
+<div class="subscription-result cancel">
+
+    <div class="icon">❌</div>
+
+    <h1>Paiement annulé</h1>
+
+    <p>
+        Aucun paiement n’a été effectué.  
+        Tu peux réessayer quand tu veux.
+    </p>
+
+    <div class="actions">
+        <a href="{{ path('app_subscription_checkout_pro') }}" class="btn primary">
+            Réessayer
+        </a>
+
+        <a href="{{ path('app_subscription') }}" class="btn secondary">
+            Retour aux abonnements
+        </a>
+    </div>
+
+</div>
+
+<style>
+.subscription-result {
+    max-width: 520px;
+    margin: 80px auto;
+    text-align: center;
+}
+.icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+.actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+.btn {
+    padding: 12px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.btn.primary {
+    background: #ef4444;
+    color: white;
+}
+.btn.secondary {
+    border: 1px solid #ddd;
+    color: #333;
+}
+</style>
+{% endblock %}
