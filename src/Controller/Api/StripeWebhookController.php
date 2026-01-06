@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class StripeWebhookController
 {
-    #[Route('/api/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
+    #[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
     public function handle(
         Request $request,
         UserRepository $users,
