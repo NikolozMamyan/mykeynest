@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class StripeWebhookController
+final class StripeWebhookController extends AbstractController
 {
     #[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
     public function handle(
