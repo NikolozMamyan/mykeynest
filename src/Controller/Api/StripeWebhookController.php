@@ -2,14 +2,15 @@
 
 namespace App\Controller\Api;
 
+use Stripe\Stripe;
+use Stripe\Webhook;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Stripe\Stripe;
-use Stripe\Webhook;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class StripeWebhookController extends AbstractController
 {
