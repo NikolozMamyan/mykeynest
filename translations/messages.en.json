@@ -10,15 +10,15 @@
       "language": "Language"
     },
     "hero": {
-      "title_before": "Secure all your passwords in",
-      "title_highlight": "one place",
-      "subtitle": "MykeyNest protects your credentials with military-grade AES-256 encryption and a zero-knowledge architecture. Access all your accounts safely, on all your devices.",
-      "cta_start": "Start for free",
-      "cta_discover": "Explore features",
+      "title_before": "Manage your passwords securely,",
+      "title_highlight": "all in one place",
+      "subtitle": "A simple, secure, and modern password manager. AES-256 encryption, zero-knowledge architecture, and multi-device synchronization. Try it for free.",
+      "cta_start": "Get started for free",
+      "cta_discover": "Learn more",
       "trust": {
         "aes": "AES-256 encryption",
-        "users": "10,000+ users",
-        "rating": "Rated 4.9/5"
+        "zeroknowledge": "Zero-knowledge",
+        "opensource": "Open Source"
       },
       "mock": {
         "gmail": "Gmail",
@@ -26,101 +26,95 @@
         "github": "GitHub"
       }
     },
-    "stats": {
-      "active_users": "Active users",
-      "passwords_secured": "Passwords secured",
-      "uptime": "Uptime",
-      "support": "Support available"
-    },
     "features": {
       "label": "Features",
-      "title": "Everything you need to keep your passwords safe",
-      "subtitle": "Powerful features designed for your security and peace of mind.",
+      "title": "Security and simplicity first",
+      "subtitle": "All the essential features to protect your credentials every day.",
       "cards": {
         "e2e_title": "End-to-end encryption",
-        "e2e_text": "Your data is encrypted with AES-256 before it ever leaves your device. No one can access your passwords.",
-        "generator_title": "Smart generator",
-        "generator_text": "Create ultra-secure passwords in one click. Unique combinations that are impossible to guess.",
-        "sync_title": "Multi-device sync",
-        "sync_text": "Access your passwords on all your devices. Always up to date, everywhere.",
+        "e2e_text": "Your data is encrypted locally with AES-256 before being synchronized. Only you can access it.",
+        "generator_title": "Password generator",
+        "generator_text": "Create strong and unique passwords in one click for all your accounts.",
+        "sync_title": "Multi-device synchronization",
+        "sync_text": "Access your credentials from your computer, smartphone, or tablet.",
         "share_title": "Secure sharing",
-        "share_text": "Share credentials with your team securely, with access controls.",
+        "share_text": "Share your credentials securely with your family or team.",
         "audit_title": "Security audit",
-        "audit_text": "Detect weak or compromised passwords. Get alerts when a breach is detected.",
-        "autofill_title": "Autofill",
-        "autofill_text": "Log in instantly to your favorite sites with our browser extension."
+        "audit_text": "Identify weak, reused, or compromised passwords to better protect them.",
+        "autofill_title": "Auto-fill",
+        "autofill_text": "Log in automatically to your favorite sites using the browser extension."
       }
     },
     "how": {
       "label": "Simple and efficient",
-      "title": "How it works",
-      "subtitle": "Start securing your passwords in 3 simple steps.",
+      "title": "How does it work?",
+      "subtitle": "Secure your passwords in three simple steps.",
       "steps": {
         "s1_title": "Create your account",
-        "s1_text": "Sign up for free and create your master key. It's the only password you need to remember.",
+        "s1_text": "Sign up for free and create your master password. It's the only one you need to remember.",
         "s2_title": "Add your credentials",
-        "s2_text": "Import or manually add your existing passwords. Everything is encrypted automatically.",
-        "s3_title": "Access anywhere",
-        "s3_text": "Log in to all your accounts in one click, on all your devices, safely."
+        "s2_text": "Import or manually enter your passwords. Everything is encrypted automatically.",
+        "s3_title": "Access everywhere",
+        "s3_text": "Log in securely on all your devices thanks to synchronization."
       }
     },
     "pricing": {
       "label": "Pricing",
-      "title": "Simple, transparent plans",
-      "subtitle": "Start for free. Upgrade when you need more.",
+      "title": "A simple and transparent plan",
+      "subtitle": "Start for free, upgrade to premium when you need it.",
       "plan": {
         "free_badge": "Free",
-        "popular_badge": "Popular",
+        "popular_badge": "Recommended",
         "per_month": "/ month",
-        "basic_name": "Basic",
-        "basic_try": "Try",
-        "basic_aria": "Try the Basic plan for free",
+        "basic_name": "Free",
+        "basic_try": "Get started",
+        "basic_aria": "Start with the free plan",
         "pro_name": "Pro",
         "pro_choose": "Choose Pro",
         "pro_aria": "Choose the Pro plan",
         "pro_reco_aria": "Recommended offer",
         "features": {
           "basic_1": "5 passwords",
-          "basic_2": "5 shares between members",
+          "basic_2": "Up to 5 shares",
           "basic_3": "Secure generator",
-          "basic_4": "Autofill",
-          "pro_1": "Unlimited",
-          "pro_2": "Unlimited sharing between members",
-          "pro_3": "2FA + Secure sharing",
+          "basic_4": "Auto-fill",
+          "pro_1": "Unlimited passwords",
+          "pro_2": "Unlimited sharing",
+          "pro_3": "2FA authentication",
           "pro_4": "Security audit",
-          "pro_5": "Secure generator",
-          "pro_6": "Secure notes",
-          "pro_7": "Autofill"
+          "pro_5": "Secure notes",
+          "pro_6": "Priority support",
+          "pro_7": "All features"
         }
       }
     },
     "faq": {
-      "label": "FAQ",
+      "label": "Frequently asked questions",
       "title": "Your questions about MykeyNest",
-      "subtitle": "Everything you need to know about our password manager.",
+      "subtitle": "Everything you need to know before getting started.",
       "items": {
         "q1": "What is a password manager?",
-        "a1": "A password manager is a security tool that stores and encrypts all your credentials in a digital vault. MykeyNest uses AES-256 encryption to protect your data.",
-        "q2": "How does AES-256 encryption work?",
-        "a2": "AES-256 is a standard used by banks. Data is encrypted locally (zero-knowledge): we never have access to it.",
-        "q3": "Is MykeyNest free?",
-        "a3": "Yes—there’s a free version with the essentials. Premium plans are available for advanced users and teams.",
-        "q4": "Are my passwords synced across all my devices?",
-        "a4": "Yes—automatic sync on desktop, smartphone and tablet.",
-        "q5": "What if I forget my master password?",
-        "a5": "We don’t store it. Keep it safe and use emergency recovery.",
-        "q6": "Is MykeyNest secure?",
-        "a6": "AES-256, zero-knowledge, 2FA, regular audits, and security best practices."
+        "a1": "It is a tool that stores and encrypts all your credentials in a secure digital vault. MykeyNest uses AES-256 encryption, the same standard used by banks.",
+        "q2": "Are my data really secure?",
+        "a2": "Yes. Your data is encrypted locally on your device before being synchronized. We never have access to your passwords in plain text (zero-knowledge architecture).",
+        "q3": "Is the free plan really free?",
+        "a3": "Yes, no credit card required. You can use MykeyNest for free with basic features. The Pro plan unlocks advanced features.",
+        "q4": "Can I use MykeyNest on multiple devices?",
+        "a4": "Yes, your passwords are automatically synchronized across all your devices: computer, smartphone, and tablet.",
+        "q5": "What happens if I forget my master password?",
+        "a5": "We cannot recover it for you (zero-knowledge). That’s why it’s essential to keep it safe. You can set up emergency recovery.",
+        "q6": "Is MykeyNest open source?",
+        "a6": "Yes, the code is publicly available. This allows the community to verify the application's security and contribute improvements."
       }
     },
     "cta": {
-      "title": "Ready to secure your passwords?",
-      "subtitle": "Join thousands of users who chose MykeyNest to protect their digital life.",
-      "start": "Start for free",
+      "title": "Ready to secure your credentials?",
+      "subtitle": "Join MykeyNest today and protect your digital life with ease.",
+      "start": "Get started for free",
       "login": "Log in"
     },
     "footer": {
-      "brand_text": "The password manager that combines maximum security with ease of use.",
+      "brand_text": "A modern password manager that combines security, simplicity, and transparency.",
       "product": "Product",
       "company": "Company",
       "resources": "Resources",

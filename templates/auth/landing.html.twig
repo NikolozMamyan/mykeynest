@@ -28,7 +28,7 @@
 }
 .nav-container{ max-width:1280px; margin:0 auto; padding:0 1rem; display:flex; align-items:center; justify-content:space-between; width:100% }
 .landing-nav.scrolled{box-shadow:var(--shadow-sm)}
-.nav-toggle{ display:inline-flex; align-items:center; gap:.5rem; border:1px solid var(--color-border); background:#fff; border-radius:8px; padding:.5rem .75rem;  width:50px;}
+.nav-toggle{ display:inline-flex; align-items:center; gap:.5rem; border:1px solid var(--color-border); background:#fff; border-radius:8px; padding:.5rem .75rem; width:50px;}
 .nav-links{
   display:none; position:fixed; left:0; right:0; top:64px;
   background:#fff; border-bottom:1px solid var(--color-border);
@@ -82,12 +82,7 @@
 .credential-info h4{font-size:.95rem;font-weight:600;color:var(--color-text-dark);margin-bottom:.125rem}
 .credential-info p{font-size:.85rem;color:var(--color-text-muted)}
 
-/* === STATS SECTION === */
-.stats-section{padding:3rem 2rem;background:var(--background-gradient);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)}
-.stats-container{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
-.stat-item{text-align:center}
-.stat-number{font-size:2.5rem;font-weight:800;color:var(--color-primary);display:block;margin-bottom:.25rem}
-.stat-label{color:var(--color-text-medium);font-size:.95rem}
+/* === SUPPRESSION STATS SECTION === */
 
 /* === FEATURES SECTION — 100% responsive === */
 .features-section{padding:6rem 2rem;background:var(--color-white)}
@@ -102,16 +97,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  justify-content: center; /* centre la dernière ligne */
+  justify-content: center;
 }
 .feature-card{
- flex: 1 1 260px;   /* base ~260px, s’adapte */
-  max-width: 340px;  /* évite qu’une carte s’étale trop */
-
+  flex: 1 1 260px;
+  max-width: 340px;
   padding:1.5rem;
   background:var(--color-white);border:1px solid var(--color-border);
   border-radius:var(--border-radius);transition:all .3s ease;
-
 }
 .feature-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-5px);border-color:var(--color-primary)}
 .feature-icon{width:56px;height:56px;background:var(--background-gradient);border-radius:var(--border-radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:1.5rem;margin-bottom:.5rem;flex:0 0 auto}
@@ -148,7 +141,7 @@
 
 /* === PRICING SECTION === */
 .pricing-section{padding:6rem 2rem;background:var(--color-white)}
-.pricing-grid{max-width:1100px;margin:0 auto;display:grid;gap:2rem;grid-template-columns:repeat(3,1fr)}
+.pricing-grid{max-width:1100px;margin:0 auto;display:grid;gap:2rem;grid-template-columns:repeat(2,1fr)}
 .pricing-card{border:1px solid var(--color-border);border-radius:var(--border-radius);padding:2rem;background:#fff;transition:transform .2s ease, box-shadow .2s ease}
 .pricing-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
 .pricing-card.popular{border-color:var(--color-primary);box-shadow:var(--shadow-green)}
@@ -211,18 +204,15 @@
 }
 @media (max-width: 1024px){
   .hero-content{grid-template-columns:1fr;gap:3rem}
-  .stats-container{grid-template-columns:repeat(2,1fr)}
   .nav-links{display:none;position:fixed;inset:64px 0 auto 0;background:#fff;border-bottom:1px solid var(--color-border);padding:1rem 2rem;gap:1rem;flex-direction:column}
   .nav-links.active{display:flex;animation:fadeIn .2s ease}
 }
 @media (max-width: 900px){
-  /* Anciennes règles supprimées (plus de grid-column span sur mobile) */
   .pricing-grid{grid-template-columns:1fr;max-width:720px}
 }
 @media (max-width: 768px){
   .hero-text h1{font-size:2.25rem}
   .section-header h2{font-size:1.75rem}
-  .stats-container{grid-template-columns:1fr}
   .footer-content{grid-template-columns:1fr}
   .cta-container{padding:3rem 2rem}
   .hero-cta{flex-direction:column;width:100%}
@@ -236,7 +226,6 @@
 }
 
 /*Focus */
-
 *:focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
 
 /* Effet CTA */
@@ -275,9 +264,7 @@ img[loading="lazy"]{content-visibility:auto}
       <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
 
       <div class="nav-lang" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
-{# Dans ta nav #}
-{% include "components/parts/lang_switcher.html.twig" %}
-
+        {% include "components/parts/lang_switcher.html.twig" %}
       </div>
     </div>
   </div>
@@ -299,8 +286,8 @@ img[loading="lazy"]{content-visibility:auto}
       <p class="subtitle">{{ 'landing.hero.subtitle'|trans }}</p>
 
       <div class="hero-cta">
-        <a
-          href="{{ path('show_register') }}"
+        
+         <a href="{{ path('show_register') }}"
           class="btn btn-primary btn-large"
           aria-label="{{ 'landing.hero.cta_start_aria'|trans }}"
         >
@@ -315,12 +302,12 @@ img[loading="lazy"]{content-visibility:auto}
           <span>{{ 'landing.hero.trust.aes'|trans }}</span>
         </div>
         <div class="trust-item">
-          <i class="fas fa-users" aria-hidden="true"></i>
-          <span>{{ 'landing.hero.trust.users'|trans }}</span>
+          <i class="fas fa-lock" aria-hidden="true"></i>
+          <span>{{ 'landing.hero.trust.zeroknowledge'|trans }}</span>
         </div>
         <div class="trust-item">
-          <i class="fas fa-star" aria-hidden="true"></i>
-          <span>{{ 'landing.hero.trust.rating'|trans }}</span>
+          <i class="fas fa-code-branch" aria-hidden="true"></i>
+          <span>{{ 'landing.hero.trust.opensource'|trans }}</span>
         </div>
       </div>
     </div>
@@ -360,29 +347,6 @@ img[loading="lazy"]{content-visibility:auto}
       </div>
     </div>
 
-  </div>
-</section>
-
-
-{# ===================== STATS SECTION ===================== #}
-<section class="stats-section" aria-label="{{ 'landing.stats.aria'|trans }}">
-  <div class="stats-container">
-    <div class="stat-item">
-      <span class="stat-number" data-target="10000">10,000+</span>
-      <span class="stat-label">{{ 'landing.stats.active_users'|trans }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number" data-target="50000">50,000+</span>
-      <span class="stat-label">{{ 'landing.stats.passwords_secured'|trans }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number" data-target="99" data-suffix=".9%">99.9%</span>
-      <span class="stat-label">{{ 'landing.stats.uptime'|trans }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number">24/7</span>
-      <span class="stat-label">{{ 'landing.stats.support'|trans }}</span>
-    </div>
   </div>
 </section>
 
@@ -485,38 +449,35 @@ img[loading="lazy"]{content-visibility:auto}
         <p class="pricing-price">0€ <span class="stat-label">{{ 'landing.pricing.plan.per_month'|trans }}</span></p>
         <ul class="pricing-features">
           <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_1'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_2'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_3'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_4'|trans }}</li>
-        </ul>
-        <a href="{{ path('show_register') }}" class="btn btn-outline" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">
-          {{ 'landing.pricing.plan.basic_try'|trans }}
-        </a>
-      </div>
-
-      <div class="pricing-card popular" aria-label="{{ 'landing.pricing.plan.pro_reco_aria'|trans }}">
-        <div class="badge">{{ 'landing.pricing.plan.popular_badge'|trans }}</div>
-        <h3>{{ 'landing.pricing.plan.pro_name'|trans }}</h3>
-        <p class="pricing-price">2,99€ <span class="stat-label">{{ 'landing.pricing.plan.per_month'|trans }}</span></p>
-        <ul class="pricing-features">
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_1'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_2'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_3'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_4'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_5'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_6'|trans }}</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_7'|trans }}</li>
-        </ul>
-        <a href="{{ path('show_register') }}" class="btn btn-primary" aria-label="{{ 'landing.pricing.plan.pro_aria'|trans }}">
-          {{ 'landing.pricing.plan.pro_choose'|trans }}
-        </a>
-      </div>
-    </div>
+<li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_2'|trans }}</li>
+<li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_3'|trans }}</li>
+<li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_4'|trans }}</li>
+</ul>
+<a href="{{ path('show_register') }}" class="btn btn-outline" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">
+{{ 'landing.pricing.plan.basic_try'|trans }}
+</a>
+</div>
+  <div class="pricing-card popular" aria-label="{{ 'landing.pricing.plan.pro_reco_aria'|trans }}">
+    <div class="badge">{{ 'landing.pricing.plan.popular_badge'|trans }}</div>
+    <h3>{{ 'landing.pricing.plan.pro_name'|trans }}</h3>
+    <p class="pricing-price">2,99€ <span class="stat-label">{{ 'landing.pricing.plan.per_month'|trans }}</span></p>
+    <ul class="pricing-features">
+      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_1'|trans }}</li>
+      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_2'|trans }}</li>
+      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_3'|trans }}</li>
+      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_4'|trans }}</li>
+      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_5'|trans }}</li>
+      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_6'|trans }}</li>
+      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_7'|trans }}</li>
+    </ul>
+    <a href="{{ path('show_register') }}" class="btn btn-primary" aria-label="{{ 'landing.pricing.plan.pro_aria'|trans }}">
+      {{ 'landing.pricing.plan.pro_choose'|trans }}
+    </a>
+  </div>
+</div>
   </div>
 </section>
-
-
-{# ===================== FAQ SECTION (visible) ===================== #}
+{# ===================== FAQ SECTION ===================== #}
 <section class="faq-section">
   <div class="section-container">
     <div class="section-header">
@@ -524,45 +485,41 @@ img[loading="lazy"]{content-visibility:auto}
       <h2>{{ 'landing.faq.title'|trans }}</h2>
       <p>{{ 'landing.faq.subtitle'|trans }}</p>
     </div>
+<div class="faq-grid">
+  <details class="faq-item">
+    <summary>{{ 'landing.faq.items.q1'|trans }}</summary>
+    <p>{{ 'landing.faq.items.a1'|trans }}</p>
+  </details>
 
-    <div class="faq-grid">
-      <details class="faq-item">
-        <summary>{{ 'landing.faq.items.q1'|trans }}</summary>
-        <p>{{ 'landing.faq.items.a1'|trans }}</p>
-      </details>
+  <details class="faq-item">
+    <summary>{{ 'landing.faq.items.q2'|trans }}</summary>
+    <p>{{ 'landing.faq.items.a2'|trans }}</p>
+  </details>
 
-      <details class="faq-item">
-        <summary>{{ 'landing.faq.items.q2'|trans }}</summary>
-        <p>{{ 'landing.faq.items.a2'|trans }}</p>
-      </details>
+  <details class="faq-item">
+    <summary>{{ 'landing.faq.items.q3'|trans }}</summary>
+    <p>{{ 'landing.faq.items.a3'|trans }}</p>
+  </details>
 
-      <details class="faq-item">
-        <summary>{{ 'landing.faq.items.q3'|trans }}</summary>
-        <p>{{ 'landing.faq.items.a3'|trans }}</p>
-      </details>
+  <details class="faq-item">
+    <summary>{{ 'landing.faq.items.q4'|trans }}</summary>
+    <p>{{ 'landing.faq.items.a4'|trans }}</p>
+  </details>
 
-      <details class="faq-item">
-        <summary>{{ 'landing.faq.items.q4'|trans }}</summary>
-        <p>{{ 'landing.faq.items.a4'|trans }}</p>
-      </details>
+  <details class="faq-item">
+    <summary>{{ 'landing.faq.items.q5'|trans }}</summary>
+    <p>{{ 'landing.faq.items.a5'|trans }}</p>
+  </details>
 
-      <details class="faq-item">
-        <summary>{{ 'landing.faq.items.q5'|trans }}</summary>
-        <p>{{ 'landing.faq.items.a5'|trans }}</p>
-      </details>
-
-      <details class="faq-item">
-        <summary>{{ 'landing.faq.items.q6'|trans }}</summary>
-        <p>{{ 'landing.faq.items.a6'|trans }}</p>
-      </details>
-    </div>
+  <details class="faq-item">
+    <summary>{{ 'landing.faq.items.q6'|trans }}</summary>
+    <p>{{ 'landing.faq.items.a6'|trans }}</p>
+  </details>
+</div>
   </div>
 </section>
-
 {# Section contact existante #}
 {% include "auth/contact/contact.html.twig" %}
-
-
 {# ===================== CTA SECTION ===================== #}
 <section class="cta-section">
   <div class="cta-container">
@@ -578,8 +535,6 @@ img[loading="lazy"]{content-visibility:auto}
     </div>
   </div>
 </section>
-
-
 {# ===================== FOOTER ===================== #}
 <footer class="footer" role="contentinfo">
   <div class="footer-content">
@@ -587,36 +542,34 @@ img[loading="lazy"]{content-visibility:auto}
       {% include 'components/parts/logo.html.twig' %}
       <p>{{ 'landing.footer.brand_text'|trans }}</p>
     </div>
+<div class="footer-links">
+  <h4>{{ 'landing.footer.product'|trans }}</h4>
+  <ul>
+    <li><a href="#features">{{ 'landing.footer.links.features'|trans }}</a></li>
+    <li><a href="#pricing">{{ 'landing.footer.links.pricing'|trans }}</a></li>
+    <li><a href="#how-it-works">{{ 'landing.footer.links.security'|trans }}</a></li>
+    <li><a href="#">{{ 'landing.footer.links.extension'|trans }}</a></li>
+  </ul>
+</div>
 
-    <div class="footer-links">
-      <h4>{{ 'landing.footer.product'|trans }}</h4>
-      <ul>
-        <li><a href="#features">{{ 'landing.footer.links.features'|trans }}</a></li>
-        <li><a href="#pricing">{{ 'landing.footer.links.pricing'|trans }}</a></li>
-        <li><a href="#how-it-works">{{ 'landing.footer.links.security'|trans }}</a></li>
-        <li><a href="#">{{ 'landing.footer.links.extension'|trans }}</a></li>
-      </ul>
-    </div>
+<div class="footer-links">
+  <h4>{{ 'landing.footer.company'|trans }}</h4>
+  <ul>
+    <li><a href="#">{{ 'landing.footer.links.about'|trans }}</a></li>
+    <li><a href="#">{{ 'landing.footer.links.blog'|trans }}</a></li>
+    <li><a href="#">{{ 'landing.footer.links.contact'|trans }}</a></li>
+  </ul>
+</div>
 
-    <div class="footer-links">
-      <h4>{{ 'landing.footer.company'|trans }}</h4>
-      <ul>
-        <li><a href="#">{{ 'landing.footer.links.about'|trans }}</a></li>
-        <li><a href="#">{{ 'landing.footer.links.blog'|trans }}</a></li>
-        <li><a href="#">{{ 'landing.footer.links.contact'|trans }}</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-links">
-      <h4>{{ 'landing.footer.resources'|trans }}</h4>
-      <ul>
-        <li><a href="#">{{ 'landing.footer.links.help_center'|trans }}</a></li>
-        <li><a href="#">{{ 'landing.footer.links.documentation'|trans }}</a></li>
-        <li><a href="#">{{ 'landing.footer.links.guides'|trans }}</a></li>
-      </ul>
-    </div>
+<div class="footer-links">
+  <h4>{{ 'landing.footer.resources'|trans }}</h4>
+  <ul>
+    <li><a href="#">{{ 'landing.footer.links.help_center'|trans }}</a></li>
+    <li><a href="#">{{ 'landing.footer.links.documentation'|trans }}</a></li>
+    <li><a href="#">{{ 'landing.footer.links.guides'|trans }}</a></li>
+  </ul>
+</div>
   </div>
-
   <div class="footer-bottom">
     <p>
       &copy; {{ "now"|date("Y") }} MykeyNest. {{ 'landing.footer.links.all_rights'|trans }} |
@@ -625,9 +578,7 @@ img[loading="lazy"]{content-visibility:auto}
     </p>
   </div>
 </footer>
-
-
-{# ===================== SCRIPTS (inchangés) ===================== #}
+{# ===================== SCRIPTS ===================== #}
 <script defer>
 /* Navbar shadow on scroll */
 const navbar = document.getElementById('navbar');
@@ -656,28 +607,10 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es=>{
   });
 },{threshold:.1, rootMargin:'0px 0px -50px 0px'}) : null;
 document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.feature-card,.step-card,.stat-item').forEach(el=>{
+  document.querySelectorAll('.feature-card,.step-card').forEach(el=>{
     el.style.opacity='0'; el.style.animation='none'; io && io.observe(el);
   });
 });
-
-/* Stats count-up */
-function animateValue(el,start,end,duration){
-  let t0=null; const step=(ts)=>{ if(!t0) t0=ts; const p=Math.min((ts-t0)/duration,1);
-    el.textContent= Math.floor(p*(end-start)+start).toLocaleString() + (el.dataset.suffix||'');
-    if(p<1) requestAnimationFrame(step);
-  }; requestAnimationFrame(step);
-}
-const statsIO = new IntersectionObserver(es=>{
-  es.forEach(entry=>{
-    if(entry.isIntersecting){
-      const n=entry.target, target=parseInt(n.dataset.target,10);
-      if(!isNaN(target)) animateValue(n,0,target,1800);
-      statsIO.unobserve(n);
-    }
-  });
-},{threshold:.5});
-document.querySelectorAll('.stat-number[data-target]').forEach(n=>statsIO.observe(n));
 
 /* Mobile menu toggle (accessibilité) */
 const toggle=document.getElementById('mobile-menu-btn');
@@ -702,8 +635,6 @@ if('loading' in HTMLImageElement.prototype===false && 'IntersectionObserver' in 
   document.querySelectorAll('img[data-src]').forEach(img=>imgIO.observe(img));
 }
 </script>
-
-
 {# ===================== JSON-LD FAQ (SEO) TRADUIT ===================== #}
 <script type="application/ld+json">
 {
@@ -743,5 +674,4 @@ if('loading' in HTMLImageElement.prototype===false && 'IntersectionObserver' in 
   ]
 }
 </script>
-
 {% endblock %}

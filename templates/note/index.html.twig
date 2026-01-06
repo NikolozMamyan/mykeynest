@@ -1,0 +1,672 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notes & Tâches{% endblock %}
+
+{% block body %}
+  <style>
+    /* -------------------------------------------------------
+      Page shell (on garde ta base + look plus "app monday")
+    ------------------------------------------------------- */
+    .note-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .note-title {
+      font-size: clamp(22px, 2.2vw, 32px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin: 0;
+      background: linear-gradient(90deg, var(--color-text-dark), var(--color-primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .note-sub {
+      margin-top: 6px;
+      color: var(--color-text-muted);
+      font-size: 13px;
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      border: 0;
+      background: linear-gradient(135deg, var(--color-primary), #10b981);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: var(--shadow-green);
+      transition: transform 0.18s ease, filter 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+    .btn-ghost {
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: var(--blur-background);
+      color: var(--color-text-dark);
+      padding: 10px 12px;
+      border-radius: 10x;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Flash */
+    .flash {
+      margin: 10px 0;
+      padding: 10px 12px;
+      border-radius: 10x;
+      border: 1px solid var(--color-border);
+      background: rgba(255,255,255,.7);
+      backdrop-filter: var(--blur-background);
+    }
+    [data-theme="dark"] .flash {
+      background: rgba(15,23,42,.45);
+      border-color: rgba(51, 65, 85, 0.75);
+    }
+
+    /* -------------------------------------------------------
+      "monday-like" surfaces + board
+    ------------------------------------------------------- */
+    .board {
+      gap: 20px;
+      display:flex;
+      flex-direction:column;
+      margin-top: 14px;
+    }
+    @media (max-width: 980px) {
+      .board { grid-template-columns: 1fr; }
+    }
+
+    .monday-surface {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: var(--blur-background);
+      border-radius: 10x;
+      overflow: hidden;
+    }
+    [data-theme="dark"] .monday-surface{
+      background: rgba(15, 23, 42, 0.55);
+      border-color: rgba(51, 65, 85, 0.75);
+    }
+
+    .col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+    }
+    [data-theme="dark"] .col-head {
+      border-bottom-color: rgba(51, 65, 85, 0.75);
+    }
+
+    .col-title {
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--color-text-dark);
+    }
+
+    .pill {
+      font-size: 12px;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 10px;
+      background: rgba(5, 150, 105, 0.12);
+      color: var(--color-primary);
+      border: 1px solid rgba(5, 150, 105, 0.18);
+    }
+
+    /* Scrollable column body + sticky table header */
+    .table-wrap{
+      max-height: 72vh;
+      overflow: auto;
+    }
+
+    .table-head{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1.7fr 1.05fr 0.95fr 0.95fr 0.75fr 1.25fr;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.92);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+    }
+    [data-theme="dark"] .table-head{
+      background: rgba(15,23,42,0.70);
+      border-bottom-color: rgba(51, 65, 85, 0.85);
+    }
+
+    .th{
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--color-text-muted);
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Rows = "table" */
+    .task-row{
+      display: grid;
+      grid-template-columns: 1.7fr 1.05fr 0.95fr 0.95fr 0.75fr 1.25fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
+      background: transparent;
+    }
+    [data-theme="dark"] .task-row{
+      border-bottom-color: rgba(51, 65, 85, 0.55);
+    }
+    .task-row:hover{
+      background: rgba(5, 150, 105, 0.06);
+    }
+    [data-theme="dark"] .task-row:hover{
+      background: rgba(5, 150, 105, 0.10);
+    }
+
+    .cell{
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Title cell */
+    .task-title{ min-width: 0; }
+    .task-title .t-main{
+      font-weight: 900;
+      color: var(--color-text-dark);
+      font-size: 14px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .task-title .t-sub{
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Assignees avatars */
+    .avatars{ display:flex; align-items:center; }
+    .avatar{
+      width: 26px;
+      height: 26px;
+      border-radius: 10px;
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+      font-size: 11px;
+      border: 1px solid rgba(226,232,240,0.9);
+      background: rgba(255,255,255,0.9);
+      color: var(--color-text-dark);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+    }
+    [data-theme="dark"] .avatar{
+      border-color: rgba(51,65,85,0.9);
+      background: rgba(30,41,59,0.8);
+    }
+    .avatar + .avatar{ margin-left: -8px; }
+
+    .chip {
+      font-size: 12px;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: var(--color-bg-hover);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-medium);
+      white-space: nowrap;
+    }
+
+    /* Status pill (bonus) */
+    .status-pill{
+      width: 100%;
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-weight: 900;
+      font-size: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border: 1px solid rgba(226,232,240,0.95);
+      background: rgba(255,255,255,0.85);
+    }
+    [data-theme="dark"] .status-pill{
+      border-color: rgba(51,65,85,0.85);
+      background: rgba(15,23,42,0.35);
+    }
+    .status-pill.is-todo{
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(59, 130, 246, 0.22);
+      color: rgba(37, 99, 235, 1);
+    }
+    .status-pill.is-progress{
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: rgba(217, 119, 6, 1);
+    }
+    .status-pill.is-done{
+      background: rgba(5, 150, 105, 0.14);
+      border-color: rgba(5, 150, 105, 0.25);
+      color: var(--color-primary);
+    }
+
+    /* Progress */
+    .task-progress { display:flex; gap: 8px; align-items:center; width: 100%; }
+    .task-progress .bar{
+      flex:1;
+      height: 8px;
+      border-radius: 10px;
+      background: rgba(148, 163, 184, 0.28);
+      overflow: hidden;
+    }
+    .task-progress .bar span{
+      display:block;
+      height:100%;
+      background: linear-gradient(135deg, var(--color-primary), #10b981);
+      border-radius: 10px;
+    }
+    .task-progress .pct{
+      width: 42px;
+      text-align:right;
+      font-weight: 900;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    /* Inputs/selects */
+    .cell select{
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+      background: rgba(255,255,255,0.7);
+      font-weight: 900;
+      outline: none;
+    }
+    .cell select:focus{
+      border-color: rgba(5, 150, 105, 0.45);
+      box-shadow: 0 0 0 4px var(--color-primary-hover);
+    }
+    [data-theme="dark"] .cell select{
+      background: rgba(15, 23, 42, 0.35);
+      border-color: rgba(51, 65, 85, 0.8);
+      color: var(--color-text-dark);
+    }
+
+    /* Actions */
+    .task-actions{ display:flex; gap: 8px; align-items:center; justify-content:flex-end; flex-wrap: wrap; }
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    [data-theme="dark"] .icon-btn{
+      background: rgba(15,23,42,0.35);
+      border-color: rgba(51, 65, 85, 0.8);
+      color: var(--color-text-dark);
+    }
+    .icon-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .danger { border-color: rgba(220, 38, 38, 0.25); color: var(--color-danger-end); }
+
+    .invite-form{ display:flex; gap: 8px; align-items:center; }
+    .invite-form input{
+      width: 160px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+      background: rgba(255,255,255,0.75);
+      outline: none;
+    }
+    .invite-form input:focus{
+      border-color: rgba(5, 150, 105, 0.45);
+      box-shadow: 0 0 0 4px var(--color-primary-hover);
+    }
+    [data-theme="dark"] .invite-form input{
+      background: rgba(15,23,42,0.35);
+      border-color: rgba(51,65,85,0.8);
+      color: var(--color-text-dark);
+    }
+
+    /* Mobile */
+    @media (max-width: 980px) {
+      .table-head{ display:none; }
+      .task-row{
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 12px;
+      }
+      .task-actions{ justify-content:flex-start; }
+      .invite-form input{ width: 100%; }
+    }
+
+    /* -------------------------------------------------------
+      Modal
+    ------------------------------------------------------- */
+    dialog.note-modal {
+      border: 0;
+      border-radius: 14px;
+      padding: 0;
+      width: min(720px, calc(100vw - 20px));
+      box-shadow: var(--shadow-xl);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: var(--blur-background);
+      margin: auto;
+    }
+    [data-theme="dark"] dialog.note-modal{
+      background: rgba(15,23,42,0.70);
+      color: var(--color-text-dark);
+    }
+
+    dialog::backdrop { background: rgba(15, 23, 42, 0.45); }
+
+    .modal-head {
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+    }
+    [data-theme="dark"] .modal-head{
+      border-bottom-color: rgba(51, 65, 85, 0.75);
+    }
+
+    .modal-title { font-weight: 900; margin: 0; }
+    .modal-body { padding: 16px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    @media (max-width: 720px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-field label {
+      display: block;
+      font-weight: 900;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.65);
+      outline: none;
+    }
+    [data-theme="dark"] .form-field input,
+    [data-theme="dark"] .form-field textarea,
+    [data-theme="dark"] .form-field select{
+      background: rgba(15,23,42,0.35);
+      border-color: rgba(51, 65, 85, 0.8);
+      color: var(--color-text-dark);
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+      border-color: rgba(5, 150, 105, 0.45);
+      box-shadow: 0 0 0 4px var(--color-primary-hover);
+    }
+  </style>
+
+
+
+      <div class="note-header">
+        <div>
+          <h1 class="note-title">Notes &amp; Tâches</h1>
+          <div class="note-sub">
+            Équipe :
+            <strong>{{ team ? team.name : 'Sans équipe' }}</strong>
+            — partage, assignation, suivi.
+          </div>
+        </div>
+
+        <div class="note-actions">
+          <select class="btn-ghost" onchange="location.href=this.value">
+            <option value="{{ path('app_note') }}" {{ team is null ? 'selected' : '' }}>
+              Sans équipe (perso)
+            </option>
+            {% for t in myTeams %}
+              <option value="{{ path('app_note', { teamId: t.id }) }}" {{ team and t.id == team.id ? 'selected' : '' }}>
+                {{ t.name }}
+              </option>
+            {% endfor %}
+          </select>
+
+          <button class="btn-primary" type="button" onclick="document.getElementById('noteModal').showModal()">
+            <i class="fa-solid fa-plus"></i>
+            Nouvelle note
+          </button>
+
+          <a class="btn-ghost" href="{{ path('app_note', { teamId: team ? team.id : null }) }}" title="Rafraîchir">
+            <i class="fa-solid fa-rotate"></i>
+          </a>
+        </div>
+      </div>
+
+      {% for label, messages in app.flashes %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endfor %}
+
+      <div class="board">
+        {% set cols = {
+          'todo': 'À faire',
+          'in_progress': 'En cours',
+          'done': 'Terminé'
+        } %}
+
+        {% for key, title in cols %}
+          <section class="monday-surface">
+            <div class="col-head">
+              <div class="col-title">
+                {{ title }}
+                <span class="pill">{{ notesByStatus[key]|length }}</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <div class="table-head">
+                <div class="th">Tâche</div>
+                <div class="th">Assigné</div>
+                <div class="th">Progress</div>
+                <div class="th">Statut</div>
+                <div class="th">Échéance</div>
+                <div class="th" style="text-align:right;">Actions</div>
+              </div>
+
+              {% for n in notesByStatus[key] %}
+                <article class="task-row">
+                  {# --- Tâche --- #}
+                  <div class="cell task-title">
+                    <div style="min-width:0;">
+                      <div class="t-main" title="{{ n.title }}">{{ n.title }}</div>
+                      {% if n.content %}
+                        <div class="t-sub">{{ n.content|u.truncate(90, '…') }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  {# --- Assignés --- #}
+                  <div class="cell">
+                    {% if n.assignments|length == 0 %}
+                      <span class="chip">Non assigné</span>
+                    {% else %}
+                      <div class="avatars"
+                           title="{% for a in n.assignments %}{{ a.assignee.email }}{% if not loop.last %}, {% endif %}{% endfor %}">
+                        {% for a in n.assignments|slice(0,3) %}
+                          {% set email = a.assignee.email %}
+                          {% set initial = email|slice(0,1)|upper %}
+                          <span class="avatar">{{ initial }}</span>
+                        {% endfor %}
+                        {% if n.assignments|length > 3 %}
+                          <span class="avatar">+{{ n.assignments|length - 3 }}</span>
+                        {% endif %}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  {# --- Progress --- #}
+                  <div class="cell">
+                    {% set pct = (n.status.value == 'todo') ? 20 : (n.status.value == 'in_progress') ? 60 : 100 %}
+                    <div class="task-progress">
+                      <div class="bar"><span style="width: {{ pct }}%"></span></div>
+                      <div class="pct">{{ pct }}%</div>
+                    </div>
+                  </div>
+
+                  {# --- Statut (select + badge) --- #}
+                  <div class="cell" style="flex-direction:column; align-items:stretch; gap:6px;">
+                    <form method="post" action="{{ path('app_note_status', { id: n.id }) }}" style="width:100%;">
+                      <input type="hidden" name="_token" value="{{ csrf_token('status_note_' ~ n.id) }}">
+                      <select name="status" onchange="this.form.submit()">
+                        <option value="todo" {{ n.status.value == 'todo' ? 'selected' : '' }}>À faire</option>
+                        <option value="in_progress" {{ n.status.value == 'in_progress' ? 'selected' : '' }}>En cours</option>
+                        <option value="done" {{ n.status.value == 'done' ? 'selected' : '' }}>Terminé</option>
+                      </select>
+                    </form>
+
+                    <span class="status-pill
+                      {{ n.status.value == 'todo' ? 'is-todo' : (n.status.value == 'in_progress' ? 'is-progress' : 'is-done') }}">
+                      {{ n.status.value == 'todo' ? 'À faire' : (n.status.value == 'in_progress' ? 'En cours' : 'Terminé') }}
+                    </span>
+                  </div>
+
+                  {# --- Échéance --- #}
+                  <div class="cell" style="font-weight:900; font-size:12px; color: var(--color-text-medium);">
+                    {% if n.dueAt %}{{ n.dueAt|date('d M') }}{% else %}—{% endif %}
+                  </div>
+
+                  {# --- Actions --- #}
+                  <div class="cell task-actions">
+                    {% if teamUsers is not empty %}
+                      <form method="post" action="{{ path('app_note_assign', { id: n.id }) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('assign_note_' ~ n.id) }}">
+                        <select name="assignee_id" onchange="this.form.submit()">
+                          <option value="">Assigner…</option>
+                          {% for u in teamUsers %}
+                            <option value="{{ u.id }}">{{ u.email }}</option>
+                          {% endfor %}
+                        </select>
+                      </form>
+                    {% endif %}
+
+                    <form method="post" action="{{ path('app_note_invite', { id: n.id }) }}" class="invite-form">
+                      <input type="hidden" name="_token" value="{{ csrf_token('invite_note_' ~ n.id) }}">
+                      <input type="email" name="email" placeholder="Inviter…" />
+                      <button class="icon-btn" title="Inviter" type="submit">
+                        <i class="fa-solid fa-paper-plane"></i>
+                      </button>
+                    </form>
+
+                    <form method="post" action="{{ path('app_note_delete', { id: n.id }) }}" onsubmit="return confirm('Supprimer ?')">
+                      <input type="hidden" name="_token" value="{{ csrf_token('delete_note_' ~ n.id) }}">
+                      <button class="icon-btn danger" title="Supprimer" type="submit">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </article>
+              {% else %}
+                <div style="padding: 12px; color: var(--color-text-muted); font-size: 13px;">
+                  Aucune note ici.
+                </div>
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+
+
+  {# -------------------------------------------------------
+    Modal création note
+  ------------------------------------------------------- #}
+  <dialog id="noteModal" class="note-modal">
+    <div class="modal-head">
+      <p class="modal-title">Créer une note</p>
+      <button class="icon-btn" onclick="document.getElementById('noteModal').close()" type="button" title="Fermer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      {{ form_start(form, { attr: { autocomplete: 'off' } }) }}
+        <div class="form-grid">
+          <div class="form-field full">
+            {{ form_label(form.title) }}
+            {{ form_widget(form.title) }}
+            {{ form_errors(form.title) }}
+          </div>
+
+          <div class="form-field full">
+            {{ form_label(form.content) }}
+            {{ form_widget(form.content) }}
+            {{ form_errors(form.content) }}
+          </div>
+
+          <div class="form-field">
+            {{ form_label(form.status) }}
+            {{ form_widget(form.status) }}
+          </div>
+
+          <div class="form-field">
+            {{ form_label(form.dueAt) }}
+            {{ form_widget(form.dueAt) }}
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+          <button class="btn-ghost" type="button" onclick="document.getElementById('noteModal').close()">Annuler</button>
+          <button class="btn-primary" type="submit">Créer</button>
+        </div>
+      {{ form_end(form) }}
+    </div>
+  </dialog>
+{% endblock %}

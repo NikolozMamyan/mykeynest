@@ -1,5 +1,5 @@
 {
-  "landing": {
+ "landing": {
     "nav": {
       "menu": "Menu",
       "features": "Fonctionnalités",
@@ -10,15 +10,15 @@
       "language": "Langue"
     },
     "hero": {
-      "title_before": "Sécurisez tous vos mots de passe en",
-      "title_highlight": "un seul endroit",
-      "subtitle": "MykeyNest protège vos identifiants avec un chiffrement militaire AES-256 et une architecture zero-knowledge. Accédez à tous vos comptes en toute sécurité, sur tous vos appareils.",
+      "title_before": "Gérez vos mots de passe en toute sécurité,",
+      "title_highlight": "en un seul endroit",
+      "subtitle": "Un gestionnaire de mots de passe simple, sécurisé et moderne. Chiffrement AES-256, architecture zero-knowledge et synchronisation multi-appareils. Essayez gratuitement.",
       "cta_start": "Commencer gratuitement",
-      "cta_discover": "Découvrir les fonctionnalités",
+      "cta_discover": "En savoir plus",
       "trust": {
         "aes": "Chiffrement AES-256",
-        "users": "+10 000 utilisateurs",
-        "rating": "Note 4.9/5"
+        "zeroknowledge": "Zero-knowledge",
+        "opensource": "Open Source"
       },
       "mock": {
         "gmail": "Gmail",
@@ -26,101 +26,95 @@
         "github": "GitHub"
       }
     },
-    "stats": {
-      "active_users": "Utilisateurs actifs",
-      "passwords_secured": "Mots de passe sécurisés",
-      "uptime": "Temps de disponibilité",
-      "support": "Support disponible"
-    },
     "features": {
       "label": "Fonctionnalités",
-      "title": "Tout ce dont vous avez besoin pour sécuriser vos mots de passe",
-      "subtitle": "Des fonctionnalités puissantes conçues pour votre sécurité et votre tranquillité d'esprit.",
+      "title": "Sécurité et simplicité avant tout",
+      "subtitle": "Toutes les fonctionnalités essentielles pour protéger vos identifiants au quotidien.",
       "cards": {
         "e2e_title": "Chiffrement de bout en bout",
-        "e2e_text": "Vos données sont chiffrées avec AES-256 avant même de quitter votre appareil. Personne ne peut accéder à vos mots de passe.",
-        "generator_title": "Générateur intelligent",
-        "generator_text": "Créez des mots de passe ultra-sécurisés en un clic. Des combinaisons uniques et impossibles à deviner.",
+        "e2e_text": "Vos données sont chiffrées localement avec AES-256 avant d'être synchronisées. Seul vous y avez accès.",
+        "generator_title": "Générateur de mots de passe",
+        "generator_text": "Créez des mots de passe robustes et uniques en un clic pour tous vos comptes.",
         "sync_title": "Synchronisation multi-appareils",
-        "sync_text": "Accédez à vos mots de passe sur tous vos appareils. Toujours à jour, partout.",
+        "sync_text": "Accédez à vos identifiants depuis votre ordinateur, smartphone ou tablette.",
         "share_title": "Partage sécurisé",
-        "share_text": "Partagez vos identifiants avec votre équipe en toute sécurité, avec contrôle des accès.",
+        "share_text": "Partagez vos identifiants en toute sécurité avec vos proches ou votre équipe.",
         "audit_title": "Audit de sécurité",
-        "audit_text": "Identifiez vos mots de passe faibles ou compromis. Recevez des alertes en cas de violation.",
-        "autofill_title": "Remplissage automatique",
-        "autofill_text": "Connectez-vous instantanément à vos sites préférés avec notre extension navigateur."
+        "audit_text": "Identifiez vos mots de passe faibles, réutilisés ou compromis pour mieux les protéger.",
+        "autofill_title": "Auto-remplissage",
+        "autofill_text": "Connectez-vous automatiquement sur vos sites favoris grâce à l'extension navigateur."
       }
     },
     "how": {
       "label": "Simple et efficace",
-      "title": "Comment ça marche",
-      "subtitle": "Commencez à sécuriser vos mots de passe en 3 étapes simples.",
+      "title": "Comment ça marche ?",
+      "subtitle": "Sécurisez vos mots de passe en trois étapes simples.",
       "steps": {
         "s1_title": "Créez votre compte",
-        "s1_text": "Inscrivez-vous gratuitement et créez votre clé maître. C'est le seul mot de passe à retenir.",
+        "s1_text": "Inscrivez-vous gratuitement et créez votre mot de passe maître. C'est le seul à retenir.",
         "s2_title": "Ajoutez vos identifiants",
-        "s2_text": "Importez ou ajoutez manuellement vos mots de passe existants. Tout est chiffré automatiquement.",
+        "s2_text": "Importez ou saisissez manuellement vos mots de passe. Tout est chiffré automatiquement.",
         "s3_title": "Accédez partout",
-        "s3_text": "Connectez-vous à tous vos comptes en un clic, sur tous vos appareils, en toute sécurité."
+        "s3_text": "Connectez-vous sur tous vos appareils en toute sécurité grâce à la synchronisation."
       }
     },
     "pricing": {
       "label": "Tarifs",
-      "title": "Des plans simples et transparents",
-      "subtitle": "Commencez gratuitement. Passez à une offre avancée quand vous en avez besoin.",
+      "title": "Une offre simple et transparente",
+      "subtitle": "Commencez gratuitement, passez au premium quand vous en ressentez le besoin.",
       "plan": {
         "free_badge": "Gratuit",
-        "popular_badge": "Populaire",
+        "popular_badge": "Recommandé",
         "per_month": "/ mois",
-        "basic_name": "Basic",
-        "basic_try": "Essayer",
-        "basic_aria": "Essayer gratuitement le plan Basic",
+        "basic_name": "Gratuit",
+        "basic_try": "Commencer",
+        "basic_aria": "Commencer avec le plan gratuit",
         "pro_name": "Pro",
         "pro_choose": "Choisir Pro",
         "pro_aria": "Choisir le plan Pro",
         "pro_reco_aria": "Offre recommandée",
         "features": {
           "basic_1": "5 mots de passe",
-          "basic_2": "5 partages entre membres",
+          "basic_2": "5 partages maximum",
           "basic_3": "Générateur sécurisé",
           "basic_4": "Auto-remplissage",
-          "pro_1": "illimité",
-          "pro_2": "Partages illimité entre membres",
-          "pro_3": "2FA + Partage sécurisé",
+          "pro_1": "Mots de passe illimités",
+          "pro_2": "Partages illimités",
+          "pro_3": "Authentification 2FA",
           "pro_4": "Audit de sécurité",
-          "pro_5": "Générateur sécurisé",
-          "pro_6": "Note sécurisé",
-          "pro_7": "Auto-remplissage"
+          "pro_5": "Notes sécurisées",
+          "pro_6": "Support prioritaire",
+          "pro_7": "Toutes les fonctionnalités"
         }
       }
     },
     "faq": {
       "label": "Questions fréquentes",
       "title": "Vos questions sur MykeyNest",
-      "subtitle": "Tout ce que vous devez savoir sur notre gestionnaire de mots de passe.",
+      "subtitle": "Tout ce que vous devez savoir avant de commencer.",
       "items": {
         "q1": "Qu'est-ce qu'un gestionnaire de mots de passe ?",
-        "a1": "Un gestionnaire de mots de passe est un outil de sécurité qui stocke et chiffre tous vos identifiants dans un coffre-fort numérique. MykeyNest utilise le chiffrement AES-256 pour protéger vos données.",
-        "q2": "Comment fonctionne le chiffrement AES-256 ?",
-        "a2": "L'AES-256 est un standard utilisé par les banques. Les données sont chiffrées localement (zero-knowledge) : nous n’y avons jamais accès.",
-        "q3": "MykeyNest est-il gratuit ?",
-        "a3": "Oui, une version gratuite avec l’essentiel. Des plans premium existent pour les utilisateurs avancés et les équipes.",
-        "q4": "Mes mots de passe sont-ils synchronisés sur tous mes appareils ?",
-        "a4": "Oui, synchronisation automatique sur ordinateur, smartphone et tablette.",
+        "a1": "C'est un outil qui stocke et chiffre tous vos identifiants dans un coffre-fort numérique sécurisé. MykeyNest utilise le chiffrement AES-256, le même standard utilisé par les banques.",
+        "q2": "Mes données sont-elles vraiment sécurisées ?",
+        "a2": "Oui. Vos données sont chiffrées localement sur votre appareil avant d'être synchronisées. Nous n'avons jamais accès à vos mots de passe en clair (architecture zero-knowledge).",
+        "q3": "L'offre gratuite est-elle vraiment gratuite ?",
+        "a3": "Oui, aucune carte bancaire requise. Vous pouvez utiliser MykeyNest gratuitement avec les fonctionnalités de base. Le plan Pro débloque des fonctionnalités avancées.",
+        "q4": "Puis-je utiliser MykeyNest sur plusieurs appareils ?",
+        "a4": "Oui, vos mots de passe sont automatiquement synchronisés sur tous vos appareils : ordinateur, smartphone et tablette.",
         "q5": "Que se passe-t-il si j'oublie mon mot de passe maître ?",
-        "a5": "Nous ne le stockons pas. Conservez-le en lieu sûr et utilisez la récupération d’urgence.",
-        "q6": "MykeyNest est-il sûr ?",
-        "a6": "AES-256, zero-knowledge, 2FA, audits réguliers et bonnes pratiques de sécurité."
+        "a5": "Nous ne pouvons pas le récupérer pour vous (zero-knowledge). C'est pourquoi il est essentiel de le conserver en lieu sûr. Vous pouvez configurer une récupération d'urgence.",
+        "q6": "MykeyNest est-il open source ?",
+        "a6": "Oui, le code est disponible publiquement. Cela permet à la communauté de vérifier la sécurité de l'application et d'apporter des améliorations."
       }
     },
     "cta": {
-      "title": "Prêt à sécuriser vos mots de passe ?",
-      "subtitle": "Rejoignez des milliers d'utilisateurs qui ont choisi MykeyNest pour protéger leur vie numérique.",
+      "title": "Prêt à sécuriser vos identifiants ?",
+      "subtitle": "Rejoignez MykeyNest dès aujourd'hui et protégez votre vie numérique simplement.",
       "start": "Commencer gratuitement",
       "login": "Se connecter"
     },
     "footer": {
-      "brand_text": "Le gestionnaire de mots de passe qui allie sécurité maximale et simplicité d'utilisation.",
+      "brand_text": "Un gestionnaire de mots de passe moderne qui allie sécurité, simplicité et transparence.",
       "product": "Produit",
       "company": "Entreprise",
       "resources": "Ressources",

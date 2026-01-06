@@ -1,0 +1,416 @@
+{# templates/settings/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Réglages{% endblock %}
+
+{% block body %}
+<style>
+/* =========================
+   SETTINGS – UI/UX STYLÉ
+   Utilise TA palette : --color-primary etc.
+   ========================= */
+
+/* Optionnel: un petit “noise” sans image externe */
+.settings-page::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(5,150,105,.12), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(16,185,129,.10), transparent 40%),
+    radial-gradient(circle at 10% 80%, rgba(245,158,11,.10), transparent 40%),
+    linear-gradient(135deg, rgba(240,253,244,.9), rgba(236,253,245,.9));
+  filter: saturate(1.05);
+  z-index: -2;
+}
+
+/* Noise layer */
+.settings-page::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .05;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.25) 0 1px, transparent 1px 4px);
+  mix-blend-mode: overlay;
+  z-index: -1;
+}
+
+.settings-page{
+  min-height: 100vh;
+  padding: 26px 16px 40px;
+  color: var(--color-text-dark);
+  background: transparent; /* géré par ::before */
+}
+
+/* Header */
+.settings-header{
+  max-width: 760px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-title{
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin: 0;
+  line-height: 1.05;
+  background: linear-gradient(90deg, var(--color-text-dark), var(--color-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Container */
+.settings-container{
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* Sections (cartes) */
+.settings-section{
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255,255,255,.72);
+  backdrop-filter: var(--blur-background);
+  -webkit-backdrop-filter: var(--blur-background);
+  border: 1px solid rgba(226,232,240,.85);
+  box-shadow: var(--shadow-md);
+  margin: 14px 0;
+}
+
+/* Mode dark: carte glassy */
+[data-theme="dark"] .settings-section{
+  background: rgba(15,23,42,.55);
+  border: 1px solid rgba(51,65,85,.75);
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+}
+
+/* Profil */
+.settings-profile{
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 16px 16px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+}
+
+.settings-profile::after{
+  content:"";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(5,150,105,.10), transparent 65%);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.settings-profile:hover::after{ opacity: 1; }
+
+.avatar-wrap{
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+}
+
+.avatar-img{
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+  background: var(--color-bg-hover);
+  border: 1px solid rgba(226,232,240,.9);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .avatar-img{
+  border-color: rgba(51,65,85,.9);
+}
+
+/* Ring “premium” */
+.avatar-wrap::before{
+  content:"";
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  background: conic-gradient(from 210deg,
+    rgba(5,150,105,.9),
+    rgba(16,185,129,.35),
+    rgba(245,158,11,.25),
+    rgba(5,150,105,.9)
+  );
+  filter: blur(.2px);
+  opacity: .9;
+  z-index: -1;
+}
+
+.avatar-upload{
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.9);
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: var(--shadow-green);
+  transform: translateZ(0);
+  transition: transform .18s ease, filter .18s ease;
+}
+.avatar-upload:hover{
+  transform: scale(1.06);
+  filter: brightness(1.05);
+}
+.avatar-upload:active{
+  transform: scale(.96);
+}
+
+.profile-info{
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-name{
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-sub{
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chevron */
+.settings-chevron{
+  position: relative;
+  z-index: 1;
+  color: rgba(100,116,139,.7);
+  font-size: 14px;
+  transition: transform .18s ease, color .18s ease;
+}
+.settings-profile:hover .settings-chevron{
+  transform: translateX(2px);
+  color: var(--color-primary);
+}
+
+/* List */
+.settings-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Séparateurs plus soft */
+.settings-item{
+  border-top: 1px solid rgba(226,232,240,.75);
+}
+[data-theme="dark"] .settings-item{
+  border-top: 1px solid rgba(51,65,85,.75);
+}
+.settings-item:first-child{ border-top: 0; }
+
+.settings-link{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  transition: background .18s ease, transform .18s ease;
+}
+
+/* Hover “lift” */
+.settings-link:hover{
+  background: rgba(241,245,249,.7);
+}
+[data-theme="dark"] .settings-link:hover{
+  background: rgba(51,65,85,.35);
+}
+.settings-link:active{
+  transform: scale(.992);
+}
+
+/* Accessibilité focus */
+.settings-link:focus-visible,
+.settings-profile:focus-visible,
+.avatar-upload:focus-visible{
+  outline: 3px solid var(--color-primary-hover);
+  outline-offset: 2px;
+  border-radius: 14px;
+}
+
+/* Icon badge */
+.settings-icon{
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  background: rgba(5,150,105,.12);
+  color: var(--color-primary);
+  box-shadow: 0 6px 18px rgba(5,150,105,.12);
+  border: 1px solid rgba(5,150,105,.18);
+}
+
+/* Texte */
+.settings-text{
+  flex: 1;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--color-text-dark);
+}
+
+/* Note */
+.settings-note{
+  max-width: 760px;
+  margin: 12px auto 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  padding: 0 6px;
+}
+
+/* Petite touche : “tag” optionnel (si tu ajoutes un span.settings-badge) */
+.settings-badge{
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(5,150,105,.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(5,150,105,.18);
+}
+
+/* Responsive */
+@media (max-width: 520px){
+  .settings-section{ border-radius: 16px; }
+  .settings-link{ padding: 13px 14px; }
+  .settings-profile{ padding: 14px 14px; }
+}
+/* Variantes d’accent par position */
+.settings-item:nth-child(1) .settings-icon { background: rgba(5,150,105,.12); border-color: rgba(5,150,105,.18); color: var(--color-primary); }
+.settings-item:nth-child(2) .settings-icon { background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.20); color: var(--color-warning); }
+.settings-item:nth-child(3) .settings-icon { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.18); color: var(--color-success); }
+.settings-item:nth-child(4) .settings-icon { background: rgba(100,116,139,.12); border-color: rgba(100,116,139,.18); color: var(--color-text-muted); }
+.settings-item:nth-child(5) .settings-icon,
+.settings-item:nth-child(6) .settings-icon { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.18); color: var(--color-danger-end); }
+
+
+</style>
+
+
+  <div class="settings-header">
+    <h1 class="settings-title">Réglages</h1>
+  </div>
+
+  <div class="settings-container">
+
+    {# --- Profil / Avatar --- #}
+    <section class="settings-section">
+      <a class="settings-profile" href="">
+        <div class="avatar-wrap">
+          {# Remplace par ton champ user avatar (ex: app.user.avatarUrl) #}
+          <img
+            class="avatar-img"
+            src="{{ app.user and app.user.avatarUrl is defined and app.user.avatarUrl ? app.user.avatarUrl : asset('images/avatar-default.png') }}"
+            alt="Avatar"
+          >
+          <button class="avatar-upload" type="button" aria-label="Uploader un avatar">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+
+        <div class="profile-info">
+          <div class="profile-name">{{ app.user ? app.user.userIdentifier : 'Invité' }}</div>
+          <div class="profile-sub">Compte & informations</div>
+        </div>
+
+        <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+      </a>
+    </section>
+
+    {# --- Liste des réglages --- #}
+    <section class="settings-section">
+      <ul class="settings-list" role="list">
+        <li class="settings-item">
+          <a class="settings-link" href="">
+            <span class="settings-icon"><i class="fa-regular fa-id-card"></i></span>
+            <span class="settings-text">Données personnelles</span>
+            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+          </a>
+        </li>
+
+        <li class="settings-item">
+          <a class="settings-link" href="">
+            <span class="settings-icon"><i class="fa-solid fa-sliders"></i></span>
+            <span class="settings-text">Préférences</span>
+            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+          </a>
+        </li>
+
+        <li class="settings-item">
+          <a class="settings-link" href="">
+            <span class="settings-icon"><i class="fa-regular fa-credit-card"></i></span>
+            <span class="settings-text">Gestion d’abonnement</span>
+            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+          </a>
+        </li>
+
+        <li class="settings-item">
+          <a class="settings-link" href="">
+            <span class="settings-icon"><i class="fa-regular fa-envelope"></i></span>
+            <span class="settings-text">Contact</span>
+            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+          </a>
+        </li>
+
+        <li class="settings-item">
+          <a class="settings-link" href="">
+            <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
+            <span class="settings-text">CGU</span>
+            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+          </a>
+        </li>
+
+        <li class="settings-item">
+          <a class="settings-link" href="">
+            <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
+            <span class="settings-text">CGV</span>
+            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <div class="settings-note">
+      Astuce : branche le bouton “+” sur un input file (ou un modal) pour l’upload d’avatar.
+    </div>
+
+  </div>
+
+{% endblock %}
