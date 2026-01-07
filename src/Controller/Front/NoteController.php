@@ -3,7 +3,10 @@
 namespace App\Controller\Front;
 
 use App\Entity\Note;
+use App\Entity\Team;
+use App\Entity\User;
 use App\Entity\NoteAssignment;
+use App\Enum\NoteStatus;
 use App\Form\NoteType;
 use App\Repository\NoteRepository;
 use App\Repository\TeamRepository;
@@ -13,12 +16,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Routing\Annotation\Route;
+use App\Controller\Front\NoteController;
+
 
 final class NoteController extends AbstractController
 {
-    #[Route('/app/note/{teamId?}', name: 'app_note', requirements: ['teamId' => '\d+'])]
+   #[Route('/app/notes/{teamId?}', name: 'app_note', requirements: ['teamId' => '\d+'], methods: ['GET', 'POST'])]
     public function index(
         ?int $teamId,
         Request $request,
@@ -28,278 +32,358 @@ final class NoteController extends AbstractController
         NoteNotifier $notifier
     ): Response {
         $user = $this->getUser();
-        \assert($user instanceof \App\Entity\User);
+        \assert($user instanceof User);
 
-        // Choix de team : si pas d’id, on prend la première team où il est owner/membre.
-        $team = $teamId ? $teams->find($teamId) : null;
-        if (!$team) {
-            // ⚠️ adapte selon ton repo : ici on fait simple via DQL côté repo si tu veux
-            // fallback: prendre la première team en DB où user est owner (sinon 403)
-            $team = $teams->findOneBy(['owner' => $user]);
-        }
-        if (!$team) {
-            throw $this->createAccessDeniedException('Aucune équipe trouvée.');
-        }
-$myTeams = $teams->createQueryBuilder('t')
-    ->leftJoin('t.members', 'm')
-    ->andWhere('t.owner = :u OR m.user = :u')
-    ->setParameter('u', $user)
-    ->orderBy('t.createdAt', 'DESC')
-    ->getQuery()->getResult();
+        // Teams list
+        $myTeams = $teams->createQueryBuilder('t')
+            ->leftJoin('t.members', 'm')
+            ->where('t.owner = :u OR m.user = :u')
+            ->setParameter('u', $user)
+            ->orderBy('t.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
 
-    $teamUsers = [];
-if ($team) {
-    $teamUsers[] = $team->getOwner();
-    foreach ($team->getMembers() as $m) $teamUsers[] = $m->getUser();
-    // unique par id
-    $uniq = [];
-    foreach ($teamUsers as $u) $uniq[$u->getId()] = $u;
-    $teamUsers = array_values($uniq);
-}
-        // Sécurité : user doit être owner ou membre
-        $isAllowed = ($team->getOwner()?->getId() === $user->getId());
-        if (!$isAllowed) {
-            foreach ($team->getMembers() as $m) {
-                if ($m->getUser()->getId() === $user->getId()) { $isAllowed = true; break; }
+        // Active team (null = personal)
+        $team = null;
+        $teamUsers = [];
+
+        if ($teamId) {
+            $team = $teams->find($teamId);
+
+            if (!$team || !$this->canAccessTeam($team, $user)) {
+                throw $this->createAccessDeniedException('You do not have access to this team.');
             }
-        }
-        if (!$isAllowed) throw $this->createAccessDeniedException();
 
-        $note = (new Note())->setTeam($team)->setCreatedBy($user);
+            $teamUsers = $this->getTeamUsers($team);
+        }
+
+        // Who can create notes?
+        // - personal workspace: yes
+        // - team workspace: only team owner (adjust if you want members too)
+        $canCreateNote = ($team === null) || ($team->getOwner()?->getId() === $user->getId());
+
+        // Create form ONLY if canCreateNote
+        $note = new Note();
+        $note->setCreatedBy($user);
+        if ($team) {
+            $note->setTeam($team);
+        }
+
         $form = $this->createForm(NoteType::class, $note);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $note->touch();
+        if ($canCreateNote && $form->isSubmitted() && $form->isValid()) {
+            $note->touch(); // updatedAt
+
             $em->persist($note);
             $em->flush();
 
-            $url = $this->generateUrl('app_note', ['teamId' => $team->getId()]);
-            $notifier->notifyTeam(
-                team: $team,
-                actor: $user,
-                title: 'Nouvelle note créée',
-                message: $note->getTitle(),
-                url: $url,
-                entity: $note
-            );
+            if ($team) {
+                $url = $this->generateUrl('app_note', ['teamId' => $team->getId()]);
+                $notifier->notifyTeam($team, $user, 'New note created', $note->getTitle(), $url, $note);
+            }
 
-            $this->addFlash('success', 'Note créée ✅');
-            return $this->redirectToRoute('app_note', ['teamId' => $team->getId()]);
+            $this->addFlash('success', 'Note created successfully ✨');
+            return $this->redirectToRoute('app_note', $teamId ? ['teamId' => $teamId] : []);
         }
 
-        $allNotes = $notes->findByTeam($team);
+        // Fetch notes
+        $allNotes = $team
+            ? $notes->findByTeam($team)
+            : $notes->findBy(['createdBy' => $user, 'team' => null], ['createdAt' => 'DESC']);
 
-        // Group by status for UI columns
-        $grouped = ['todo' => [], 'in_progress' => [], 'done' => []];
+        // Filter: show only notes where user is owner or assigned
+        $visibleNotes = [];
         foreach ($allNotes as $n) {
+            $isOwner = $n->getCreatedBy()?->getId() === $user->getId();
+            $isAssignee = $n->isAssignedTo($user);
+            if ($isOwner || $isAssignee) {
+                $visibleNotes[] = $n;
+            }
+        }
+
+        // Group by status
+        $grouped = ['todo' => [], 'in_progress' => [], 'done' => []];
+        foreach ($visibleNotes as $n) {
             $grouped[$n->getStatus()->value][] = $n;
         }
 
         return $this->render('note/index.html.twig', [
-          'team' => $team,
-  'myTeams' => $myTeams,
-  'teamUsers' => $teamUsers,
-  'form' => $form,
-  'notesByStatus' => $grouped,
+            'team' => $team,
+            'myTeams' => $myTeams,
+            'teamUsers' => $teamUsers,
+            'form' => $form,
+            'notesByStatus' => $grouped,
+            'isPersonalWorkspace' => $team === null,
+            'canCreateNote' => $canCreateNote,
         ]);
     }
 
-    #[Route('/app/note/{id}/toggle', name: 'app_note_toggle', methods: ['POST'])]
-    public function toggle(Note $note, Request $request, EntityManagerInterface $em, NoteNotifier $notifier): Response
-    {
-        $this->denyAccessUnlessGranted('NOTE_EDIT', $note);
-        if (!$this->isCsrfTokenValid('toggle_note_'.$note->getId(), (string)$request->request->get('_token'))) {
+
+   #[Route('/app/notes/{id}/status', name: 'app_note_status', requirements: ['id' => '\d+'], methods: ['POST'])]
+public function updateStatus(
+    Note $note,
+    Request $request,
+    EntityManagerInterface $em,
+    NoteNotifier $notifier
+): Response {
+    $user = $this->getUser();
+    \assert($user instanceof User);
+
+    if (!$this->isCsrfTokenValid('status_note_' . $note->getId(), (string) $request->request->get('_token'))) {
+        $this->addFlash('danger', 'ERROR: Le jeton CSRF est invalide. Veuillez renvoyer le formulaire.');
+        return $this->redirectBackToBoard($note);
+    }
+
+    $isOwner = $note->getCreatedBy()?->getId() === $user->getId();
+    $isAssignee = $note->isAssignedTo($user);
+
+    // Only owner OR assigned can change status
+    if (!$isOwner && !$isAssignee) {
+        throw $this->createAccessDeniedException('You cannot change status for this note.');
+    }
+
+    $statusValue = (string) $request->request->get('status');
+    $newStatus = NoteStatus::tryFrom($statusValue);
+
+    if (!$newStatus) {
+        $this->addFlash('warning', 'Invalid status.');
+        return $this->redirectBackToBoard($note);
+    }
+
+    $oldStatus = $note->getStatus();
+
+    // si aucun changement, pas besoin de notifier
+    if ($oldStatus === $newStatus) {
+        return $this->redirectBackToBoard($note);
+    }
+
+    $note->setStatus($newStatus);
+    $note->touch();
+
+    $em->flush();
+
+    // ✅ Notifications (team only)
+    $team = $note->getTeam();
+    if ($team) {
+        $url = $this->generateUrl('app_note', ['teamId' => $team->getId()]);
+
+        // Message selon statut
+        $title = $newStatus === NoteStatus::DONE
+            ? 'Task completed ✅'
+            : 'Task progress updated';
+
+        // Petit texte lisible
+        $description = sprintf(
+            '%s changed "%s" from %s → %s',
+            $user->getEmail(),
+            $note->getTitle(),
+            $oldStatus->label(),
+            $newStatus->label()
+        );
+
+        // Notifie l’équipe (selon ton service)
+        $notifier->notifyTeam(
+            $team,
+            $user,
+            $title,
+            $description,
+            $url,
+            $note
+        );
+    }
+
+    $this->addFlash('success', 'Status updated ✅');
+    return $this->redirectBackToBoard($note);
+}
+
+
+
+
+#[Route('/app/notes/{id}/assign', name: 'app_note_assign', requirements: ['id' => '\d+'], methods: ['POST'])]
+public function assign(
+    Note $note,
+    Request $request,
+    EntityManagerInterface $em,
+    UserRepository $users
+): Response {
+    $currentUser = $this->getUser();
+    \assert($currentUser instanceof User);
+
+    if (!$this->isCsrfTokenValid('assign_note_' . $note->getId(), (string) $request->request->get('_token'))) {
+        $this->addFlash('danger', 'ERROR: Le jeton CSRF est invalide.');
+        return $this->redirectBackToBoard($note);
+    }
+
+    // ✅ sécurité : seul le créateur (ou owner team) peut assigner
+    $isOwner = $note->getCreatedBy()?->getId() === $currentUser->getId();
+    if (!$isOwner) {
+        throw $this->createAccessDeniedException('You cannot assign users for this note.');
+    }
+
+    $assigneeId = $request->request->get('assignee_id');
+    if (!$assigneeId) {
+        $this->addFlash('warning', 'Please select a user.');
+        return $this->redirectBackToBoard($note);
+    }
+
+    $assignee = $users->find((int) $assigneeId);
+    if (!$assignee) {
+        $this->addFlash('warning', 'User not found.');
+        return $this->redirectBackToBoard($note);
+    }
+
+    // ✅ éviter doublons
+    if ($note->isAssignedTo($assignee)) {
+        $this->addFlash('info', 'Already assigned.');
+        return $this->redirectBackToBoard($note);
+    }
+
+    $assignment = (new NoteAssignment())
+        ->setNote($note)
+        ->setAssignee($assignee)
+        ->setAssignedBy($currentUser) // ✅ C’EST ÇA QUI MANQUAIT
+    ;
+
+    $em->persist($assignment);
+    $em->flush();
+
+    $this->addFlash('success', 'Assigned ✅');
+    return $this->redirectBackToBoard($note);
+}
+
+    #[Route('/app/note/{id}/unassign/{userId}', name: 'app_note_unassign', methods: ['POST'])]
+    public function unassign(
+        Note $note,
+        int $userId,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        $this->denyAccessUnlessGranted('NOTE_ASSIGN', $note);
+
+        if (!$this->isCsrfTokenValid('unassign_note_'.$note->getId(), (string)$request->request->get('_token'))) {
             throw $this->createAccessDeniedException();
         }
 
-        // simple cycle: todo -> in_progress -> done -> todo
-        $next = match ($note->getStatus()->value) {
-            'todo' => \App\Enum\NoteStatus::IN_PROGRESS,
-            'in_progress' => \App\Enum\NoteStatus::DONE,
-            default => \App\Enum\NoteStatus::TODO,
-        };
-        $note->setStatus($next);
+        foreach ($note->getAssignments() as $assignment) {
+            if ($assignment->getAssignee()->getId() === $userId) {
+                $note->removeAssignment($assignment);
+                $em->remove($assignment);
+                $note->touch();
+                $em->flush();
+                
+                $this->addFlash('success', 'User unassigned successfully.');
+                break;
+            }
+        }
+
+        return $this->redirectToRoute('app_note', $this->getRedirectParams($note));
+    }
+
+
+
+    #[Route('/app/note/{id}/update', name: 'app_note_update', methods: ['POST'])]
+    public function quickUpdate(
+        Note $note,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        $this->denyAccessUnlessGranted('NOTE_EDIT', $note);
+
+        if (!$this->isCsrfTokenValid('update_note_'.$note->getId(), (string)$request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $field = $request->request->get('field');
+        $value = $request->request->get('value');
+
+        switch ($field) {
+            case 'title':
+                $note->setTitle($value);
+                break;
+            case 'dueAt':
+                $note->setDueAt($value ? new \DateTimeImmutable($value) : null);
+                break;
+            case 'priority':
+                // If you have a priority field
+                // $note->setPriority($value);
+                break;
+        }
+
         $note->touch();
         $em->flush();
 
-        $actor = $this->getUser(); \assert($actor instanceof \App\Entity\User);
-        $url = $this->generateUrl('app_note', ['teamId' => $note->getTeam()->getId()]);
-
-        $notifier->notifyAssignees(
-            note: $note,
-            actor: $actor,
-            title: 'Statut de tâche mis à jour',
-            message: $note->getTitle().' → '.$note->getStatus()->label(),
-            url: $url
-        );
-
-        return $this->redirectToRoute('app_note', ['teamId' => $note->getTeam()->getId()]);
+        return $this->json(['success' => true]);
     }
+  #[Route('/app/notes/{id}/delete', name: 'app_note_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function delete(
+        Note $note,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        $user = $this->getUser();
+        \assert($user instanceof User);
 
-    #[Route('/app/note/{id}/delete', name: 'app_note_delete', methods: ['POST'])]
-    public function delete(Note $note, Request $request, EntityManagerInterface $em, NoteNotifier $notifier): Response
-    {
-        $this->denyAccessUnlessGranted('NOTE_DELETE', $note);
-        if (!$this->isCsrfTokenValid('delete_note_'.$note->getId(), (string)$request->request->get('_token'))) {
-            throw $this->createAccessDeniedException();
+        if (!$this->isCsrfTokenValid('delete_note_' . $note->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'ERROR: Le jeton CSRF est invalide. Veuillez renvoyer le formulaire.');
+            return $this->redirectBackToBoard($note);
         }
 
-        $team = $note->getTeam();
-        $title = $note->getTitle();
+        // Only owner can delete
+        if ($note->getCreatedBy()?->getId() !== $user->getId()) {
+            throw $this->createAccessDeniedException('You cannot delete this note.');
+        }
+
+        $teamId = $note->getTeam()?->getId();
 
         $em->remove($note);
         $em->flush();
 
-        $actor = $this->getUser(); \assert($actor instanceof \App\Entity\User);
-        $url = $this->generateUrl('app_note', ['teamId' => $team->getId()]);
-        $notifier->notifyTeam($team, $actor, 'Note supprimée', $title, $url, null);
+        $this->addFlash('success', 'Note deleted 🗑️');
 
-        $this->addFlash('success', 'Supprimé 🗑️');
-        return $this->redirectToRoute('app_note', ['teamId' => $team->getId()]);
+        return $this->redirectToRoute('app_note', $teamId ? ['teamId' => $teamId] : []);
     }
 
-    #[Route('/app/note/{id}/assign', name: 'app_note_assign', methods: ['POST'])]
-    public function assign(
-        Note $note,
-        Request $request,
-        UserRepository $users,
-        EntityManagerInterface $em,
-        NoteNotifier $notifier
-    ): Response {
-        $this->denyAccessUnlessGranted('NOTE_ASSIGN', $note);
-        if (!$this->isCsrfTokenValid('assign_note_'.$note->getId(), (string)$request->request->get('_token'))) {
-            throw $this->createAccessDeniedException();
+    private function redirectBackToBoard(Note $note): Response
+    {
+        $teamId = $note->getTeam()?->getId();
+        return $this->redirectToRoute('app_note', $teamId ? ['teamId' => $teamId] : []);
+    }
+
+    private function canAccessTeam(Team $team, User $user): bool
+    {
+        if ($team->getOwner()?->getId() === $user->getId()) {
+            return true;
         }
 
-        $assigneeId = (int)$request->request->get('assignee_id');
-        $assignee = $users->find($assigneeId);
-        if (!$assignee) {
-            $this->addFlash('danger', 'Utilisateur introuvable.');
-            return $this->redirectToRoute('app_note', ['teamId' => $note->getTeam()->getId()]);
-        }
-
-        // (Option) Vérifier que assignee est dans la team
-        $team = $note->getTeam();
-        $isInTeam = ($team->getOwner()?->getId() === $assignee->getId());
-        if (!$isInTeam) {
-            foreach ($team->getMembers() as $m) {
-                if ($m->getUser()->getId() === $assignee->getId()) { $isInTeam = true; break; }
+        foreach ($team->getMembers() as $member) {
+            if ($member->getUser()?->getId() === $user->getId()) {
+                return true;
             }
         }
-        if (!$isInTeam) {
-            $this->addFlash('danger', 'Cet utilisateur n’est pas dans l’équipe.');
-            return $this->redirectToRoute('app_note', ['teamId' => $team->getId()]);
+
+        return false;
+    }
+
+    /**
+     * @return User[]
+     */
+    private function getTeamUsers(Team $team): array
+    {
+        $users = [];
+
+        if ($team->getOwner()) {
+            $users[] = $team->getOwner();
         }
 
-        // Create assignment (unique constraint prevents duplicates)
-        $actor = $this->getUser(); \assert($actor instanceof \App\Entity\User);
+        foreach ($team->getMembers() as $member) {
+            $u = $member->getUser();
+            if ($u && !\in_array($u, $users, true)) {
+                $users[] = $u;
+            }
+        }
 
-        $assignment = (new NoteAssignment())
-            ->setNote($note)
-            ->setAssignee($assignee)
-            ->setAssignedBy($actor);
-
-        $note->addAssignment($assignment);
-        $note->touch();
-
-        $em->persist($assignment);
-        $em->flush();
-
-        $url = $this->generateUrl('app_note', ['teamId' => $team->getId()]);
-        $notifier->notifyTeam($team, $actor, 'Tâche assignée', $note->getTitle().' → '.$assignee->getUserIdentifier(), $url, $note);
-
-        $this->addFlash('success', 'Assigné ✅');
-        return $this->redirectToRoute('app_note', ['teamId' => $team->getId()]);
+        return $users;
     }
-
-    #[Route('/app/note/{id}/status', name: 'app_note_status', methods: ['POST'])]
-public function status(Note $note, Request $request, EntityManagerInterface $em, NoteNotifier $notifier): Response
-{
-    $this->denyAccessUnlessGranted('NOTE_STATUS', $note);
-
-    if (!$this->isCsrfTokenValid('status_note_'.$note->getId(), (string)$request->request->get('_token'))) {
-        throw $this->createAccessDeniedException();
-    }
-
-    $status = (string)$request->request->get('status');
-    $enum = \App\Enum\NoteStatus::tryFrom($status);
-    if (!$enum) {
-        $this->addFlash('danger', 'Statut invalide.');
-        return $this->redirectToRoute('app_note');
-    }
-
-    $note->setStatus($enum);
-    $note->touch();
-    $em->flush();
-
-    $actor = $this->getUser(); \assert($actor instanceof \App\Entity\User);
-
-    // notif assignees + team si besoin
-    if ($note->getTeam()) {
-        $url = $this->generateUrl('app_note', ['teamId' => $note->getTeam()->getId()]);
-        $notifier->notifyAssignees($note, $actor, 'Statut mis à jour', $note->getTitle().' → '.$enum->label(), $url);
-    }
-
-    return $this->redirectToRoute('app_note', ['teamId' => $note->getTeam()?->getId()]);
-}
-
-#[Route('/app/note/{id}/invite', name: 'app_note_invite', methods: ['POST'])]
-public function invite(
-    Note $note,
-    Request $request,
-    UserRepository $users,
-    EntityManagerInterface $em,
-    NoteNotifier $notifier
-): Response {
-    // pour l’instant : seul créateur peut inviter
-    $this->denyAccessUnlessGranted('NOTE_EDIT', $note);
-
-    if (!$this->isCsrfTokenValid('invite_note_'.$note->getId(), (string)$request->request->get('_token'))) {
-        throw $this->createAccessDeniedException();
-    }
-
-    $email = mb_strtolower(trim((string)$request->request->get('email')));
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $this->addFlash('danger', 'Email invalide.');
-        return $this->redirectToRoute('app_note', ['teamId' => $note->getTeam()?->getId()]);
-    }
-
-    $actor = $this->getUser(); \assert($actor instanceof \App\Entity\User);
-
-    // Si user existe : on peut l’assigner direct (ou l’ajouter en "collaborator" selon ton choix)
-    $existing = $users->findOneBy(['email' => $email]);
-    if ($existing) {
-        // option: assignment direct
-        $assignment = (new \App\Entity\NoteAssignment())
-            ->setNote($note)
-            ->setAssignee($existing)
-            ->setAssignedBy($actor);
-
-        $note->addAssignment($assignment);
-        $note->touch();
-        $em->persist($assignment);
-        $em->flush();
-
-        $notifier->notifyAssignees($note, $actor, 'Vous avez été ajouté à une tâche', $note->getTitle(), $this->generateUrl('app_note'));
-        $this->addFlash('success', 'Utilisateur ajouté ✅');
-        return $this->redirectToRoute('app_note', ['teamId' => $note->getTeam()?->getId()]);
-    }
-
-    // Sinon : invite pending
-    $invite = (new \App\Entity\NoteInvite())
-        ->setNote($note)
-        ->setEmail($email)
-        ->setInvitedBy($actor);
-
-    $em->persist($invite);
-    $em->flush();
-
-    // Ici tu peux envoyer un email avec $invite->getToken()
-    $this->addFlash('success', 'Invitation créée (pending) ✉️');
-
-    return $this->redirectToRoute('app_note', ['teamId' => $note->getTeam()?->getId()]);
-}
-
 
 }

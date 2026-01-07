@@ -2,14 +2,12 @@
 
 namespace App\Entity;
 
-use App\Enum\NoteStatus;
-use App\Repository\NoteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: NoteRepository::class)]
-#[ORM\Index(columns: ['created_at'])]
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class Note
 {
     #[ORM\Id]
@@ -17,48 +15,39 @@ class Note
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Team::class)]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Team $team = null;
-
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $createdBy = null;
-
-    #[ORM\Column(length: 140)]
-    private string $title = '';
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 20, enumType: NoteStatus::class)]
-    private NoteStatus $status = NoteStatus::TODO;
+    #[ORM\Column(type: 'string', enumType: \App\Enum\NoteStatus::class)]
+    private \App\Enum\NoteStatus $status = \App\Enum\NoteStatus::TODO;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dueAt = null;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
 
-    #[ORM\Column]
-    private \DateTimeImmutable $updatedAt;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Team $team = null;
 
-    /**
-     * @var Collection<int, NoteAssignment>
-     */
     #[ORM\OneToMany(mappedBy: 'note', targetEntity: NoteAssignment::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $assignments;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
-        $now = new \DateTimeImmutable();
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
         $this->assignments = new ArrayCollection();
-    }
-
-    public function touch(): void
-    {
+        $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
 
@@ -67,31 +56,7 @@ class Note
         return $this->id;
     }
 
-    public function getTeam(): ?Team
-    {
-        return $this->team;
-    }
-
-    public function setTeam(Team $team): static
-    {
-        $this->team = $team;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?User
-    {
-        return $this->createdBy;
-    }
-
-    public function setCreatedBy(User $user): static
-    {
-        $this->createdBy = $user;
-
-        return $this;
-    }
-
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -99,7 +64,6 @@ class Note
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -111,19 +75,17 @@ class Note
     public function setContent(?string $content): static
     {
         $this->content = $content;
-
         return $this;
     }
 
-    public function getStatus(): NoteStatus
+    public function getStatus(): \App\Enum\NoteStatus
     {
         return $this->status;
     }
 
-    public function setStatus(NoteStatus $status): static
+    public function setStatus(\App\Enum\NoteStatus $status): static
     {
         $this->status = $status;
-
         return $this;
     }
 
@@ -135,21 +97,34 @@ class Note
     public function setDueAt(?\DateTimeImmutable $dueAt): static
     {
         $this->dueAt = $dueAt;
-
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedBy(): ?User
     {
-        return $this->createdAt;
+        return $this->createdBy;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function setCreatedBy(?User $createdBy): static
     {
-        return $this->updatedAt;
+        $this->createdBy = $createdBy;
+        return $this;
     }
 
-    /** @return Collection<int, NoteAssignment> */
+    public function getTeam(): ?Team
+    {
+        return $this->team;
+    }
+
+    public function setTeam(?Team $team): static
+    {
+        $this->team = $team;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NoteAssignment>
+     */
     public function getAssignments(): Collection
     {
         return $this->assignments;
@@ -167,20 +142,74 @@ class Note
 
     public function removeAssignment(NoteAssignment $assignment): static
     {
-        $this->assignments->removeElement($assignment);
+        if ($this->assignments->removeElement($assignment)) {
+            if ($assignment->getNote() === $this) {
+                $assignment->setNote(null);
+            }
+        }
 
         return $this;
     }
 
-    /** @return list<User> */
+    /**
+     * Get all assignees (users assigned to this note)
+     * 
+     * @return User[]
+     */
     public function getAssignees(): array
     {
-        $users = [];
-
-        foreach ($this->assignments as $a) {
-            $users[] = $a->getAssignee();
-        }
-
-        return $users;
+        return $this->assignments->map(fn(NoteAssignment $a) => $a->getAssignee())->toArray();
     }
+
+    /**
+     * Check if a user is assigned to this note
+     */
+    public function isAssignedTo(User $user): bool
+    {
+        foreach ($this->assignments as $assignment) {
+            if ($assignment->getAssignee()->getId() === $user->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function touch(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+    public function canEdit(User $user): bool
+{
+    return $this->getCreatedBy()?->getId() === $user->getId();
+}
+
+public function canChangeStatus(User $user): bool
+{
+    // owner OU assigné
+    return $this->canEdit($user) || $this->isAssignedTo($user);
+}
+
 }
