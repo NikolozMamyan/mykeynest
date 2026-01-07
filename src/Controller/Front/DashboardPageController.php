@@ -34,7 +34,7 @@ final class DashboardPageController extends AbstractController
         // Partages actifs (où user est owner)
         $sharedCount = (int) $em->getRepository(SharedAccess::class)->count(['owner' => $user]);
 
-        // Teams cards : pour chaque team, compter membres + identifiants
+        // Teams cards
         $teamsCards = [];
         foreach ($ownedTeams as $team) {
             $teamsCards[] = [
@@ -42,7 +42,7 @@ final class DashboardPageController extends AbstractController
                 'name' => $team->getName(),
                 'membersCount' => $team->getMembers()->count(),
                 'credentialsCount' => $team->getCredentials()->count(),
-                'roleLabel' => 'Propriétaire', // tu peux adapter selon ton TeamMember si tu l’utilises
+                'roleLabel' => 'Propriétaire', // optionnel : tu peux aussi i18n plus tard
                 'roleClass' => 'owner',
                 'avatar' => mb_strtoupper(mb_substr($team->getName(), 0, 2)),
             ];
@@ -55,13 +55,13 @@ final class DashboardPageController extends AbstractController
             5
         );
 
-        // Activité récente (simple, basé sur les derniers credentials + drafts + shares)
-        // Pour un vrai "activity log", il faudra une table Activity.
+        // Activité récente
         $recentCredentials = $em->getRepository(Credential::class)->findBy(
             ['user' => $user],
             ['createdAt' => 'DESC'],
             3
         );
+
         $recentShares = $em->getRepository(SharedAccess::class)->findBy(
             ['owner' => $user],
             ['createdAt' => 'DESC'],
@@ -73,7 +73,7 @@ final class DashboardPageController extends AbstractController
         foreach ($recentCredentials as $c) {
             $activity[] = [
                 'type' => 'credential_created',
-                'title' => 'Nouvel identifiant créé',
+                'title_key' => 'dashboard.activity.credential_created.title',
                 'desc' => $c->getName(),
                 'at' => $c->getCreatedAt(),
             ];
@@ -82,8 +82,8 @@ final class DashboardPageController extends AbstractController
         foreach ($drafts as $d) {
             $activity[] = [
                 'type' => 'draft_created',
-                'title' => 'Brouillon créé',
-                'desc' => $d->getName() ?: 'Sans nom',
+                'title_key' => 'dashboard.activity.draft_created.title',
+                'desc' => $d->getName() ?: null, // fallback côté twig via trans
                 'at' => $d->getCreatedAt(),
             ];
         }
@@ -91,8 +91,8 @@ final class DashboardPageController extends AbstractController
         foreach ($recentShares as $s) {
             $activity[] = [
                 'type' => 'share_created',
-                'title' => 'Accès partagé',
-                'desc' => $s->getCredential()?->getName() ?? 'Identifiant',
+                'title_key' => 'dashboard.activity.share_created.title',
+                'desc' => $s->getCredential()?->getName() ?: null, // fallback twig
                 'at' => $s->getCreatedAt(),
             ];
         }

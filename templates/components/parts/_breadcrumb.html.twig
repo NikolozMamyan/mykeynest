@@ -1,4 +1,4 @@
-        <style>
+<style>
 /* Fil d'Ariane */
 .breadcrumb-nav {
   background: var(--color-white);
@@ -63,10 +63,9 @@
   align-items: center;
   font-size: 12px;
 }
-
-
 </style>
-<nav class="breadcrumb-nav" aria-label="Fil d'Ariane">
+
+<nav class="breadcrumb-nav" aria-label="{{ 'breadcrumb.aria'|default('Breadcrumb')|trans }}">
   <ol class="breadcrumb-list">
     {% for item in items %}
       {% set isActive = item.active is defined and item.active %}
@@ -77,15 +76,16 @@
             {% if item.icon is defined %}
               <i class="{{ item.icon }}"></i>
             {% endif %}
-            <span> {{ item.label }}</span>
+            <span>{{ item.label|trans }}</span>
           </a>
         {% else %}
           {% if item.icon is defined %}
             <i class="{{ item.icon }}"></i>
           {% endif %}
-          <span> {{ item.label }}</span>
+          <span>{{ item.label|trans }}</span>
         {% endif %}
       </li>
+
       {% if not loop.last %}
         <li class="breadcrumb-separator" aria-hidden="true">
           <i class="fas fa-chevron-right"></i>
@@ -94,5 +94,3 @@
     {% endfor %}
   </ol>
 </nav>
-
-

@@ -8,30 +8,33 @@
   <div class="hero-section">
     <div class="hero-content">
       <div class="hero-text">
-        <h1 class="hero-title">Gestion des accès partagés</h1>
-        <p class="hero-subtitle">Partagez vos identifiants en toute sécurité et gérez les accès en temps réel.</p>
+        <h1 class="hero-title">{{ 'shared_access.index.hero.title'|trans }}</h1>
+        <p class="hero-subtitle">{{ 'shared_access.index.hero.subtitle'|trans }}</p>
       </div>
+
       <a href="{{ path('shared_access_new') }}" class="btn-primary">
         <i class="fas fa-share-alt"></i>
-        <span>Nouveau partage</span>
+        <span>{{ 'shared_access.index.hero.new'|trans }}</span>
       </a>
     </div>
   </div>
+
   <!-- Tabs -->
   <div class="tabs-wrapper">
     <div class="tabs-header">
       <button class="tab-btn active" data-tab="shared-by-me">
         <i class="fas fa-share-alt"></i>
-        <span>Partagés par moi</span>
+        <span>{{ 'shared_access.index.tabs.shared_by_me'|trans }}</span>
         <span class="tab-badge">{{ sharedByMe|length }}</span>
       </button>
+
       <button class="tab-btn" data-tab="shared-with-me">
         <i class="fas fa-inbox"></i>
-        <span>Partagés avec moi</span>
+        <span>{{ 'shared_access.index.tabs.shared_with_me'|trans }}</span>
         <span class="tab-badge">{{ sharedWithMe|length }}</span>
       </button>
     </div>
-    
+
     <!-- Tab Content: Shared by me -->
     <div id="shared-by-me" class="tab-panel active">
       {% if sharedByMe is empty %}
@@ -41,11 +44,13 @@
               <i class="fas fa-share-alt"></i>
             </div>
           </div>
-          <h3 class="empty-title">Aucun partage effectué</h3>
-          <p class="empty-description">Commencez à partager vos identifiants avec d'autres utilisateurs de manière sécurisée.</p>
+
+          <h3 class="empty-title">{{ 'shared_access.index.empty.by_me.title'|trans }}</h3>
+          <p class="empty-description">{{ 'shared_access.index.empty.by_me.text'|trans }}</p>
+
           <a href="{{ path('shared_access_new') }}" class="btn-primary-outline">
             <i class="fas fa-plus"></i>
-            <span>Créer mon premier partage</span>
+            <span>{{ 'shared_access.index.empty.by_me.cta'|trans }}</span>
           </a>
         </div>
       {% else %}
@@ -70,7 +75,7 @@
                 <!-- Body -->
                 <div class="card-body">
                   <div class="info-row">
-                    <span class="info-label">Partagé avec</span>
+                    <span class="info-label">{{ 'shared_access.index.labels.shared_with'|trans }}</span>
                     <div class="user-badge">
                       <div class="user-avatar-sm color-{{ (loop.index * 3) % 5 }}">
                         {{ access.guest.email|first|upper }}
@@ -81,9 +86,9 @@
                       </div>
                     </div>
                   </div>
-                  
+
                   <div class="info-row">
-                    <span class="info-label">Date de partage</span>
+                    <span class="info-label">{{ 'shared_access.index.labels.shared_date'|trans }}</span>
                     <div class="date-badge">
                       <i class="far fa-calendar-alt"></i>
                       <span>{{ access.createdAt|date('d/m/Y') }}</span>
@@ -93,11 +98,13 @@
 
                 <!-- Footer -->
                 <div class="card-footer">
-                  <form method="post" action="{{ path('shared_access_revoke', {'id': access.id}) }}" class="revoke-form">
+                  <form method="post"
+                        action="{{ path('shared_access_revoke', {'id': access.id}) }}"
+                        class="revoke-form">
                     <input type="hidden" name="_token" value="{{ csrf_token('revoke' ~ access.id) }}">
                     <button type="button" class="btn-danger revoke-btn" data-id="{{ access.id }}">
                       <i class="fas fa-user-slash"></i>
-                      <span>Révoquer l'accès</span>
+                      <span>{{ 'shared_access.index.actions.revoke'|trans }}</span>
                     </button>
                   </form>
                 </div>
@@ -107,7 +114,7 @@
         </div>
       {% endif %}
     </div>
-    
+
     <!-- Tab Content: Shared with me -->
     <div id="shared-with-me" class="tab-panel">
       {% if sharedWithMe is empty %}
@@ -117,8 +124,8 @@
               <i class="fas fa-inbox"></i>
             </div>
           </div>
-          <h3 class="empty-title">Aucun identifiant reçu</h3>
-          <p class="empty-description">Vous n'avez pas encore reçu d'identifiants partagés par d'autres utilisateurs.</p>
+          <h3 class="empty-title">{{ 'shared_access.index.empty.with_me.title'|trans }}</h3>
+          <p class="empty-description">{{ 'shared_access.index.empty.with_me.text'|trans }}</p>
         </div>
       {% else %}
         <div class="access-grid">
@@ -142,7 +149,7 @@
                 <!-- Body -->
                 <div class="card-body">
                   <div class="info-row">
-                    <span class="info-label">Partagé par</span>
+                    <span class="info-label">{{ 'shared_access.index.labels.shared_by'|trans }}</span>
                     <div class="user-badge">
                       <div class="user-avatar-sm color-{{ (loop.index * 3) % 5 }}">
                         {{ access.owner.email|first|upper }}
@@ -153,9 +160,9 @@
                       </div>
                     </div>
                   </div>
-                  
+
                   <div class="info-row">
-                    <span class="info-label">Date de partage</span>
+                    <span class="info-label">{{ 'shared_access.index.labels.shared_date'|trans }}</span>
                     <div class="date-badge">
                       <i class="far fa-calendar-alt"></i>
                       <span>{{ access.createdAt|date('d/m/Y') }}</span>
@@ -167,7 +174,7 @@
                 <div class="card-footer">
                   <a href="{{ path('shared_access_view_credential', {'id': access.id}) }}" class="btn-view">
                     <i class="fas fa-key"></i>
-                    <span>Voir les identifiants</span>
+                    <span>{{ 'shared_access.index.actions.view_credentials'|trans }}</span>
                   </a>
                 </div>
               </div>
@@ -178,35 +185,42 @@
     </div>
   </div>
 
+  <!-- Revoke Modal -->
+  <div id="revoke-modal" class="modal"
+       data-loading-text="{{ 'shared_access.index.modal.loading'|trans|e('html_attr') }}">
+    <div class="modal-overlay"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ 'shared_access.index.modal.title'|trans }}</h3>
+        <button class="modal-close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-<!-- Revoke Modal -->
-<div id="revoke-modal" class="modal">
-  <div class="modal-overlay"></div>
-  <div class="modal-dialog">
-    <div class="modal-header">
-      <h3 class="modal-title">Confirmer la révocation</h3>
-      <button class="modal-close">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="warning-box">
-        <i class="fas fa-exclamation-triangle"></i>
-        <div>
-          <p class="warning-title">Attention : Action irréversible</p>
-          <p class="warning-text">Êtes-vous sûr de vouloir révoquer cet accès partagé ? L'utilisateur perdra immédiatement l'accès à ces identifiants.</p>
+      <div class="modal-body">
+        <div class="warning-box">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <p class="warning-title">{{ 'shared_access.index.modal.warning_title'|trans }}</p>
+            <p class="warning-text">{{ 'shared_access.index.modal.warning_text'|trans }}</p>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button id="cancel-revoke" class="btn-secondary">Annuler</button>
-      <button id="confirm-revoke" class="btn-danger-confirm">
-        <i class="fas fa-user-slash"></i>
-        <span>Confirmer la révocation</span>
-      </button>
+
+      <div class="modal-footer">
+        <button id="cancel-revoke" class="btn-secondary">
+          {{ 'shared_access.index.modal.cancel'|trans }}
+        </button>
+
+        <button id="confirm-revoke" class="btn-danger-confirm"
+                data-default-text="{{ 'shared_access.index.modal.confirm'|trans|e('html_attr') }}">
+          <i class="fas fa-user-slash"></i>
+          <span>{{ 'shared_access.index.modal.confirm'|trans }}</span>
+        </button>
+      </div>
     </div>
   </div>
-</div>
+
 
 <style>
 
@@ -1054,15 +1068,20 @@
     modalOverlay.addEventListener('click', closeModal);
 
     // Confirm revocation
-    confirmButton.addEventListener('click', function() {
-      if (currentForm) {
-        // Add loading state
-        this.disabled = true;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Révocation en cours...</span>';
-        
-        currentForm.submit();
-      }
-    });
+// Confirm revocation
+confirmButton.addEventListener('click', function() {
+  if (currentForm) {
+    const modalEl = document.getElementById('revoke-modal');
+    const loadingText = modalEl?.dataset.loadingText || 'Loading...';
+
+    // Add loading state
+    this.disabled = true;
+    this.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>${loadingText}</span>`;
+
+    currentForm.submit();
+  }
+});
+
 
     // Close modal with Escape key
     document.addEventListener('keydown', function(e) {

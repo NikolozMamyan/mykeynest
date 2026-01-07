@@ -373,101 +373,114 @@
 
 
 <!-- === SIDEBAR === -->
-<aside class="sidebar"
-       data-layout-target="sidebar">
+<aside class="sidebar" data-layout-target="sidebar">
 
   <!-- Header du logo (mobile) -->
   <div class="sidebar-header">
     <div class="logo-container">
-   {% include 'components/parts/logo.html.twig' %}
+      {% include 'components/parts/logo.html.twig' %}
     </div>
   </div>
 
   <!-- Navigation -->
   <nav class="sidebar-nav">
+
+    <!-- ===== Main ===== -->
     <div class="nav-section">
-      <div class="nav-section-title">Principal</div>
+      <div class="nav-section-title">
+        {{ 'sidebar.sections.main'|trans }}
+      </div>
 
       <a href="{{ path('app_dashboard') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_dashboard' ? 'active' : '' }}">
         <i class="fas fa-house"></i>
-        <span>Tableau de bord</span>
+        <span>{{ 'sidebar.items.dashboard'|trans }}</span>
       </a>
+
       <a href="{{ path('app_team_index') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_team_index' ? 'active' : '' }}">
         <i class="fas fa-users"></i>
-        <span>Équipes</span>
+        <span>{{ 'sidebar.items.teams'|trans }}</span>
       </a>
+
       <a href="{{ path('app_credential') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_credential' ? 'active' : '' }}">
         <i class="fas fa-key"></i>
-        <span>Mots de passe</span>
-        <span class="nav-item-badge"
-              data-layout-target="passLength"></span>
+        <span>{{ 'sidebar.items.credentials'|trans }}</span>
+        <span class="nav-item-badge" data-layout-target="passLength"></span>
       </a>
 
       <a href="{{ path('shared_access_index') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'shared_access_index' ? 'active' : '' }}">
         <i class="fas fa-share-alt"></i>
-        <span>Partages sécurisées</span>
+        <span>{{ 'sidebar.items.shared_access'|trans }}</span>
       </a>
 
-      <a href="{{path('app_extention')}}"
+      <a href="{{ path('app_extention') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_extention' ? 'active' : '' }}">
         <i class="fas fa-plug"></i>
-        <span>Extension navigateur</span>
+        <span>{{ 'sidebar.items.extension'|trans }}</span>
       </a>
     </div>
 
     <div class="nav-divider"></div>
 
+    <!-- ===== Tools ===== -->
     <div class="nav-section">
-      <div class="nav-section-title">Outils</div>
-      <a href="{{path('app_generator')}}"
+      <div class="nav-section-title">
+        {{ 'sidebar.sections.tools'|trans }}
+      </div>
+
+      <a href="{{ path('app_generator') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
         <i class="fas fa-wand-magic-sparkles"></i>
-        <span>Générateur</span>
+        <span>{{ 'sidebar.items.generator'|trans }}</span>
       </a>
-      <a href="{{path('app_note')}}"
+
+      <a href="{{ path('app_note') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_note' ? 'active' : '' }}">
         <i class="fas fa-note-sticky"></i>
-        <span>Notes sécurisées</span>
+        <span>{{ 'sidebar.items.notes'|trans }}</span>
       </a>
-      <a href="{{path('app_security_checker')}}"
+
+      <a href="{{ path('app_security_checker') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
         <i class="fas fa-shield-heart"></i>
-        <span>Vérificateur de sécurité</span>
+        <span>{{ 'sidebar.items.security_checker'|trans }}</span>
       </a>
     </div>
 
     <div class="nav-divider"></div>
 
+    <!-- ===== Settings ===== -->
     <div class="nav-section">
-      <div class="nav-section-title">Paramètres</div>
+      <div class="nav-section-title">
+        {{ 'sidebar.sections.settings'|trans }}
+      </div>
+
       <a href="{{ path('app_subscription') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_subscription' ? 'active' : '' }}">
         <i class="fas fa-receipt"></i>
-        <span>Abonnements</span>
+        <span>{{ 'sidebar.items.subscription'|trans }}</span>
       </a>
+
       <a href="{{ path('app_settings') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_settings' ? 'active' : '' }}">
         <i class="fas fa-gear"></i>
-        <span>Paramètres</span>
+        <span>{{ 'sidebar.items.settings'|trans }}</span>
       </a>
-      {# <a href=""
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_security' ? 'active' : '' }}">
-        <i class="fas fa-shield"></i>
-        <span>Sécurité</span>
-      </a> #}
     </div>
   </nav>
 
+  <!-- Footer -->
   <div class="sidebar-footer">
-    <a href="" class="logout-btn"
+    <a href="#"
+       class="logout-btn"
        data-controller="auth"
        data-action="click->auth#logout">
       <i class="fas fa-sign-out-alt"></i>
-      <span>Déconnexion</span>
+      <span>{{ 'sidebar.items.logout'|trans }}</span>
     </a>
   </div>
 </aside>
+

@@ -665,13 +665,14 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
     <div class="header-left">
       <h1 class="header-title">
         <i class="fa-solid fa-clipboard-check"></i>
-        Notes & Tasks
+        {{ 'note.index.header.title'|trans }}
       </h1>
+
       <div class="header-subtitle">
         {% if isPersonalWorkspace %}
           <span class="workspace-badge">
             <i class="fa-solid fa-user"></i>
-            Personal Workspace
+            {{ 'note.index.header.personal_workspace'|trans }}
           </span>
         {% else %}
           <span class="workspace-badge">
@@ -685,7 +686,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
     <div class="header-actions">
       <select class="team-selector" onchange="location.href=this.value">
         <option value="{{ path('app_note') }}" {{ isPersonalWorkspace ? 'selected' : '' }}>
-          Personal Workspace
+          {{ 'note.index.workspace.selector_personal'|trans }}
         </option>
         {% for t in myTeams %}
           <option value="{{ path('app_note', { teamId: t.id }) }}" {{ team and t.id == team.id ? 'selected' : '' }}>
@@ -697,11 +698,13 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
       {% if canCreateNote %}
         <button class="btn btn-primary" onclick="document.getElementById('noteModal').showModal()">
           <i class="fa-solid fa-plus"></i>
-          New Note
+          {{ 'note.index.actions.new_note'|trans }}
         </button>
       {% endif %}
 
-      <button class="btn btn-secondary btn-icon" onclick="location.reload()" title="Refresh">
+      <button class="btn btn-secondary btn-icon"
+              onclick="location.reload()"
+              title="{{ 'note.index.actions.refresh'|trans }}">
         <i class="fa-solid fa-rotate"></i>
       </button>
     </div>
@@ -724,9 +727,9 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
   <!-- Board -->
   <div class="board">
     {% set statusConfig = {
-      'todo': { title: 'To Do', icon: 'circle', badge: 'badge-todo' },
-      'in_progress': { title: 'In Progress', icon: 'spinner', badge: 'badge-progress' },
-      'done': { title: 'Done', icon: 'circle-check', badge: 'badge-done' }
+      'todo': { title: ('note.index.board.statuses.todo'|trans), icon: 'circle', badge: 'badge-todo' },
+      'in_progress': { title: ('note.index.board.statuses.in_progress'|trans), icon: 'spinner', badge: 'badge-progress' },
+      'done': { title: ('note.index.board.statuses.done'|trans), icon: 'circle-check', badge: 'badge-done' }
     } %}
 
     {% for statusKey, config in statusConfig %}
@@ -744,12 +747,14 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
         {% if notesByStatus[statusKey]|length > 0 %}
           <div class="notes-table">
             <div class="table-header">
-              <div class="table-header-cell">Task</div>
-              <div class="table-header-cell">Assigned</div>
-              <div class="table-header-cell">Progress</div>
-              <div class="table-header-cell">Status</div>
-              <div class="table-header-cell">Due Date</div>
-              <div class="table-header-cell" style="text-align: right;">Actions</div>
+              <div class="table-header-cell">{{ 'note.index.board.table.task'|trans }}</div>
+              <div class="table-header-cell">{{ 'note.index.board.table.assigned'|trans }}</div>
+              <div class="table-header-cell">{{ 'note.index.board.table.progress'|trans }}</div>
+              <div class="table-header-cell">{{ 'note.index.board.table.status'|trans }}</div>
+              <div class="table-header-cell">{{ 'note.index.board.table.due_date'|trans }}</div>
+              <div class="table-header-cell" style="text-align: right;">
+                {{ 'note.index.board.table.actions'|trans }}
+              </div>
             </div>
 
             <div class="table-body">
@@ -772,7 +777,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                       {% endif %}
                     </div>
 
-                    <!-- Assigned (visible pour tout le monde qui peut voir la note) -->
+                    <!-- Assigned -->
                     <div class="cell assignees-cell">
                       {% if note.assignments|length > 0 %}
                         <div class="assignee-avatars">
@@ -786,7 +791,9 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                           {% endif %}
                         </div>
                       {% else %}
-                        <span class="unassigned-badge">Unassigned</span>
+                        <span class="unassigned-badge">
+                          {{ 'note.index.board.badges.unassigned'|trans }}
+                        </span>
                       {% endif %}
                     </div>
 
@@ -799,15 +806,21 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                       <span class="progress-text">{{ progress }}%</span>
                     </div>
 
-                    <!-- Status : Owner OU Assigné => peut changer -->
+                    <!-- Status -->
                     <div class="cell">
                       {% if isOwner or isAssignee %}
                         <form method="post" action="{{ path('app_note_status', { id: note.id }) }}" style="width: 100%;">
                           <input type="hidden" name="_token" value="{{ csrf_token('status_note_' ~ note.id) }}">
                           <select name="status" class="status-select" onchange="this.form.submit()">
-                            <option value="todo" {{ statusKey == 'todo' ? 'selected' : '' }}>To Do</option>
-                            <option value="in_progress" {{ statusKey == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                            <option value="done" {{ statusKey == 'done' ? 'selected' : '' }}>Done</option>
+                            <option value="todo" {{ statusKey == 'todo' ? 'selected' : '' }}>
+                              {{ 'note.index.board.statuses.todo'|trans }}
+                            </option>
+                            <option value="in_progress" {{ statusKey == 'in_progress' ? 'selected' : '' }}>
+                              {{ 'note.index.board.statuses.in_progress'|trans }}
+                            </option>
+                            <option value="done" {{ statusKey == 'done' ? 'selected' : '' }}>
+                              {{ 'note.index.board.statuses.done'|trans }}
+                            </option>
                           </select>
                         </form>
                       {% else %}
@@ -828,16 +841,16 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                       {% endif %}
                     </div>
 
-                    <!-- Actions : seulement OWNER -->
+                    <!-- Actions (Owner only) -->
                     <div class="cell actions-cell">
                       {% if isOwner %}
                         {% if (teamUsers|length > 0 or not team) %}
                           <form method="post" action="{{ path('app_note_assign', { id: note.id }) }}" class="assign-dropdown">
                             <input type="hidden" name="_token" value="{{ csrf_token('assign_note_' ~ note.id) }}">
                             <select name="assignee_id" class="assign-select" onchange="this.form.submit()">
-                              <option value="">Assign…</option>
+                              <option value="">{{ 'note.index.board.assign.placeholder'|trans }}</option>
                               {% if not team %}
-                                <option value="{{ app.user.id }}">Yourself</option>
+                                <option value="{{ app.user.id }}">{{ 'note.index.board.assign.yourself'|trans }}</option>
                               {% else %}
                                 {% for user in teamUsers %}
                                   <option value="{{ user.id }}">{{ user.email|split('@')[0] }}</option>
@@ -847,14 +860,17 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                           </form>
                         {% endif %}
 
-                        <form method="post" action="{{ path('app_note_delete', { id: note.id }) }}" onsubmit="return confirm('Delete this note?')">
+                        <form method="post"
+                              action="{{ path('app_note_delete', { id: note.id }) }}"
+                              onsubmit="return confirm('{{ 'note.index.board.delete.confirm'|trans }}')">
                           <input type="hidden" name="_token" value="{{ csrf_token('delete_note_' ~ note.id) }}">
-                          <button type="submit" class="action-btn danger" title="Delete">
+                          <button type="submit"
+                                  class="action-btn danger"
+                                  title="{{ 'note.index.board.delete.title'|trans }}">
                             <i class="fa-solid fa-trash"></i>
                           </button>
                         </form>
                       {% else %}
-                        {# assigné => rien ici #}
                         <span></span>
                       {% endif %}
                     </div>
@@ -866,7 +882,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
         {% else %}
           <div class="empty-state">
             <i class="fa-solid fa-inbox"></i>
-            <p>No notes in this section</p>
+            <p>{{ 'note.index.board.empty_column'|trans }}</p>
           </div>
         {% endif %}
       </div>
@@ -878,7 +894,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
   <!-- Create Note Modal -->
   <dialog id="noteModal" class="modal">
     <div class="modal-header">
-      <h2 class="modal-title">Create New Note</h2>
+      <h2 class="modal-title">{{ 'note.index.modal.title'|trans }}</h2>
       <button class="action-btn" onclick="document.getElementById('noteModal').close()">
         <i class="fa-solid fa-xmark"></i>
       </button>
@@ -916,11 +932,11 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
 
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="document.getElementById('noteModal').close()">
-        Cancel
+        {{ 'note.index.modal.cancel'|trans }}
       </button>
       <button class="btn btn-primary" onclick="document.querySelector('#noteModal form').submit()">
         <i class="fa-solid fa-check"></i>
-        Create Note
+        {{ 'note.index.modal.create'|trans }}
       </button>
     </div>
   </dialog>

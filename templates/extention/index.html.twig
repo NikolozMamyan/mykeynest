@@ -860,109 +860,108 @@ color:var(--color-text-dark);
         <i class="fa-solid fa-puzzle-piece"></i>
       </div>
     </div>
-    <h1>Extension navigateur</h1>
-    <p class="tagline">Accédez à vos mots de passe directement depuis votre navigateur</p>
-    
+
+    <h1>{{ 'extension.page.hero.title'|trans }}</h1>
+    <p class="tagline">{{ 'extension.page.hero.tagline'|trans }}</p>
+
     <a href="/path/to/your/extension.zip" class="download-btn" download>
       <i class="fa-solid fa-download"></i>
-      Télécharger l'extension
+      {{ 'extension.page.hero.download'|trans }}
     </a>
   </section>
 
   <div class="demo-window">
-  <div class="window-header">
-    <div class="window-dot dot-red"></div>
-    <div class="window-dot dot-yellow"></div>
-    <div class="window-dot dot-green"></div>
-    <div class="window-title"><i class="fa-solid fa-browser"></i> Installation de l'extension</div>
-  </div>
-
-  <div class="window-content">
-    <div class="screenshot-container">
-      <div class="screenshot active" data-step="1" 
-           style="background-image: url('https://picsum.photos/1000/500?1');">
-        <div class="screenshot-placeholder">
-          <div class="screenshot-placeholder-icon">
-            <i class="fa-solid fa-download"></i>
-          </div>
-          <h3>Étape 1 : Téléchargement</h3>
-          <p>Téléchargez le fichier ZIP de l'extension</p>
-        </div>
-      </div>
-
-      <div class="screenshot" data-step="2" 
-           style="background-image: url('https://picsum.photos/1000/500?2');">
-        <div class="screenshot-placeholder">
-          <div class="screenshot-placeholder-icon">
-            <i class="fa-solid fa-cog"></i>
-          </div>
-          <h3>Étape 2 : Installation</h3>
-          <p>Installez l'extension dans votre navigateur</p>
-        </div>
-      </div>
-
-      <div class="screenshot" data-step="3" 
-           style="background-image: url('https://picsum.photos/1000/500?3');">
-        <div class="screenshot-placeholder">
-          <div class="screenshot-placeholder-icon">
-            <i class="fa-solid fa-key"></i>
-          </div>
-          <h3>Étape 3 : Configuration</h3>
-          <p>Configurez votre clé API pour commencer</p>
-        </div>
+    <div class="window-header">
+      <div class="window-dot dot-red"></div>
+      <div class="window-dot dot-yellow"></div>
+      <div class="window-dot dot-green"></div>
+      <div class="window-title">
+        <i class="fa-solid fa-browser"></i>
+        {{ 'extension.page.demo.window_title'|trans }}
       </div>
     </div>
 
-    <div class="navigation-dots">
-      <div class="nav-dot active" data-step="1"></div>
-      <div class="nav-dot" data-step="2"></div>
-      <div class="nav-dot" data-step="3"></div>
+    <div class="window-content">
+      <div class="screenshot-container">
+        <div class="screenshot active" data-step="1"
+             style="background-image: url('https://picsum.photos/1000/500?1');">
+          <div class="screenshot-placeholder">
+            <div class="screenshot-placeholder-icon">
+              <i class="fa-solid fa-download"></i>
+            </div>
+            <h3>{{ 'extension.page.demo.step1_title'|trans }}</h3>
+            <p>{{ 'extension.page.demo.step1_text'|trans }}</p>
+          </div>
+        </div>
+
+        <div class="screenshot" data-step="2"
+             style="background-image: url('https://picsum.photos/1000/500?2');">
+          <div class="screenshot-placeholder">
+            <div class="screenshot-placeholder-icon">
+              <i class="fa-solid fa-cog"></i>
+            </div>
+            <h3>{{ 'extension.page.demo.step2_title'|trans }}</h3>
+            <p>{{ 'extension.page.demo.step2_text'|trans }}</p>
+          </div>
+        </div>
+
+        <div class="screenshot" data-step="3"
+             style="background-image: url('https://picsum.photos/1000/500?3');">
+          <div class="screenshot-placeholder">
+            <div class="screenshot-placeholder-icon">
+              <i class="fa-solid fa-key"></i>
+            </div>
+            <h3>{{ 'extension.page.demo.step3_title'|trans }}</h3>
+            <p>{{ 'extension.page.demo.step3_text'|trans }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="navigation-dots">
+        <div class="nav-dot active" data-step="1"></div>
+        <div class="nav-dot" data-step="2"></div>
+        <div class="nav-dot" data-step="3"></div>
+      </div>
     </div>
   </div>
-</div>
-
 
   <!-- ====== Steps Grid ====== -->
   <div class="steps-grid">
-    <!-- Étape 1 : Installation -->
+
+    <!-- Step 1 -->
     <div class="card">
       <div class="card-header">
         <div class="step-number">1</div>
         <div class="card-icon"><i class="fa-solid fa-download"></i></div>
         <div class="card-title">
-          <h2>Installez l'extension</h2>
-          <div class="helper">Chargez l'extension dans votre navigateur préféré</div>
+          <h2>{{ 'extension.page.cards.install.title'|trans }}</h2>
+          <div class="helper">{{ 'extension.page.cards.install.helper'|trans }}</div>
         </div>
       </div>
+
       <div class="card-body">
         <p style="color: var(--color-text-medium); margin-bottom: var(--spacing-lg); line-height: 1.6;">
-          Téléchargez le fichier ZIP puis suivez les instructions selon votre navigateur :
+          {{ 'extension.page.cards.install.intro'|trans }}
         </p>
-        
+
         <div class="browser-list">
           <div class="browser-card">
             <div class="browser-header">
               <span class="browser-icon">🌐</span>
-              <strong>Chrome / Edge</strong>
+              <strong>{{ 'extension.page.cards.install.browsers.chrome_edge'|trans }}</strong>
             </div>
             <div class="browser-steps">
-              1. Ouvrez <code>chrome://extensions</code><br>
-              2. Activez le <strong>Mode développeur</strong><br>
-              3. Cliquez sur <strong>Charger l'extension</strong><br>
-              4. Sélectionnez le dossier décompressé
+              {{ 'extension.page.cards.install.browsers.chrome_edge_steps'|trans|raw }}
             </div>
           </div>
-          
+
           <div class="browser-card">
             <div class="browser-header">
               <span class="browser-icon">🦊</span>
-              <strong>Firefox</strong>
+              <strong>{{ 'extension.page.cards.install.browsers.firefox'|trans }}</strong>
             </div>
             <div class="browser-steps">
-              1. Ouvrez <code>about:debugging</code><br>
-              2. Cliquez sur <strong>Ce Firefox</strong><br>
-              3. Cliquez sur <strong>Charger un module temporaire</strong><br>
-              4. Sélectionnez <code>manifest.json</code>
+              {{ 'extension.page.cards.install.browsers.firefox_steps'|trans|raw }}
             </div>
           </div>
         </div>
@@ -970,42 +969,58 @@ color:var(--color-text-dark);
         <div class="alert alert-info">
           <i class="fa-solid fa-lightbulb"></i>
           <div>
-            <strong>Astuce :</strong> Une fois installée, épinglez l'extension à votre barre d'outils pour un accès rapide.
+            <strong>{{ 'extension.page.cards.install.tip.title'|trans }}</strong>
+            {{ 'extension.page.cards.install.tip.text'|trans }}
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Étape 2 : Clé API -->
+    <!-- Step 2 -->
     <div class="card">
       <div class="card-header">
         <div class="step-number">2</div>
         <div class="card-icon"><i class="fa-solid fa-key"></i></div>
         <div class="card-title">
-          <h2>Récupérez votre clé API</h2>
-          <div class="helper">Cette clé permet de connecter l'extension à votre compte</div>
+          <h2>{{ 'extension.page.cards.api_key.title'|trans }}</h2>
+          <div class="helper">{{ 'extension.page.cards.api_key.helper'|trans }}</div>
         </div>
       </div>
+
       <div class="card-body">
         <p style="color: var(--color-text-medium); margin-bottom: var(--spacing-lg); line-height: 1.6;">
-          Votre clé API personnelle vous permet d'accéder à vos mots de passe de manière sécurisée. Copiez-la et conservez-la en lieu sûr.
+          {{ 'extension.page.cards.api_key.intro'|trans }}
         </p>
-        
-        <div class="token-section">
+
+        <div class="token-section"
+             data-toast-success-title="{{ 'extension.page.toast.success_title'|trans|e('html_attr') }}"
+             data-toast-error-title="{{ 'extension.page.toast.error_title'|trans|e('html_attr') }}"
+             data-toast-copy-success="{{ 'extension.page.toast.copy_success'|trans|e('html_attr') }}"
+             data-toast-copy-error="{{ 'extension.page.toast.copy_error'|trans|e('html_attr') }}"
+             data-sim-close="{{ 'extension.page.toast.sim_close'|trans|e('html_attr') }}"
+             data-sim-minimize="{{ 'extension.page.toast.sim_minimize'|trans|e('html_attr') }}"
+             data-sim-fullscreen="{{ 'extension.page.toast.sim_fullscreen'|trans|e('html_attr') }}">
+
           <div class="token-header">
             <i class="fa-solid fa-shield-halved token-icon"></i>
-            <span class="token-label">Votre clé API personnelle</span>
+            <span class="token-label">{{ 'extension.page.cards.api_key.label'|trans }}</span>
           </div>
-          
+
           <div class="token-display">
             <div class="token-value masked" id="tokenValue" data-token="{{ extentiotoken }}">
               ••••••••••••••••••••••••••••••••
             </div>
+
             <div class="token-actions">
-              <button class="icon-btn" onclick="toggleToken()" title="Afficher/Masquer">
+              <button class="icon-btn js-toggle-token"
+                      type="button"
+                      title="{{ 'extension.page.cards.api_key.buttons.toggle'|trans }}">
                 <i class="fa-solid fa-eye"></i>
               </button>
-              <button class="icon-btn" onclick="copyToken()" title="Copier">
+
+              <button class="icon-btn js-copy-token"
+                      type="button"
+                      title="{{ 'extension.page.cards.api_key.buttons.copy'|trans }}">
                 <i class="fa-solid fa-copy"></i>
               </button>
             </div>
@@ -1014,33 +1029,35 @@ color:var(--color-text-dark);
           <div class="alert alert-warning" style="margin-top: 20px;">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <div>
-              <strong>Important :</strong> Ne partagez jamais cette clé. Elle donne un accès complet à tous vos mots de passe.
+              <strong>{{ 'extension.page.cards.api_key.warning.title'|trans }}</strong>
+              {{ 'extension.page.cards.api_key.warning.text'|trans }}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Étape 3 : Configuration -->
+    <!-- Step 3 -->
     <div class="card">
       <div class="card-header">
         <div class="step-number">3</div>
         <div class="card-icon"><i class="fa-solid fa-check-circle"></i></div>
         <div class="card-title">
-          <h2>Configurez l'extension</h2>
-          <div class="helper">Dernière étape pour commencer à utiliser votre gestionnaire</div>
+          <h2>{{ 'extension.page.cards.configure.title'|trans }}</h2>
+          <div class="helper">{{ 'extension.page.cards.configure.helper'|trans }}</div>
         </div>
       </div>
+
       <div class="card-body">
         <p style="color: var(--color-text-medium); margin-bottom: var(--spacing-lg); line-height: 1.6;">
-          Quelques secondes suffisent pour finaliser la configuration et profiter de vos mots de passe partout :
+          {{ 'extension.page.cards.configure.intro'|trans }}
         </p>
-        
+
         <div class="final-step">
           <ul class="final-step-list">
-            <li>Cliquez sur l'icône de l'extension dans votre barre d'outils</li>
-            <li>Collez votre clé API dans le champ de connexion</li>
-            <li>Validez et profitez de vos mots de passe partout !</li>
+            <li>{{ 'extension.page.cards.configure.list.l1'|trans }}</li>
+            <li>{{ 'extension.page.cards.configure.list.l2'|trans }}</li>
+            <li>{{ 'extension.page.cards.configure.list.l3'|trans }}</li>
           </ul>
         </div>
 
@@ -1050,171 +1067,204 @@ color:var(--color-text-dark);
           <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%); border-radius: 12px; border: 2px dashed var(--color-primary);">
             <i class="fa-solid fa-rocket" style="font-size: 1.5rem; color: var(--color-primary);"></i>
             <span style="font-weight: 700; color: var(--color-text-dark); font-size: 1.1rem;">
-              Vous êtes prêt à utiliser l'extension !
+              {{ 'extension.page.cards.configure.ready'|trans }}
             </span>
           </div>
         </div>
       </div>
     </div>
+
   </div>
+
 
 
 <!-- Toast Container -->
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-  // ====== Token Management ======
-  let isTokenVisible = false;
+document.addEventListener('DOMContentLoaded', () => {
+  // =========================================================
+  // I18N (strings depuis data-* sur .token-section)
+  // =========================================================
+  const tokenSection = document.querySelector('.token-section');
+  const i18n = {
+    toastSuccessTitle: tokenSection?.dataset.toastSuccessTitle || 'Success',
+    toastErrorTitle: tokenSection?.dataset.toastErrorTitle || 'Error',
+    copySuccess: tokenSection?.dataset.toastCopySuccess || 'Copied!',
+    copyError: tokenSection?.dataset.toastCopyError || 'Copy failed',
+    simClose: tokenSection?.dataset.simClose || 'Simulated close',
+    simMinimize: tokenSection?.dataset.simMinimize || 'Simulated minimize',
+    simFullscreen: tokenSection?.dataset.simFullscreen || 'Simulated fullscreen'
+  };
 
-  function toggleToken() {
-    const tokenElement = document.getElementById('tokenValue');
-    const actualToken = tokenElement.getAttribute('data-token');
-    const eyeIcon = event.currentTarget.querySelector('i');
-    
-    if (isTokenVisible) {
-      tokenElement.textContent = '••••••••••••••••••••••••••••••••';
-      tokenElement.classList.add('masked');
-      eyeIcon.className = 'fa-solid fa-eye';
-    } else {
-      tokenElement.textContent = actualToken;
-      tokenElement.classList.remove('masked');
-      eyeIcon.className = 'fa-solid fa-eye-slash';
-    }
-    
-    isTokenVisible = !isTokenVisible;
-  }
-
-  function copyToken() {
-    const tokenElement = document.getElementById('tokenValue');
-    const actualToken = tokenElement.getAttribute('data-token');
-    const copyBtn = event.currentTarget;
-    const copyIcon = copyBtn.querySelector('i');
-    
-    navigator.clipboard.writeText(actualToken).then(() => {
-      copyIcon.className = 'fa-solid fa-check';
-      copyBtn.classList.add('success');
-      
-      showToast('Clé API copiée avec succès !', 'success');
-      
-      setTimeout(() => {
-        copyIcon.className = 'fa-solid fa-copy';
-        copyBtn.classList.remove('success');
-      }, 2000);
-    }).catch(err => {
-      console.error('Erreur de copie:', err);
-      showToast('Erreur lors de la copie', 'error');
-    });
-  }
-
-  // ====== Screenshot Carousel ======
-  let currentStep = 1;
-  const totalSteps = 3;
-
-function showScreenshot(step) {
-  document.querySelectorAll('.screenshot').forEach(screenshot => {
-    screenshot.classList.remove('active');
-  });
-  const activeScreenshot = document.querySelector(`.screenshot[data-step="${step}"]`);
-  if (activeScreenshot) {
-    activeScreenshot.classList.add('active');
-  }
-
-  document.querySelectorAll('.nav-dot').forEach(dot => dot.classList.remove('active'));
-  const activeDot = document.querySelector(`.nav-dot[data-step="${step}"]`);
-  if (activeDot) activeDot.classList.add('active');
-  currentStep = step;
-}
-
-  // Navigation par clic sur les dots
-  document.querySelectorAll('.nav-dot').forEach(dot => {
-    dot.addEventListener('click', function() {
-      const step = parseInt(this.getAttribute('data-step'));
-      showScreenshot(step);
-    });
-  });
-
-  // Navigation automatique (toutes les 5 secondes)
-  let autoPlayInterval = setInterval(() => {
-    let nextStep = currentStep + 1;
-    if (nextStep > totalSteps) {
-      nextStep = 1;
-    }
-    showScreenshot(nextStep);
-  }, 5000);
-
-  // Pause au survol
-  const demoWindow = document.querySelector('.demo-window');
-  if (demoWindow) {
-    demoWindow.addEventListener('mouseenter', () => {
-      clearInterval(autoPlayInterval);
-    });
-
-    demoWindow.addEventListener('mouseleave', () => {
-      autoPlayInterval = setInterval(() => {
-        let nextStep = currentStep + 1;
-        if (nextStep > totalSteps) {
-          nextStep = 1;
-        }
-        showScreenshot(nextStep);
-      }, 5000);
-    });
-  }
-
-  // Navigation au clavier
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') {
-      let prevStep = currentStep - 1;
-      if (prevStep < 1) {
-        prevStep = totalSteps;
-      }
-      showScreenshot(prevStep);
-    } else if (e.key === 'ArrowRight') {
-      let nextStep = currentStep + 1;
-      if (nextStep > totalSteps) {
-        nextStep = 1;
-      }
-      showScreenshot(nextStep);
-    }
-  });
-
-  // ====== Toast Notifications ======
+  // =========================================================
+  // Toast Notifications
+  // =========================================================
   function showToast(message, type = 'success') {
     const toastWrap = document.getElementById('toastWrap');
     if (!toastWrap) return;
 
     // Supprimer les anciens toasts
-    const existingToasts = toastWrap.querySelectorAll('.toast');
-    existingToasts.forEach(toast => toast.remove());
+    toastWrap.querySelectorAll('.toast').forEach(t => t.remove());
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
-    const icon = type === 'success' 
+
+    const icon = type === 'success'
       ? '<i class="fa-solid fa-check"></i>'
       : '<i class="fa-solid fa-xmark"></i>';
-    
+
+    const title = type === 'success' ? i18n.toastSuccessTitle : i18n.toastErrorTitle;
+
     toast.innerHTML = `
       ${icon}
       <div class="toast-content">
-        <div class="title">${type === 'success' ? 'Succès' : 'Erreur'}</div>
+        <div class="title">${title}</div>
         <div class="msg">${message}</div>
       </div>
     `;
-    
+
     toastWrap.appendChild(toast);
-    
-    // Animation de disparition
+
     setTimeout(() => {
       toast.style.opacity = '0';
       setTimeout(() => toast.remove(), 300);
     }, 3000);
   }
 
-  // ====== Scroll Animations ======
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-  };
+  // =========================================================
+  // Token Management (Afficher/Masquer + Copier)
+  // =========================================================
+  let isTokenVisible = false;
+
+  function toggleToken(button) {
+    const tokenElement = document.getElementById('tokenValue');
+    if (!tokenElement) return;
+
+    const actualToken = tokenElement.getAttribute('data-token') || '';
+    const eyeIcon = button?.querySelector('i');
+
+    if (isTokenVisible) {
+      tokenElement.textContent = '••••••••••••••••••••••••••••••••';
+      tokenElement.classList.add('masked');
+      if (eyeIcon) eyeIcon.className = 'fa-solid fa-eye';
+    } else {
+      tokenElement.textContent = actualToken;
+      tokenElement.classList.remove('masked');
+      if (eyeIcon) eyeIcon.className = 'fa-solid fa-eye-slash';
+    }
+
+    isTokenVisible = !isTokenVisible;
+  }
+
+  function copyToken(button) {
+    const tokenElement = document.getElementById('tokenValue');
+    if (!tokenElement) return;
+
+    const actualToken = tokenElement.getAttribute('data-token') || '';
+    const copyIcon = button?.querySelector('i');
+
+    if (!actualToken) {
+      showToast(i18n.copyError, 'error');
+      return;
+    }
+
+    navigator.clipboard.writeText(actualToken).then(() => {
+      if (copyIcon) copyIcon.className = 'fa-solid fa-check';
+      if (button) button.classList.add('success');
+
+      showToast(i18n.copySuccess, 'success');
+
+      setTimeout(() => {
+        if (copyIcon) copyIcon.className = 'fa-solid fa-copy';
+        if (button) button.classList.remove('success');
+      }, 2000);
+    }).catch(err => {
+      console.error('Copy error:', err);
+      showToast(i18n.copyError, 'error');
+    });
+  }
+
+  // Bind buttons (tes boutons Twig doivent avoir ces classes)
+  const toggleBtn = document.querySelector('.js-toggle-token');
+  const copyBtn = document.querySelector('.js-copy-token');
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      toggleToken(this);
+    });
+  }
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function () {
+      copyToken(this);
+    });
+  }
+
+  // =========================================================
+  // Screenshot Carousel
+  // =========================================================
+  let currentStep = 1;
+  const totalSteps = 3;
+
+  function showScreenshot(step) {
+    document.querySelectorAll('.screenshot').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.screenshot[data-step="${step}"]`)?.classList.add('active');
+
+    document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
+    document.querySelector(`.nav-dot[data-step="${step}"]`)?.classList.add('active');
+
+    currentStep = step;
+  }
+
+  // Navigation par clic sur les dots
+  document.querySelectorAll('.nav-dot').forEach(dot => {
+    dot.addEventListener('click', function () {
+      const step = parseInt(this.getAttribute('data-step'), 10);
+      if (!Number.isNaN(step)) showScreenshot(step);
+    });
+  });
+
+  // Navigation automatique
+  let autoPlayInterval = setInterval(() => {
+    let nextStep = currentStep + 1;
+    if (nextStep > totalSteps) nextStep = 1;
+    showScreenshot(nextStep);
+  }, 5000);
+
+  // Pause au survol
+  const demoWindow = document.querySelector('.demo-window');
+  if (demoWindow) {
+    demoWindow.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+    demoWindow.addEventListener('mouseleave', () => {
+      autoPlayInterval = setInterval(() => {
+        let nextStep = currentStep + 1;
+        if (nextStep > totalSteps) nextStep = 1;
+        showScreenshot(nextStep);
+      }, 5000);
+    });
+  }
+
+  // Navigation au clavier (optionnel : seulement si on n’est pas dans un input)
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement?.tagName?.toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+
+    if (e.key === 'ArrowLeft') {
+      let prevStep = currentStep - 1;
+      if (prevStep < 1) prevStep = totalSteps;
+      showScreenshot(prevStep);
+    } else if (e.key === 'ArrowRight') {
+      let nextStep = currentStep + 1;
+      if (nextStep > totalSteps) nextStep = 1;
+      showScreenshot(nextStep);
+    }
+  });
+
+  // =========================================================
+  // Scroll Animations (IntersectionObserver)
+  // =========================================================
+  const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -1225,12 +1275,11 @@ function showScreenshot(step) {
     });
   }, observerOptions);
 
-  // Observer toutes les cards
-  document.querySelectorAll('.card').forEach(card => {
-    observer.observe(card);
-  });
+  document.querySelectorAll('.card').forEach(card => observer.observe(card));
 
-  // ====== Parallax Effect on Hero Icon ======
+  // =========================================================
+  // Parallax Effect sur l’icône hero
+  // =========================================================
   document.addEventListener('mousemove', (e) => {
     const heroIcon = document.querySelector('.hero-icon');
     if (heroIcon && window.innerWidth > 768) {
@@ -1240,25 +1289,28 @@ function showScreenshot(step) {
     }
   });
 
-  // ====== Window Dots Interaction ======
+  // =========================================================
+  // Window Dots Interaction (avec i18n)
+  // =========================================================
   document.querySelectorAll('.window-dot').forEach(dot => {
-    dot.addEventListener('click', function() {
+    dot.addEventListener('click', function () {
       if (this.classList.contains('dot-red')) {
-        showToast('Fermeture simulée 😄', 'error');
+        showToast(i18n.simClose, 'error');
       } else if (this.classList.contains('dot-yellow')) {
-        showToast('Minimisation simulée 🟡', 'success');
+        showToast(i18n.simMinimize, 'success');
       } else if (this.classList.contains('dot-green')) {
-        showToast('Plein écran simulé 🟢', 'success');
+        showToast(i18n.simFullscreen, 'success');
       }
     });
   });
 
-  // ====== Smooth Scroll to Steps ======
+  // =========================================================
+  // Smooth Scroll to Steps (optionnel, tu peux décommenter)
+  // =========================================================
   const downloadBtn = document.querySelector('.download-btn');
   if (downloadBtn) {
-    downloadBtn.addEventListener('click', function(e) {
-      // Si tu veux un scroll vers les étapes au lieu du téléchargement
-      // Décommente les lignes suivantes et commente le href
+    downloadBtn.addEventListener('click', function (e) {
+      // Si tu veux un scroll vers les étapes au lieu du téléchargement:
       /*
       e.preventDefault();
       const stepsGrid = document.querySelector('.steps-grid');
@@ -1269,21 +1321,24 @@ function showScreenshot(step) {
     });
   }
 
-  // ====== Browser Cards Animation Stagger ======
-  const browserCards = document.querySelectorAll('.browser-card');
-  browserCards.forEach((card, index) => {
+  // =========================================================
+  // Browser Cards Animation Stagger
+  // =========================================================
+  document.querySelectorAll('.browser-card').forEach((card, index) => {
     card.style.animationDelay = `${index * 0.1}s`;
   });
 
-  // ====== Add Hover Effect on Final Step Items ======
+  // =========================================================
+  // Hover effect sur les items finaux
+  // =========================================================
   document.querySelectorAll('.final-step-list li').forEach(item => {
-    item.addEventListener('mouseenter', function() {
+    item.addEventListener('mouseenter', function () {
       this.style.paddingLeft = '60px';
     });
-    
-    item.addEventListener('mouseleave', function() {
+    item.addEventListener('mouseleave', function () {
       this.style.paddingLeft = '50px';
     });
   });
+});
 </script>
 {% endblock %}

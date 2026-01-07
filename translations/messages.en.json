@@ -1,4 +1,38 @@
 {
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "teams": "Teams",
+    "credentials": "Passwords",
+    "new": "New",
+    "shared_access": "Secure sharing",
+    "extension": "Browser extension",
+    "tools": "Tools",
+    "generator": "Generator",
+    "notes": "Secure notes",
+    "security_checker": "Security checker",
+    "settings": "Settings",
+    "subscription": "Subscriptions"
+  },
+    "sidebar": {
+    "sections": {
+      "main": "Main",
+      "tools": "Tools",
+      "settings": "Settings"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "teams": "Teams",
+      "credentials": "Passwords",
+      "shared_access": "Secure sharing",
+      "extension": "Browser extension",
+      "generator": "Generator",
+      "notes": "Secure notes",
+      "security_checker": "Security checker",
+      "subscription": "Subscriptions",
+      "settings": "Settings",
+      "logout": "Log out"
+    }
+  },
   "landing": {
     "nav": {
       "menu": "Menu",
@@ -179,6 +213,373 @@
         "hint": "Already have an account?",
         "hint_link": "Log in"
       }
+    }
+  },
+    "credential": {
+    "index": {
+      "meta": {
+        "title": "Password Manager"
+      },
+      "header": {
+        "title": "My Credentials",
+        "subtitle": "Manage your passwords securely"
+      },
+      "search": {
+        "placeholder": "Search by name, domain, or username..."
+      },
+      "actions": {
+        "add": "Add a credential",
+        "add_first": "Add my first credential"
+      },
+      "filters": {
+        "all": "All",
+        "web": "Websites",
+        "recent": "Recent"
+      },
+      "labels": {
+        "username": "Username",
+        "password": "Password"
+      },
+      "card_actions": {
+        "view": "View details",
+        "share": "Share",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "empty": {
+        "title": "No credentials saved",
+        "text": "Start securing your passwords by adding your first credential. Your data will be encrypted and protected."
+      },
+      "no_results": {
+        "title": "No results found",
+        "text": "Try using different keywords"
+      },
+      "confirm": {
+        "delete": "Are you sure you want to delete this credential?"
+      }
+    }
+  },
+  "shared_access": {
+    "index": {
+      "hero": {
+        "title": "Shared Access Management",
+        "subtitle": "Share your credentials securely and manage access in real time.",
+        "new": "New share"
+      },
+      "tabs": {
+        "shared_by_me": "Shared by me",
+        "shared_with_me": "Shared with me"
+      },
+      "empty": {
+        "by_me": {
+          "title": "No shares yet",
+          "text": "Start sharing your credentials securely with other users.",
+          "cta": "Create my first share"
+        },
+        "with_me": {
+          "title": "No credentials received",
+          "text": "You haven't received any credentials shared by other users yet."
+        }
+      },
+      "labels": {
+        "shared_with": "Shared with",
+        "shared_by": "Shared by",
+        "shared_date": "Shared on"
+      },
+      "actions": {
+        "revoke": "Revoke access",
+        "view_credentials": "View credentials"
+      },
+      "modal": {
+        "title": "Confirm revocation",
+        "warning_title": "Warning: irreversible action",
+        "warning_text": "Are you sure you want to revoke this shared access? The user will immediately lose access to these credentials.",
+        "cancel": "Cancel",
+        "confirm": "Confirm revocation",
+        "loading": "Revoking..."
+      }
+    }
+  },
+    "extension": {
+    "page": {
+      "hero": {
+        "title": "Browser extension",
+        "tagline": "Access your passwords directly from your browser",
+        "download": "Download the extension"
+      },
+      "demo": {
+        "window_title": "Extension installation",
+        "step1_title": "Step 1: Download",
+        "step1_text": "Download the extension ZIP file",
+        "step2_title": "Step 2: Install",
+        "step2_text": "Install the extension in your browser",
+        "step3_title": "Step 3: Configure",
+        "step3_text": "Set up your API key to get started"
+      },
+      "cards": {
+        "install": {
+          "title": "Install the extension",
+          "helper": "Load the extension in your preferred browser",
+          "intro": "Download the ZIP file and follow the instructions for your browser:",
+          "browsers": {
+            "chrome_edge": "Chrome / Edge",
+            "firefox": "Firefox",
+            "chrome_edge_steps": "1. Open <code>chrome://extensions</code><br>2. Enable <strong>Developer mode</strong><br>3. Click <strong>Load unpacked</strong><br>4. Select the extracted folder",
+            "firefox_steps": "1. Open <code>about:debugging</code><br>2. Click <strong>This Firefox</strong><br>3. Click <strong>Load Temporary Add-on</strong><br>4. Select <code>manifest.json</code>"
+          },
+          "tip": {
+            "title": "Tip:",
+            "text": "Once installed, pin the extension to your toolbar for quick access."
+          }
+        },
+        "api_key": {
+          "title": "Get your API key",
+          "helper": "This key connects the extension to your account",
+          "intro": "Your personal API key lets you securely access your passwords. Copy it and keep it somewhere safe.",
+          "label": "Your personal API key",
+          "buttons": {
+            "toggle": "Show/Hide",
+            "copy": "Copy"
+          },
+          "warning": {
+            "title": "Important:",
+            "text": "Never share this key. It provides full access to all your passwords."
+          }
+        },
+        "configure": {
+          "title": "Configure the extension",
+          "helper": "Final step to start using your manager",
+          "intro": "It only takes a few seconds to finish setup and access your passwords everywhere:",
+          "list": {
+            "l1": "Click the extension icon in your toolbar",
+            "l2": "Paste your API key into the login field",
+            "l3": "Confirm and enjoy your passwords everywhere!"
+          },
+          "ready": "You're ready to use the extension!"
+        }
+      },
+      "toast": {
+        "success_title": "Success",
+        "error_title": "Error",
+        "copy_success": "API key copied successfully!",
+        "copy_error": "Copy failed",
+        "sim_close": "Simulated close 😄",
+        "sim_minimize": "Simulated minimize 🟡",
+        "sim_fullscreen": "Simulated fullscreen 🟢"
+      }
+    }
+  },
+  "note": {
+    "index": {
+      "header": {
+        "title": "Notes & Tasks",
+        "personal_workspace": "Personal Workspace"
+      },
+      "actions": {
+        "new_note": "New Note",
+        "refresh": "Refresh"
+      },
+      "workspace": {
+        "selector_personal": "Personal Workspace"
+      },
+      "board": {
+        "statuses": {
+          "todo": "To Do",
+          "in_progress": "In Progress",
+          "done": "Done"
+        },
+        "table": {
+          "task": "Task",
+          "assigned": "Assigned",
+          "progress": "Progress",
+          "status": "Status",
+          "due_date": "Due Date",
+          "actions": "Actions"
+        },
+        "badges": {
+          "unassigned": "Unassigned"
+        },
+        "assign": {
+          "placeholder": "Assign…",
+          "yourself": "Yourself"
+        },
+        "delete": {
+          "confirm": "Delete this note?",
+          "title": "Delete"
+        },
+        "empty_column": "No notes in this section"
+      },
+      "modal": {
+        "title": "Create New Note",
+        "cancel": "Cancel",
+        "create": "Create Note"
+      }
+    }
+  },
+   "dashboard": {
+    "stats": {
+      "credentials": "Credentials",
+      "teams": "Teams",
+      "active_shares": "Active shares",
+      "drafts": "Drafts",
+      "change": {
+        "plus_this_month": "+ this month",
+        "stable": "Stable",
+        "plus_this_week": "+ this week"
+      }
+    },
+    "recent_activity": {
+      "title": "Recent activity",
+      "view_all": "View all",
+      "empty": {
+        "title": "No activity",
+        "desc": "Your latest actions will appear here."
+      }
+    },
+    "teams": {
+      "title": "My teams",
+      "create": "Create",
+      "empty": {
+        "title": "No teams",
+        "desc": "Create your first team to share securely."
+      },
+      "meta": {
+        "members": "members",
+        "credentials": "credentials"
+      }
+    },
+    "quick_actions": {
+      "title": "Quick actions",
+      "new_credential": "New credential",
+      "invite_member": "Invite a member",
+      "share_access": "Share access",
+      "create_team": "Create a team"
+    },
+    "drafts": {
+      "title": "Pending drafts",
+      "view_all": "View all",
+      "empty": {
+        "title": "No drafts",
+        "desc": "Your pending credentials will appear here."
+      },
+      "unnamed": "Untitled",
+      "created_on": "Created on",
+      "complete": "Complete"
+    },
+    "security": {
+      "title": "Security score",
+      "strong_passwords": "strong passwords",
+      "weak_passwords": "weak passwords to improve",
+      "reused_passwords": "reused passwords",
+      "improve": "Improve my security"
+    },
+     "activity": {
+      "credential_created": { "title": "New credential created" },
+      "draft_created": { "title": "Draft created" },
+      "share_created": { "title": "Access shared" },
+      "fallback_credential": "Credential",
+      "fallback_unnamed": "Untitled"
+    }
+  },
+    "subscription": {
+      "page_title": "Subscriptions - Password Manager",
+    "hero": {
+      "badge": "Our plans",
+      "title_before": "Choose the",
+      "title_highlight": "plan",
+      "title_after": "that protects your access",
+      "subtitle": "Solutions tailored to your needs, whether you're an individual, a small team, or a large company.",
+      "stats": {
+        "users": "Users",
+        "uptime": "Uptime",
+        "encryption": "Encryption"
+      }
+    },
+    "status_card": {
+      "title": "You're subscribed 🎉",
+      "subtitle": "Thanks for your trust. Your account is currently on",
+      "plan": "Pro",
+      "benefits": {
+        "unlimited_shares": "Unlimited sharing",
+        "team_management": "Team management",
+        "security_tools": "Advanced security audit"
+      },
+      "cta_manage": "Manage my subscription"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "price_suffix": "/month",
+        "description": "Perfect for individuals who want a simple and secure password manager.",
+        "features": {
+          "f1": "Up to 5 credentials",
+          "f2": "Up to 5 shared accesses",
+          "f3": "Password generator",
+          "f4": "Security checker"
+        }
+      },
+      "pro": {
+        "badge_popular": "Popular",
+        "name": "Pro",
+        "price_suffix": "/month",
+        "description": "For professionals and teams who want advanced management and unlimited sharing.",
+        "features": {
+          "f1": "20 credentials",
+          "f2": "Unlimited sharing",
+          "f3": "Team management",
+          "f4": "Generator + security checker"
+        },
+        "cta_upgrade": "Upgrade to Pro"
+      }
+    },
+    "tools": {
+      "title_before": "Our",
+      "title_highlight": "built-in tools",
+      "subtitle": "Powerful features to simplify your security.",
+      "password_generator": {
+        "title": "Password generator",
+        "desc": "Create strong and unique passwords in one click — for free.",
+        "badge": "Free"
+      },
+      "security_checker": {
+        "title": "Security checker",
+        "desc": "Analyze password strength and get security recommendations.",
+        "badge": "Free"
+      },
+      "team_management": {
+        "title": "Team management",
+        "desc": "Assign roles, manage access, and track your team activity."
+      }
+    },
+    "contact": {
+      "title": "Need a demo?",
+      "subtitle": "Contact our team — we’ll be happy to help!",
+      "full_name": "Full name",
+      "email": "Email",
+      "subject": "Subject",
+      "subject_demo": "Demo request",
+      "subject_support": "Support",
+      "subject_other": "Other question",
+      "message": "Message",
+      "message_placeholder": "Describe your request...",
+      "submit": "Send message"
+    },
+    "faq": {
+      "title_before": "Frequently",
+      "title_highlight": "asked questions",
+      "subtitle": "Here are answers to the most common questions.",
+      "q1": "How do I upgrade from Free to Pro?",
+      "a1": "Create an account, then upgrade from your dashboard in the Subscription section.",
+      "q2": "Is my data really secure?",
+      "a2": "Yes. Your credentials are encrypted with AES-256 and stored securely on our European servers.",
+      "q3": "Can I share my passwords?",
+      "a3": "Yes! The Free plan allows limited sharing, while Pro offers unlimited sharing."
+    },
+    "trust": {
+      "title": "They trust us",
+      "companies": "Companies",
+      "startups": "Startups",
+      "universities": "Universities"
     }
   }
 }

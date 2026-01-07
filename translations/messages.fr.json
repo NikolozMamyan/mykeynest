@@ -1,4 +1,38 @@
 {
+  "breadcrumb": {
+    "dashboard": "Tableau de bord",
+    "teams": "Équipes",
+    "credentials": "Mots de passe",
+    "new": "Nouveau",
+    "shared_access": "Partages sécurisés",
+    "extension": "Extension navigateur",
+    "tools": "Outils",
+    "generator": "Générateur",
+    "notes": "Notes sécurisées",
+    "security_checker": "Vérificateur de sécurité",
+    "settings": "Paramètres",
+    "subscription": "Abonnements"
+  },
+  "sidebar": {
+    "sections": {
+      "main": "Principal",
+      "tools": "Outils",
+      "settings": "Paramètres"
+    },
+    "items": {
+      "dashboard": "Tableau de bord",
+      "teams": "Équipes",
+      "credentials": "Mots de passe",
+      "shared_access": "Partages sécurisés",
+      "extension": "Extension navigateur",
+      "generator": "Générateur",
+      "notes": "Notes sécurisées",
+      "security_checker": "Vérificateur de sécurité",
+      "subscription": "Abonnements",
+      "settings": "Paramètres",
+      "logout": "Déconnexion"
+    }
+  },
  "landing": {
     "nav": {
       "menu": "Menu",
@@ -179,6 +213,374 @@
         "hint": "Déjà un compte ?",
         "hint_link": "Se connecter"
       }
+    }
+  },
+   "credential": {
+    "index": {
+      "meta": {
+        "title": "Gestionnaire de mots de passe"
+      },
+      "header": {
+        "title": "Mes identifiants",
+        "subtitle": "Gérez vos mots de passe en toute sécurité"
+      },
+      "search": {
+        "placeholder": "Rechercher par nom, domaine ou identifiant..."
+      },
+      "actions": {
+        "add": "Ajouter un identifiant",
+        "add_first": "Ajouter mon premier identifiant"
+      },
+      "filters": {
+        "all": "Tous",
+        "web": "Sites web",
+        "recent": "Récents"
+      },
+      "labels": {
+        "username": "Identifiant",
+        "password": "Mot de passe"
+      },
+      "card_actions": {
+        "view": "Voir les détails",
+        "share": "Partager",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "empty": {
+        "title": "Aucun identifiant enregistré",
+        "text": "Commencez à sécuriser vos mots de passe en ajoutant votre premier identifiant. Vos données seront chiffrées et protégées."
+      },
+      "no_results": {
+        "title": "Aucun résultat trouvé",
+        "text": "Essayez avec d'autres mots-clés"
+      },
+      "confirm": {
+        "delete": "Êtes-vous sûr de vouloir supprimer cet identifiant ?"
+      }
+    }
+  },
+  "shared_access": {
+    "index": {
+      "hero": {
+        "title": "Gestion des accès partagés",
+        "subtitle": "Partagez vos identifiants en toute sécurité et gérez les accès en temps réel.",
+        "new": "Nouveau partage"
+      },
+      "tabs": {
+        "shared_by_me": "Partagés par moi",
+        "shared_with_me": "Partagés avec moi"
+      },
+      "empty": {
+        "by_me": {
+          "title": "Aucun partage effectué",
+          "text": "Commencez à partager vos identifiants avec d'autres utilisateurs de manière sécurisée.",
+          "cta": "Créer mon premier partage"
+        },
+        "with_me": {
+          "title": "Aucun identifiant reçu",
+          "text": "Vous n'avez pas encore reçu d'identifiants partagés par d'autres utilisateurs."
+        }
+      },
+      "labels": {
+        "shared_with": "Partagé avec",
+        "shared_by": "Partagé par",
+        "shared_date": "Date de partage"
+      },
+      "actions": {
+        "revoke": "Révoquer l'accès",
+        "view_credentials": "Voir les identifiants"
+      },
+      "modal": {
+        "title": "Confirmer la révocation",
+        "warning_title": "Attention : Action irréversible",
+        "warning_text": "Êtes-vous sûr de vouloir révoquer cet accès partagé ? L'utilisateur perdra immédiatement l'accès à ces identifiants.",
+        "cancel": "Annuler",
+        "confirm": "Confirmer la révocation",
+        "loading": "Révocation en cours..."
+      }
+    }
+  },
+   "extension": {
+    "page": {
+      "hero": {
+        "title": "Extension navigateur",
+        "tagline": "Accédez à vos mots de passe directement depuis votre navigateur",
+        "download": "Télécharger l'extension"
+      },
+      "demo": {
+        "window_title": "Installation de l'extension",
+        "step1_title": "Étape 1 : Téléchargement",
+        "step1_text": "Téléchargez le fichier ZIP de l'extension",
+        "step2_title": "Étape 2 : Installation",
+        "step2_text": "Installez l'extension dans votre navigateur",
+        "step3_title": "Étape 3 : Configuration",
+        "step3_text": "Configurez votre clé API pour commencer"
+      },
+      "cards": {
+        "install": {
+          "title": "Installez l'extension",
+          "helper": "Chargez l'extension dans votre navigateur préféré",
+          "intro": "Téléchargez le fichier ZIP puis suivez les instructions selon votre navigateur :",
+          "browsers": {
+            "chrome_edge": "Chrome / Edge",
+            "firefox": "Firefox",
+            "chrome_edge_steps": "1. Ouvrez <code>chrome://extensions</code><br>2. Activez le <strong>Mode développeur</strong><br>3. Cliquez sur <strong>Charger l'extension</strong><br>4. Sélectionnez le dossier décompressé",
+            "firefox_steps": "1. Ouvrez <code>about:debugging</code><br>2. Cliquez sur <strong>Ce Firefox</strong><br>3. Cliquez sur <strong>Charger un module temporaire</strong><br>4. Sélectionnez <code>manifest.json</code>"
+          },
+          "tip": {
+            "title": "Astuce :",
+            "text": "Une fois installée, épinglez l'extension à votre barre d'outils pour un accès rapide."
+          }
+        },
+        "api_key": {
+          "title": "Récupérez votre clé API",
+          "helper": "Cette clé permet de connecter l'extension à votre compte",
+          "intro": "Votre clé API personnelle vous permet d'accéder à vos mots de passe de manière sécurisée. Copiez-la et conservez-la en lieu sûr.",
+          "label": "Votre clé API personnelle",
+          "buttons": {
+            "toggle": "Afficher/Masquer",
+            "copy": "Copier"
+          },
+          "warning": {
+            "title": "Important :",
+            "text": "Ne partagez jamais cette clé. Elle donne un accès complet à tous vos mots de passe."
+          }
+        },
+        "configure": {
+          "title": "Configurez l'extension",
+          "helper": "Dernière étape pour commencer à utiliser votre gestionnaire",
+          "intro": "Quelques secondes suffisent pour finaliser la configuration et profiter de vos mots de passe partout :",
+          "list": {
+            "l1": "Cliquez sur l'icône de l'extension dans votre barre d'outils",
+            "l2": "Collez votre clé API dans le champ de connexion",
+            "l3": "Validez et profitez de vos mots de passe partout !"
+          },
+          "ready": "Vous êtes prêt à utiliser l'extension !"
+        }
+      },
+      "toast": {
+        "success_title": "Succès",
+        "error_title": "Erreur",
+        "copy_success": "Clé API copiée avec succès !",
+        "copy_error": "Erreur lors de la copie",
+        "sim_close": "Fermeture simulée 😄",
+        "sim_minimize": "Minimisation simulée 🟡",
+        "sim_fullscreen": "Plein écran simulé 🟢"
+      }
+    }
+  },
+  "note": {
+    "index": {
+      "header": {
+        "title": "Notes & Tâches",
+        "personal_workspace": "Espace personnel"
+      },
+      "actions": {
+        "new_note": "Nouvelle note",
+        "refresh": "Rafraîchir"
+      },
+      "workspace": {
+        "selector_personal": "Espace personnel"
+      },
+      "board": {
+        "statuses": {
+          "todo": "À faire",
+          "in_progress": "En cours",
+          "done": "Terminé"
+        },
+        "table": {
+          "task": "Tâche",
+          "assigned": "Assigné",
+          "progress": "Avancement",
+          "status": "Statut",
+          "due_date": "Échéance",
+          "actions": "Actions"
+        },
+        "badges": {
+          "unassigned": "Non assigné"
+        },
+        "assign": {
+          "placeholder": "Assigner…",
+          "yourself": "Vous-même"
+        },
+        "delete": {
+          "confirm": "Supprimer cette note ?",
+          "title": "Supprimer"
+        },
+        "empty_column": "Aucune note dans cette section"
+      },
+      "modal": {
+        "title": "Créer une nouvelle note",
+        "cancel": "Annuler",
+        "create": "Créer la note"
+      }
+    }
+  },
+   "dashboard": {
+    "stats": {
+      "credentials": "Identifiants",
+      "teams": "Équipes",
+      "active_shares": "Partages actifs",
+      "drafts": "Brouillons",
+      "change": {
+        "plus_this_month": "+ ce mois",
+        "stable": "Stable",
+        "plus_this_week": "+ cette semaine"
+      }
+    },
+    "recent_activity": {
+      "title": "Activité récente",
+      "view_all": "Voir tout",
+      "empty": {
+        "title": "Aucune activité",
+        "desc": "Les dernières actions apparaîtront ici."
+      }
+    },
+    "teams": {
+      "title": "Mes équipes",
+      "create": "Créer",
+      "empty": {
+        "title": "Aucune équipe",
+        "desc": "Crée ta première équipe pour partager en toute sécurité."
+      },
+      "meta": {
+        "members": "membres",
+        "credentials": "identifiants"
+      }
+    },
+    "quick_actions": {
+      "title": "Actions rapides",
+      "new_credential": "Nouvel identifiant",
+      "invite_member": "Inviter un membre",
+      "share_access": "Partager un accès",
+      "create_team": "Créer une équipe"
+    },
+    "drafts": {
+      "title": "Brouillons en attente",
+      "view_all": "Voir tout",
+      "empty": {
+        "title": "Aucun brouillon",
+        "desc": "Tes identifiants en attente apparaîtront ici."
+      },
+      "unnamed": "Sans nom",
+      "created_on": "Créé le",
+      "complete": "Compléter"
+    },
+    "security": {
+      "title": "Score de sécurité",
+      "strong_passwords": "mots de passe forts",
+      "weak_passwords": "mots de passe faibles à améliorer",
+      "reused_passwords": "mots de passe réutilisés",
+      "improve": "Améliorer ma sécurité"
+    },
+    "activity": {
+      "credential_created": { "title": "Nouvel identifiant créé" },
+      "draft_created": { "title": "Brouillon créé" },
+      "share_created": { "title": "Accès partagé" },
+      "fallback_credential": "Identifiant",
+      "fallback_unnamed": "Sans nom"
+    }
+  },
+   "subscription": {
+    "page_title": "Abonnements - Gestionnaire de mots de passe",
+    "hero": {
+      
+      "badge": "Nos offres",
+      "title_before": "Choisissez le",
+      "title_highlight": "plan",
+      "title_after": "qui protège vos accès",
+      "subtitle": "Des solutions adaptées à vos besoins, que vous soyez un utilisateur individuel, une petite équipe ou une grande entreprise.",
+      "stats": {
+        "users": "Utilisateurs",
+        "uptime": "Disponibilité",
+        "encryption": "Chiffrement"
+      }
+    },
+    "status_card": {
+      "title": "Vous êtes abonné 🎉",
+      "subtitle": "Merci pour votre confiance. Votre compte est actuellement en",
+      "plan": "Pro",
+      "benefits": {
+        "unlimited_shares": "Partages illimités",
+        "team_management": "Gestion d’équipe",
+        "security_tools": "Audit & sécurité avancée"
+      },
+      "cta_manage": "Gérer mon abonnement"
+    },
+    "plans": {
+      "free": {
+        "name": "Free",
+        "price_suffix": "/mois",
+        "description": "Idéal pour les particuliers qui veulent un gestionnaire simple et sécurisé.",
+        "features": {
+          "f1": "5 identifiants maximum",
+          "f2": "5 partages entre membres",
+          "f3": "Générateur de mots de passe",
+          "f4": "Vérificateur de sécurité"
+        }
+      },
+      "pro": {
+        "badge_popular": "Populaire",
+        "name": "Pro",
+        "price_suffix": "/mois",
+        "description": "Pour les professionnels et équipes qui veulent une gestion avancée et un partage illimité.",
+        "features": {
+          "f1": "20 identifiants",
+          "f2": "Partages illimités",
+          "f3": "Gestion d’équipe",
+          "f4": "Générateur + vérificateur de sécurité"
+        },
+        "cta_upgrade": "Passer en Pro"
+      }
+    },
+    "tools": {
+      "title_before": "Nos",
+      "title_highlight": "outils intégrés",
+      "subtitle": "Des fonctionnalités puissantes pour simplifier votre sécurité.",
+      "password_generator": {
+        "title": "Générateur de mots de passe",
+        "desc": "Créez des mots de passe forts et uniques en un clic, gratuitement.",
+        "badge": "Free"
+      },
+      "security_checker": {
+        "title": "Vérificateur de sécurité",
+        "desc": "Analysez la robustesse de vos identifiants et recevez des conseils de sécurité.",
+        "badge": "Free"
+      },
+      "team_management": {
+        "title": "Gestion d’équipe",
+        "desc": "Attribuez des rôles, gérez les accès et suivez les activités de votre équipe."
+      }
+    },
+    "contact": {
+      "title": "Besoin d'une démonstration ?",
+      "subtitle": "Contactez notre équipe, nous serons ravis de vous aider !",
+      "full_name": "Nom complet",
+      "email": "Email",
+      "subject": "Objet",
+      "subject_demo": "Demande de démo",
+      "subject_support": "Assistance",
+      "subject_other": "Autre question",
+      "message": "Message",
+      "message_placeholder": "Décrivez votre demande...",
+      "submit": "Envoyer le message"
+    },
+    "faq": {
+      "title_before": "Questions",
+      "title_highlight": "fréquentes",
+      "subtitle": "Voici les réponses aux questions les plus courantes.",
+      "q1": "Comment passer de Free à Pro ?",
+      "a1": "Créez un compte, puis mettez à niveau depuis votre tableau de bord dans la section Abonnements.",
+      "q2": "Mes données sont-elles sécurisées ?",
+      "a2": "Oui, vos identifiants sont chiffrés avec AES-256 et stockés de manière sécurisée sur nos serveurs européens.",
+      "q3": "Puis-je partager mes mots de passe ?",
+      "a3": "Bien sûr ! Le plan Free permet 3 partages, tandis que Pro et Entreprise offrent un partage illimité."
+    },
+    "trust": {
+      "title": "Ils nous font confiance",
+      "companies": "Entreprises",
+      "startups": "Startups",
+      "universities": "Universités"
     }
   }
 }
