@@ -1,21 +1,27 @@
 {{ form_start(form, {'attr': {'class': 'team-form'}}) }}
-    
+
     <div class="form-group">
         {{ form_label(form.name, null, {'label_attr': {'class': 'form-label'}}) }}
-        {{ form_widget(form.name, {'attr': {'class': 'form-input', 'placeholder': 'Ex: Équipe Marketing'}}) }}
+        {{ form_widget(form.name, {
+            'attr': {
+                'class': 'form-input',
+                'placeholder': 'teams.new.form.name_placeholder'|trans
+            }
+        }) }}
         {{ form_errors(form.name) }}
     </div>
 
     {% if form.credentials is defined %}
         <div class="form-group">
             {{ form_label(form.credentials, null, {'label_attr': {'class': 'form-label'}}) }}
+
             <div class="form-help-text">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                Sélectionnez les credentials à partager immédiatement avec cette équipe
+                {{ 'teams.new.form.credentials_help'|trans }}
             </div>
-            
+
             <div class="credentials-list">
                 {{ form_widget(form.credentials) }}
             </div>
@@ -28,7 +34,7 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
-            {{ button_label|default('Créer') }}
+            {{ button_label|default('teams.new.form.submit_create_team'|trans) }}
         </button>
     </div>
 

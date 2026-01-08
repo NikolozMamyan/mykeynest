@@ -13,6 +13,30 @@
     "settings": "Paramètres",
     "subscription": "Abonnements"
   },
+  "header": {
+    "burger_aria": "Menu",
+    "notifications": {
+      "aria": "Notifications",
+      "title": "Notifications",
+      "mark_all_read": "Marquer lu",
+      "loading": "Chargement..."
+    },
+    "profile": {
+      "avatar_alt": "Avatar",
+      "language": "Langue",
+      "language_aria": "Langue",
+      "language_fr": "Français",
+      "language_en": "English",
+      "settings": {
+        "label": "Paramètres",
+        "desc": "Gérer votre compte"
+      },
+      "logout": {
+        "label": "Déconnexion",
+        "desc": "Se déconnecter"
+      }
+    }
+  },
   "sidebar": {
     "sections": {
       "main": "Principal",
@@ -581,6 +605,89 @@
       "companies": "Entreprises",
       "startups": "Startups",
       "universities": "Universités"
+    }
+  },
+   "settings": {
+    "title": "Réglages",
+    "profile": {
+      "fallback_name": "Profil",
+      "change_avatar": "Changer l’avatar",
+      "avatar_alt": "Avatar"
+    },
+    "menu": {
+      "personal_data": "Données personnelles",
+      "preferences": "Préférences",
+      "subscription": "Gestion d’abonnement",
+      "contact": "Contact",
+      "terms_cgu": "CGU",
+      "terms_cgv": "CGV"
+    },
+   "hint": "Astuce : cliquez sur le bouton “+” pour changer votre avatar."
+  },
+   "teams": {
+    "page_title": "Mes équipes",
+    "header": {
+      "title": "Mes équipes",
+      "subtitle": "Gérez vos équipes et collaborez efficacement",
+      "new_team": "Nouvelle équipe"
+    },
+    "empty": {
+      "title": "Aucune équipe pour le moment",
+      "description": "Créez votre première équipe pour commencer à collaborer",
+      "action": "Créer une équipe"
+    },
+    "card": {
+      "members": "membre",
+      "members_plural": "membres",
+      "view": "Voir l'équipe",
+      "owner_fallback": "N/A"
+    },
+     "show": {
+      "title": "Équipe %name%",
+      "back": "Retour aux équipes",
+      "delete_team": "Supprimer l'équipe",
+      "created_at": "Créée le %date%",
+      "owner": "Propriétaire : %email%",
+      "na": "N/A",
+
+      "credentials": {
+        "title": "Identifiants partagés",
+        "add": "Ajouter",
+        "empty": "Aucun credential partagé avec cette équipe",
+        "remove_confirm": "Retirer ce credential de l'équipe ?",
+        "remove_title": "Retirer ce credential",
+        "modal": {
+          "title": "Ajouter des credentials",
+          "help": "Sélectionnez les credentials à partager avec cette équipe",
+          "cancel": "Annuler",
+          "submit": "Ajouter les credentials"
+        }
+      },
+      "members": {
+        "title": "Membres de l'équipe",
+        "empty": "Aucun membre dans cette équipe",
+        "joined_at": "Ajouté le %date%",
+        "remove_confirm": "Supprimer ce membre de l'équipe ?",
+        "remove_title": "Supprimer ce membre",
+        "add": {
+          "title": "Ajouter un membre",
+          "submit": "Ajouter",
+          "email_placeholder": "email@exemple.com"
+        }
+      }
+    },
+    "new": {
+      "page_title": "Nouvelle équipe",
+      "back": "Retour",
+      "header": {
+        "title": "Créer une nouvelle équipe",
+        "subtitle": "Commencez à collaborer en créant votre équipe"
+      },
+      "form": {
+        "submit_create_team": "Créer l'équipe",
+        "name_placeholder": "Ex: Équipe Marketing",
+        "credentials_help": "Sélectionnez les credentials à partager immédiatement avec cette équipe"
+      }
     }
   }
 }

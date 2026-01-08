@@ -13,6 +13,30 @@
     "settings": "Settings",
     "subscription": "Subscriptions"
   },
+   "header": {
+    "burger_aria": "Menu",
+    "notifications": {
+      "aria": "Notifications",
+      "title": "Notifications",
+      "mark_all_read": "Mark as read",
+      "loading": "Loading..."
+    },
+    "profile": {
+      "avatar_alt": "Avatar",
+      "language": "Language",
+      "language_aria": "Language",
+      "language_fr": "French",
+      "language_en": "English",
+      "settings": {
+        "label": "Settings",
+        "desc": "Manage your account"
+      },
+      "logout": {
+        "label": "Log out",
+        "desc": "Sign out"
+      }
+    }
+  },
     "sidebar": {
     "sections": {
       "main": "Main",
@@ -580,6 +604,89 @@
       "companies": "Companies",
       "startups": "Startups",
       "universities": "Universities"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "fallback_name": "Profile",
+      "change_avatar": "Change avatar",
+      "avatar_alt": "Avatar"
+    },
+    "menu": {
+      "personal_data": "Personal data",
+      "preferences": "Preferences",
+      "subscription": "Subscription management",
+      "contact": "Contact",
+      "terms_cgu": "Terms of Use",
+      "terms_cgv": "Terms of Sale"
+    },
+    "hint": "Tip: click the “+” button to change your avatar."
+  },
+  "teams": {
+    "page_title": "My teams",
+    "header": {
+      "title": "My teams",
+      "subtitle": "Manage your teams and collaborate efficiently",
+      "new_team": "New team"
+    },
+    "empty": {
+      "title": "No teams yet",
+      "description": "Create your first team to start collaborating",
+      "action": "Create a team"
+    },
+    "card": {
+      "members": "member",
+      "members_plural": "members",
+      "view": "View team",
+      "owner_fallback": "N/A"
+    },
+    "show": {
+      "title": "Team %name%",
+      "back": "Back to teams",
+      "delete_team": "Delete team",
+      "created_at": "Created on %date%",
+      "owner": "Owner: %email%",
+      "na": "N/A",
+
+      "credentials": {
+        "title": "Shared credentials",
+        "add": "Add",
+        "empty": "No credential shared with this team",
+        "remove_confirm": "Remove this credential from the team?",
+        "remove_title": "Remove this credential",
+        "modal": {
+          "title": "Add credentials",
+          "help": "Select the credentials to share with this team",
+          "cancel": "Cancel",
+          "submit": "Add credentials"
+        }
+      },
+      "members": {
+        "title": "Team members",
+        "empty": "No members in this team",
+        "joined_at": "Added on %date%",
+        "remove_confirm": "Remove this member from the team?",
+        "remove_title": "Remove this member",
+        "add": {
+          "title": "Add a member",
+          "submit": "Add",
+          "email_placeholder": "email@example.com"
+        }
+      }
+    },
+    "new": {
+      "page_title": "New team",
+      "back": "Back",
+      "header": {
+        "title": "Create a new team",
+        "subtitle": "Start collaborating by creating your team"
+      },
+      "form": {
+        "submit_create_team": "Create team",
+        "name_placeholder": "e.g. Marketing Team",
+        "credentials_help": "Select the credentials to share with this team right away"
+      }
     }
   }
 }

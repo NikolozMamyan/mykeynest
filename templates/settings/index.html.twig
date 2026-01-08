@@ -387,120 +387,118 @@
 
 </style>
 
+<div class="settings-header">
+  <h1 class="settings-title">{{ 'settings.title'|trans }}</h1>
+</div>
 
-  <div class="settings-header">
-    <h1 class="settings-title">Réglages</h1>
-  </div>
+<div class="settings-container">
 
-  <div class="settings-container">
+  <section class="settings-section">
+    {{ form_start(form, { attr: { id: 'avatar-form' }, enctype: 'multipart/form-data' }) }}
 
-<section class="settings-section">
-  {{ form_start(form, { attr: { id: 'avatar-form' }, enctype: 'multipart/form-data' }) }}
+    <div class="settings-profile">
+      <div class="avatar-wrap">
+        <img class="avatar-img"
+             src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
+             alt="{{ 'settings.profile.avatar_alt'|trans }}">
 
-  <div class="settings-profile">
-    <div class="avatar-wrap">
-      <img class="avatar-img"
-           src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
-           alt="Avatar">
+        {{ form_widget(form.avatar, {
+          attr: { class: 'js-avatar-input', accept: 'image/*', style: 'display:none' }
+        }) }}
 
-      {{ form_widget(form.avatar, {
-        attr: { class: 'js-avatar-input', accept: 'image/*', style: 'display:none' }
-      }) }}
-
-      <button type="button" class="avatar-upload js-avatar-btn" title="Changer l’avatar">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-    </div>
-
-    <div class="profile-info">
-      {% set fullName = (app.user.prenom|default('') ~ ' ' ~ app.user.nom|default(''))|trim %}
-      <div class="profile-name">
-        {{ fullName ?: 'Profil' }}
+        <button type="button"
+                class="avatar-upload js-avatar-btn"
+                title="{{ 'settings.profile.change_avatar'|trans }}">
+          <i class="fa-solid fa-plus"></i>
+        </button>
       </div>
 
-      <div class="profile-meta">
-        {% if app.user.company %}
-          <span class="profile-chip">
-            <i class="fa-solid fa-building" aria-hidden="true"></i>
-            <span>{{ app.user.company }}</span>
-          </span>
-        {% endif %}
+      <div class="profile-info">
+        {% set fullName = (app.user.prenom|default('') ~ ' ' ~ app.user.nom|default(''))|trim %}
+        <div class="profile-name">
+          {{ fullName ?: ('settings.profile.fallback_name'|trans) }}
+        </div>
 
-        {% if app.user.email %}
-          <span class="profile-sub">
-            {{ app.user.email }}
-          </span>
-        {% endif %}
+        <div class="profile-meta">
+          {% if app.user.company %}
+            <span class="profile-chip">
+              <i class="fa-solid fa-building" aria-hidden="true"></i>
+              <span>{{ app.user.company }}</span>
+            </span>
+          {% endif %}
+
+          {% if app.user.email %}
+            <span class="profile-sub">
+              {{ app.user.email }}
+            </span>
+          {% endif %}
+        </div>
       </div>
     </div>
 
-   
+    <button type="submit" style="display:none">{{ 'common.save'|trans }}</button>
+    {{ form_end(form) }}
+  </section>
+
+  {# --- Liste des réglages --- #}
+  <section class="settings-section">
+    <ul class="settings-list" role="list">
+      <li class="settings-item">
+        <a class="settings-link" href="">
+          <span class="settings-icon"><i class="fa-regular fa-id-card"></i></span>
+          <span class="settings-text">{{ 'settings.menu.personal_data'|trans }}</span>
+          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+        </a>
+      </li>
+
+      <li class="settings-item">
+        <a class="settings-link" href="">
+          <span class="settings-icon"><i class="fa-solid fa-sliders"></i></span>
+          <span class="settings-text">{{ 'settings.menu.preferences'|trans }}</span>
+          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+        </a>
+      </li>
+
+      <li class="settings-item">
+        <a class="settings-link" href="">
+          <span class="settings-icon"><i class="fa-regular fa-credit-card"></i></span>
+          <span class="settings-text">{{ 'settings.menu.subscription'|trans }}</span>
+          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+        </a>
+      </li>
+
+      <li class="settings-item">
+        <a class="settings-link" href="">
+          <span class="settings-icon"><i class="fa-regular fa-envelope"></i></span>
+          <span class="settings-text">{{ 'settings.menu.contact'|trans }}</span>
+          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+        </a>
+      </li>
+
+      <li class="settings-item">
+        <a class="settings-link" href="">
+          <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
+          <span class="settings-text">{{ 'settings.menu.terms_cgu'|trans }}</span>
+          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+        </a>
+      </li>
+
+      <li class="settings-item">
+        <a class="settings-link" href="">
+          <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
+          <span class="settings-text">{{ 'settings.menu.terms_cgv'|trans }}</span>
+          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <div class="settings-note">
+    {{ 'settings.hint'|trans }}
   </div>
 
-  <button type="submit" style="display:none">save</button>
-  {{ form_end(form) }}
-</section>
+</div>
 
-
-
-    {# --- Liste des réglages --- #}
-    <section class="settings-section">
-      <ul class="settings-list" role="list">
-        <li class="settings-item">
-          <a class="settings-link" href="">
-            <span class="settings-icon"><i class="fa-regular fa-id-card"></i></span>
-            <span class="settings-text">Données personnelles</span>
-            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-          </a>
-        </li>
-
-        <li class="settings-item">
-          <a class="settings-link" href="">
-            <span class="settings-icon"><i class="fa-solid fa-sliders"></i></span>
-            <span class="settings-text">Préférences</span>
-            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-          </a>
-        </li>
-
-        <li class="settings-item">
-          <a class="settings-link" href="">
-            <span class="settings-icon"><i class="fa-regular fa-credit-card"></i></span>
-            <span class="settings-text">Gestion d’abonnement</span>
-            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-          </a>
-        </li>
-
-        <li class="settings-item">
-          <a class="settings-link" href="">
-            <span class="settings-icon"><i class="fa-regular fa-envelope"></i></span>
-            <span class="settings-text">Contact</span>
-            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-          </a>
-        </li>
-
-        <li class="settings-item">
-          <a class="settings-link" href="">
-            <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
-            <span class="settings-text">CGU</span>
-            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-          </a>
-        </li>
-
-        <li class="settings-item">
-          <a class="settings-link" href="">
-            <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
-            <span class="settings-text">CGV</span>
-            <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-          </a>
-        </li>
-      </ul>
-    </section>
-
-    <div class="settings-note">
-      Astuce : branche le bouton “+” sur un input file (ou un modal) pour l’upload d’avatar.
-    </div>
-
-  </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const input = document.querySelector('.js-avatar-input');

@@ -15,10 +15,10 @@ class TeamAddMemberType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'label' => 'Email de l’utilisateur',
+                'label' => 'User Email',
             ])
             ->add('role', ChoiceType::class, [
-                'label' => 'Rôle dans l’équipe',
+                'label' => 'Role',
                 'choices' => [
                     'Membre' => TeamRole::MEMBER,
                     'Admin'  => TeamRole::ADMIN,

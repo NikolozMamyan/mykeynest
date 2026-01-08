@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Équipe {{ team.name }}{% endblock %}
+{% block title %}{{ 'teams.show.title'|trans({'%name%': team.name}) }}{% endblock %}
 
 {% block body %}
 <div class="team-show-container">
@@ -10,15 +10,15 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
-            Retour aux équipes
+            {{ 'teams.show.back'|trans }}
         </a>
-        
+
         {% if is_granted('TEAM_DELETE', team) %}
             <button type="button" class="btn-danger-outline" onclick="confirmDeleteTeam()">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
-                Supprimer l'équipe
+                {{ 'teams.show.delete_team'|trans }}
             </button>
         {% endif %}
     </div>
@@ -36,13 +36,13 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Créée le {{ team.createdAt|date('d/m/Y') }}
+                        {{ 'teams.show.created_at'|trans({'%date%': team.createdAt|date('d/m/Y')}) }}
                     </span>
                     <span class="metadata-item">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Propriétaire : {{ team.owner.email ?? 'N/A' }}
+                        {{ 'teams.show.owner'|trans({'%email%': team.owner.email ?? ('teams.show.na'|trans) }) }}
                     </span>
                 </div>
             </div>
@@ -56,7 +56,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                 </svg>
-                <h2>Identifiants partagés</h2>
+                <h2>{{ 'teams.show.credentials.title'|trans }}</h2>
                 <span class="member-count">{{ team.credentials|length }}</span>
             </div>
             {% if is_granted('TEAM_MANAGE', team) %}
@@ -64,7 +64,7 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    Ajouter
+                    {{ 'teams.show.credentials.add'|trans }}
                 </button>
             {% endif %}
         </div>
@@ -74,7 +74,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                 </svg>
-                <p>Aucun credential partagé avec cette équipe</p>
+                <p>{{ 'teams.show.credentials.empty'|trans }}</p>
             </div>
         {% else %}
             <div class="credentials-list">
@@ -96,9 +96,9 @@
                             <form method="post"
                                   action="{{ path('app_team_remove_credential', {id: team.id, credentialId: credential.id}) }}"
                                   class="remove-credential-form"
-                                  onsubmit="return confirm('Retirer ce credential de l\'équipe ?');">
+                                  onsubmit="return confirm('{{ 'teams.show.credentials.remove_confirm'|trans|e('js') }}');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('remove_credential_' ~ credential.id) }}">
-                                <button type="submit" class="btn-remove-member" title="Retirer ce credential">
+                                <button type="submit" class="btn-remove-member" title="{{ 'teams.show.credentials.remove_title'|trans }}">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -118,7 +118,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                 </svg>
-                <h2>Membres de l'équipe</h2>
+                <h2>{{ 'teams.show.members.title'|trans }}</h2>
                 <span class="member-count">{{ team.members|length }}</span>
             </div>
         </div>
@@ -126,9 +126,10 @@
         {% if team.members is empty %}
             <div class="empty-members">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                <p>Aucun membre dans cette équipe</p>
+                <p>{{ 'teams.show.members.empty'|trans }}</p>
             </div>
         {% else %}
             <div class="members-list">
@@ -156,8 +157,9 @@
                                     {% endif %}
                                     {{ member.role.value }}
                                 </span>
+
                                 <span class="joined-date">
-                                    Ajouté le {{ member.joinedAt|date('d/m/Y') }}
+                                    {{ 'teams.show.members.joined_at'|trans({'%date%': member.joinedAt|date('d/m/Y')}) }}
                                 </span>
                             </div>
                         </div>
@@ -166,9 +168,9 @@
                             <form method="post"
                                   action="{{ path('app_team_remove_member', {id: team.id, memberId: member.id}) }}"
                                   class="remove-member-form"
-                                  onsubmit="return confirm('Supprimer ce membre de l'équipe ?');">
+                                  onsubmit="return confirm('{{ 'teams.show.members.remove_confirm'|trans|e('js') }}');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('remove_member_' ~ member.id) }}">
-                                <button type="submit" class="btn-remove-member" title="Supprimer ce membre">
+                                <button type="submit" class="btn-remove-member" title="{{ 'teams.show.members.remove_title'|trans }}">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
@@ -189,7 +191,7 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     </svg>
-                    <h2>Ajouter un membre</h2>
+                    <h2>{{ 'teams.show.members.add.title'|trans }}</h2>
                 </div>
             </div>
 
@@ -197,67 +199,73 @@
                 <div class="form-row">
                     <div class="form-group-inline">
                         {{ form_label(add_member_form.email, null, {'label_attr': {'class': 'form-label-inline'}}) }}
-                        {{ form_widget(add_member_form.email, {'attr': {'class': 'form-input-inline', 'placeholder': 'email@exemple.com'}}) }}
+                        {{ form_widget(add_member_form.email, {'attr': {'class': 'form-input-inline', 'placeholder': 'teams.show.members.add.email_placeholder'|trans }}) }}
                         {{ form_errors(add_member_form.email) }}
                     </div>
+
                     <div class="form-group-inline">
                         {{ form_label(add_member_form.role, null, {'label_attr': {'class': 'form-label-inline'}}) }}
                         {{ form_widget(add_member_form.role, {'attr': {'class': 'form-select-inline'}}) }}
                         {{ form_errors(add_member_form.role) }}
                     </div>
+
                     <button type="submit" class="btn-add-member">
-<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-</svg>
-Ajouter
-</button>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        {{ 'teams.show.members.add.submit'|trans }}
+                    </button>
+                </div>
+            {{ form_end(add_member_form) }}
+        </div>
+    {% endif %}
 </div>
-{{ form_end(add_member_form) }}
-</div>
-{% endif %}
-</div>
+
 {# Modal pour ajouter des credentials #}
 {% if add_credentials_form is defined and add_credentials_form %}
 <div id="credentialsModal" class="modal">
     <div class="modal-overlay" onclick="closeCredentialsModal()"></div>
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Ajouter des credentials</h2>
+            <h2>{{ 'teams.show.credentials.modal.title'|trans }}</h2>
             <button type="button" class="btn-close-modal" onclick="closeCredentialsModal()">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
+
         <div class="modal-body">
             {{ form_start(add_credentials_form, {'attr': {'class': 'credentials-form'}}) }}
                 <div class="form-help-text-modal">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Sélectionnez les credentials à partager avec cette équipe
+                    {{ 'teams.show.credentials.modal.help'|trans }}
                 </div>
-            <div class="credentials-checkboxes">
-                {{ form_widget(add_credentials_form.credentials) }}
-                {{ form_errors(add_credentials_form.credentials) }}
-            </div>
 
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeCredentialsModal()">
-                    Annuler
-                </button>
-                <button type="submit" class="btn-primary-modal">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    Ajouter les credentials
-                </button>
-            </div>
-        {{ form_end(add_credentials_form) }}
+                <div class="credentials-checkboxes">
+                    {{ form_widget(add_credentials_form.credentials) }}
+                    {{ form_errors(add_credentials_form.credentials) }}
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeCredentialsModal()">
+                        {{ 'teams.show.credentials.modal.cancel'|trans }}
+                    </button>
+                    <button type="submit" class="btn-primary-modal">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {{ 'teams.show.credentials.modal.submit'|trans }}
+                    </button>
+                </div>
+            {{ form_end(add_credentials_form) }}
+        </div>
     </div>
 </div>
-</div>
 {% endif %}
+
 {# Formulaire caché pour la suppression de l'équipe #}
 {% if is_granted('TEAM_DELETE', team) %}
 <form id="deleteTeamForm" method="post" action="{{ path('app_team_delete', {id: team.id}) }}" style="display: none;">
@@ -994,7 +1002,7 @@ function closeCredentialsModal() {
 }
 
 function confirmDeleteTeam() {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette équipe ? Cette action est irréversible et supprimera également tous les membres.')) {
+    if (confirm('Are you sure you want to delete this team? This action is irreversible and will also remove all members.')) {
         document.getElementById('deleteTeamForm').submit();
     }
 }

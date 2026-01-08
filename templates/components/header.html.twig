@@ -918,7 +918,7 @@
 <header class="header_top">
   <!-- Bouton burger pour mobile -->
   <button class="burger-btn"
-          aria-label="Menu"
+          aria-label="{{ 'header.burger_aria'|trans }}"
           data-action="click->layout#toggleSidebar">
     <i class="fas fa-bars"></i>
   </button>
@@ -926,7 +926,7 @@
   <!-- Logo -->
   <div class="header-logo">
     <div class="logo-container">
-    {% include 'components/parts/logo.html.twig' %}
+      {% include 'components/parts/logo.html.twig' %}
     </div>
   </div>
 
@@ -936,8 +936,8 @@
 
     <!-- Notifications -->
     <div style="position: relative;">
-      <button class="notification-btn" 
-              aria-label="Notifications"
+      <button class="notification-btn"
+              aria-label="{{ 'header.notifications.aria'|trans }}"
               id="notificationBtn">
         <i class="fas fa-bell"></i>
         <span id="notif" class="notification-badge"></span>
@@ -948,20 +948,24 @@
         <div class="notification-panel-header">
           <div class="notification-panel-title">
             <i class="fas fa-bell"></i>
-            Notifications
+            {{ 'header.notifications.title'|trans }}
             <span class="notification-count-badge" id="notificationCountBadge">0</span>
           </div>
+
           <button class="mark-all-read" id="markAllReadBtn">
             <i class="fas fa-check-double"></i>
-            Marquer lu
+            {{ 'header.notifications.mark_all_read'|trans }}
           </button>
         </div>
+
         <div class="notification-list" id="notificationList">
           <div class="notification-empty">
             <div class="notification-empty-icon">
               <i class="fas fa-bell-slash"></i>
             </div>
-            <div class="notification-empty-text">Chargement...</div>
+            <div class="notification-empty-text">
+              {{ 'header.notifications.loading'|trans }}
+            </div>
           </div>
         </div>
       </div>
@@ -972,9 +976,8 @@
       <div class="user-profile" id="userProfileBtn">
         <div class="avatar-wrapper">
           <img class="avatar-img"
-           src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
-           alt="Avatar">
-
+               src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
+               alt="{{ 'header.profile.avatar_alt'|trans }}">
         </div>
         <span class="company-name">{{ app.user.company }}</span>
       </div>
@@ -984,10 +987,9 @@
         <!-- Header avec info user -->
         <div class="user-dropdown-header">
           <div class="user-dropdown-info">
-           <img class="avatar-img"
-           src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
-           alt="Avatar"
-                 class="user-dropdown-avatar" />
+            <img class="avatar-img user-dropdown-avatar"
+                 src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
+                 alt="{{ 'header.profile.avatar_alt'|trans }}" />
             <div class="user-dropdown-details">
               <div class="user-dropdown-company">{{ app.user.nom ?? '' }}</div>
               <div class="user-dropdown-name">{{ app.user.company }}</div>
@@ -1000,74 +1002,78 @@
           <!-- Section Langue -->
           <div class="user-dropdown-section">
             <div class="user-dropdown-section-title">
-<i class="fas fa-globe"></i> Langue
-</div>
-<div class="user-dropdown-lang">
-{% set currentLocale = app.request.locale|default('fr') %}
-<div class="lang-switch" role="group" aria-label="Langue">
-<button
-               type="button"
-               class="lang-switch__btn {{ currentLocale == 'fr' ? 'is-active' : '' }}"
-               data-lang="fr"
-               aria-pressed="{{ currentLocale == 'fr' ? 'true' : 'false' }}"
-               title="Français"
-             >
-<img
-                 src="{{ asset('images/flags/fr.svg') }}"
-                 alt="Français"
-                 class="lang-switch__flag"
-                 loading="lazy"
-                 width="22"
-                 height="16"
-               >
-</button>
-            <button
-              type="button"
-              class="lang-switch__btn {{ currentLocale == 'en' ? 'is-active' : '' }}"
-              data-lang="en"
-              aria-pressed="{{ currentLocale == 'en' ? 'true' : 'false' }}"
-              title="English"
-            >
-              <img
-                src="{{ asset('images/flags/gb.svg') }}"
-                alt="English"
-                class="lang-switch__flag"
-                loading="lazy"
-                width="22"
-                height="16"
-              >
-            </button>
+              <i class="fas fa-globe"></i> {{ 'header.profile.language'|trans }}
+            </div>
+
+            <div class="user-dropdown-lang">
+              {% set currentLocale = app.request.locale|default('fr') %}
+
+              <div class="lang-switch" role="group" aria-label="{{ 'header.profile.language_aria'|trans }}">
+                <button
+                  type="button"
+                  class="lang-switch__btn {{ currentLocale == 'fr' ? 'is-active' : '' }}"
+                  data-lang="fr"
+                  aria-pressed="{{ currentLocale == 'fr' ? 'true' : 'false' }}"
+                  title="{{ 'header.profile.language_fr'|trans }}"
+                >
+                  <img
+                    src="{{ asset('images/flags/fr.svg') }}"
+                    alt="{{ 'header.profile.language_fr'|trans }}"
+                    class="lang-switch__flag"
+                    loading="lazy"
+                    width="22"
+                    height="16"
+                  >
+                </button>
+
+                <button
+                  type="button"
+                  class="lang-switch__btn {{ currentLocale == 'en' ? 'is-active' : '' }}"
+                  data-lang="en"
+                  aria-pressed="{{ currentLocale == 'en' ? 'true' : 'false' }}"
+                  title="{{ 'header.profile.language_en'|trans }}"
+                >
+                  <img
+                    src="{{ asset('images/flags/gb.svg') }}"
+                    alt="{{ 'header.profile.language_en'|trans }}"
+                    class="lang-switch__flag"
+                    loading="lazy"
+                    width="22"
+                    height="16"
+                  >
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="user-dropdown-divider"></div>
+
+          <!-- Section Actions -->
+          <div class="user-dropdown-section">
+            <a href="{{ path('app_settings') }}" class="user-dropdown-item">
+              <div class="user-dropdown-item-icon">
+                <i class="fas fa-cog"></i>
+              </div>
+              <div class="user-dropdown-item-text">
+                <div class="user-dropdown-item-label">{{ 'header.profile.settings.label'|trans }}</div>
+                <div class="user-dropdown-item-desc">{{ 'header.profile.settings.desc'|trans }}</div>
+              </div>
+            </a>
+
+            <a href="" class="user-dropdown-item" data-controller="auth" data-action="click->auth#logout">
+              <div class="user-dropdown-item-icon">
+                <i class="fas fa-sign-out-alt"></i>
+              </div>
+              <div class="user-dropdown-item-text">
+                <div class="user-dropdown-item-label">{{ 'header.profile.logout.label'|trans }}</div>
+                <div class="user-dropdown-item-desc">{{ 'header.profile.logout.desc'|trans }}</div>
+              </div>
+            </a>
           </div>
         </div>
       </div>
-
-      <div class="user-dropdown-divider"></div>
-
-      <!-- Section Actions -->
-      <div class="user-dropdown-section">
-        <a href="{{ path('app_settings') }}" class="user-dropdown-item">
-          <div class="user-dropdown-item-icon">
-            <i class="fas fa-cog"></i>
-          </div>
-          <div class="user-dropdown-item-text">
-            <div class="user-dropdown-item-label">Paramètres</div>
-            <div class="user-dropdown-item-desc">Gérer votre compte</div>
-          </div>
-        </a>
-
-        <a href="" class="user-dropdown-item" data-controller="auth" data-action="click->auth#logout">
-          <div class="user-dropdown-item-icon">
-            <i class="fas fa-sign-out-alt"></i>
-          </div>
-          <div class="user-dropdown-item-text">
-            <div class="user-dropdown-item-label">Déconnexion</div>
-            <div class="user-dropdown-item-desc">Se déconnecter</div>
-          </div>
-        </a>
-      </div>
     </div>
-  </div>
-</div>
+
   </div>
 </header>
 <script>
