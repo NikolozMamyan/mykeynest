@@ -88,7 +88,7 @@ final class SettingsController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Profile updated');
 
-            return $this->redirectToRoute('app_user_profil');
+            return $this->redirectToRoute('app_user_profile');
         }
 
         return $this->render('settings/profile.html.twig', [
