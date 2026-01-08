@@ -1,0 +1,175 @@
+<style>
+/* ===================== */
+/* TOASTS (bottom-right) */
+/* ===================== */
+.toasts{
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast{
+  pointer-events: auto;
+  width: min(360px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: 18px 1fr 28px;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 10px 8px;
+  border-radius: var(--border-radius);
+  background: rgba(255,255,255,.78);
+  backdrop-filter: var(--blur-background);
+  -webkit-backdrop-filter: var(--blur-background);
+  border: 1px solid rgba(226,232,240,.85);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+
+  transform: translateY(8px);
+  opacity: 0;
+  animation: toastIn .22s ease forwards;
+}
+
+[data-theme="dark"] .toast{
+  background: rgba(15,23,42,.62);
+  border-color: rgba(51,65,85,.75);
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+}
+
+.toast--success{ border-left: 4px solid var(--color-success); }
+.toast--error{ border-left: 4px solid var(--color-danger-start); }
+
+.toast__icon{
+  margin-top: 1px;
+  font-size: 16px;
+  line-height: 1;
+}
+.toast--success .toast__icon{ color: var(--color-success); }
+.toast--error .toast__icon{ color: var(--color-danger-start); }
+
+.toast__content{
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+  color: var(--color-text-dark);
+}
+[data-theme="dark"] .toast__content{
+  color: rgba(226,232,240,.92);
+}
+
+.toast__close{
+  border: 0;
+  background: transparent;
+  padding: 0;
+  height: 24px;
+  width: 24px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+.toast__close:hover{
+  background: rgba(148,163,184,.18);
+  color: var(--color-text-dark);
+}
+[data-theme="dark"] .toast__close:hover{
+  background: rgba(148,163,184,.12);
+  color: rgba(226,232,240,.95);
+}
+.toast__close:active{ transform: scale(.96); }
+
+.toast__bar{
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left;
+  animation: toastBar linear forwards;
+  opacity: .95;
+}
+
+.toast--success .toast__bar{
+  background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+}
+.toast--error .toast__bar{
+  background: linear-gradient(90deg, var(--color-danger-start), var(--color-danger-end));
+}
+
+@keyframes toastIn{
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastOut{
+  to { opacity: 0; transform: translateY(10px); }
+}
+@keyframes toastBar{
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .toast{ animation: none; opacity: 1; transform: none; }
+  .toast__bar{ display:none; }
+}
+
+</style>
+<div class="toasts" aria-live="polite" aria-atomic="true">
+  {% for message in app.flashes('success') %}
+    <div class="toast toast--success" role="status" data-duration="4200">
+      <div class="toast__icon" aria-hidden="true">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div class="toast__content">{{ message }}</div>
+      <button class="toast__close" type="button" aria-label="Fermer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="toast__bar" aria-hidden="true"></div>
+    </div>
+  {% endfor %}
+
+  {% for message in app.flashes('error') %}
+    <div class="toast toast--error" role="alert" data-duration="6000">
+      <div class="toast__icon" aria-hidden="true">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div class="toast__content">{{ message }}</div>
+      <button class="toast__close" type="button" aria-label="Fermer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="toast__bar" aria-hidden="true"></div>
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.toast').forEach((toast) => {
+      const duration = parseInt(toast.dataset.duration || '4000', 10);
+
+      const bar = toast.querySelector('.toast__bar');
+      if (bar) bar.style.animationDuration = duration + 'ms';
+
+      const close = () => {
+        toast.style.animation = 'toastOut .18s ease forwards';
+        window.setTimeout(() => toast.remove(), 220);
+      };
+
+      toast.querySelector('.toast__close')?.addEventListener('click', close);
+
+      // auto close (pause au hover)
+      let t = window.setTimeout(close, duration);
+      toast.addEventListener('mouseenter', () => window.clearTimeout(t));
+      toast.addEventListener('mouseleave', () => {
+        window.clearTimeout(t);
+        t = window.setTimeout(close, duration);
+      });
+    });
+  });
+</script>

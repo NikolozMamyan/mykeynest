@@ -1,128 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ app.request.locale|default('fr') }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      referrerpolicy="no-referrer"
     />
+
     <title>{% block title %}Welcome!{% endblock %}</title>
+
+    {# CSS global (idéalement via importmap/asset mapper). Laisse ton système actuel. #}
+    {% block stylesheets %}
+      {# Exemple si tu as un CSS global :
+         <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+      #}
+    {% endblock %}
+
+    {# Slot CSS page (évite de mettre des <style> dans le body) #}
+    {% block page_styles %}{% endblock %}
 
     {% block javascripts %}
       {% block importmap %}{{ importmap('app') }}{% endblock %}
     {% endblock %}
-
-    {% block stylesheets %}{% endblock %}
   </head>
 
   <body data-controller="layout">
-    {% if app.user %}
-      {% include "./components/header.html.twig" %}
-    {% endif %}
+    {# ===== Layout wrapper ===== #}
+    <div class="app-shell">
       {% if app.user %}
+        {% include "./components/header.html.twig" %}
         {% include "./components/sidebar.html.twig" %}
       {% endif %}
-        <!-- Backdrop -->
-  <div class="sidebar-backdrop"
-       data-layout-target="backdrop"
-       data-action="click->layout#closeSidebar"></div>
-    <div class="wrapper-layout">
-    <!-- MAIN CONTENT -->
-<main class="main-content">
-{% set currentRoute = app.request.attributes.get('_route') %}
-{% set breadcrumbItems = breadcrumb_map()[currentRoute] ?? [] %}
 
-{% include './components/parts/_breadcrumb.html.twig' with { items: breadcrumbItems } %}
-{% block body %}{% endblock %}
-<style>
-/* Alerts */
-  .alerts-container {
-    margin-bottom: 1.5rem;
-  }
+      {# Backdrop sidebar #}
+      <div
+        class="sidebar-backdrop"
+        data-layout-target="backdrop"
+        data-action="click->layout#closeSidebar"
+        aria-hidden="true"
+      ></div>
 
-  .alert {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border-radius: var(--border-radius-sm);
-    margin-bottom: 1rem;
-    animation: slideInDown 0.3s ease;
-    box-shadow: var(--shadow-sm);
-  }
+      <div class="wrapper-layout">
+        <main class="main-content" id="main-content" tabindex="-1">
+          {# ===== Breadcrumb (optionnel) ===== #}
+          {% block breadcrumb %}
+            {% set currentRoute = app.request.attributes.get('_route') %}
+            {% set breadcrumbItems = breadcrumb_map()[currentRoute] ?? [] %}
+            {% if breadcrumbItems is not empty %}
+              {% include './components/parts/_breadcrumb.html.twig' with { items: breadcrumbItems } %}
+            {% endif %}
+          {% endblock %}
 
-  .alert-success {
-    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-    border-left: 4px solid var(--color-success);
-  }
-
-  .alert-danger {
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    border-left: 4px solid var(--color-danger-start);
-  }
-
-  .alert-icon {
-    font-size: 1.5rem;
-  }
-
-  .alert-success .alert-icon {
-    color: var(--color-success);
-  }
-
-  .alert-danger .alert-icon {
-    color: var(--color-danger-start);
-  }
-
-  .alert-message {
-    flex: 1;
-    color: var(--color-text-dark);
-    font-weight: 500;
-  }
-
-  .alert-close {
-    background: none;
-    border: none;
-    color: var(--color-text-muted);
-    cursor: pointer;
-    font-size: 1.25rem;
-    padding: 0.25rem;
-    transition: all 0.2s ease;
-  }
-
-  .alert-close:hover {
-    color: var(--color-text-dark);
-  }
-
-</style>
-  <!-- Alerts -->
-  <div class="alerts-container">
-    {% for message in app.flashes('success') %}
-      <div class="alert alert-success">
-        <div class="alert-icon">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <span class="alert-message">{{ message }}</span>
-        <button class="alert-close"><i class="fas fa-times"></i></button>
+          {# ===== Contenu page ===== #}
+          {% block body %}{% endblock %}
+        </main>
       </div>
-    {% endfor %}
-
-    {% for message in app.flashes('error') %}
-      <div class="alert alert-danger">
-        <div class="alert-icon">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
-        <span class="alert-message">{{ message }}</span>
-        <button class="alert-close"><i class="fas fa-times"></i></button>
-      </div>
-    {% endfor %}
-  </div>
-</main>
-
-
-
     </div>
+
+    {# ===== Toasts / Alerts (fixed bottom-right) ===== #}
+    {% include './components/parts/_toasts.html.twig' %}
+
+    {# JS page #}
+    {% block page_scripts %}{% endblock %}
   </body>
 </html>

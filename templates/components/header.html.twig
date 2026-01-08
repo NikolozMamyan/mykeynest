@@ -971,7 +971,10 @@
     <div class="user-profile-wrapper">
       <div class="user-profile" id="userProfileBtn">
         <div class="avatar-wrapper">
-          <img src="https://i.pravatar.cc/150?img=5" alt="Avatar utilisateur" />
+          <img class="avatar-img"
+           src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
+           alt="Avatar">
+
         </div>
         <span class="company-name">{{ app.user.company }}</span>
       </div>
@@ -981,12 +984,13 @@
         <!-- Header avec info user -->
         <div class="user-dropdown-header">
           <div class="user-dropdown-info">
-            <img src="https://i.pravatar.cc/150?img=5" 
-                 alt="Avatar" 
+           <img class="avatar-img"
+           src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
+           alt="Avatar"
                  class="user-dropdown-avatar" />
             <div class="user-dropdown-details">
-              <div class="user-dropdown-name">{{ app.user.fullName ?? 'Utilisateur' }}</div>
-              <div class="user-dropdown-company">{{ app.user.company }}</div>
+              <div class="user-dropdown-company">{{ app.user.nom ?? '' }}</div>
+              <div class="user-dropdown-name">{{ app.user.company }}</div>
             </div>
           </div>
         </div>

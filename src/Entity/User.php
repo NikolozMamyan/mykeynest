@@ -61,6 +61,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $stripeSubscriptionId = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatar = null;
+
 
 public function __construct()
 {
@@ -238,6 +241,17 @@ public function getStripeSubscriptionId(): ?string
 public function setStripeSubscriptionId(?string $stripeSubscriptionId): static
 {
     $this->stripeSubscriptionId = $stripeSubscriptionId;
+    return $this;
+}
+public function getAvatar(): ?string
+{
+    return $this->avatar;
+}
+
+public function setAvatar(?string $avatar): self
+{
+    $this->avatar = $avatar;
+
     return $this;
 }
 }
