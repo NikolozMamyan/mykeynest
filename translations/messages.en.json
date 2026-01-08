@@ -13,6 +13,20 @@
     "settings": "Settings",
     "subscription": "Subscriptions"
   },
+  "user": {
+  "field": {
+    "firstname": "First name",
+    "lastname": "Last name",
+    "company": "Company",
+    "email": "Email address",
+    "phone": "Phone number"
+  }
+},
+"common": {
+  "back": "Back",
+  "cancel": "Cancel",
+  "save_changes": "Save changes"
+},
    "header": {
     "burger_aria": "Menu",
     "notifications": {
@@ -606,23 +620,67 @@
       "universities": "Universities"
     }
   },
-  "settings": {
-    "title": "Settings",
-    "profile": {
-      "fallback_name": "Profile",
-      "change_avatar": "Change avatar",
-      "avatar_alt": "Avatar"
-    },
-    "menu": {
-      "personal_data": "Personal data",
-      "preferences": "Preferences",
-      "subscription": "Subscription management",
-      "contact": "Contact",
-      "terms_cgu": "Terms of Use",
-      "terms_cgv": "Terms of Sale"
-    },
-    "hint": "Tip: click the “+” button to change your avatar."
+"settings": {
+  "title": "Settings",
+
+  "profile": {
+    "fallback_name": "Profile",
+    "change_avatar": "Change avatar",
+    "avatar_alt": "Avatar",
+    "title": "Profile",
+    "edit_title": "Edit my profile",
+    "section_identity": "Identity",
+    "section_business": "Company",
+    "section_contact": "Contact details",
+    "company_help": "Your company or organization name."
   },
+
+  "menu": {
+    "personal_data": "Personal data",
+    "preferences": "Preferences",
+    "subscription": "Subscription management",
+    "contact": "Contact",
+    "terms_cgu": "Terms of Use",
+    "terms_cgv": "Terms of Sale"
+  },
+
+  "preferences": {
+    "title": "Preferences",
+
+    "language": {
+      "title": "Language",
+      "description": "Choose the language used for the application interface."
+    },
+
+    "engagement": {
+      "title": "Notifications and engagement",
+      "description": "Manage your communication and interaction preferences."
+    },
+
+    "feedback": {
+      "label": "Feedback requests",
+      "description": "Allow feedback requests to help improve your experience."
+    },
+
+    "security": {
+      "title": "Cybersecurity",
+      "description": "Settings related to security and sensitive communications."
+    },
+
+    "cybersecurity": {
+      "label": "Interest in cybersecurity",
+      "description": "Receive content and recommendations related to cybersecurity."
+    },
+
+    "security_emails": {
+      "label": "Security emails",
+      "description": "Receive important security alerts and notifications."
+    }
+  },
+
+  "hint": "Tip: click the “+” button to change your avatar."
+},
+
   "teams": {
     "page_title": "My teams",
     "header": {

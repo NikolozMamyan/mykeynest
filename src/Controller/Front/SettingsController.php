@@ -2,14 +2,16 @@
 
 namespace App\Controller\Front;
 
+use App\Form\UserType;
 use App\Form\AvatarType;
+use App\Form\PreferencesType;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Filesystem\Filesystem;
 
 final class SettingsController extends AbstractController
 {
@@ -70,4 +72,55 @@ final class SettingsController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    #[Route('/app/settings/profile', name: 'app_user_profile')]
+    public function profile(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Profile updated');
+
+            return $this->redirectToRoute('app_user_profil');
+        }
+
+        return $this->render('settings/profile.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+#[Route('/app/settings/preferences', name: 'app_user_preferences')]
+public function preferences(Request $request, EntityManagerInterface $em): Response
+{
+    $user = $this->getUser();
+
+    if (!$user) {
+        throw $this->createAccessDeniedException();
+    }
+
+    $form = $this->createForm(PreferencesType::class, $user);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->flush();
+        
+
+        $request->getSession()->set('_locale', $user->getLocale());
+        
+        $this->addFlash('success', 'Préférences mises à jour avec succès');
+
+        return $this->redirectToRoute('app_user_preferences');
+    }
+
+    return $this->render('settings/preferences.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
 }

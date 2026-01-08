@@ -979,7 +979,12 @@
                src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
                alt="{{ 'header.profile.avatar_alt'|trans }}">
         </div>
-        <span class="company-name">{{ app.user.company }}</span>
+{% set fullName = (app.user.prenom|default('') ~ ' ' ~ app.user.nom|default(''))|trim %}
+
+<span class="company-name">
+  {{ fullName ?: app.user.company }}
+</span>
+
       </div>
 
       <!-- Dropdown du profil -->
@@ -991,7 +996,7 @@
                  src="{{ app.user.avatar ? asset('uploads/avatars/' ~ app.user.avatar) : asset('images/avatar-default.png') }}"
                  alt="{{ 'header.profile.avatar_alt'|trans }}" />
             <div class="user-dropdown-details">
-              <div class="user-dropdown-company">{{ app.user.nom ?? '' }}</div>
+              <div class="user-dropdown-company">{{ app.user.nom ?? '' }} {{ app.user.prenom ?? '' }}</div>
               <div class="user-dropdown-name">{{ app.user.company }}</div>
             </div>
           </div>

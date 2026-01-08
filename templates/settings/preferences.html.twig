@@ -1,0 +1,576 @@
+{# templates/settings/preferences.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'settings.preferences.title'|trans }}{% endblock %}
+
+{% block body %}
+<style>
+/* =========================
+   PREFERENCES – UI/UX STYLÉ
+   Reprend la palette de settings
+   ========================= */
+
+/* Background avec gradients */
+.preferences-page::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(5,150,105,.12), transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(16,185,129,.10), transparent 40%),
+    radial-gradient(circle at 10% 80%, rgba(245,158,11,.10), transparent 40%),
+    linear-gradient(135deg, rgba(240,253,244,.9), rgba(236,253,245,.9));
+  filter: saturate(1.05);
+  z-index: -2;
+}
+
+/* Noise texture */
+.preferences-page::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .05;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.25) 0 1px, transparent 1px 4px);
+  mix-blend-mode: overlay;
+  z-index: -1;
+}
+
+.preferences-page{
+  min-height: 100vh;
+  padding: 26px 16px 40px;
+  color: var(--color-text-dark);
+  background: transparent;
+}
+
+/* Header */
+.preferences-header{
+  max-width: 760px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.preferences-back{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--color-text-dark);
+  font-weight: 700;
+  font-size: 14px;
+  background: rgba(255,255,255,.72);
+  backdrop-filter: var(--blur-background);
+  border: 1px solid rgba(226,232,240,.85);
+  box-shadow: var(--shadow-sm);
+  transition: all .18s ease;
+}
+
+.preferences-back:hover{
+  background: rgba(241,245,249,.9);
+  transform: translateX(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .preferences-back{
+  background: rgba(15,23,42,.55);
+  border-color: rgba(51,65,85,.75);
+  color: var(--color-text-light);
+}
+
+.preferences-title{
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin: 0;
+  line-height: 1.05;
+  background: linear-gradient(90deg, var(--color-text-dark), var(--color-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Container */
+.preferences-container{
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* Card */
+.preferences-card{
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255,255,255,.72);
+  backdrop-filter: var(--blur-background);
+  border: 1px solid rgba(226,232,240,.85);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 20px;
+}
+
+[data-theme="dark"] .preferences-card{
+  background: rgba(15,23,42,.55);
+  border: 1px solid rgba(51,65,85,.75);
+  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+}
+
+/* Section */
+.pref-section{
+  padding: 24px 20px;
+}
+
+.pref-section + .pref-section{
+  border-top: 1px solid rgba(226,232,240,.75);
+}
+
+[data-theme="dark"] .pref-section + .pref-section{
+  border-top: 1px solid rgba(51,65,85,.75);
+}
+
+/* Section header */
+.pref-section-header{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.pref-icon{
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(5,150,105,.12);
+  color: var(--color-primary);
+  border: 1px solid rgba(5,150,105,.18);
+  box-shadow: 0 6px 18px rgba(5,150,105,.12);
+}
+
+.pref-section-title{
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--color-text-dark);
+}
+
+.pref-section-desc{
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* ===== Language Switcher ===== */
+.lang-switcher{
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.lang-option{
+  flex: 1;
+  position: relative;
+}
+
+.lang-option input{
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lang-label{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.85);
+  border: 2px solid rgba(226,232,240,.9);
+  cursor: pointer;
+  transition: all .2s ease;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text-dark);
+}
+
+.lang-label:hover{
+  background: rgba(241,245,249,.95);
+  border-color: rgba(203,213,225,.95);
+}
+
+.lang-option input:checked + .lang-label{
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-green);
+}
+
+.lang-flag{
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+}
+
+.lang-option input:checked ~ .lang-label{
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-green);
+}
+.lang-option input:checked ~ .lang-label .lang-flag{
+  box-shadow: 0 0 0 2px rgba(255,255,255,.5);
+}
+
+
+[data-theme="dark"] .lang-label{
+  background: rgba(30,41,59,.55);
+  border-color: rgba(51,65,85,.9);
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .lang-label:hover{
+  background: rgba(30,41,59,.75);
+}
+
+/* ===== iOS-Style Toggle Switch ===== */
+.pref-list{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.pref-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(226,232,240,.75);
+  transition: background .2s ease;
+}
+
+.pref-item:hover{
+  background: rgba(241,245,249,.8);
+}
+
+[data-theme="dark"] .pref-item{
+  background: rgba(30,41,59,.4);
+  border-color: rgba(51,65,85,.7);
+}
+
+[data-theme="dark"] .pref-item:hover{
+  background: rgba(30,41,59,.6);
+}
+
+.pref-item-info{
+  flex: 1;
+  min-width: 0;
+}
+
+.pref-item-label{
+  font-size: 15px;
+  font-weight: 750;
+  color: var(--color-text-dark);
+  margin-bottom: 4px;
+}
+
+.pref-item-desc{
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* iOS Toggle */
+.ios-toggle{
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.ios-toggle input{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ios-slider{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(120,120,128,.16);
+  transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.15);
+}
+
+.ios-slider::before{
+  content: "";
+  position: absolute;
+  height: 26px;
+  width: 26px;
+  left: 2px;
+  bottom: 2px;
+  background: white;
+  transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+
+.ios-toggle input:checked ~ .ios-slider{
+  background: var(--color-primary);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.12), var(--shadow-green);
+}
+.ios-toggle input:checked ~ .ios-slider::before{
+  transform: translateX(20px);
+}
+
+.ios-toggle input:focus-visible + .ios-slider{
+  box-shadow: 0 0 0 3px var(--color-primary-hover);
+}
+
+[data-theme="dark"] .ios-slider{
+  background: rgba(120,120,128,.3);
+}
+
+[data-theme="dark"] .ios-slider::before{
+  background: rgba(255,255,255,.95);
+}
+
+/* Actions */
+.preferences-actions{
+  padding: 20px;
+  background: rgba(241,245,249,.5);
+  border-top: 1px solid rgba(226,232,240,.75);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+[data-theme="dark"] .preferences-actions{
+  background: rgba(15,23,42,.35);
+  border-top-color: rgba(51,65,85,.75);
+}
+
+.btn{
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all .18s ease;
+  font-family: inherit;
+}
+
+.btn-primary{
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
+  color: #fff;
+  box-shadow: var(--shadow-green);
+}
+
+.btn-primary:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* Flash messages */
+.flash-messages{
+  max-width: 760px;
+  margin: 0 auto 16px;
+}
+
+.flash-alert{
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: var(--blur-background);
+  box-shadow: var(--shadow-sm);
+}
+
+.flash-success{
+  background: rgba(16,185,129,.15);
+  border: 1px solid rgba(16,185,129,.3);
+  color: #047857;
+}
+
+/* Responsive */
+@media (max-width: 520px){
+  .preferences-page{ padding: 20px 12px 32px; }
+  .preferences-header{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .pref-section{ padding: 20px 16px; }
+  .preferences-actions{
+    padding: 16px;
+    flex-direction: column;
+  }
+  .btn{ 
+    width: 100%; 
+    justify-content: center;
+  }
+}
+
+/* Icon variations */
+.pref-icon.icon-language{ background: rgba(5,150,105,.12); border-color: rgba(5,150,105,.18); color: var(--color-primary); }
+.pref-icon.icon-notifications{ background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.18); color: var(--color-success); }
+.pref-icon.icon-security{ background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.20); color: var(--color-warning); }
+</style>
+
+
+
+    {# Header #}
+  <div class="preferences-header">
+    <a href="{{ path('app_settings') }}" class="preferences-back">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>{{ 'common.back'|trans }}</span>
+    </a>
+    <h1 class="preferences-title">{{ 'settings.preferences.title'|trans }}</h1>
+  </div>
+
+  {# Form #}
+  <div class="preferences-container">
+    {{ form_start(form, { attr: { class: 'preferences-form' } }) }}
+
+    <div class="preferences-card">
+
+      {# Langue #}
+      <section class="pref-section">
+        <div class="pref-section-header">
+          <span class="pref-icon icon-language">
+            <i class="fa-solid fa-globe"></i>
+          </span>
+          <div>
+            <h2 class="pref-section-title">{{ 'settings.preferences.language.title'|trans }}</h2>
+            <p class="pref-section-desc">{{ 'settings.preferences.language.description'|trans }}</p>
+          </div>
+        </div>
+
+        <div class="lang-switcher">
+          <div class="lang-option">
+            {{ form_widget(form.locale[0]) }}
+            <label for="{{ form.locale[0].vars.id }}" class="lang-label">
+              <img src="{{ asset('images/flags/fr.svg') }}" alt="Français" class="lang-flag">
+              <span>Français</span>
+            </label>
+          </div>
+
+          <div class="lang-option">
+            {{ form_widget(form.locale[1]) }}
+            <label for="{{ form.locale[1].vars.id }}" class="lang-label">
+              <img src="{{ asset('images/flags/gb.svg') }}" alt="English" class="lang-flag">
+              <span>English</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      {# Notifications & Engagement #}
+      <section class="pref-section">
+        <div class="pref-section-header">
+          <span class="pref-icon icon-notifications">
+            <i class="fa-solid fa-bell"></i>
+          </span>
+          <div>
+            <h2 class="pref-section-title">{{ 'settings.preferences.engagement.title'|trans }}</h2>
+            <p class="pref-section-desc">{{ 'settings.preferences.engagement.description'|trans }}</p>
+          </div>
+        </div>
+
+        <div class="pref-list">
+          <div class="pref-item">
+            <div class="pref-item-info">
+              <div class="pref-item-label">{{ 'settings.preferences.feedback.label'|trans }}</div>
+              <div class="pref-item-desc">{{ 'settings.preferences.feedback.description'|trans }}</div>
+            </div>
+            <label class="ios-toggle">
+              {{ form_widget(form.allowFeedback, { attr: { id: 'pref_feedback' } }) }}
+              <span class="ios-slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      {# Cybersécurité #}
+      <section class="pref-section">
+        <div class="pref-section-header">
+          <span class="pref-icon icon-security">
+            <i class="fa-solid fa-shield-halved"></i>
+          </span>
+          <div>
+            <h2 class="pref-section-title">{{ 'settings.preferences.security.title'|trans }}</h2>
+            <p class="pref-section-desc">{{ 'settings.preferences.security.description'|trans }}</p>
+          </div>
+        </div>
+
+        <div class="pref-list">
+          <div class="pref-item">
+            <div class="pref-item-info">
+              <div class="pref-item-label">{{ 'settings.preferences.cybersecurity.label'|trans }}</div>
+              <div class="pref-item-desc">{{ 'settings.preferences.cybersecurity.description'|trans }}</div>
+            </div>
+            <label class="ios-toggle">
+              {{ form_widget(form.interestedInCyberSecurity, { attr: { id: 'pref_cyber' } }) }}
+              <span class="ios-slider"></span>
+            </label>
+          </div>
+
+          <div class="pref-item">
+            <div class="pref-item-info">
+              <div class="pref-item-label">{{ 'settings.preferences.security_emails.label'|trans }}</div>
+              <div class="pref-item-desc">{{ 'settings.preferences.security_emails.description'|trans }}</div>
+            </div>
+            <label class="ios-toggle">
+              {{ form_widget(form.receiveSecurityEmails, { attr: { id: 'pref_emails' } }) }}
+              <span class="ios-slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      {# Actions #}
+      <div class="preferences-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="fa-solid fa-check"></i>
+          <span>{{ 'common.save_changes'|trans }}</span>
+        </button>
+      </div>
+
+    </div>
+
+    {{ form_end(form) }}
+  </div>
+
+
+{% endblock %}

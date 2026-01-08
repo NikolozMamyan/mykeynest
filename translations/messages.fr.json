@@ -13,6 +13,20 @@
     "settings": "Paramètres",
     "subscription": "Abonnements"
   },
+  "user": {
+  "field": {
+    "firstname": "Prénom",
+    "lastname": "Nom",
+    "company": "Entreprise",
+    "email": "Adresse email",
+    "phone": "Téléphone"
+  }
+},
+  "common": {
+  "back": "Retour",
+  "cancel": "Annuler",
+  "save_changes": "Enregistrer les modifications"
+},
   "header": {
     "burger_aria": "Menu",
     "notifications": {
@@ -607,23 +621,61 @@
       "universities": "Universités"
     }
   },
-   "settings": {
-    "title": "Réglages",
-    "profile": {
-      "fallback_name": "Profil",
-      "change_avatar": "Changer l’avatar",
-      "avatar_alt": "Avatar"
-    },
-    "menu": {
-      "personal_data": "Données personnelles",
-      "preferences": "Préférences",
-      "subscription": "Gestion d’abonnement",
-      "contact": "Contact",
-      "terms_cgu": "CGU",
-      "terms_cgv": "CGV"
-    },
-   "hint": "Astuce : cliquez sur le bouton “+” pour changer votre avatar."
+"settings": {
+  "title": "Réglages",
+
+  "profile": {
+    "fallback_name": "Profil",
+    "change_avatar": "Changer l’avatar",
+    "avatar_alt": "Avatar",
+    "title": "Profil",
+    "edit_title": "Modifier mon profil",
+    "section_identity": "Identité",
+    "section_business": "Entreprise",
+    "section_contact": "Coordonnées",
+    "company_help": "Le nom de votre entreprise ou organisation."
   },
+
+  "menu": {
+    "personal_data": "Données personnelles",
+    "preferences": "Préférences",
+    "subscription": "Gestion d’abonnement",
+    "contact": "Contact",
+    "terms_cgu": "CGU",
+    "terms_cgv": "CGV"
+  },
+
+  "preferences": {
+    "title": "Préférences",
+
+    "language": {
+      "title": "Langue",
+      "description": "Choisissez la langue utilisée pour l’interface de l’application."
+    },
+    "engagement": {
+      "title": "Notifications et engagement",
+      "description": "Gérez vos préférences de communication et d’interaction."
+    },
+    "feedback": {
+      "label": "Demandes de feedback",
+      "description": "Autoriser l’envoi de demandes de retour pour améliorer votre expérience."
+    },
+    "security": {
+      "title": "Cybersécurité",
+      "description": "Paramètres liés à la sécurité et aux communications sensibles."
+    },
+    "cybersecurity": {
+      "label": "Intérêt pour la cybersécurité",
+      "description": "Recevoir du contenu et des recommandations liés à la cybersécurité."
+    },
+    "security_emails": {
+      "label": "Emails de sécurité",
+      "description": "Recevoir des alertes et informations importantes concernant la sécurité."
+    }
+  },
+
+  "hint": "Astuce : cliquez sur le bouton “+” pour changer votre avatar."
+},
    "teams": {
     "page_title": "Mes équipes",
     "header": {

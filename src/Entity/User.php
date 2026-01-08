@@ -7,6 +7,7 @@ use App\Entity\Friendship;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -63,6 +64,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
+
+#[ORM\Column(type: 'string', length: 20, nullable: true)]
+#[Assert\Regex(
+    pattern: '/^\+?[0-9\s\-]{6,20}$/',
+    message: 'Phone number'
+)]
+private ?string $phone = null;
+
+#[ORM\Column(type: 'string', length: 5, options: ['default' => 'fr'])]
+    private string $locale = 'fr';
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $allowFeedback = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $interestedInCyberSecurity = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $receiveSecurityEmails = false;
 
 
 public function __construct()
@@ -254,4 +274,59 @@ public function setAvatar(?string $avatar): self
 
     return $this;
 }
+public function getPhone(): ?string
+{
+    return $this->phone;
+}
+
+public function setPhone(?string $phone): self
+{
+    $this->phone = $phone;
+
+    return $this;
+}
+
+  public function getLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(string $locale): self
+    {
+        $this->locale = $locale;
+        return $this;
+    }
+
+    public function isAllowFeedback(): bool
+    {
+        return $this->allowFeedback;
+    }
+
+    public function setAllowFeedback(bool $allowFeedback): self
+    {
+        $this->allowFeedback = $allowFeedback;
+        return $this;
+    }
+
+    public function isInterestedInCyberSecurity(): bool
+    {
+        return $this->interestedInCyberSecurity;
+    }
+
+    public function setInterestedInCyberSecurity(bool $interestedInCyberSecurity): self
+    {
+        $this->interestedInCyberSecurity = $interestedInCyberSecurity;
+        return $this;
+    }
+
+    public function isReceiveSecurityEmails(): bool
+    {
+        return $this->receiveSecurityEmails;
+    }
+
+    public function setReceiveSecurityEmails(bool $receiveSecurityEmails): self
+    {
+        $this->receiveSecurityEmails = $receiveSecurityEmails;
+        return $this;
+    }
 }
