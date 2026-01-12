@@ -52,6 +52,13 @@ public function findPaginated(int $page, int $perPage): array
         'pages' => max(1, (int) ceil($total / $perPage)),
     ];
 }
+public function findAllForSitemap(): array
+{
+    return $this->createQueryBuilder('a')
+        ->orderBy('a.updatedAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
 
 
 }
