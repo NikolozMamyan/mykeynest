@@ -22,8 +22,8 @@ final class ArticleFixtures extends Fixture
         $article->setPublishedAt(new \DateTimeImmutable('2026-01-10 10:00:00'));
         $article->setUpdatedAt(new \DateTimeImmutable('2026-01-10 10:00:00'));
         $article->setCoverImage('secure-passwords.webp');
-$article->setCoverAltFr('Sécuriser ses mots de passe');
-$article->setCoverAltEn('How to secure passwords');
+        $article->setCoverAltFr('Sécuriser ses mots de passe');
+        $article->setCoverAltEn('How to secure passwords');
 
 
         // Meta description (≈ 140–160 chars)

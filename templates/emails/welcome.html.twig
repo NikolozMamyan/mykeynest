@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+    <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
+      
+      <!-- Contenu principal -->
+      <div style="background:#ffffff;border-radius:16px;padding:40px 32px;box-shadow:0 10px 25px rgba(0,0,0,.08);border:1px solid #e2e8f0;">
+        
+        <h1 style="margin:0 0 16px;font-size:26px;color:#1e293b;font-weight:700;line-height:1.3;">
+          {{ 'email.welcome.title'|trans }} 👋
+        </h1>
+
+        <p style="margin:0 0 24px;color:#475569;line-height:1.7;font-size:15px;">
+          {{ 'email.welcome.message'|trans({ '%email%': user.email })|raw }}
+        </p>
+
+        <!-- Bénéfices clés -->
+        <div style="background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);border-radius:12px;padding:20px;margin:24px 0;border-left:4px solid #059669;">
+          <p style="margin:0 0 12px;color:#1e293b;font-weight:600;font-size:14px;">{{ 'email.welcome.benefits.title'|trans }}</p>
+          <ul style="margin:0;padding-left:20px;color:#475569;font-size:14px;line-height:1.8;">
+            <li style="margin-bottom:8px;">{{ 'email.welcome.benefits.item1'|trans }}</li>
+            <li style="margin-bottom:8px;">{{ 'email.welcome.benefits.item2'|trans }}</li>
+            <li style="margin-bottom:0;">{{ 'email.welcome.benefits.item3'|trans }}</li>
+          </ul>
+        </div>
+
+        <!-- CTA principal -->
+        <div style="margin:32px 0 24px;text-align:center;">
+          <a href="{{ settingsUrl }}"
+             style="display:inline-block;padding:14px 32px;border-radius:10px;background:#059669;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;box-shadow:0 4px 12px rgba(5, 150, 105, 0.3);transition:all 0.3s;">
+            {{ 'email.welcome.cta'|trans }} →
+          </a>
+        </div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:#e2e8f0;margin:28px 0;"></div>
+
+        <!-- Footer message -->
+        <p style="margin:0;color:#64748b;font-size:13px;line-height:1.6;text-align:center;">
+          {{ 'email.welcome.footer'|trans }}
+        </p>
+
+        <!-- Aide / Support -->
+        <div style="text-align:center;margin-top:20px;">
+          <p style="margin:0 0 8px;color:#94a3b8;font-size:12px;">{{ 'email.welcome.support.title'|trans }}</p>
+          <a href="mailto:contact@key-nest.com" style="color:#059669;text-decoration:none;font-size:13px;font-weight:500;">{{ 'email.welcome.support.link'|trans }}</a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="text-align:center;margin-top:32px;">
+        <p style="margin:0 0 8px;color:#94a3b8;font-size:12px;">
+          © {{ "now"|date("Y") }} {{ 'email.welcome.copyright'|trans }}
+        </p>
+        <p style="margin:0;color:#cbd5e1;font-size:11px;">
+          {{ 'email.welcome.disclaimer'|trans }}
+        </p>
+      </div>
+
+    </div>
+  </body>
+</html>

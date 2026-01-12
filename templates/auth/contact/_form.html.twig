@@ -1,0 +1,74 @@
+<form action="{{ path('contact_send') }}" method="POST" class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">
+              <i class="fas fa-user"></i>
+              {{ 'landing.contact.form.full_name'|trans }} <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-control"
+              placeholder="{{ 'landing.contact.form.name_placeholder'|trans }}"
+              required
+              value="{{ app.request.get('name', '') }}"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">
+              <i class="fas fa-envelope"></i>
+              {{ 'landing.contact.form.email'|trans }} <span class="required">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              placeholder="{{ 'landing.contact.form.email_placeholder'|trans }}"
+              required
+              value="{{ app.request.get('email', '') }}"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reason">
+            <i class="fas fa-tag"></i>
+            {{ 'landing.contact.form.subject'|trans }} <span class="required">*</span>
+          </label>
+
+          {# NOTE: on garde name="reason" pour ton controller (contact_send) #}
+          <select id="reason" name="reason" class="form-control" required>
+            <option value="demo" {{ app.request.get('reason') == 'demo' ? 'selected' : '' }}>
+              {{ 'landing.contact.form.subject_demo'|trans }}
+            </option>
+            <option value="support" {{ app.request.get('reason') == 'support' ? 'selected' : '' }}>
+              {{ 'landing.contact.form.subject_support'|trans }}
+            </option>
+            <option value="other" {{ app.request.get('reason') == 'other' ? 'selected' : '' }}>
+              {{ 'landing.contact.form.subject_other'|trans }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="message">
+            <i class="fas fa-message"></i>
+            {{ 'landing.contact.form.message'|trans }} <span class="required">*</span>
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            class="form-control"
+            placeholder="{{ 'landing.contact.form.message_placeholder'|trans }}"
+            required
+          >{{ app.request.get('message', '') }}</textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-paper-plane"></i>
+          {{ 'landing.contact.form.submit'|trans }}
+        </button>
+      </form>

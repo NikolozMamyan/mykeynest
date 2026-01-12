@@ -22,6 +22,26 @@
     "phone": "Téléphone"
   }
 },
+"email": {
+    "welcome": {
+      "title": "Bienvenue sur KeyNest",
+      "message": "Nous sommes ravis de vous accueillir, <strong>%email%</strong> ! Complétez votre profil pour profiter pleinement de l'application.",
+      "cta": "Compléter mon profil",
+      "footer": "Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.",
+      "benefits": {
+        "title": "✨ Ce que vous pouvez faire dès maintenant :",
+        "item1": "Gérer vos clés en toute sécurité",
+        "item2": "Accéder à votre tableau de bord personnalisé",
+        "item3": "Configurer vos préférences"
+      },
+      "support": {
+        "title": "Besoin d'aide ?",
+        "link": "Contactez notre support"
+      },
+      "copyright": "KeyNest - Gestion sécurisée de clés",
+      "disclaimer": "Vous recevez cet email car vous vous êtes inscrit sur KeyNest."
+    }
+  },
   "common": {
   "back": "Retour",
   "cancel": "Annuler",
@@ -160,6 +180,35 @@
         }
       }
     },
+    "contact": {
+  "label": "Contact",
+  "title": "Contactez-nous",
+  "subtitle": "Une question ? Un problème ? Notre équipe est là pour vous aider. Réponse sous 24 heures.",
+  "form": {
+    "title": "Envoyez-nous un message",
+    "subtitle": "Tous les champs marqués d'un * sont obligatoires",
+    "full_name": "Nom complet",
+    "email": "Email",
+    "subject": "Sujet",
+    "subject_demo": "Demande de démo",
+    "name_placeholder": "Jean Dupont",
+    "email_placeholder": "exemple@email.com",
+    "subject_support": "Support",
+    "subject_other": "Autre",
+    "message": "Message",
+    "message_placeholder": "Expliquez votre demande…",
+    "submit": "Envoyer",
+    "sending": "Envoi en cours..."
+  },
+  "info": {
+    "email_title": "Email",
+    "support_title": "Support",
+    "support_text": "Disponible 24/7",
+    "support_time": "Temps de réponse : <strong>&lt; 2h</strong>",
+    "hours_title": "Horaires",
+    "hours_text": "Lun - Ven : 9h - 18h<br>Sam - Dim : 10h - 16h"
+  }
+},
     "faq": {
       "label": "Questions fréquentes",
       "title": "Vos questions sur MykeyNest",

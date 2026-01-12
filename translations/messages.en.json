@@ -22,6 +22,26 @@
     "phone": "Phone number"
   }
 },
+"email": {
+    "welcome": {
+      "title": "Welcome to KeyNest",
+      "message": "We are delighted to welcome you, <strong>%email%</strong>! Complete your profile to fully enjoy the application.",
+      "cta": "Complete my profile",
+      "footer": "If you did not sign up for this account, you can safely ignore this email.",
+      "benefits": {
+        "title": "✨ What you can do right now:",
+        "item1": "Manage your keys securely",
+        "item2": "Access your personalized dashboard",
+        "item3": "Configure your preferences"
+      },
+      "support": {
+        "title": "Need help?",
+        "link": "Contact our support"
+      },
+      "copyright": "KeyNest - Secure key management",
+      "disclaimer": "You are receiving this email because you signed up for KeyNest."
+    }
+  },
 "common": {
   "back": "Back",
   "cancel": "Cancel",
@@ -160,6 +180,35 @@
         }
       }
     },
+    "contact": {
+  "label": "Contact",
+  "title": "Get in touch",
+  "subtitle": "A question or an issue? Our team is here to help. We reply within 24 hours.",
+  "form": {
+    "title": "Send us a message",
+    "subtitle": "Fields marked with * are required",
+    "full_name": "Full name",
+    "email": "Email",
+    "subject": "Subject",
+    "subject_demo": "Request a demo",
+    "name_placeholder": "John Doe",
+    "email_placeholder": "example@email.com",
+    "subject_support": "Support",
+    "subject_other": "Other",
+    "message": "Message",
+    "message_placeholder": "Tell us what you need…",
+    "submit": "Send",
+    "sending": "Sending..."
+  },
+  "info": {
+    "email_title": "Email",
+    "support_title": "Support",
+    "support_text": "Available 24/7",
+    "support_time": "Response time: <strong>&lt; 2h</strong>",
+    "hours_title": "Hours",
+    "hours_text": "Mon - Fri: 9am - 6pm<br>Sat - Sun: 10am - 4pm"
+  }
+},
     "faq": {
       "label": "Frequently asked questions",
       "title": "Your questions about MykeyNest",

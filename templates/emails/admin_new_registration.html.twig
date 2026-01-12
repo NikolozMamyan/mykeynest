@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:#f6f7fb;font-family:Arial, sans-serif;">
+    <div style="max-width:640px;margin:0 auto;padding:24px;">
+      <div style="background:#ffffff;border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(0,0,0,.06);">
+        <h2 style="margin:0 0 10px;font-size:18px;color:#111827;">
+          Nouvelle inscription 🚀
+        </h2>
+
+        <p style="margin:0 0 14px;color:#374151;line-height:1.6;">
+          Un nouvel utilisateur vient de s’inscrire.
+        </p>
+
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Email</td>
+            <td style="padding:8px 0;color:#111827;"><strong>{{ user.email }}</strong></td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Company</td>
+            <td style="padding:8px 0;color:#111827;">{{ user.company ?? '—' }}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Date</td>
+            <td style="padding:8px 0;color:#111827;">{{ registeredAt|date('Y-m-d H:i:s') }}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">IP</td>
+            <td style="padding:8px 0;color:#111827;">{{ ip ?? '—' }}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">User-Agent</td>
+            <td style="padding:8px 0;color:#111827;">{{ userAgent ?? '—' }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="text-align:center;color:#9ca3af;font-size:12px;margin:14px 0 0;">
+        KeyNest • Notification automatique
+      </p>
+    </div>
+  </body>
+</html>

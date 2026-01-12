@@ -252,6 +252,10 @@ img[loading="lazy"]{content-visibility:auto}
       <a href="#features" class="nav-link">{{ 'landing.nav.features'|trans }}</a>
       <a href="#how-it-works" class="nav-link">{{ 'landing.nav.how_it_works'|trans }}</a>
       <a href="#pricing" class="nav-link">{{ 'landing.nav.pricing'|trans }}</a>
+     <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
+       hreflang="{{ app.request.locale }}" class="nav-link">
+        {{ 'landing.footer.links.blog'|trans }}
+    </a>
 
       <div class="nav-cta nav-cta-mobile">
         <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
@@ -518,8 +522,58 @@ img[loading="lazy"]{content-visibility:auto}
 </div>
   </div>
 </section>
+<div class="contact-page" id="contact">
+  <!-- Contact Content -->
+  <div class="contact-container">
+  <!-- Left Side - Info -->
+    <div class="contact-info">
+      <h1>{{ 'landing.contact.title'|trans }}</h1>
+      <p class="subtitle">
+        {{ 'landing.contact.subtitle'|trans }}
+      </p>
+
+      <div class="contact-methods">
+        <div class="contact-method">
+          <div class="contact-method-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="contact-method-content">
+            <h3>{{ 'landing.contact.info.email_title'|trans }}</h3>
+            <p>
+              <a href="mailto:contact@key-nest.com">contact@key-nest.com</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="contact-method">
+          <div class="contact-method-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div class="contact-method-content">
+            <h3>{{ 'landing.contact.info.support_title'|trans }}</h3>
+            <p>
+              {{ 'landing.contact.info.support_text'|trans }}<br>
+              {{ 'landing.contact.info.support_time'|trans|raw }}
+            </p>
+          </div>
+        </div>
+
+        <div class="contact-method">
+          <div class="contact-method-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="contact-method-content">
+            <h3>{{ 'landing.contact.info.hours_title'|trans }}</h3>
+            <p>{{ 'landing.contact.info.hours_text'|trans|raw }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
 {# Section contact existante #}
 {% include "auth/contact/contact.html.twig" %}
+
+  </div>
+</div>
 {# ===================== CTA SECTION ===================== #}
 <section class="cta-section">
   <div class="cta-container">
@@ -563,7 +617,7 @@ img[loading="lazy"]{content-visibility:auto}
     </a>
 </li>
 
-    <li><a href="#">{{ 'landing.footer.links.contact'|trans }}</a></li>
+    <li><a href="/#contact">{{ 'landing.footer.links.contact'|trans }}</a></li>
   </ul>
 </div>
 
