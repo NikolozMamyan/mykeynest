@@ -28,6 +28,7 @@
 /node_modules/
 /public/build/
 /public/uploads/avatars
+/public/uploads/blog
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###

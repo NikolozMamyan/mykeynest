@@ -556,7 +556,13 @@ img[loading="lazy"]{content-visibility:auto}
   <h4>{{ 'landing.footer.company'|trans }}</h4>
   <ul>
     <li><a href="#">{{ 'landing.footer.links.about'|trans }}</a></li>
-    <li><a href="#">{{ 'landing.footer.links.blog'|trans }}</a></li>
+   <li>
+    <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
+       hreflang="{{ app.request.locale }}">
+        {{ 'landing.footer.links.blog'|trans }}
+    </a>
+</li>
+
     <li><a href="#">{{ 'landing.footer.links.contact'|trans }}</a></li>
   </ul>
 </div>

@@ -1,0 +1,99 @@
+{% extends 'base.blog.html.twig' %}
+
+{% block seo_title %}{{ vm.seoTitle }}{% endblock %}
+{% block seo_description %}{{ vm.metaDesc }}{% endblock %}
+
+{% block seo_hreflang %}
+    <link rel="alternate" hreflang="fr" href="{{ vm.url_fr }}">
+    <link rel="alternate" hreflang="en" href="{{ vm.url_en }}">
+    <link rel="alternate" hreflang="x-default" href="{{ vm.url_en }}">
+{% endblock %}
+
+{% block seo_canonical %}
+    <link rel="canonical" href="{{ vm.canonical }}">
+{% endblock %}
+
+{% block seo_open_graph %}
+    <meta property="og:title" content="{{ vm.seoTitle }}">
+    <meta property="og:description" content="{{ vm.metaDesc }}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ vm.canonical }}">
+    <meta property="og:locale" content="{{ vm.ogLocale }}">
+    <meta property="og:locale:alternate" content="fr_FR">
+    <meta property="og:locale:alternate" content="en_US">
+{% endblock %}
+
+{% block seo_twitter %}
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ vm.seoTitle }}">
+    <meta name="twitter:description" content="{{ vm.metaDesc }}">
+{% endblock %}
+
+{% block seo_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": "{{ vm.canonical|e('js') }}",
+  "headline": "{{ vm.h1|e('js') }}",
+  "description": "{{ vm.metaDesc|e('js') }}",
+  "datePublished": "{{ vm.publishedAt|date('c') }}",
+  "dateModified": "{{ vm.updatedAt|date('c') }}",
+  "inLanguage": "{{ app.request.locale|e('js') }}",
+  "author": { "@type": "Organization", "name": "MyKeyNest" },
+  "publisher": { "@type": "Organization", "name": "MyKeyNest" }
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<article itemscope itemtype="https://schema.org/Article">
+    <header>
+        <h1 itemprop="headline">{{ vm.h1 }}</h1>
+
+        <div class="article-meta">
+            <time datetime="{{ vm.publishedAt|date('Y-m-d') }}">
+                {% if app.request.locale == 'fr' %}
+                    {{ vm.publishedAt|date('d/m/Y') }}
+                {% else %}
+                    {{ vm.publishedAt|date('M d, Y') }}
+                {% endif %}
+            </time>
+
+            <span class="meta-divider"></span>
+            <span>{{ app.request.locale == 'fr' ? 'Lecture 5 min' : '5 min read' }}</span>
+        </div>
+    </header>
+
+    <section class="content" itemprop="articleBody">
+        {# IMPORTANT: vm.content doit être “safe HTML” (sanitizé) #}
+        {{ vm.content|raw }}
+    </section>
+</article>
+{% endblock %}
+
+{% block footer %}
+<footer class="page-footer">
+    <div class="cta-container">
+        {% if app.request.locale == 'fr' %}
+            <h2 class="cta-title">Prêt à commencer ?</h2>
+            <p class="cta-description">Découvrez comment MyKeyNest peut simplifier votre gestion</p>
+            <a href="{{path('show_register')}}" class="cta-button" aria-label="Créer un compte MyKeyNest">
+                Essayer gratuitement
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                    <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        {% else %}
+            <h2 class="cta-title">Ready to get started?</h2>
+            <p class="cta-description">Discover how MyKeyNest can simplify your management</p>
+            <a href="{{path('show_register')}}" class="cta-button" aria-label="Create a MyKeyNest account">
+                Try it free
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                    <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        {% endif %}
+    </div>
+</footer>
+{% endblock %}

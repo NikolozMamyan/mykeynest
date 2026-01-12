@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block seo_title %}{% endblock %}</title>
+    <meta name="description" content="{% block seo_description %}{% endblock %}">
+
+    {% block seo_hreflang %}{% endblock %}
+    {% block seo_canonical %}{% endblock %}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
+        <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <meta name="robots" content="{% block seo_robots %}index,follow{% endblock %}">
+
+    {% block seo_open_graph %}{% endblock %}
+    {% block seo_twitter %}{% endblock %}
+    {% block seo_jsonld %}{% endblock %}
+
+    <style>
+        :root {
+            --color-primary: #059669;
+            --color-primary-hover: rgba(16, 185, 129, 0.3);
+            --background-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            --color-white: #ffffff;
+            --color-bg-light: #f8fafc;
+            --color-bg-hover: #f1f5f9;
+            --color-text-dark: #1e293b;
+            --color-text-medium: #475569;
+            --color-text-muted: #64748b;
+            --color-text-light: #94a3b8;
+            --color-border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-green: 0 4px 12px var(--color-primary-hover);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--color-text-dark);
+            background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(16, 185, 129, 0.12), transparent 40%),
+        radial-gradient(800px 500px at 90% 10%, rgba(5, 150, 105, 0.10), transparent 45%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+
+    min-height: 100vh;
+
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body::before,
+body::after {
+    content: '';
+    position: fixed;
+    z-index: -1;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.45;
+}
+
+body::before {
+    background: #10b981;
+    top: -120px;
+    left: -120px;
+}
+
+body::after {
+    background: #34d399;
+    bottom: -140px;
+    right: -140px;
+}
+
+
+        nav {
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            text-decoration: none;
+        }
+
+        .logo-accent { color: var(--color-primary); }
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+
+    backdrop-filter: blur(6px);
+}
+
+
+        h1 {
+            font-size: clamp(2.25rem, 5vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--color-text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--color-text-muted);
+            font-size: 0.9375rem;
+            padding-top: 1rem;
+        }
+
+        .meta-divider {
+            width: 4px;
+            height: 4px;
+            background: var(--color-text-light);
+            border-radius: 50%;
+        }
+
+        .content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--color-text-medium);
+        }
+
+        .content > * + * { margin-top: 1.75rem; }
+
+        .content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+            color: var(--color-text-dark);
+            margin-top: 3rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--color-text-dark);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .content h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-dark);
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .content p { margin-bottom: 1.75rem; }
+
+        .content a {
+            color: var(--color-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--color-primary);
+            transition: opacity 0.2s ease;
+        }
+        .content a:hover { opacity: 0.7; }
+
+        .content strong { font-weight: 600; color: var(--color-text-dark); }
+
+        .content ul, .content ol { padding-left: 1.5rem; margin: 1.75rem 0; }
+
+        .content li { margin-bottom: 0.75rem; padding-left: 0.5rem; }
+        .content ul li::marker { color: var(--color-primary); }
+        .content ol li::marker { color: var(--color-text-muted); font-weight: 600; }
+
+        .content blockquote {
+            border-left: 3px solid var(--color-text-dark);
+            padding-left: 1.5rem;
+            margin: 2.5rem 0;
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--color-text-dark);
+            line-height: 1.6;
+        }
+
+        .content img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius-sm);
+            margin: 2.5rem 0;
+        }
+
+        .content pre {
+            background: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            padding: 1.25rem;
+            overflow-x: auto;
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            margin: 2rem 0;
+        }
+
+        .content code {
+            background: var(--color-bg-light);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace;
+        }
+
+        .content pre code { background: none; padding: 0; }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 1rem;
+        }
+
+        .content th, .content td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .content th {
+            font-weight: 600;
+            color: var(--color-text-dark);
+            background: var(--color-bg-light);
+        }
+
+        .content hr {
+            border: none;
+            height: 1px;
+            background: var(--color-border);
+            margin: 3rem 0;
+        }
+
+        footer.page-footer {
+            margin-top: 5rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .cta-container {
+            background: var(--background-gradient);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .cta-description {
+            color: var(--color-text-medium);
+            margin-bottom: 1.75rem;
+            font-size: 1rem;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: var(--color-primary);
+            color: var(--color-white);
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: var(--border-radius-sm);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cta-button:hover {
+            background: #047857;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        a:focus-visible, .cta-button:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        ::selection { background: var(--color-primary-hover); color: var(--color-text-dark); }
+
+        @media (max-width: 768px) {
+            .nav-container { padding: 1rem 1.5rem; }
+            main { padding: 2.5rem 1.5rem 4rem; }
+            h1 { font-size: 2rem; margin-bottom: 1rem; }
+            .content { font-size: 1.0625rem; }
+            .content h2 { font-size: 1.75rem; margin-top: 2.5rem; }
+            .content h3 { font-size: 1.375rem; }
+            .cta-container { padding: 2rem 1.5rem; }
+            .cta-title { font-size: 1.25rem; }
+        }
+
+        .lang-switch {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    background: var(--color-bg-light);
+    padding: 0.375rem;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--color-text-medium);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.lang-option:hover {
+    background: var(--color-white);
+    color: var(--color-text-dark);
+    box-shadow: var(--shadow-sm);
+}
+
+.lang-option.active {
+    background: var(--color-white);
+    color: var(--color-text-dark);
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+}
+
+.lang-flag {
+    font-size: 1.125rem;
+    line-height: 1;
+}
+
+.lang-label {
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .lang-switch {
+        gap: 0.375rem;
+        padding: 0.25rem;
+    }
+    
+    .lang-option {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.875rem;
+    }
+    
+    .lang-label {
+        display: none;
+    }
+    
+    .lang-flag {
+        font-size: 1.25rem;
+    }
+}
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+<nav>
+<div class="nav-container">
+    {% include 'components/parts/logo.html.twig' %}
+
+    <div class="lang-switch">
+        {% if app.request.locale == 'fr' %}
+            <a href="{{ vm.url_fr }}" class="lang-option active" lang="fr" aria-current="true">
+                <span class="lang-flag">🇫🇷</span>
+
+            </a>
+            <a href="{{ vm.url_en }}" class="lang-option" lang="en" hreflang="en">
+                <span class="lang-flag">🇬🇧</span>
+
+            </a>
+        {% else %}
+            <a href="{{ vm.url_en }}" class="lang-option active" lang="en" aria-current="true">
+                <span class="lang-flag">🇬🇧</span>
+
+            </a>
+            <a href="{{ vm.url_fr }}" class="lang-option" lang="fr" hreflang="fr">
+                <span class="lang-flag">🇫🇷</span>
+
+            </a>
+        {% endif %}
+    </div>
+</nav>
+
+<main>
+    {% block body %}{% endblock %}
+</main>
+
+{% block footer %}{% endblock %}
+</body>
+</html>

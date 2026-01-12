@@ -3,3 +3,16 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+blog_index:
+  path: /{_locale}/blog
+  controller: App\Controller\BlogController::index
+  requirements:
+    _locale: fr|en
+
+
+blog_article_show:
+  path: /{_locale}/blog/{slug}
+  controller: App\Controller\BlogController::show
+  requirements:
+    _locale: fr|en    

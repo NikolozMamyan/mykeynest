@@ -1,0 +1,307 @@
+{% extends 'base.blog.html.twig' %}
+
+{% block seo_title %}{{ vm.seoTitle }}{% endblock %}
+{% block seo_description %}{{ vm.metaDesc }}{% endblock %}
+
+{% block seo_hreflang %}
+    <link rel="alternate" hreflang="fr" href="{{ vm.url_fr }}">
+    <link rel="alternate" hreflang="en" href="{{ vm.url_en }}">
+    <link rel="alternate" hreflang="x-default" href="{{ vm.url_en }}">
+{% endblock %}
+
+{% block seo_canonical %}
+    <link rel="canonical" href="{{ vm.canonical }}">
+{% endblock %}
+
+{% block seo_open_graph %}
+    <meta property="og:title" content="{{ vm.seoTitle }}">
+    <meta property="og:description" content="{{ vm.metaDesc }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ vm.canonical }}">
+    <meta property="og:locale" content="{{ vm.ogLocale }}">
+    <meta property="og:locale:alternate" content="fr_FR">
+    <meta property="og:locale:alternate" content="en_US">
+{% endblock %}
+
+{% block seo_twitter %}
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ vm.seoTitle }}">
+    <meta name="twitter:description" content="{{ vm.metaDesc }}">
+{% endblock %}
+
+{% block seo_jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "{{ vm.seoTitle|e('js') }}",
+  "description": "{{ vm.metaDesc|e('js') }}",
+  "inLanguage": "{{ app.request.locale|e('js') }}"
+}
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .blog-header {
+        margin-bottom: 2rem;
+    }
+
+    .blog-kicker {
+        display: inline-block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        background: rgba(16, 185, 129, 0.10);
+        border: 1px solid rgba(16, 185, 129, 0.18);
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        margin-bottom: 1rem;
+    }
+
+    .blog-subtitle {
+        color: var(--color-text-medium);
+        font-size: 1.125rem;
+        margin-top: 0.5rem;
+        max-width: 60ch;
+    }
+
+    .blog-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .post-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius);
+        padding: 1.25rem 1.25rem 1.1rem;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .post-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-bottom: 0.5rem;
+        color: var(--color-text-dark);
+    }
+
+    .post-title a {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: none;
+    }
+
+    .post-excerpt {
+        color: var(--color-text-medium);
+        margin: 0.75rem 0 0.25rem;
+    }
+
+    .post-meta {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        margin-top: 0.9rem;
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+    }
+
+    .post-meta .dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--color-text-light);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--color-border);
+        gap: 1rem;
+    }
+
+    .pager {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 0.85rem;
+        border-radius: 10px;
+        border: 1px solid var(--color-border);
+        background: rgba(255,255,255,0.9);
+        text-decoration: none;
+        color: var(--color-text-dark);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 0.15s ease;
+    }
+
+    .pager:hover {
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
+    }
+
+    .pager.disabled {
+        opacity: 0.45;
+        pointer-events: none;
+    }
+
+    .page-indicator {
+        color: var(--color-text-muted);
+        font-size: 0.9375rem;
+        white-space: nowrap;
+    }
+    .post-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    background: var(--color-bg-light);
+}
+
+.post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    transition: transform 0.25s ease;
+}
+
+.post-card:hover .post-image img {
+    transform: scale(1.04);
+}
+
+</style>
+{% endblock %}
+
+{% block body %}
+<header class="blog-header">
+    <span class="blog-kicker">
+        {% if app.request.locale == 'fr' %}Blog{% else %}Blog{% endif %}
+    </span>
+    <h1>
+        {% if app.request.locale == 'fr' %}
+            Conseils cybersécurité & mots de passe
+        {% else %}
+            Password security & cybersecurity tips
+        {% endif %}
+    </h1>
+
+    <p class="blog-subtitle">
+        {% if app.request.locale == 'fr' %}
+            Guides concrets pour protéger vos comptes : mots de passe forts, 2FA, phishing, bonnes pratiques et outils.
+        {% else %}
+            Practical guides to protect your accounts: strong passwords, 2FA, phishing defense, best practices and tools.
+        {% endif %}
+    </p>
+</header>
+
+<section class="blog-grid" aria-label="Blog posts">
+    {% for a in articles %}
+        {% set url = path('blog_article_show', {
+            _locale: app.request.locale,
+            slug: (app.request.locale == 'fr' ? a.slugFr : a.slugEn)
+        }) %}
+
+        {% set title = (app.request.locale == 'fr' ? a.h1Fr : a.h1En) %}
+        {% set desc = (app.request.locale == 'fr' ? a.metaDescFr : a.metaDescEn) %}
+
+      <article class="post-card">
+    <a class="card-link" href="{{ url }}" aria-label="{{ title }}"></a>
+
+    <div class="post-image">
+        <img
+          src="{{ a.coverImage
+              ? asset('uploads/blog/' ~ a.coverImage)
+              : asset('images/blog/blog-default.webp')
+          }}"
+          alt="{{ a.getCoverAlt(app.request.locale) ?? 'Blog MyKeyNest' }}"
+          loading="lazy"
+          width="800"
+          height="450"
+        >
+    </div>
+
+    <h2 class="post-title">
+        <a class="title-link" href="{{ url }}">{{ title }}</a>
+    </h2>
+
+    <p class="post-excerpt">{{ desc }}</p>
+
+    <div class="post-meta">
+        <time datetime="{{ a.publishedAt|date('Y-m-d') }}">
+            {% if app.request.locale == 'fr' %}
+                {{ a.publishedAt|date('d/m/Y') }}
+            {% else %}
+                {{ a.publishedAt|date('M d, Y') }}
+            {% endif %}
+        </time>
+        <span class="dot"></span>
+        <span>{{ app.request.locale == 'fr' ? 'Lecture 5 min' : '5 min read' }}</span>
+    </div>
+</article>
+
+    {% else %}
+        <p class="content">
+            {% if app.request.locale == 'fr' %}
+                Aucun article pour le moment.
+            {% else %}
+                No posts yet.
+            {% endif %}
+        </p>
+    {% endfor %}
+</section>
+
+{% if vm.pages > 1 %}
+    <nav class="pagination" aria-label="Pagination">
+        {% set prevPage = vm.page - 1 %}
+        {% set nextPage = vm.page + 1 %}
+
+        <a class="pager {{ vm.page <= 1 ? 'disabled' : '' }}"
+           href="{{ path('blog_index', { _locale: app.request.locale }) }}{% if prevPage > 1 %}?page={{ prevPage }}{% endif %}">
+            {% if app.request.locale == 'fr' %}← Précédent{% else %}← Previous{% endif %}
+        </a>
+
+        <div class="page-indicator">
+            {% if app.request.locale == 'fr' %}
+                Page {{ vm.page }} / {{ vm.pages }}
+            {% else %}
+                Page {{ vm.page }} / {{ vm.pages }}
+            {% endif %}
+        </div>
+
+        <a class="pager {{ vm.page >= vm.pages ? 'disabled' : '' }}"
+           href="{{ path('blog_index', { _locale: app.request.locale }) }}?page={{ nextPage }}">
+            {% if app.request.locale == 'fr' %}Suivant →{% else %}Next →{% endif %}
+        </a>
+    </nav>
+{% endif %}
+{% endblock %}
+
+{% block footer %}
+<footer class="page-footer">
+    <div class="cta-container">
+        {% if app.request.locale == 'fr' %}
+            <h2 class="cta-title">Prêt à sécuriser vos mots de passe ?</h2>
+            <p class="cta-description">Créez votre coffre MyKeyNest et passez à des mots de passe uniques et robustes.</p>
+            <a href="/signup" class="cta-button">Essayer gratuitement</a>
+        {% else %}
+            <h2 class="cta-title">Ready to secure your passwords?</h2>
+            <p class="cta-description">Create your MyKeyNest vault and start using strong, unique passwords.</p>
+            <a href="/signup" class="cta-button">Try it free</a>
+        {% endif %}
+    </div>
+</footer>
+{% endblock %}
