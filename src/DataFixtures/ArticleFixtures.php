@@ -107,7 +107,7 @@ $article->setCoverAltEn('How to secure passwords');
 
 <h2>Aller plus loin avec MyKeyNest</h2>
 <p>Si vous cherchez un <strong>gestionnaire de mots de passe sécurisé</strong> avec synchronisation et partage, vous pouvez démarrer en quelques minutes :</p>
-<p><a href="register">Créer un coffre MyKeyNest</a> · <a href="https://key-nest.com/#pricing">Voir les offres</a></p>
+<p><a href="/register">Créer un coffre MyKeyNest</a> · <a href="https://key-nest.com/#pricing">Voir les offres</a></p>
 
 <!-- <p><em>Astuce SEO/Produit :</em> ajoutez un lien interne vers votre page pilier : <a href="/fr/gestionnaire-mots-de-passe">Gestionnaire de mots de passe</a> (si vous la créez).</p> -->
 HTML;
