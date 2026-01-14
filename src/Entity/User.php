@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Character;
-use App\Entity\Friendship;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;

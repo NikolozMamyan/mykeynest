@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Entity\Credential;
 use App\Form\CredentialType;
 use App\Service\CredentialManager;
+use App\Service\SecurityCheckerService;
 use App\Repository\CredentialRepository;
 use App\Repository\SharedAccessRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ final class CredentialPageController extends AbstractController
 {
     public function __construct(
         private CredentialManager $credentialManager,
+        private SecurityCheckerService $checker,
     ) {}
 
     #[Route('/app/credential', name: 'app_credential')]
@@ -45,6 +47,7 @@ final class CredentialPageController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->credentialManager->create($credential, $this->getUser());
             $this->addFlash('success', 'Nouvel identifiant ajouté avec succès.');
+             $this->checker->buildReportAndNotify($this->getUser(), SecurityCheckerService::ROTATION_DAYS_DEFAULT);
 
             return $this->redirectToRoute('app_credential');
         }

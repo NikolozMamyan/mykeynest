@@ -53,6 +53,10 @@ class Notification
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $relatedEntityType = null;
 
+    #[ORM\Column(length: 255, unique: true)]
+    private string $uniqueKey;
+
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -185,6 +189,17 @@ class Notification
         $this->priority = $priority;
         return $this;
     }
+    public function getUniqueKey(): string
+{
+    return $this->uniqueKey;
+}
+public function setUniqueKey(string $uniqueKey): self
+{
+    $this->uniqueKey = $uniqueKey;
+
+    return $this;
+}
+
 
     public function getRelatedEntityId(): ?int
     {

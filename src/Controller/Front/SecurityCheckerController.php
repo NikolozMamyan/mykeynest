@@ -2,15 +2,17 @@
 
 namespace App\Controller\Front;
 
-use App\Repository\CredentialRepository;
-use App\Service\SecurityCheckerService;
+use App\Entity\Notification;
 use App\Service\NotificationService;
+use App\Service\SecurityCheckerService;
+use App\Repository\CredentialRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\NotificationRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class SecurityCheckerController extends AbstractController
 {
@@ -20,6 +22,7 @@ final class SecurityCheckerController extends AbstractController
         private CredentialRepository $credentialRepository,
         private EntityManagerInterface $em,
         private NotificationService $notificationService,
+        private NotificationRepository $notificationRepository,
     ) {}
 
     #[Route('/app/security/checker', name: 'app_security_checker', methods: ['GET'])]
@@ -32,18 +35,14 @@ final class SecurityCheckerController extends AbstractController
 
         $report = $this->checker->buildReport($user, SecurityCheckerService::ROTATION_DAYS_DEFAULT);
 
-        // Optionnel: créer une notification si score très bas (simple exemple)
-        if (($report['overallScore'] ?? 0) < 40) {
-            $this->notificationService->createNotification(
-                $user,
-                'Sécurité : mots de passe à améliorer',
-                'Certains mots de passe sont faibles/anciens. Consulte le vérificateur de sécurité.',
-                type: \App\Entity\Notification::TYPE_WARNING,
-                actionUrl: $this->generateUrl('app_security_checker'),
-                icon: 'shield-exclamation',
-                priority: \App\Entity\Notification::PRIORITY_HIGH
-            );
-        }
+        $score = $report['overallScore'] ?? 0;
+
+if ($score < 40) {
+
+
+       $this->checker->buildReportAndNotify($user, SecurityCheckerService::ROTATION_DAYS_DEFAULT);
+    
+}
 
         return $this->render('security_checker/index.html.twig', [
             'report' => $report,

@@ -107,4 +107,14 @@ class NotificationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function existsByUniqueKey(string $key): bool
+{
+    return (bool) $this->createQueryBuilder('n')
+        ->select('1')
+        ->where('n.uniqueKey = :key')
+        ->setParameter('key', $key)
+        ->getQuery()
+        ->getOneOrNullResult();
+}
+
 }

@@ -32,6 +32,15 @@ class CredentialRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findCredentialsByUser(User $user): array
+{
+    return $this->createQueryBuilder('c')
+        ->where('c.user = :user')
+        ->setParameter('user', $user)
+        ->orderBy('c.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
     /**
      * @return Credential[] Returns an array of Credential objects
      */

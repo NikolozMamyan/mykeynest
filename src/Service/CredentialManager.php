@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Entity\Credential;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -15,35 +16,49 @@ final class CredentialManager
     /**
      * Ajoute un nouvel identifiant pour un utilisateur.
      */
-    public function create(Credential $credential, object $user): void
-    {
-        $credential->setUser($user);
-        $this->normalizeDomain($credential);
+public function create(Credential $credential, User $user): void
+{
+    $credential->setUser($user);
+    $this->normalizeDomain($credential);
 
-        $encryptedPassword = $this->encryptionService->encrypt($credential->getPassword());
-        $credential->setPassword($encryptedPassword);
+    // ✅ clé correcte pour CE user
+    $this->encryptionService->setKeyFromUserToken($user->getApiExtensionToken());
 
-        $this->entityManager->persist($credential);
-        $this->entityManager->flush();
-    }
+    $plainPassword = (string) $credential->getPassword();
+    $credential->setPassword($this->encryptionService->encrypt($plainPassword));
+
+    $this->entityManager->persist($credential);
+    $this->entityManager->flush();
+}
+
 
     /**
      * Met à jour un identifiant existant.
      */
-    public function update(Credential $credential, string $decryptedPassword, string $originalEncryptedPassword): void
-    {
-        $this->normalizeDomain($credential);
+public function update(Credential $credential, string $decryptedPassword, string $originalEncryptedPassword): void
+{
+    $this->normalizeDomain($credential);
 
-        $plainPassword = $credential->getPassword();
-        if ($plainPassword !== $decryptedPassword) {
-            $credential->setPassword($this->encryptionService->encrypt($plainPassword));
-        } else {
-            $credential->setPassword($originalEncryptedPassword);
-        }
-
-        $credential->setUpdatedAt(new \DateTimeImmutable());
-        $this->entityManager->flush();
+    $owner = $credential->getUser();
+    if (!$owner || !$owner->getApiExtensionToken()) {
+        throw new \RuntimeException('Owner missing apiExtensionToken, cannot encrypt/decrypt safely.');
     }
+
+    // ✅ clé correcte (owner)
+    $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+
+    $plainPassword = (string) $credential->getPassword();
+
+    if ($plainPassword !== $decryptedPassword) {
+        $credential->setPassword($this->encryptionService->encrypt($plainPassword));
+    } else {
+        $credential->setPassword($originalEncryptedPassword);
+    }
+
+    $credential->setUpdatedAt(new \DateTimeImmutable());
+    $this->entityManager->flush();
+}
+
 
     /**
      * Supprime un identifiant.
@@ -57,10 +72,18 @@ final class CredentialManager
     /**
      * Déchiffre un mot de passe pour affichage.
      */
-    public function decryptPassword(Credential $credential): string
-    {
-        return $this->encryptionService->decrypt($credential->getPassword());
+public function decryptPassword(Credential $credential): string
+{
+    $owner = $credential->getUser();
+    if (!$owner || !$owner->getApiExtensionToken()) {
+        return '';
     }
+
+    $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+
+    return $this->encryptionService->decrypt((string) $credential->getPassword());
+}
+
 
     /**
      * Normalise le domaine pour cohérence (sans http/https/www/fin slash).

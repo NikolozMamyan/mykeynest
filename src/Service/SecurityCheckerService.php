@@ -2,22 +2,30 @@
 
 namespace App\Service;
 
-use App\Entity\Credential;
-use App\Entity\SharedAccess;
 use App\Entity\User;
+use App\Entity\Credential;
+use App\Entity\Notification;
+use App\Entity\SharedAccess;
+use App\Service\EncryptionService;
+use App\Service\NotificationService;
 use App\Repository\CredentialRepository;
+use App\Repository\NotificationRepository;
 use App\Repository\SharedAccessRepository;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Routing\RouterInterface;
 
 class SecurityCheckerService
 {
     public const ROTATION_DAYS_DEFAULT = 120; // ~4 mois
 
     public function __construct(
-        private CredentialRepository $credentialRepository,
-        private SharedAccessRepository $sharedAccessRepository,
-        private EncryptionService $encryptionService,
-        private Security $security,
+private CredentialRepository $credentialRepository,
+    private SharedAccessRepository $sharedAccessRepository,
+    private EncryptionService $encryptionService,
+    private Security $security,
+    private NotificationService $notificationService,
+    private NotificationRepository $notificationRepository,
+    private RouterInterface $router,
     ) {}
 
     /**
@@ -27,6 +35,44 @@ class SecurityCheckerService
      *   items: array<int, array<string,mixed>>
      * }
      */
+
+    public function buildReportAndNotify(User $viewer, int $rotationDays = self::ROTATION_DAYS_DEFAULT): array
+{
+    $report = $this->buildReport($viewer, $rotationDays);
+
+    foreach (($report['items'] ?? []) as $item) {
+        $score = (int) ($item['score'] ?? 100);
+
+        if ($score < 40) {
+            $credId = (int) ($item['id'] ?? 0);
+            if ($credId <= 0) {
+                continue;
+            }
+
+            // ✅ unique par user + credential
+            $uniqueKey = 'security_checker_'.$viewer->getId().'_cred_'.$credId;
+
+            if (!$this->notificationRepository->existsByUniqueKey($uniqueKey)) {
+                $name = (string) ($item['name'] ?? '');
+                $domain = (string) ($item['domain'] ?? '');
+
+                $this->notificationService->createNotification(
+                    $viewer,
+                    'Sécurité : credential à améliorer',
+                    sprintf('Le credential "%s" (%s) est faible. Pense à le renforcer.', $name, $domain),
+                    type: Notification::TYPE_WARNING,
+                    actionUrl: $this->router->generate('app_security_checker'),
+                    icon: 'shield-exclamation',
+                    priority: Notification::PRIORITY_HIGH,
+                    uniqueKey: $uniqueKey
+                );
+            }
+        }
+    }
+
+    return $report;
+}
+
     public function buildReport(User $viewer, int $rotationDays = self::ROTATION_DAYS_DEFAULT): array
     {
         $viewerKey = $viewer->getApiExtensionToken() ?? 'default_key_if_no_user';

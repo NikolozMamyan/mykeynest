@@ -26,7 +26,8 @@ class NotificationService
         string $type = Notification::TYPE_INFO,
         ?string $actionUrl = null,
         ?string $icon = null,
-        string $priority = Notification::PRIORITY_NORMAL
+        string $priority = Notification::PRIORITY_NORMAL,
+        string $uniqueKey
     ): Notification {
         try {
             $notification = new Notification();
@@ -37,7 +38,8 @@ class NotificationService
                 ->setType($type)
                 ->setActionUrl($actionUrl)
                 ->setIcon($icon)
-                ->setPriority($priority);
+                ->setPriority($priority)
+                ->setUniqueKey($uniqueKey);
 
             $this->entityManager->persist($notification);
             $this->entityManager->flush();
