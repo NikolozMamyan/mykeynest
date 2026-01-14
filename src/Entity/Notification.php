@@ -53,7 +53,7 @@ class Notification
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $relatedEntityType = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
     private string $uniqueKey;
 
 

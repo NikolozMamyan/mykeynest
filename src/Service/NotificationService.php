@@ -19,16 +19,17 @@ class NotificationService
     /**
      * Create a new notification
      */
-    public function createNotification(
-        User $user,
-        string $title,
-        ?string $message = null,
-        string $type = Notification::TYPE_INFO,
-        ?string $actionUrl = null,
-        ?string $icon = null,
-        string $priority = Notification::PRIORITY_NORMAL,
-        string $uniqueKey
-    ): Notification {
+public function createNotification(
+    User $user,
+    string $title,
+    ?string $message = null,
+    string $type = Notification::TYPE_INFO,
+    ?string $actionUrl = null,
+    ?string $icon = null,
+    string $priority = Notification::PRIORITY_NORMAL,
+    ?string $uniqueKey = null
+): Notification
+ {
         try {
             $notification = new Notification();
             $notification
