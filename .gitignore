@@ -28,7 +28,9 @@
 /node_modules/
 /public/build/
 /public/uploads/avatars
+/public/uploads/chrome-extension-form-autofill-master.zip
 /public/uploads/blog
+/public/uploads/steps
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
