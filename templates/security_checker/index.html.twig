@@ -1,9 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Vérificateur de sécurité{% endblock %}
+{% block title %}{{ 'security_checker.title'|trans }}{% endblock %}
 
 {% block body %}
-
 <style>
 /* =========================================================
    CSS OPTIMISÉ - Vérificateur de sécurité
@@ -969,15 +968,18 @@
 }
 </style>
 
-  <h1 class="mb-3">Vérificateur de sécurité</h1>
+
+
+
+  <h1 class="mb-3">{{ 'security_checker.page_title'|trans }}</h1>
 
   <div class="row g-3 mb-4">
     <div class="col-md-4">
       <div class="card">
         <div class="card-body">
-          <div class="h6 text-muted">Score global</div>
+          <div class="h6 text-muted">{{ 'security_checker.global_score.label'|trans }}</div>
           <div class="display-6">{{ report.overallScore }}/100</div>
-          <div class="text-muted">Basé sur les mots de passe déchiffrables</div>
+          <div class="text-muted">{{ 'security_checker.global_score.based_on_decipherable'|trans }}</div>
         </div>
       </div>
     </div>
@@ -985,25 +987,40 @@
     <div class="col-md-8">
       <div class="card">
         <div class="card-body">
-          <div class="h6 text-muted">Résumé</div>
+          <div class="h6 text-muted">{{ 'security_checker.summary.title'|trans }}</div>
+
           <div class="d-flex flex-wrap gap-2">
-            <span class="badge bg-secondary">Total: {{ report.counts.total }}</span>
-            <span class="badge bg-danger">Faibles: {{ report.counts.weak }}</span>
-            <span class="badge bg-warning text-dark">Réutilisés: {{ report.counts.reused }}</span>
-            <span class="badge bg-info text-dark">À renouveler (+{{ rotationDays }}j): {{ report.counts.expired }}</span>
-            <span class="badge bg-dark">Indéchiffrables: {{ report.counts.undecipherable }}</span>
+            <span class="badge bg-secondary">
+              {{ 'security_checker.summary.total'|trans }}: {{ report.counts.total }}
+            </span>
+
+            <span class="badge bg-danger">
+              {{ 'security_checker.summary.weak'|trans }}: {{ report.counts.weak }}
+            </span>
+
+            <span class="badge bg-warning text-dark">
+              {{ 'security_checker.summary.reused'|trans }}: {{ report.counts.reused }}
+            </span>
+
+            <span class="badge bg-info text-dark">
+              {{ 'security_checker.summary.rotate_due'|trans({'%days%': rotationDays}) }}: {{ report.counts.expired }}
+            </span>
+
+            <span class="badge bg-dark">
+              {{ 'security_checker.summary.undecipherable'|trans }}: {{ report.counts.undecipherable }}
+            </span>
           </div>
+
           <div class="mt-2 text-muted small">
-            Règle rotation : recommande de changer tous les {{ rotationDays }} jours (~4 mois).
+            {{ 'security_checker.summary.rotation_rule'|trans({'%days%': rotationDays}) }}
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Nouvelle structure en cartes -->
   <div class="section-header">
-    <h2>Détails par accès</h2>
+    <h2>{{ 'security_checker.details.title'|trans }}</h2>
   </div>
 
   <div class="access-cards">
@@ -1013,175 +1030,189 @@
         <div class="access-card-header">
           <div class="access-info">
             <div class="access-name">{{ item.name }}</div>
+
             <div class="access-meta">
               <div class="access-meta-item">
                 <i class="fas fa-globe"></i>
                 <span>{{ item.domain }}</span>
               </div>
+
               <div class="access-meta-item">
                 <i class="fas fa-user"></i>
-<span>{{ item.username }}</span>
-</div>
-</div>
-</div>
-      <div class="access-score">
-        <div class="score-circle {% if item.score >= 70 %}score-high{% elseif item.score >= 40 %}score-medium{% else %}score-low{% endif %}">
-          {{ item.score }}
-        </div>
-        <span class="badge
-          {% if item.label == 'Fort' %}bg-success
-          {% elseif item.label == 'Bon' %}bg-primary
-          {% elseif item.label == 'Moyen' %}bg-warning text-dark
-          {% elseif item.label == 'Faible' %}bg-danger
-          {% else %}bg-secondary{% endif %}
-        ">
-          {{ item.label }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Corps avec sections -->
-    <div class="access-card-body">
-      <!-- Date de changement -->
-      {% if item.lastChangedAt %}
-        <div class="access-section">
-          <div class="access-section-title">Dernier changement</div>
-          <div class="date-info">
-            <div class="date-label">
-              <i class="far fa-calendar-alt"></i>
-              Date
+                <span>{{ item.username }}</span>
+              </div>
             </div>
-            <div>
-              <div class="date-value">{{ item.lastChangedAt|date('d/m/Y') }}</div>
-              {% if item.ageDays is not null %}
-                <div class="date-age">Il y a {{ item.ageDays }} jours</div>
+          </div>
+
+<div class="access-score">
+  <div class="score-circle {% if item.score >= 70 %}score-high{% elseif item.score >= 40 %}score-medium{% else %}score-low{% endif %}">
+    {{ item.score }}
+  </div>
+
+  {# ✅ labelKey vient du service: strong|good|medium|weak|unknown #}
+  {% set labelKey = item.labelKey|default('unknown') %}
+
+  <span class="badge
+    {% if labelKey == 'strong' %}bg-success
+    {% elseif labelKey == 'good' %}bg-primary
+    {% elseif labelKey == 'medium' %}bg-warning text-dark
+    {% elseif labelKey == 'weak' %}bg-danger
+    {% else %}bg-secondary{% endif %}
+  ">
+    {{ ('security_checker.labels.' ~ labelKey)|trans }}
+  </span>
+</div>
+
+        </div>
+
+        <!-- Corps avec sections -->
+        <div class="access-card-body">
+          <!-- Date de changement -->
+          {% if item.lastChangedAt %}
+            <div class="access-section">
+              <div class="access-section-title">{{ 'security_checker.item.last_change'|trans }}</div>
+
+              <div class="date-info">
+                <div class="date-label">
+                  <i class="far fa-calendar-alt"></i>
+                  {{ 'security_checker.item.date'|trans }}
+                </div>
+
+                <div>
+                  <div class="date-value">{{ item.lastChangedAt|date('d/m/Y') }}</div>
+                  {% if item.ageDays is not null %}
+                    <div class="date-age">
+                      {{ 'security_checker.item.days_ago'|trans({'%days%': item.ageDays}) }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                {% if item.rotationDue %}
+                  <span class="badge bg-info text-dark">{{ 'security_checker.item.rotate_now'|trans }}</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Problèmes détectés -->
+          <div class="access-section">
+            <div class="access-section-title">{{ 'security_checker.item.issues'|trans }}</div>
+
+            <div class="access-section-content">
+              {% if item.issues is empty %}
+                <div class="no-items">{{ 'security_checker.item.no_issues'|trans }}</div>
+              {% else %}
+                <ul class="issue-list">
+{% for issue in item.issues %}
+  <li class="issue-item">{{ issue.key|trans(issue.params) }}</li>
+{% endfor %}
+
+                </ul>
               {% endif %}
             </div>
-            {% if item.rotationDue %}
-              <span class="badge bg-info text-dark">À renouveler</span>
-            {% endif %}
           </div>
-        </div>
-      {% endif %}
 
-      <!-- Problèmes détectés -->
-      <div class="access-section">
-        <div class="access-section-title">Problèmes détectés</div>
-        <div class="access-section-content">
-          {% if item.issues is empty %}
-            <div class="no-items">Aucun problème détecté</div>
-          {% else %}
-            <ul class="issue-list">
-              {% for issue in item.issues %}
-                <li class="issue-item">{{ issue }}</li>
-              {% endfor %}
-            </ul>
+          <!-- Recommandations -->
+          {% if item.recommendations is not empty %}
+            <div class="access-section">
+              <div class="access-section-title">{{ 'security_checker.item.recommendations'|trans }}</div>
+
+              <div class="access-section-content">
+                <ul class="recommendation-list">
+{% for recommendation in item.recommendations %}
+  <li class="recommendation-item">{{ recommendation.key|trans(recommendation.params) }}</li>
+{% endfor %}
+
+                </ul>
+
+                {% if item.suggestedPassword %}
+                  <div class="password-suggestion">
+                    <div class="password-suggestion-label">
+                      {{ 'security_checker.item.suggested_password'|trans }}
+                    </div>
+
+                    <div class="password-value">
+                      {# ✅ IMPORTANT: on garde ton idée loop.index #}
+                      <span class="password-text" id="password-{{ loop.index }}">{{ item.suggestedPassword }}</span>
+
+                      <button class="copy-btn"
+                              onclick="copyPassword('password-{{ loop.index }}', this)"
+                              title="{{ 'security_checker.item.copy_password'|trans }}"
+                              type="button">
+                        <i class="far fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
           {% endif %}
         </div>
       </div>
-
-      <!-- Recommandations -->
-      {% if item.recommendations is not empty %}
-        <div class="access-section">
-          <div class="access-section-title">Recommandations</div>
-          <div class="access-section-content">
-            <ul class="recommendation-list">
-              {% for recommendation in item.recommendations %}
-                <li class="recommendation-item">{{ recommendation }}</li>
-              {% endfor %}
-            </ul>
-
-            {% if item.suggestedPassword %}
-  <div class="password-suggestion">
-    <div class="password-suggestion-label">Mot de passe suggéré</div>
-    <div class="password-value">
-      <span class="password-text" id="password-{{ loop.index }}">{{ item.suggestedPassword }}</span>
-     <button class="copy-btn"
-        onclick="copyPassword('password-{{ loop.index }}', this)"
-        title="Copier le mot de passe">
-
-        <i class="far fa-copy"></i>
-      </button>
-    </div>
-  </div>
-{% endif %}
-          </div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-{% endfor %}
+    {% endfor %}
   </div>
 
   <script>
-// Fonction pour copier le mot de passe
-function copyPassword(elementId, button = null) {
-  const passwordElement = document.getElementById(elementId);
-  const password = passwordElement ? passwordElement.textContent : '';
+    // Fonction pour copier le mot de passe
+    function copyPassword(elementId, button = null) {
+      const passwordElement = document.getElementById(elementId);
+      const password = passwordElement ? passwordElement.textContent : '';
 
-  if (!password) {
-    showToast("Mot de passe introuvable", "error");
-    return;
-  }
-
-  navigator.clipboard.writeText(password).then(() => {
-    showToast('Mot de passe copié !');
-
-    // Animation du bouton uniquement si on a le bouton
-    if (button) {
-      const icon = button.querySelector('i');
-      if (icon) {
-icon.classList.remove('fa-copy', 'far');
-icon.classList.add('fa-check', 'fas');
-
+      if (!password) {
+        showToast("{{ 'security_checker.toast.password_not_found'|trans|e('js') }}", "error");
+        return;
       }
-      button.style.color = 'var(--color-primary)';
+
+      navigator.clipboard.writeText(password).then(() => {
+        showToast("{{ 'security_checker.toast.password_copied'|trans|e('js') }}");
+
+        // Animation du bouton uniquement si on a le bouton
+        if (button) {
+          const icon = button.querySelector('i');
+          if (icon) {
+            icon.classList.remove('fa-copy', 'far');
+            icon.classList.add('fa-check', 'fas');
+          }
+          button.style.color = 'var(--color-primary)';
+
+          setTimeout(() => {
+            if (icon) {
+              icon.classList.remove('fa-check', 'fas');
+              icon.classList.add('fa-copy', 'far');
+            }
+            button.style.color = '';
+          }, 2000);
+        }
+      }).catch(err => {
+        console.error('Erreur lors de la copie:', err);
+        showToast("{{ 'security_checker.toast.copy_error'|trans|e('js') }}", "error");
+      });
+    }
+
+    // Fonction pour afficher le toast
+    function showToast(message, type = 'success') {
+      const existingToast = document.querySelector('.toast-notification');
+      if (existingToast) existingToast.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'toast-notification';
+      toast.textContent = message;
+
+      document.body.appendChild(toast);
 
       setTimeout(() => {
-        if (icon) {
-icon.classList.remove('fa-check', 'fas');
-icon.classList.add('fa-copy', 'far');
-        }
-        button.style.color = '';
-      }, 2000);
+        toast.remove();
+      }, 3000);
     }
-  }).catch(err => {
-    console.error('Erreur lors de la copie:', err);
-    showToast('Erreur lors de la copie', 'error');
-  });
-}
 
-
-// Fonction pour afficher le toast
-function showToast(message, type = 'success') {
-  // Supprimer les anciens toasts
-  const existingToast = document.querySelector('.toast-notification');
-  if (existingToast) {
-    existingToast.remove();
-  }
-  
-  // Créer le nouveau toast
-  const toast = document.createElement('div');
-  toast.className = 'toast-notification';
-  toast.textContent = message;
-  
-  // Ajouter au DOM
-  document.body.appendChild(toast);
-  
-  // Supprimer après 3 secondes
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
-
-// Optionnel : Raccourci clavier Ctrl+C sur le mot de passe
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.password-text').forEach((element, index) => {
-    element.addEventListener('click', () => {
-      copyPassword(element.id);
+    // Optionnel : clic sur le mot de passe pour copier
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.password-text').forEach((element) => {
+        element.addEventListener('click', () => {
+          copyPassword(element.id);
+        });
+      });
     });
-  });
-});
-</script>
+  </script>
 
 {% endblock %}

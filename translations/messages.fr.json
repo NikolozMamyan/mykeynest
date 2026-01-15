@@ -503,7 +503,8 @@
       }
     }
   },
-   "dashboard": {
+ "dashboard": {
+    "title": "Tableau de bord",
     "stats": {
       "credentials": "Identifiants",
       "teams": "Équipes",
@@ -511,8 +512,13 @@
       "drafts": "Brouillons",
       "change": {
         "plus_this_month": "+ ce mois",
+        "plus_this_week": "+ cette semaine",
         "stable": "Stable",
-        "plus_this_week": "+ cette semaine"
+
+        "plus_n_this_month": "+%count% ce mois-ci",
+        "minus_n_this_month": "-%count% ce mois-ci",
+        "plus_n_this_week": "+%count% cette semaine",
+        "minus_n_this_week": "-%count% cette semaine"
       }
     },
     "recent_activity": {
@@ -558,6 +564,8 @@
       "strong_passwords": "mots de passe forts",
       "weak_passwords": "mots de passe faibles à améliorer",
       "reused_passwords": "mots de passe réutilisés",
+      "expired_passwords": "mots de passe à renouveler",
+      "undecipherable": "mots de passe indéchiffrables",
       "improve": "Améliorer ma sécurité"
     },
     "activity": {
@@ -566,6 +574,69 @@
       "share_created": { "title": "Accès partagé" },
       "fallback_credential": "Identifiant",
       "fallback_unnamed": "Sans nom"
+    }
+  },
+    "generator": {
+    "title": "Générateur",
+    "subtitle": "Créez un mot de passe fort et enregistrez-le.",
+    "copy": "Copier",
+    "generate": "Générer",
+    "password_length": "Longueur du mot de passe",
+    "uppercase": "Majuscules (A-Z)",
+    "lowercase": "Minuscules (a-z)",
+    "numbers": "Chiffres (0-9)",
+    "symbols": "Symboles (!@#$...)",
+    "entropy": "Entropie : %bits% bits",
+    "entropy_empty": "Entropie : —",
+    "strength": "Force : %label%",
+    "strength_empty": "Force : —",
+    "strength_labels": {
+      "strong": "Forte",
+      "medium": "Moyenne",
+      "weak": "Faible"
+    },
+
+    "history": {
+      "title": "Historique",
+      "subtitle": "Gérez vos mots de passe",
+      "tabs": { "recents": "Récents", "drafts": "Enregistrés" },
+      "tooltip": "Vous pouvez transformer vos brouillons en mots de passe permanents dans votre coffre — simples à retrouver et protégés.",
+      "delete_all": "Tout supprimer"
+    },
+
+    "modals": {
+      "save": { "title": "Enregistrer", "placeholder": "Nom du brouillon", "cancel": "Annuler", "confirm": "Enregistrer" },
+      "convert": { "title": "Convertir", "name": "Nom", "domain": "Domaine", "username": "Identifiant", "cancel": "Annuler", "confirm": "Convertir" },
+      "confirm_clear": { "title": "Tout supprimer ?", "text": "Supprimer tous les récents ?", "cancel": "Annuler", "confirm": "Confirmer" }
+    },
+
+    "list": {
+      "empty_recents": "Aucun mot de passe",
+      "loading": "Chargement...",
+      "empty_drafts": "Aucun brouillon"
+    },
+
+    "toast": {
+      "options": "Options",
+      "choose_one_type": "Choisissez au moins un type de caractère.",
+      "copied_title": "Copié",
+      "copied_msg": "Mot de passe copié !",
+      "cleaned_title": "Nettoyé",
+      "cleaned_msg": "Tous les récents ont été supprimés.",
+      "deleted_title": "Supprimé",
+      "deleted_msg": "Élément retiré.",
+      "draft_title": "Brouillon",
+      "draft_saved": "Enregistré !",
+      "name_required_title": "Nom requis",
+      "name_required_msg": "Merci d'indiquer un nom.",
+      "error_title": "Erreur",
+      "save_failed": "Impossible d'enregistrer.",
+      "converted_title": "Converti",
+      "converted_msg": "Brouillon transformé !",
+      "failed": "Échec.",
+      "network_error_title": "Erreur réseau",
+      "network_error_msg": "Vérifiez la connexion.",
+      "load_error": "Erreur de chargement."
     }
   },
    "subscription": {
@@ -668,6 +739,93 @@
       "companies": "Entreprises",
       "startups": "Startups",
       "universities": "Universités"
+    }
+  },
+  "security_checker": {
+    "title": "Vérificateur de sécurité",
+    "page_title": "Vérificateur de sécurité",
+
+    "global_score": {
+      "label": "Score global",
+      "based_on_decipherable": "Basé sur les mots de passe déchiffrables"
+    },
+
+    "summary": {
+      "title": "Résumé",
+      "total": "Total",
+      "weak": "Faibles",
+      "reused": "Réutilisés",
+      "rotate_due": "À renouveler (+%days%j)",
+      "undecipherable": "Indéchiffrables",
+      "rotation_rule": "Règle rotation : recommande de changer tous les %days% jours (~4 mois)."
+    },
+
+    "details": {
+      "title": "Détails par accès"
+    },
+
+    "item": {
+      "domain": "Domaine",
+      "username": "Identifiant",
+
+      "last_change": "Dernier changement",
+      "date": "Date",
+      "days_ago": "Il y a %days% jours",
+      "rotate_now": "À renouveler",
+
+      "issues": "Problèmes détectés",
+      "no_issues": "Aucun problème détecté",
+
+      "recommendations": "Recommandations",
+
+      "suggested_password": "Mot de passe suggéré",
+      "copy_password": "Copier le mot de passe"
+    },
+
+    "labels": {
+      "strong": "Fort",
+      "good": "Bon",
+      "medium": "Moyen",
+      "weak": "Faible",
+      "unknown": "Inconnu"
+    },
+
+    "toast": {
+      "password_copied": "Mot de passe copié !",
+      "password_not_found": "Mot de passe introuvable",
+      "copy_error": "Erreur lors de la copie"
+    },
+     "issues": {
+      "reused": "Mot de passe réutilisé",
+      "rotation_due": "Mot de passe à renouveler (>%days% jours)",
+      "undecipherable": "Impossible de déchiffrer (clé manquante ou donnée invalide)",
+      "too_short": "Trop court",
+      "too_common": "Mot de passe trop commun",
+      "contains_account_info": "Contient des infos liées au compte",
+      "simple_sequence": "Séquence simple détectée",
+      "repetitions": "Répétitions détectées",
+      "weak_password": "Mot de passe faible"
+    },
+    "recs": {
+      "unique_per_service": "Utilise un mot de passe unique par service (aucune réutilisation).",
+      "plan_rotation": "Planifie un changement de mot de passe (rotation).",
+      "check_owner_key": "Vérifie que le propriétaire a bien un apiExtensionToken et que le mot de passe chiffré est valide.",
+      "length_12_16": "Passe à 12–16+ caractères (idéalement 16+).",
+      "add_upper": "Ajoute au moins une majuscule.",
+      "add_lower": "Ajoute au moins une minuscule.",
+      "add_digit": "Ajoute au moins un chiffre.",
+      "add_symbol": "Ajoute au moins un caractère spécial (ex: !@#…).",
+      "avoid_common": "Évite les mots de passe connus/communs (faciles à deviner).",
+      "avoid_account_info": "Évite username/nom/domaine dans le mot de passe.",
+      "avoid_sequences": "Évite les suites (1234, azerty, qwerty…).",
+      "avoid_repetitions": "Évite les répétitions (aaa, 111…).",
+      "use_passphrase_or_generator": "Utilise une phrase de passe (4+ mots) ou un générateur."
+    },
+    "notifications": {
+      "weak": {
+        "title": "Sécurité : identifiant à améliorer",
+        "message": "Un identifiant est faible. Pense à le renforcer."
+      }
     }
   },
 "settings": {

@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
-{% block title %}Gestionnaire de mots de passe{% endblock %}
+{% block title %}{{ 'dashboard.title'|trans }}{% endblock %}
+
 {% block body %}
 <style>
 /* ===== Dashboard Layout ===== */
@@ -47,9 +48,7 @@
 }
 
 .dashboard-card:hover::before,
-.stat-card:hover::before {
-  left: 100%;
-}
+.stat-card:hover::before { left: 100%; }
 
 .dashboard-card:hover,
 .stat-card:hover{
@@ -77,16 +76,14 @@
   letter-spacing: -0.3px;
 }
 
-.card-header h2 i {
-  animation: pulse 2s ease-in-out infinite;
-}
+.card-header h2 i { animation: pulse 2s ease-in-out infinite; }
 
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.1); }
 }
 
-.card-content{ 
+.card-content{
   padding:20px;
   animation: fadeIn 0.5s ease-in;
 }
@@ -96,7 +93,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Stat Card améliorée ===== */
+/* ===== Stat Card ===== */
 .stat-card{
   display:flex;
   gap:16px;
@@ -136,19 +133,14 @@
   z-index: -1;
 }
 
-.stat-icon i {
-  font-size: 22px;
-  animation: rotate 4s linear infinite;
-}
+.stat-icon i { font-size: 22px; animation: rotate 4s linear infinite; }
 
 @keyframes rotate {
   0%, 90%, 100% { transform: rotate(0deg); }
   95% { transform: rotate(15deg) scale(1.1); }
 }
 
-.stat-content {
-  flex: 1;
-}
+.stat-content { flex: 1; }
 
 .stat-content .stat-label{
   font-size: 13px;
@@ -168,18 +160,6 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: countUp 0.8s ease-out;
-}
-
-@keyframes countUp {
-  from { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .stat-change{
@@ -191,45 +171,16 @@
   padding: 4px 10px;
   border-radius: 20px;
   font-weight: 700;
-  animation: slideIn 0.5s ease-out 0.3s backwards;
 }
 
-@keyframes slideIn {
-  from { 
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+.stat-change.positive{ color: var(--color-success); background: rgba(16,185,129,0.1); }
+.stat-change.neutral { color: var(--color-text-muted); background: rgba(100,116,139,0.1); }
+.stat-change.error   { color: var(--color-danger-end); background: rgba(239,68,68,0.1); }
 
-.stat-change.positive{ 
-  color: var(--color-success);
-  background: rgba(16,185,129,0.1);
-}
+.stat-change i { animation: bounce 1s ease-in-out infinite; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
-.stat-change.neutral{ 
-  color: var(--color-text-muted);
-  background: rgba(100,116,139,0.1);
-}
-
-.stat-change.error{ 
-  color: var(--color-danger-end);
-  background: rgba(239,68,68,0.1);
-}
-
-.stat-change i {
-  animation: bounce 1s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-/* ===== Buttons améliorés ===== */
+/* ===== Buttons ===== */
 .btn-link{
   background: transparent;
   border: 0;
@@ -239,6 +190,7 @@
   font-size: 14px;
   position: relative;
   transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 .btn-link::after {
@@ -252,13 +204,8 @@
   transition: width 0.3s ease;
 }
 
-.btn-link:hover::after {
-  width: 100%;
-}
-
-.btn-link:hover {
-  transform: translateX(4px);
-}
+.btn-link:hover::after { width: 100%; }
+.btn-link:hover { transform: translateX(4px); }
 
 .btn-primary-small{
   display:inline-flex;
@@ -275,41 +222,11 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  text-decoration: none;
 }
 
-.btn-primary-small::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn-primary-small:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.btn-primary-small:hover{
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 20px -4px rgba(16,185,129,0.5);
-}
-
-.btn-primary-small:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* ===== Activity améliorée ===== */
-.activity-list{ 
-  display:flex; 
-  flex-direction:column; 
-  gap:14px;
-}
+/* ===== Activity ===== */
+.activity-list{ display:flex; flex-direction:column; gap:14px; }
 
 .activity-item{
   display:flex;
@@ -324,21 +241,18 @@
   overflow: hidden;
 }
 
-.activity-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 3px;
+.activity-item::before{
+  content:'';
+  position:absolute;
+  left:0; top:0;
+  height:100%;
+  width:3px;
   background: var(--color-primary);
   transform: scaleY(0);
   transition: transform 0.3s ease;
 }
 
-.activity-item:hover::before {
-  transform: scaleY(1);
-}
+.activity-item:hover::before { transform: scaleY(1); }
 
 .activity-item:hover{
   background: var(--color-white);
@@ -348,8 +262,7 @@
 }
 
 .activity-icon{
-  width:44px;
-  height:44px;
+  width:44px; height:44px;
   border-radius: 14px;
   display:flex;
   align-items:center;
@@ -360,62 +273,19 @@
   flex-shrink: 0;
 }
 
-.activity-item:hover .activity-icon {
-  transform: rotate(10deg) scale(1.1);
-}
+.activity-item:hover .activity-icon { transform: rotate(10deg) scale(1.1); }
 
-.activity-icon--credential_created{ 
-  background: rgba(16,185,129,.15); 
-  color: var(--color-primary);
-  box-shadow: 0 4px 8px -2px rgba(16,185,129,0.3);
-}
+.activity-icon--credential_created{ background: rgba(16,185,129,.15); color: var(--color-primary); box-shadow: 0 4px 8px -2px rgba(16,185,129,0.3); }
+.activity-icon--share_created{ background: rgba(245,158,11,.18); color: var(--color-warning); box-shadow: 0 4px 8px -2px rgba(245,158,11,0.3); }
+.activity-icon--draft_created{ background: rgba(59,130,246,.14); color: #3b82f6; box-shadow: 0 4px 8px -2px rgba(59,130,246,0.3); }
 
-.activity-icon--share_created{ 
-  background: rgba(245,158,11,.18); 
-  color: var(--color-warning);
-  box-shadow: 0 4px 8px -2px rgba(245,158,11,0.3);
-}
+.activity-title{ font-weight: 900; color: var(--color-text-dark); font-size: 15px; margin-bottom: 4px; }
+.activity-desc{ color: var(--color-text-medium); font-size: 13px; line-height: 1.5; }
+.activity-time{ color: var(--color-text-muted); margin-top: 6px; font-size: 12px; display:flex; align-items:center; gap:4px; }
+.activity-time::before { content: '•'; font-weight: bold; }
 
-.activity-icon--draft_created{ 
-  background: rgba(59,130,246,.14); 
-  color: #3b82f6;
-  box-shadow: 0 4px 8px -2px rgba(59,130,246,0.3);
-}
-
-.activity-title{
-  font-weight: 900;
-  color: var(--color-text-dark);
-  font-size: 15px;
-  margin-bottom: 4px;
-}
-
-.activity-desc{
-  color: var(--color-text-medium);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.activity-time{
-  color: var(--color-text-muted);
-  margin-top: 6px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.activity-time::before {
-  content: '•';
-  font-weight: bold;
-}
-
-/* ===== Teams améliorées ===== */
-.teams-list{ 
-  display:flex; 
-  flex-direction:column; 
-  gap:14px;
-}
-
+/* ===== Teams ===== */
+.teams-list{ display:flex; flex-direction:column; gap:14px; }
 .team-item{
   display:flex;
   align-items:center;
@@ -427,25 +297,8 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
-}
-
-.team-item::after {
-  content: '';
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.team-item:hover::after {
-  opacity: 1;
-  right: 10px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .team-item:hover{
@@ -456,8 +309,7 @@
 }
 
 .team-avatar{
-  width:48px;
-  height:48px;
+  width:48px; height:48px;
   border-radius: 16px;
   display:flex;
   align-items:center;
@@ -471,40 +323,13 @@
   flex-shrink: 0;
 }
 
-.team-item:hover .team-avatar {
-  transform: scale(1.1) rotate(-5deg);
-  box-shadow: 0 8px 16px -3px rgba(16,185,129,0.5);
-}
+.team-item:hover .team-avatar { transform: scale(1.1) rotate(-5deg); }
 
-.team-info {
-  flex: 1;
-}
-
-.team-name{
-  font-weight: 900;
-  color: var(--color-text-dark);
-  font-size: 15px;
-  margin-bottom: 6px;
-}
-
-.team-meta{
-  display:flex;
-  gap:14px;
-  color: var(--color-text-muted);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.team-meta span {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.team-meta i{ 
-  color: var(--color-primary);
-  font-size: 11px;
-}
+.team-info { flex: 1; }
+.team-name{ font-weight: 900; color: var(--color-text-dark); font-size: 15px; margin-bottom: 6px; }
+.team-meta{ display:flex; gap:14px; color: var(--color-text-muted); font-size: 12px; font-weight: 600; }
+.team-meta span { display:flex; align-items:center; gap:4px; }
+.team-meta i{ color: var(--color-primary); font-size: 11px; }
 
 .badge{
   margin-left:auto;
@@ -517,36 +342,12 @@
   color: var(--color-text-medium);
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  transition: all 0.3s ease;
 }
 
-.badge-owner{
-  border-color: rgba(16,185,129,.4);
-  background: rgba(16,185,129,.15);
-  color: var(--color-primary);
-  box-shadow: 0 2px 6px -2px rgba(16,185,129,0.3);
-}
-
-.badge-admin{
-  border-color: rgba(245,158,11,.4);
-  background: rgba(245,158,11,.15);
-  color: var(--color-warning);
-  box-shadow: 0 2px 6px -2px rgba(245,158,11,0.3);
-}
-
-.badge-member{
-  border-color: rgba(100,116,139,.4);
-  background: rgba(100,116,139,.15);
-  color: var(--color-text-medium);
-}
+.badge-owner{ border-color: rgba(16,185,129,.4); background: rgba(16,185,129,.15); color: var(--color-primary); }
 
 /* ===== Quick actions ===== */
-.quick-actions{
-  display:grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap:14px;
-}
-
+.quick-actions{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px; }
 .action-btn{
   border: 1px solid var(--color-border);
   background: var(--color-bg-light);
@@ -562,32 +363,14 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-}
-
-.action-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(16,185,129,0.1), transparent);
-  transition: left 0.5s;
-}
-
-.action-btn:hover::before {
-  left: 100%;
+  text-decoration: none;
 }
 
 .action-btn i{
   color: var(--color-primary);
   font-size: 20px;
-  transition: all 0.3s ease;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 32px; height: 32px;
+  display:flex; align-items:center; justify-content:center;
   background: rgba(16,185,129,0.1);
   border-radius: 10px;
 }
@@ -599,22 +382,10 @@
   border-color: rgba(16,185,129,0.4);
 }
 
-.action-btn:hover i {
-  transform: scale(1.2) rotate(10deg);
-  background: rgba(16,185,129,0.2);
-}
-
-.action-btn:active {
-  transform: translateY(-1px);
-}
+.action-btn:hover i { transform: scale(1.2) rotate(10deg); background: rgba(16,185,129,0.2); }
 
 /* ===== Drafts ===== */
-.drafts-list{ 
-  display:flex; 
-  flex-direction:column; 
-  gap:14px;
-}
-
+.drafts-list{ display:flex; flex-direction:column; gap:14px; }
 .draft-item{
   display:flex;
   align-items:center;
@@ -624,7 +395,8 @@
   background: var(--color-bg-light);
   border: 1px solid var(--color-border);
   transition: all 0.3s ease;
-  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .draft-item:hover{
@@ -635,44 +407,23 @@
 }
 
 .draft-icon{
-  width:44px;
-  height:44px;
+  width:44px; height:44px;
   border-radius: 14px;
   display:flex;
   align-items:center;
   justify-content:center;
   background: rgba(139,92,246,0.1);
   color: #8b5cf6;
-  transition: all 0.3s ease;
   flex-shrink: 0;
 }
 
-.draft-item:hover .draft-icon {
-  transform: scale(1.1) rotate(-5deg);
-  background: rgba(139,92,246,0.15);
-}
-
-.draft-info {
-  flex: 1;
-}
-
-.draft-name{
-  font-weight: 900;
-  color: var(--color-text-dark);
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.draft-time{
-  font-size: 12px;
-  color: var(--color-text-muted);
-  font-weight: 600;
-}
+.draft-info { flex:1; }
+.draft-name{ font-weight: 900; color: var(--color-text-dark); font-size: 14px; margin-bottom: 4px; }
+.draft-time{ font-size: 12px; color: var(--color-text-muted); font-weight: 600; }
 
 .btn-icon{
   margin-left:auto;
-  width:38px;
-  height:38px;
+  width:38px; height:38px;
   border-radius: 12px;
   border: 1px solid var(--color-border);
   background: var(--color-white);
@@ -683,6 +434,7 @@
   color: var(--color-text-medium);
   transition: all 0.3s ease;
   flex-shrink: 0;
+  text-decoration: none;
 }
 
 .btn-icon:hover{
@@ -700,28 +452,12 @@
   border-radius: var(--border-radius-sm);
   background: linear-gradient(135deg, rgba(16,185,129,0.02) 0%, rgba(16,185,129,0.05) 100%);
   text-align: center;
-  transition: all 0.3s ease;
 }
 
-.empty-state:hover {
-  border-color: rgba(16,185,129,0.3);
-  background: rgba(16,185,129,0.08);
-}
+.empty-title{ font-weight: 900; color: var(--color-text-dark); font-size: 15px; margin-bottom: 8px; }
+.empty-desc{ color: var(--color-text-muted); font-size: 13px; line-height: 1.6; }
 
-.empty-title{
-  font-weight: 900;
-  color: var(--color-text-dark);
-  font-size: 15px;
-  margin-bottom: 8px;
-}
-
-.empty-desc{
-  color: var(--color-text-muted);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-/* ===== Security Score Styles ===== */
+/* ===== Security Score ===== */
 .security-score {
   display: grid;
   grid-template-columns: 200px 1fr;
@@ -730,53 +466,19 @@
 }
 
 @media (max-width: 768px) {
-  .security-score {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
-  }
+  .security-score { grid-template-columns: 1fr; justify-items: center; text-align: center; }
 }
 
-.score-circle {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  animation: fadeInScale 0.8s ease-out;
+.score-circle { position: relative; width: 200px; height: 200px; }
+.score-circle svg { transform: rotate(-90deg); filter: drop-shadow(0 4px 12px rgba(16,185,129,0.3)); }
+
+.score-circle circle.progress {
+  transition: stroke-dashoffset 1.2s ease-out;
 }
 
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.score-circle svg {
-  transform: rotate(-90deg);
-  filter: drop-shadow(0 4px 12px rgba(16,185,129,0.3));
-}
-
-.score-circle circle:last-child {
-  animation: drawCircle 2s ease-out forwards;
-}
-
-@keyframes drawCircle {
-  from {
-    stroke-dashoffset: 565;
-  }
-  to {
-    stroke-dashoffset: 113;
-  }
-}
-
-.score-value {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.score-value{
+  position:absolute;
+  top:50%; left:50%;
   transform: translate(-50%, -50%);
   font-size: 48px;
   font-weight: 900;
@@ -784,200 +486,141 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: countUp 1.5s ease-out;
 }
 
-.score-details {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.score-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.score-details{ display:flex; flex-direction:column; gap:16px; }
+.score-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
   padding: 12px 16px;
   background: var(--color-bg-light);
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--color-border);
   transition: all 0.3s ease;
-  animation: slideInRight 0.5s ease-out backwards;
 }
 
-.score-item:nth-child(1) { animation-delay: 0.2s; }
-.score-item:nth-child(2) { animation-delay: 0.3s; }
-.score-item:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.score-item:hover {
+.score-item:hover{
   background: var(--color-white);
   transform: translateX(4px);
   box-shadow: 0 4px 12px -4px rgba(0,0,0,0.1);
 }
 
-.score-item i {
-  font-size: 18px;
-  flex-shrink: 0;
-}
+.score-item i { font-size: 18px; flex-shrink:0; }
+.score-item span { font-size: 14px; color: var(--color-text-dark); font-weight: 700; }
 
-.score-item span {
-  font-size: 14px;
-  color: var(--color-text-dark);
-  font-weight: 700;
-}
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+.btn-primary{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
   padding: 14px 28px;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-success) 100%);
-  color: white;
+  color:#fff;
   border: none;
   border-radius: 999px;
   font-weight: 800;
   font-size: 15px;
-  cursor: pointer;
+  cursor:pointer;
   box-shadow: 0 6px 16px -4px rgba(16,185,129,0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  text-decoration: none;
 }
 
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn-primary:hover::before {
-  width: 400px;
-  height: 400px;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 10px 24px -6px rgba(16,185,129,0.5);
-}
-
-.btn-primary:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* Animation au chargement de la page */
+/* Animation au chargement */
 @keyframes pageLoad {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity:0; transform: translateY(20px); }
+  to { opacity:1; transform: translateY(0); }
 }
-
-.stats-grid > * {
-  animation: pageLoad 0.6s ease-out backwards;
-}
-
-.stats-grid > *:nth-child(1) { animation-delay: 0.1s; }
-.stats-grid > *:nth-child(2) { animation-delay: 0.2s; }
-.stats-grid > *:nth-child(3) { animation-delay: 0.3s; }
-.stats-grid > *:nth-child(4) { animation-delay: 0.4s; }
-
-.dashboard-grid > * {
-  animation: pageLoad 0.6s ease-out backwards;
-}
-
-.dashboard-grid > *:nth-child(1) { animation-delay: 0.5s; }
-.dashboard-grid > *:nth-child(2) { animation-delay: 0.6s; }
-
+.stats-grid > * { animation: pageLoad .6s ease-out backwards; }
+.stats-grid > *:nth-child(1){ animation-delay:.1s;}
+.stats-grid > *:nth-child(2){ animation-delay:.2s;}
+.stats-grid > *:nth-child(3){ animation-delay:.3s;}
+.stats-grid > *:nth-child(4){ animation-delay:.4s;}
+.dashboard-grid > * { animation: pageLoad .6s ease-out backwards; }
+.dashboard-grid > *:nth-child(1){ animation-delay:.5s;}
+.dashboard-grid > *:nth-child(2){ animation-delay:.6s;}
 </style>
 
-     <!-- Stats Cards -->
+{# -----------------------------
+   Helpers Twig
+------------------------------ #}
+{% set deltaCreds = deltas.credentialsMonth ?? 0 %}
+{% set deltaTeams = deltas.teamsMonth ?? 0 %}
+{% set deltaShares = deltas.sharesWeek ?? 0 %}
+{% set deltaDrafts = deltas.draftsMonth ?? 0 %}
+
+{% macro delta_badge(delta, positiveText, neutralText, negativeText) %}
+  {% if delta > 0 %}
+    <div class="stat-change positive"><i class="fas fa-arrow-up"></i> {{ positiveText|trans({'%count%': delta}) }}</div>
+  {% elseif delta < 0 %}
+    <div class="stat-change error"><i class="fas fa-arrow-down"></i> {{ negativeText|trans({'%count%': delta|abs}) }}</div>
+  {% else %}
+    <div class="stat-change neutral"><i class="fas fa-minus"></i> {{ neutralText|trans }}</div>
+  {% endif %}
+{% endmacro %}
+{% import _self as ui %}
+
+{# -----------------------------
+   Stats Cards (cliquables)
+------------------------------ #}
 <div class="stats-grid">
-  <div class="stat-card">
+
+  <a class="stat-card" href="{{ path('app_credential') }}" style="text-decoration:none; color:inherit;">
     <div class="stat-icon" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
       <i class="fas fa-key"></i>
     </div>
     <div class="stat-content">
       <div class="stat-label">{{ 'dashboard.stats.credentials'|trans }}</div>
-      <div class="stat-value">{{ stats.credentials }}</div>
-      <div class="stat-change positive">
-        <i class="fas fa-arrow-up"></i> {{ 'dashboard.stats.change.plus_this_month'|trans }}
-      </div>
+      <div class="stat-value js-count" data-count="{{ stats.credentials|default(0) }}">0</div>
+      {{ ui.delta_badge(deltaCreds, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month') }}
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card">
+  <a class="stat-card" href="{{ path('app_team_index') }}" style="text-decoration:none; color:inherit;">
     <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);">
       <i class="fas fa-users"></i>
     </div>
     <div class="stat-content">
       <div class="stat-label">{{ 'dashboard.stats.teams'|trans }}</div>
-      <div class="stat-value">{{ stats.teams }}</div>
-      <div class="stat-change neutral">
-        <i class="fas fa-minus"></i> {{ 'dashboard.stats.change.stable'|trans }}
-      </div>
+      <div class="stat-value js-count" data-count="{{ stats.teams|default(0) }}">0</div>
+      {{ ui.delta_badge(deltaTeams, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month') }}
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card">
+  <a class="stat-card" href="{{ path('shared_access_index') }}" style="text-decoration:none; color:inherit;">
     <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
       <i class="fas fa-share-alt"></i>
     </div>
     <div class="stat-content">
       <div class="stat-label">{{ 'dashboard.stats.active_shares'|trans }}</div>
-      <div class="stat-value">{{ stats.shares }}</div>
-      <div class="stat-change positive">
-        <i class="fas fa-arrow-up"></i> {{ 'dashboard.stats.change.plus_this_week'|trans }}
-      </div>
+      <div class="stat-value js-count" data-count="{{ stats.shares|default(0) }}">0</div>
+      {{ ui.delta_badge(deltaShares, 'dashboard.stats.change.plus_n_this_week', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_week') }}
     </div>
-  </div>
+  </a>
 
-  <div class="stat-card">
+  <a class="stat-card" href="{{ path('app_generator') }}" style="text-decoration:none; color:inherit;">
     <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);">
       <i class="fas fa-file-alt"></i>
     </div>
     <div class="stat-content">
       <div class="stat-label">{{ 'dashboard.stats.drafts'|trans }}</div>
-      <div class="stat-value">{{ stats.drafts }}</div>
-      <div class="stat-change neutral">
-        <i class="fas fa-clock"></i>
-      </div>
+      <div class="stat-value js-count" data-count="{{ stats.drafts|default(0) }}">0</div>
+      {{ ui.delta_badge(deltaDrafts, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month') }}
     </div>
-  </div>
+  </a>
+
 </div>
 
-<!-- Two Column Layout -->
+{# -----------------------------
+   Row 1: Activity + Teams
+------------------------------ #}
 <div class="dashboard-grid">
-  <!-- Recent Activity -->
+
   <div class="dashboard-card">
     <div class="card-header">
-      <h2>
-        <i class="fas fa-clock"></i>
-        {{ 'dashboard.recent_activity.title'|trans }}
-      </h2>
-      <button class="btn-link">{{ 'dashboard.recent_activity.view_all'|trans }}</button>
+      <h2><i class="fas fa-clock"></i> {{ 'dashboard.recent_activity.title'|trans }}</h2>
+      <a class="btn-link" href="">{{ 'dashboard.recent_activity.view_all'|trans }}</a>
     </div>
+
     <div class="card-content">
       <div class="activity-list">
         {% if activity is empty %}
@@ -988,7 +631,7 @@
         {% else %}
           {% for a in activity %}
             <div class="activity-item">
-              <div class="activity-icon activity-icon--{{ a.type }}">
+              <div class="activity-icon activity-icon--{{ a.type|e }}">
                 <i class="fas
                   {% if a.type == 'credential_created' %} fa-plus
                   {% elseif a.type == 'share_created' %} fa-share
@@ -998,14 +641,13 @@
               </div>
 
               <div class="activity-details">
-<div class="activity-title">{{ a.title_key|trans }}</div>
-<div class="activity-desc">
-  {{ a.desc ?: (a.type == 'draft_created'
-      ? ('dashboard.activity.fallback_unnamed'|trans)
-      : ('dashboard.activity.fallback_credential'|trans)
-  ) }}
-</div>
-
+                <div class="activity-title">{{ a.title_key|trans }}</div>
+                <div class="activity-desc">
+                  {{ a.desc ?: (a.type == 'draft_created'
+                    ? ('dashboard.activity.fallback_unnamed'|trans)
+                    : ('dashboard.activity.fallback_credential'|trans)
+                  ) }}
+                </div>
                 <div class="activity-time">{{ a.at|date('d/m/Y H:i') }}</div>
               </div>
             </div>
@@ -1015,17 +657,12 @@
     </div>
   </div>
 
-  <!-- Teams Overview -->
   <div class="dashboard-card">
     <div class="card-header">
-      <h2>
-        <i class="fas fa-users"></i>
-        {{ 'dashboard.teams.title'|trans }}
-      </h2>
-      <button class="btn-primary-small">
-        <i class="fas fa-plus"></i>
-        {{ 'dashboard.teams.create'|trans }}
-      </button>
+      <h2><i class="fas fa-users"></i> {{ 'dashboard.teams.title'|trans }}</h2>
+      <a class="btn-primary-small" href="{{ path('app_team_new') }}">
+        <i class="fas fa-plus"></i> {{ 'dashboard.teams.create'|trans }}
+      </a>
     </div>
 
     <div class="card-content">
@@ -1037,64 +674,64 @@
           </div>
         {% else %}
           {% for t in teams %}
-            <div class="team-item">
-              <div class="team-avatar">{{ t.avatar }}</div>
+            <a class="team-item" href="{{ path('app_team_show', {id: t.id}) }}">
+              <div class="team-avatar">{{ t.avatar|e }}</div>
               <div class="team-info">
-                <div class="team-name">{{ t.name }}</div>
+                <div class="team-name">{{ t.name|e }}</div>
                 <div class="team-meta">
                   <span><i class="fas fa-users"></i> {{ t.membersCount }} {{ 'dashboard.teams.meta.members'|trans }}</span>
                   <span><i class="fas fa-key"></i> {{ t.credentialsCount }} {{ 'dashboard.teams.meta.credentials'|trans }}</span>
                 </div>
               </div>
-              <span class="badge badge-{{ t.roleClass }}">{{ t.roleLabel }}</span>
-            </div>
+              <span class="badge badge-{{ t.roleClass|e }}">{{ t.roleLabel|e }}</span>
+            </a>
           {% endfor %}
         {% endif %}
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- Quick Actions & Drafts -->
+{# -----------------------------
+   Row 2: Quick actions + Drafts
+------------------------------ #}
 <div class="dashboard-grid">
-  <!-- Quick Actions -->
+
   <div class="dashboard-card">
     <div class="card-header">
-      <h2>
-        <i class="fas fa-bolt"></i>
-        {{ 'dashboard.quick_actions.title'|trans }}
-      </h2>
+      <h2><i class="fas fa-bolt"></i> {{ 'dashboard.quick_actions.title'|trans }}</h2>
     </div>
+
     <div class="card-content">
       <div class="quick-actions">
-        <button class="action-btn">
+        <a class="action-btn" href="{{ path('credential_new') }}">
           <i class="fas fa-plus-circle"></i>
           <span>{{ 'dashboard.quick_actions.new_credential'|trans }}</span>
-        </button>
-        <button class="action-btn">
+        </a>
+
+        <a class="action-btn" href="{{ path('app_team_index') }}">
           <i class="fas fa-user-plus"></i>
           <span>{{ 'dashboard.quick_actions.invite_member'|trans }}</span>
-        </button>
-        <button class="action-btn">
+        </a>
+
+        <a class="action-btn" href="{{ path('shared_access_new') }}">
           <i class="fas fa-share-alt"></i>
           <span>{{ 'dashboard.quick_actions.share_access'|trans }}</span>
-        </button>
-        <button class="action-btn">
+        </a>
+
+        <a class="action-btn" href="{{ path('app_team_new') }}">
           <i class="fas fa-users-cog"></i>
           <span>{{ 'dashboard.quick_actions.create_team'|trans }}</span>
-        </button>
+        </a>
       </div>
     </div>
   </div>
 
-  <!-- Drafts -->
   <div class="dashboard-card">
     <div class="card-header">
-      <h2>
-        <i class="fas fa-file-alt"></i>
-        {{ 'dashboard.drafts.title'|trans }}
-      </h2>
-      <button class="btn-link">{{ 'dashboard.drafts.view_all'|trans }}</button>
+      <h2><i class="fas fa-file-alt"></i> {{ 'dashboard.drafts.title'|trans }}</h2>
+      <a class="btn-link" href="{{ path('app_generator') }}">{{ 'dashboard.drafts.view_all'|trans }}</a>
     </div>
 
     <div class="card-content">
@@ -1110,61 +747,124 @@
               <div class="draft-icon"><i class="fas fa-file"></i></div>
               <div class="draft-info">
                 <div class="draft-name">{{ d.name ?: ('dashboard.drafts.unnamed'|trans) }}</div>
-                <div class="draft-time">
-                  {{ 'dashboard.drafts.created_on'|trans }} {{ d.createdAt|date('d/m/Y H:i') }}
-                </div>
+                <div class="draft-time">{{ 'dashboard.drafts.created_on'|trans }} {{ d.createdAt|date('d/m/Y H:i') }}</div>
               </div>
-              <button class="btn-icon" title="{{ 'dashboard.drafts.complete'|trans }}">
+              {# <a class="btn-icon" href="{{ path('app_draft_edit', {id: d.id}) }}" title="{{ 'dashboard.drafts.complete'|trans }}">
                 <i class="fas fa-edit"></i>
-              </button>
+              </a> #}
             </div>
           {% endfor %}
         {% endif %}
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- Security Score -->
+{# -----------------------------
+   Security Score
+------------------------------ #}
+{% set score = security.score|default(0) %}
+{% set circumference = 2 * 3.14159 * 90 %}
+{% set dashOffset = circumference - (circumference * score / 100) %}
+
+{% set strokeColor =
+  score >= 80 ? '#059669' :
+  (score >= 50 ? '#f59e0b' : '#ef4444')
+%}
+
 <div class="dashboard-card">
   <div class="card-header">
-    <h2>
-      <i class="fas fa-shield-alt"></i>
-      {{ 'dashboard.security.title'|trans }}
-    </h2>
+    <h2><i class="fas fa-shield-alt"></i> {{ 'dashboard.security.title'|trans }}</h2>
   </div>
 
   <div class="card-content">
     <div class="security-score">
-      <div class="score-circle">
+      <div class="score-circle" aria-label="{{ 'dashboard.security.score'|trans }} {{ score }}%">
         <svg viewBox="0 0 200 200">
           <circle cx="100" cy="100" r="90" fill="none" stroke="#e2e8f0" stroke-width="20"/>
-          <circle cx="100" cy="100" r="90" fill="none" stroke="#059669" stroke-width="20"
-                  stroke-dasharray="565" stroke-dashoffset="113"
-                  transform="rotate(-90 100 100)" stroke-linecap="round"/>
+          <circle class="progress"
+                  cx="100" cy="100" r="90" fill="none"
+                  stroke="{{ strokeColor }}"
+                  stroke-width="20"
+                  stroke-dasharray="{{ circumference }}"
+                  stroke-dashoffset="{{ circumference }}"
+                  data-target-offset="{{ dashOffset }}"
+                  stroke-linecap="round"/>
         </svg>
-        <div class="score-value"> %</div>
+        <div class="score-value js-score" data-score="{{ score }}">0%</div>
       </div>
 
       <div class="score-details">
         <div class="score-item">
-          <i class="fas fa-check-circle" style="color: #10b981;"></i>
-          <span> {{ 'dashboard.security.strong_passwords'|trans }}</span>
+          <i class="fas fa-check-circle" style="color:#10b981;"></i>
+          <span>{{ security.strong|default(0) }} {{ 'dashboard.security.strong_passwords'|trans }}</span>
         </div>
-        <div class="score-item warning">
-          <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-          <span>{{ 'dashboard.security.weak_passwords'|trans }}</span>
+        <div class="score-item">
+          <i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i>
+          <span>{{ security.weak|default(0) }} {{ 'dashboard.security.weak_passwords'|trans }}</span>
         </div>
-        <div class="score-item error">
-          <i class="fas fa-times-circle" style="color: #ef4444;"></i>
-          <span> {{ 'dashboard.security.reused_passwords'|trans }}</span>
+        <div class="score-item">
+          <i class="fas fa-times-circle" style="color:#ef4444;"></i>
+          <span>{{ security.reused|default(0) }} {{ 'dashboard.security.reused_passwords'|trans }}</span>
         </div>
 
-        <button class="btn-primary" style="margin-top: 20px;">
+        <a class="btn-primary" href="{{ path('app_security_checker') }}" style="margin-top:20px;">
           {{ 'dashboard.security.improve'|trans }}
-        </button>
+        </a>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+(() => {
+  // Animation compteur (stat cards)
+  const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+  function animateNumber(el, to, duration = 700) {
+    const from = 0;
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min(1, (now - start) / duration);
+      const v = Math.round(from + (to - from) * easeOutCubic(p));
+      el.textContent = String(v);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  document.querySelectorAll('.js-count').forEach(el => {
+    const to = parseInt(el.dataset.count || '0', 10);
+    animateNumber(el, isNaN(to) ? 0 : to, 650);
+  });
+
+  // Animation score + cercle
+  const scoreEl = document.querySelector('.js-score');
+  const circle = document.querySelector('.score-circle circle.progress');
+  if (scoreEl) {
+    const score = parseInt(scoreEl.dataset.score || '0', 10);
+    let start = performance.now();
+    const duration = 900;
+
+    function tick(now) {
+      const p = Math.min(1, (now - start) / duration);
+      const v = Math.round(score * easeOutCubic(p));
+      scoreEl.textContent = v + '%';
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  if (circle) {
+    // Départ plein cercle => offset = circumference (déjà dans Twig)
+    // Puis on applique la vraie valeur pour déclencher la transition
+    const target = parseFloat(circle.dataset.targetOffset || '0');
+    requestAnimationFrame(() => {
+      circle.style.strokeDashoffset = String(target);
+    });
+  }
+})();
+</script>
+
 {% endblock %}

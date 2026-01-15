@@ -791,16 +791,51 @@
 {% endblock %}
 
 {% block body %}
-<div class="page-wrapper" data-controller="generator">
+<div
+  class="page-wrapper"
+  data-controller="generator"
 
-  <!-- ====== Generator ====== -->
+  data-generator-t-options-title-value="{{ 'generator.toast.options'|trans }}"
+  data-generator-t-choose-one-type-value="{{ 'generator.toast.choose_one_type'|trans }}"
+  data-generator-t-copied-title-value="{{ 'generator.toast.copied_title'|trans }}"
+  data-generator-t-copied-msg-value="{{ 'generator.toast.copied_msg'|trans }}"
+  data-generator-t-cleaned-title-value="{{ 'generator.toast.cleaned_title'|trans }}"
+  data-generator-t-cleaned-msg-value="{{ 'generator.toast.cleaned_msg'|trans }}"
+  data-generator-t-deleted-title-value="{{ 'generator.toast.deleted_title'|trans }}"
+  data-generator-t-deleted-msg-value="{{ 'generator.toast.deleted_msg'|trans }}"
+  data-generator-t-name-required-title-value="{{ 'generator.toast.name_required_title'|trans }}"
+  data-generator-t-name-required-msg-value="{{ 'generator.toast.name_required_msg'|trans }}"
+  data-generator-t-error-title-value="{{ 'generator.toast.error_title'|trans }}"
+  data-generator-t-save-failed-value="{{ 'generator.toast.save_failed'|trans }}"
+  data-generator-t-converted-title-value="{{ 'generator.toast.converted_title'|trans }}"
+  data-generator-t-converted-msg-value="{{ 'generator.toast.converted_msg'|trans }}"
+  data-generator-t-failed-value="{{ 'generator.toast.failed'|trans }}"
+  data-generator-t-network-error-title-value="{{ 'generator.toast.network_error_title'|trans }}"
+  data-generator-t-network-error-msg-value="{{ 'generator.toast.network_error_msg'|trans }}"
+  data-generator-t-load-error-value="{{ 'generator.toast.load_error'|trans }}"
+
+  data-generator-t-loading-value="{{ 'generator.list.loading'|trans }}"
+  data-generator-t-empty-drafts-value="{{ 'generator.list.empty_drafts'|trans }}"
+  data-generator-t-empty-recents-value="{{ 'generator.list.empty_recents'|trans }}"
+
+  data-generator-t-entropy-empty-value="{{ 'generator.entropy_empty'|trans }}"
+  data-generator-t-strength-empty-value="{{ 'generator.strength_empty'|trans }}"
+  data-generator-t-entropy-template-value="{{ 'generator.entropy'|trans({'%bits%':'__BITS__'}) }}"
+  data-generator-t-strength-template-value="{{ 'generator.strength'|trans({'%label%':'__LABEL__'}) }}"
+  data-generator-t-strength-strong-value="{{ 'generator.strength_labels.strong'|trans }}"
+  data-generator-t-strength-medium-value="{{ 'generator.strength_labels.medium'|trans }}"
+  data-generator-t-strength-weak-value="{{ 'generator.strength_labels.weak'|trans }}"
+>
+
+
+    <!-- ====== Generator ====== -->
   <section class="card">
     <div class="card-header">
       <div class="card-header-left">
         <div class="card-icon"><i class="fa-solid fa-key"></i></div>
         <div>
-          <h1>Générateur</h1>
-          <div class="helper">Créez un mot de passe fort et enregistrez-le.</div>
+          <h1>{{ 'generator.title'|trans }}</h1>
+          <div class="helper">{{ 'generator.subtitle'|trans }}</div>
         </div>
       </div>
     </div>
@@ -810,11 +845,17 @@
         <div class="password-output" aria-live="polite" data-generator-target="outputContainer">
           <span class="mono" data-generator-target="output"></span>
           <div class="password-actions">
-            <button class="btn btn-icon" title="Copier" data-action="click->generator#copyPassword">
+            <button
+              class="btn btn-icon"
+              title="{{ 'generator.copy'|trans }}"
+              aria-label="{{ 'generator.copy'|trans }}"
+              data-action="click->generator#copyPassword"
+            >
               <i class="fa-solid fa-copy"></i>
             </button>
+
             <button class="btn btn-primary" data-action="click->generator#generatePassword">
-              <i class="fa-solid fa-bolt"></i> Générer
+              <i class="fa-solid fa-bolt"></i> {{ 'generator.generate'|trans }}
             </button>
           </div>
         </div>
@@ -823,37 +864,62 @@
       <div class="hr"></div>
 
       <div class="length-control">
-        <label>Longueur du mot de passe</label>
+        <label for="gen-length">{{ 'generator.password_length'|trans }}</label>
         <div class="range-wrap">
-          <input type="range" min="8" max="64" value="12" data-generator-target="lengthInput" data-action="input->generator#updateLength">
+          <input
+            id="gen-length"
+            type="range"
+            min="8"
+            max="64"
+            value="12"
+            data-generator-target="lengthInput"
+            data-action="input->generator#updateLength"
+          >
           <span class="badge" data-generator-target="lengthValue">12</span>
         </div>
       </div>
 
       <div class="controls">
         <div class="field">
-          <label>Majuscules (A-Z)</label>
-          <label class="switch"><input type="checkbox" checked data-generator-target="uppercase"><span class="dot"></span></label>
+          <label>{{ 'generator.uppercase'|trans }}</label>
+          <label class="switch">
+            <input type="checkbox" checked data-generator-target="uppercase">
+            <span class="dot"></span>
+          </label>
         </div>
+
         <div class="field">
-          <label>Minuscules (a-z)</label>
-          <label class="switch"><input type="checkbox" checked data-generator-target="lowercase"><span class="dot"></span></label>
+          <label>{{ 'generator.lowercase'|trans }}</label>
+          <label class="switch">
+            <input type="checkbox" checked data-generator-target="lowercase">
+            <span class="dot"></span>
+          </label>
         </div>
+
         <div class="field">
-          <label>Chiffres (0-9)</label>
-          <label class="switch"><input type="checkbox" checked data-generator-target="numbers"><span class="dot"></span></label>
+          <label>{{ 'generator.numbers'|trans }}</label>
+          <label class="switch">
+            <input type="checkbox" checked data-generator-target="numbers">
+            <span class="dot"></span>
+          </label>
         </div>
+
         <div class="field">
-          <label>Symboles (!@#$...)</label>
-          <label class="switch"><input type="checkbox" checked data-generator-target="symbols"><span class="dot"></span></label>
+          <label>{{ 'generator.symbols'|trans }}</label>
+          <label class="switch">
+            <input type="checkbox" checked data-generator-target="symbols">
+            <span class="dot"></span>
+          </label>
         </div>
       </div>
 
       <div class="strength-section">
         <div class="meter" data-generator-target="meter"><div></div></div>
         <div class="meter-label">
-          <span id="entropyLabel"><i class="fa-solid fa-shield-halved"></i> Entropie : —</span>
-          <span id="strengthLabel">Force : —</span>
+          <span id="entropyLabel">
+            <i class="fa-solid fa-shield-halved"></i> {{ 'generator.entropy_empty'|trans }}
+          </span>
+          <span id="strengthLabel">{{ 'generator.strength_empty'|trans }}</span>
         </div>
       </div>
     </div>
@@ -865,83 +931,88 @@
       <div class="card-header-left">
         <div class="card-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
         <div>
-          <h2>Historique</h2>
-          <div class="helper">Gérez vos mots de passe</div>
+          <h2>{{ 'generator.history.title'|trans }}</h2>
+          <div class="helper">{{ 'generator.history.subtitle'|trans }}</div>
         </div>
       </div>
+
       <div class="header-actions">
-        <div class="switcher" role="tablist">
-          <button class="active" data-action="click->generator#showRecents">Récents</button>
-          <button data-action="click->generator#showDrafts">Enregistrés</button>
+        <div class="switcher" role="tablist" aria-label="{{ 'generator.history.title'|trans }}">
+          <button class="active" data-action="click->generator#showRecents">
+            {{ 'generator.history.tabs.recents'|trans }}
+          </button>
+          <button data-action="click->generator#showDrafts">
+            {{ 'generator.history.tabs.drafts'|trans }}
+          </button>
         </div>
-        <button class="btn btn-icon btn-icon-danger" title="Tout supprimer" data-action="click->generator#confirmClearAll">
+
+        <button
+          class="btn btn-icon btn-icon-danger"
+          title="{{ 'generator.history.delete_all'|trans }}"
+          aria-label="{{ 'generator.history.delete_all'|trans }}"
+          data-action="click->generator#confirmClearAll"
+        >
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
     </div>
+
     <style>
-    .info-hover {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  cursor: default;
-}
+      .info-hover {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+        cursor: default;
+      }
 
-/* infobulle */
-.info-hover .tooltip {
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  bottom: 130%; /* au-dessus du ⓘ */
-  left: 60%;
-  transform: translateX(-50%);
-  width: 280px;
-  background: var(--color-white);
-  color: var(--color-text-dark);
-  text-align: center;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 10px 12px;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-  z-index: 2000;
-}
+      .info-hover .tooltip {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        bottom: 130%;
+        left: 60%;
+        transform: translateX(-50%);
+        width: 280px;
+        background: var(--color-white);
+        color: var(--color-text-dark);
+        text-align: center;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        border-radius: 8px;
+        border: 1px solid var(--color-border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 10px 12px;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        z-index: 2000;
+      }
 
-/* petite flèche */
-.info-hover .tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 95%;
-  transform: translateX(-50%);
-  border-width: 6px;
-  border-style: solid;
-  border-color: #fff transparent transparent transparent;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
-}
+      .info-hover .tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 95%;
+        transform: translateX(-50%);
+        border-width: 6px;
+        border-style: solid;
+        border-color: #fff transparent transparent transparent;
+        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+      }
 
-/* affichage au survol */
-.info-hover:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
+      .info-hover:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
     </style>
+
     <div class="card-body history-body">
-      <p class="helper text-center info-hover">
-  <i class="fa-solid fa-info-circle"></i>
-  <span class="tooltip">
-    Vous pouvez transformer vos brouillons en mots de passe permanents
-    dans votre coffre — simples à retrouver et protégés.
-  </span>
-</p>
+      <p class="helper text-center info-hover" aria-label="info">
+        <i class="fa-solid fa-info-circle"></i>
+        <span class="tooltip">{{ 'generator.history.tooltip'|trans }}</span>
+      </p>
 
       <div data-generator-target="list"></div>
-   
     </div>
   </aside>
 
@@ -951,42 +1022,70 @@
   <!-- Modales -->
   <div class="modal-backdrop" id="saveModal" hidden>
     <div class="modal">
-      <header><h3><i class="fa-solid fa-floppy-disk"></i> Enregistrer</h3></header>
+      <header>
+        <h3><i class="fa-solid fa-floppy-disk"></i> {{ 'generator.modals.save.title'|trans }}</h3>
+      </header>
+
       <div class="content">
-        <input type="text" placeholder="Nom du brouillon" data-generator-target="saveName">
+        <input
+          type="text"
+          placeholder="{{ 'generator.modals.save.placeholder'|trans }}"
+          data-generator-target="saveName"
+        >
       </div>
+
       <footer>
-        <button class="btn" data-action="click->generator#closeModal">Annuler</button>
-        <button class="btn btn-primary" data-action="click->generator#saveDraft">Enregistrer</button>
+        <button class="btn" data-action="click->generator#closeModal">
+          {{ 'generator.modals.save.cancel'|trans }}
+        </button>
+        <button class="btn btn-primary" data-action="click->generator#saveDraft">
+          {{ 'generator.modals.save.confirm'|trans }}
+        </button>
       </footer>
     </div>
   </div>
 
   <div class="modal-backdrop" id="convertModal" hidden>
     <div class="modal">
-      <header><h3><i class="fa-solid fa-right-long"></i> Convertir</h3></header>
+      <header>
+        <h3><i class="fa-solid fa-right-long"></i> {{ 'generator.modals.convert.title'|trans }}</h3>
+      </header>
+
       <div class="content">
-        <input type="text" placeholder="Nom" data-generator-target="credName">
-        <input type="text" placeholder="Domaine" data-generator-target="credDomain">
-        <input type="text" placeholder="Identifiant" data-generator-target="credUsername">
+        <input type="text" placeholder="{{ 'generator.modals.convert.name'|trans }}" data-generator-target="credName">
+        <input type="text" placeholder="{{ 'generator.modals.convert.domain'|trans }}" data-generator-target="credDomain">
+        <input type="text" placeholder="{{ 'generator.modals.convert.username'|trans }}" data-generator-target="credUsername">
       </div>
+
       <footer>
-        <button class="btn" data-action="click->generator#closeModal">Annuler</button>
-        <button class="btn btn-primary" data-action="click->generator#convertDraft">Convertir</button>
+        <button class="btn" data-action="click->generator#closeModal">
+          {{ 'generator.modals.convert.cancel'|trans }}
+        </button>
+        <button class="btn btn-primary" data-action="click->generator#convertDraft">
+          {{ 'generator.modals.convert.confirm'|trans }}
+        </button>
       </footer>
     </div>
   </div>
 
   <div class="modal-backdrop" id="confirmModal" hidden>
     <div class="modal">
-      <header><h3><i class="fa-solid fa-triangle-exclamation"></i> Tout supprimer ?</h3></header>
-      <div class="content"><p>Supprimer tous les récents ?</p></div>
+      <header>
+        <h3><i class="fa-solid fa-triangle-exclamation"></i> {{ 'generator.modals.confirm_clear.title'|trans }}</h3>
+      </header>
+
+      <div class="content">
+        <p>{{ 'generator.modals.confirm_clear.text'|trans }}</p>
+      </div>
+
       <footer>
-        <button class="btn" data-action="click->generator#closeModal">Annuler</button>
-        <button class="btn btn-danger" data-action="click->generator#clearAllRecents">Confirmer</button>
+        <button class="btn" data-action="click->generator#closeModal">
+          {{ 'generator.modals.confirm_clear.cancel'|trans }}
+        </button>
+        <button class="btn btn-danger" data-action="click->generator#clearAllRecents">
+          {{ 'generator.modals.confirm_clear.confirm'|trans }}
+        </button>
       </footer>
     </div>
   </div>
-
-</div>
 {% endblock %}

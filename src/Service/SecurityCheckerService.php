@@ -6,8 +6,6 @@ use App\Entity\User;
 use App\Entity\Credential;
 use App\Entity\Notification;
 use App\Entity\SharedAccess;
-use App\Service\EncryptionService;
-use App\Service\NotificationService;
 use App\Repository\CredentialRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\SharedAccessRepository;
@@ -19,13 +17,13 @@ class SecurityCheckerService
     public const ROTATION_DAYS_DEFAULT = 120; // ~4 mois
 
     public function __construct(
-private CredentialRepository $credentialRepository,
-    private SharedAccessRepository $sharedAccessRepository,
-    private EncryptionService $encryptionService,
-    private Security $security,
-    private NotificationService $notificationService,
-    private NotificationRepository $notificationRepository,
-    private RouterInterface $router,
+        private CredentialRepository $credentialRepository,
+        private SharedAccessRepository $sharedAccessRepository,
+        private EncryptionService $encryptionService,
+        private Security $security,
+        private NotificationService $notificationService,
+        private NotificationRepository $notificationRepository,
+        private RouterInterface $router,
     ) {}
 
     /**
@@ -35,48 +33,49 @@ private CredentialRepository $credentialRepository,
      *   items: array<int, array<string,mixed>>
      * }
      */
-
     public function buildReportAndNotify(User $viewer, int $rotationDays = self::ROTATION_DAYS_DEFAULT): array
-{
-    $report = $this->buildReport($viewer, $rotationDays);
+    {
+        $report = $this->buildReport($viewer, $rotationDays);
 
-    foreach (($report['items'] ?? []) as $item) {
-        $score = (int) ($item['score'] ?? 100);
+        foreach (($report['items'] ?? []) as $item) {
+            $score = (int) ($item['score'] ?? 100);
 
-        if ($score < 40) {
-            $credId = (int) ($item['id'] ?? 0);
-            if ($credId <= 0) {
-                continue;
-            }
+            if ($score < 40) {
+                $credId = (int) ($item['id'] ?? 0);
+                if ($credId <= 0) continue;
 
-            // ✅ unique par user + credential
-            $uniqueKey = 'security_checker_'.$viewer->getId().'_cred_'.$credId;
+                $uniqueKey = 'security_checker_'.$viewer->getId().'_cred_'.$credId;
 
-            if (!$this->notificationRepository->existsByUniqueKey($uniqueKey)) {
-                $name = (string) ($item['name'] ?? '');
-                $domain = (string) ($item['domain'] ?? '');
+                if (!$this->notificationRepository->existsByUniqueKey($uniqueKey)) {
+                    $name = (string) ($item['name'] ?? '');
+                    $domain = (string) ($item['domain'] ?? '');
 
-                $this->notificationService->createNotification(
-                    $viewer,
-                    'Sécurité : credential à améliorer',
-                    sprintf('Le credential "%s" (%s) est faible. Pense à le renforcer.', $name, $domain),
-                    type: Notification::TYPE_WARNING,
-                    actionUrl: $this->router->generate('app_security_checker'),
-                    icon: 'shield-exclamation',
-                    priority: Notification::PRIORITY_HIGH,
-                    uniqueKey: $uniqueKey
-                );
+                    // ✅ On envoie des textes simples (ou tu peux faire traduire dans NotificationService)
+                    // Ici je te mets la version "clé" en dur + params dans le message (prod propre)
+                    $title = 'security_checker.notifications.weak.title';
+                    $message = 'security_checker.notifications.weak.message';
+
+                    $this->notificationService->createNotification(
+                        $viewer,
+                        $title,
+                        $message,
+                        type: Notification::TYPE_WARNING,
+                        actionUrl: $this->router->generate('app_security_checker'),
+                        icon: 'shield-exclamation',
+                        priority: Notification::PRIORITY_HIGH,
+                        uniqueKey: $uniqueKey,
+                        // si ton NotificationService supporte des params:
+                        // params: ['%name%' => $name, '%domain%' => $domain]
+                    );
+                }
             }
         }
-    }
 
-    return $report;
-}
+        return $report;
+    }
 
     public function buildReport(User $viewer, int $rotationDays = self::ROTATION_DAYS_DEFAULT): array
     {
-        $viewerKey = $viewer->getApiExtensionToken() ?? 'default_key_if_no_user';
-
         // 1) Credentials appartenant à l'utilisateur
         $owned = $this->credentialRepository->findBy(['user' => $viewer]);
 
@@ -87,51 +86,43 @@ private CredentialRepository $credentialRepository,
         /** @var Credential[] $allCreds */
         $allCreds = $owned;
         foreach ($shared as $sa) {
-            if ($sa->getCredential()) {
-                $allCreds[] = $sa->getCredential();
-            }
+            if ($sa->getCredential()) $allCreds[] = $sa->getCredential();
         }
 
-        // Dédup si un credential apparaît 2 fois
+        // Dédup
         $uniq = [];
-        foreach ($allCreds as $c) {
-            $uniq[$c->getId()] = $c;
-        }
+        foreach ($allCreds as $c) $uniq[$c->getId()] = $c;
         $allCreds = array_values($uniq);
 
-        // 1er passage : déchiffrer et calculer hash pour détecter réutilisation
+        // 1er passage : déchiffrer + hash reuse
         $plainById = [];
         $hashCounts = [];
 
-$viewerKey = $viewer->getApiExtensionToken() ?? '';
+        $viewerKey = $viewer->getApiExtensionToken() ?? '';
 
-foreach ($allCreds as $cred) {
-    $owner = $cred->getUser();
-    $ownerKey = $owner?->getApiExtensionToken();
+        foreach ($allCreds as $cred) {
+            $owner = $cred->getUser();
+            $ownerKey = $owner?->getApiExtensionToken();
 
-    if (!$ownerKey) {
-        $plainById[$cred->getId()] = null;
-        continue;
-    }
+            if (!$ownerKey) {
+                $plainById[$cred->getId()] = null;
+                continue;
+            }
 
-    // ✅ utiliser le nouveau mode
-    $this->encryptionService->setKeyFromUserToken($ownerKey);
+            $this->encryptionService->setKeyFromUserToken($ownerKey);
+            $plain = $this->encryptionService->decrypt((string) $cred->getPassword());
 
-    $plain = $this->encryptionService->decrypt((string) $cred->getPassword());
+            if ($viewerKey !== '') {
+                $this->encryptionService->setKeyFromUserToken($viewerKey);
+            }
 
-    // ✅ remettre la clé du viewer si tu veux garder une "propreté" globale
-    if ($viewerKey !== '') {
-        $this->encryptionService->setKeyFromUserToken($viewerKey);
-    }
+            $plainById[$cred->getId()] = $plain !== '' ? $plain : null;
 
-    $plainById[$cred->getId()] = $plain !== '' ? $plain : null;
-
-    if ($plain !== '') {
-        $h = hash('sha256', $plain);
-        $hashCounts[$h] = ($hashCounts[$h] ?? 0) + 1;
-    }
-}
-
+            if ($plain !== '') {
+                $h = hash('sha256', $plain);
+                $hashCounts[$h] = ($hashCounts[$h] ?? 0) + 1;
+            }
+        }
 
         // 2e passage : analyse
         $items = [];
@@ -153,54 +144,49 @@ foreach ($allCreds as $cred) {
             $ageDays = $lastChangedAt ? (int) floor((time() - $lastChangedAt->getTimestamp()) / 86400) : null;
             $rotationDue = ($ageDays !== null) ? ($ageDays >= $rotationDays) : false;
 
-            $issues = [];
-            $recommendations = [];
+            // ✅ issues/recs deviennent des "messages" structurés
+            $issues = [];          // array<int, array{key:string, params:array}>
+            $recommendations = []; // idem
 
             $reused = false;
             if ($plain) {
                 $h = hash('sha256', $plain);
                 $reused = ($hashCounts[$h] ?? 0) > 1;
                 if ($reused) {
-                    $issues[] = 'Mot de passe réutilisé';
-                    $recommendations[] = 'Utilise un mot de passe unique par service (aucune réutilisation).';
+                    $issues[] = ['key' => 'security_checker.issues.reused', 'params' => []];
+                    $recommendations[] = ['key' => 'security_checker.recs.unique_per_service', 'params' => []];
                 }
             }
 
             if ($rotationDue) {
-                $issues[] = sprintf('Mot de passe à renouveler (>%d jours)', $rotationDays);
-                $recommendations[] = 'Planifie un changement de mot de passe (rotation).';
+                $issues[] = ['key' => 'security_checker.issues.rotation_due', 'params' => ['%days%' => $rotationDays]];
+                $recommendations[] = ['key' => 'security_checker.recs.plan_rotation', 'params' => []];
             }
 
             if ($plain === null) {
                 $counts['undecipherable']++;
                 $score = 0;
-                $label = 'Inconnu';
-                $issues[] = 'Impossible de déchiffrer (clé manquante ou donnée invalide)';
-                $recommendations[] = 'Vérifie que le owner a bien un apiExtensionToken et que le mot de passe chiffré est valide.';
+                $labelKey = 'unknown';
+                $issues[] = ['key' => 'security_checker.issues.undecipherable', 'params' => []];
+                $recommendations[] = ['key' => 'security_checker.recs.check_owner_key', 'params' => []];
             } else {
-                [$score, $label, $localIssues, $localRecs] = $this->scorePassword(
+                [$score, $labelKey, $localIssues, $localRecs] = $this->scorePassword(
                     $plain,
                     (string) $cred->getUsername(),
                     (string) $cred->getDomain(),
                     (string) $cred->getName(),
                 );
 
-                $issues = array_values(array_unique(array_merge($issues, $localIssues)));
-                $recommendations = array_values(array_unique(array_merge($recommendations, $localRecs)));
+                $issues = $this->mergeMessages($issues, $localIssues);
+                $recommendations = $this->mergeMessages($recommendations, $localRecs);
 
                 $sumScore += $score;
                 $countScored++;
             }
 
-            if ($plain !== null && $score < 40) {
-                $counts['weak']++;
-            }
-            if ($reused) {
-                $counts['reused']++;
-            }
-            if ($rotationDue) {
-                $counts['expired']++;
-            }
+            if ($plain !== null && $score < 40) $counts['weak']++;
+            if ($reused) $counts['reused']++;
+            if ($rotationDue) $counts['expired']++;
 
             $items[] = [
                 'id' => $cred->getId(),
@@ -211,10 +197,14 @@ foreach ($allCreds as $cred) {
                 'ageDays' => $ageDays,
                 'rotationDue' => $rotationDue,
                 'score' => $score,
-                'label' => $label,
+
+                // ✅ labelKey au lieu de 'Fort/Bon...'
+                'labelKey' => $labelKey,
+
+                // ✅ messages structurés
                 'issues' => $issues,
                 'recommendations' => $recommendations,
-                // On masque toujours côté UI
+
                 'passwordMasked' => $plain ? str_repeat('•', min(12, max(8, strlen($plain)))) : '—',
                 'suggestedPassword' => $this->generateStrongPassword(18),
             ];
@@ -230,7 +220,7 @@ foreach ($allCreds as $cred) {
     }
 
     /**
-     * @return array{0:int,1:string,2:array,3:array}
+     * @return array{0:int,1:string,2:array<int,array{key:string,params:array}>,3:array<int,array{key:string,params:array}>}
      */
     private function scorePassword(string $pwd, string $username, string $domain, string $name): array
     {
@@ -246,8 +236,8 @@ foreach ($allCreds as $cred) {
         elseif ($len >= 10) $score += 20;
         elseif ($len >= 8) $score += 10;
         else {
-            $issues[] = 'Trop court';
-            $recs[] = 'Passe à 12–16+ caractères (idéalement 16+).';
+            $issues[] = ['key' => 'security_checker.issues.too_short', 'params' => []];
+            $recs[]   = ['key' => 'security_checker.recs.length_12_16', 'params' => []];
         }
 
         // Diversité
@@ -259,17 +249,17 @@ foreach ($allCreds as $cred) {
         $variety = (int)$hasLower + (int)$hasUpper + (int)$hasDigit + (int)$hasSymbol;
         $score += $variety * 10;
 
-        if (!$hasUpper) $recs[] = 'Ajoute au moins une majuscule.';
-        if (!$hasLower) $recs[] = 'Ajoute au moins une minuscule.';
-        if (!$hasDigit) $recs[] = 'Ajoute au moins un chiffre.';
-        if (!$hasSymbol) $recs[] = 'Ajoute au moins un caractère spécial (ex: !@#…).';
+        if (!$hasUpper)  $recs[] = ['key' => 'security_checker.recs.add_upper', 'params' => []];
+        if (!$hasLower)  $recs[] = ['key' => 'security_checker.recs.add_lower', 'params' => []];
+        if (!$hasDigit)  $recs[] = ['key' => 'security_checker.recs.add_digit', 'params' => []];
+        if (!$hasSymbol) $recs[] = ['key' => 'security_checker.recs.add_symbol', 'params' => []];
 
-        // Mot de passe “trop commun” (mini liste)
+        // Trop commun
         $common = ['password','123456','123456789','qwerty','azerty','admin','welcome','iloveyou'];
         if (in_array(mb_strtolower($pwd), $common, true)) {
             $score -= 50;
-            $issues[] = 'Mot de passe trop commun';
-            $recs[] = 'Évite les mots de passe connus/communs (faciles à deviner).';
+            $issues[] = ['key' => 'security_checker.issues.too_common', 'params' => []];
+            $recs[]   = ['key' => 'security_checker.recs.avoid_common', 'params' => []];
         }
 
         // Contient username / nom / domaine
@@ -282,8 +272,8 @@ foreach ($allCreds as $cred) {
         foreach ($leaks as $token) {
             if (str_contains($p, $token)) {
                 $score -= 20;
-                $issues[] = 'Contient des infos liées au compte';
-                $recs[] = 'Évite username/nom/domaine dans le mot de passe.';
+                $issues[] = ['key' => 'security_checker.issues.contains_account_info', 'params' => []];
+                $recs[]   = ['key' => 'security_checker.recs.avoid_account_info', 'params' => []];
                 break;
             }
         }
@@ -291,31 +281,53 @@ foreach ($allCreds as $cred) {
         // Séquences simples
         if (preg_match('/(0123|1234|2345|3456|4567|5678|6789|abcd|qwerty|azerty)/i', $pwd)) {
             $score -= 15;
-            $issues[] = 'Séquence simple détectée';
-            $recs[] = 'Évite les suites (1234, azerty, qwerty…).';
+            $issues[] = ['key' => 'security_checker.issues.simple_sequence', 'params' => []];
+            $recs[]   = ['key' => 'security_checker.recs.avoid_sequences', 'params' => []];
         }
 
         // Répétitions
         if (preg_match('/(.)\1\1/', $pwd)) {
             $score -= 10;
-            $issues[] = 'Répétitions détectées';
-            $recs[] = 'Évite les répétitions (aaa, 111…).';
+            $issues[] = ['key' => 'security_checker.issues.repetitions', 'params' => []];
+            $recs[]   = ['key' => 'security_checker.recs.avoid_repetitions', 'params' => []];
         }
 
         $score = max(0, min(100, $score));
-        $label = match (true) {
-            $score >= 80 => 'Fort',
-            $score >= 60 => 'Bon',
-            $score >= 40 => 'Moyen',
-            default => 'Faible',
+
+        $labelKey = match (true) {
+            $score >= 80 => 'strong',
+            $score >= 60 => 'good',
+            $score >= 40 => 'medium',
+            default => 'weak',
         };
 
         if ($score < 40) {
-            $issues[] = 'Mot de passe faible';
-            $recs[] = 'Utilise une phrase de passe (4+ mots) ou un générateur.';
+            $issues[] = ['key' => 'security_checker.issues.weak_password', 'params' => []];
+            $recs[]   = ['key' => 'security_checker.recs.use_passphrase_or_generator', 'params' => []];
         }
 
-        return [$score, $label, array_values(array_unique($issues)), array_values(array_unique($recs))];
+        return [$score, $labelKey, $issues, $recs];
+    }
+
+    /**
+     * Merge sans doublons par key+params sérialisés
+     * @param array<int,array{key:string,params:array}> $a
+     * @param array<int,array{key:string,params:array}> $b
+     * @return array<int,array{key:string,params:array}>
+     */
+    private function mergeMessages(array $a, array $b): array
+    {
+        $seen = [];
+        $out = [];
+
+        foreach (array_merge($a, $b) as $m) {
+            $k = $m['key'].'|'.json_encode($m['params'] ?? [], JSON_UNESCAPED_UNICODE);
+            if (isset($seen[$k])) continue;
+            $seen[$k] = true;
+            $out[] = $m;
+        }
+
+        return $out;
     }
 
     private function generateStrongPassword(int $length = 18): string

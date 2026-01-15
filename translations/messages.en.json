@@ -503,7 +503,9 @@
       }
     }
   },
-   "dashboard": {
+
+"dashboard": {
+    "title": "Dashboard",
     "stats": {
       "credentials": "Credentials",
       "teams": "Teams",
@@ -511,8 +513,13 @@
       "drafts": "Drafts",
       "change": {
         "plus_this_month": "+ this month",
+        "plus_this_week": "+ this week",
         "stable": "Stable",
-        "plus_this_week": "+ this week"
+
+        "plus_n_this_month": "+%count% this month",
+        "minus_n_this_month": "-%count% this month",
+        "plus_n_this_week": "+%count% this week",
+        "minus_n_this_week": "-%count% this week"
       }
     },
     "recent_activity": {
@@ -558,14 +565,166 @@
       "strong_passwords": "strong passwords",
       "weak_passwords": "weak passwords to improve",
       "reused_passwords": "reused passwords",
+      "expired_passwords": "passwords to rotate",
+      "undecipherable": "undecipherable passwords",
       "improve": "Improve my security"
     },
-     "activity": {
+    "activity": {
       "credential_created": { "title": "New credential created" },
       "draft_created": { "title": "Draft created" },
       "share_created": { "title": "Access shared" },
       "fallback_credential": "Credential",
       "fallback_unnamed": "Untitled"
+    }
+  },
+  "generator": {
+    "title": "Generator",
+    "subtitle": "Create a strong password and save it.",
+    "copy": "Copy",
+    "generate": "Generate",
+    "password_length": "Password length",
+    "uppercase": "Uppercase (A-Z)",
+    "lowercase": "Lowercase (a-z)",
+    "numbers": "Numbers (0-9)",
+    "symbols": "Symbols (!@#$...)",
+    "entropy": "Entropy: %bits% bits",
+    "entropy_empty": "Entropy: —",
+    "strength": "Strength: %label%",
+    "strength_empty": "Strength: —",
+    "strength_labels": {
+      "strong": "Strong",
+      "medium": "Medium",
+      "weak": "Weak"
+    },
+
+    "history": {
+      "title": "History",
+      "subtitle": "Manage your passwords",
+      "tabs": { "recents": "Recents", "drafts": "Saved" },
+      "tooltip": "You can convert your drafts into permanent passwords in your vault — easy to find and protected.",
+      "delete_all": "Delete all"
+    },
+
+    "modals": {
+      "save": { "title": "Save", "placeholder": "Draft name", "cancel": "Cancel", "confirm": "Save" },
+      "convert": { "title": "Convert", "name": "Name", "domain": "Domain", "username": "Username", "cancel": "Cancel", "confirm": "Convert" },
+      "confirm_clear": { "title": "Delete all?", "text": "Delete all recents?", "cancel": "Cancel", "confirm": "Confirm" }
+    },
+
+    "list": {
+      "empty_recents": "No password",
+      "loading": "Loading...",
+      "empty_drafts": "No drafts"
+    },
+
+    "toast": {
+      "options": "Options",
+      "choose_one_type": "Choose at least one character type.",
+      "copied_title": "Copied",
+      "copied_msg": "Password copied!",
+      "cleaned_title": "Cleaned",
+      "cleaned_msg": "All recents have been removed.",
+      "deleted_title": "Deleted",
+      "deleted_msg": "Item removed.",
+      "draft_title": "Draft",
+      "draft_saved": "Saved!",
+      "name_required_title": "Name required",
+      "name_required_msg": "Please enter a name.",
+      "error_title": "Error",
+      "save_failed": "Unable to save.",
+      "converted_title": "Converted",
+      "converted_msg": "Draft converted!",
+      "failed": "Failed.",
+      "network_error_title": "Network error",
+      "network_error_msg": "Check your connection.",
+      "load_error": "Loading error."
+    }
+  },
+  "security_checker": {
+    "title": "Security checker",
+    "page_title": "Security checker",
+
+    "global_score": {
+      "label": "Overall score",
+      "based_on_decipherable": "Based on decipherable passwords"
+    },
+
+    "summary": {
+      "title": "Summary",
+      "total": "Total",
+      "weak": "Weak",
+      "reused": "Reused",
+      "rotate_due": "To rotate (+%days%d)",
+      "undecipherable": "Undecipherable",
+      "rotation_rule": "Rotation rule: recommended change every %days% days (~4 months)."
+    },
+
+    "details": {
+      "title": "Details per access"
+    },
+
+    "item": {
+      "domain": "Domain",
+      "username": "Username",
+
+      "last_change": "Last change",
+      "date": "Date",
+      "days_ago": "%days% days ago",
+      "rotate_now": "To rotate",
+
+      "issues": "Detected issues",
+      "no_issues": "No issues detected",
+
+      "recommendations": "Recommendations",
+
+      "suggested_password": "Suggested password",
+      "copy_password": "Copy password"
+    },
+
+    "labels": {
+      "strong": "Strong",
+      "good": "Good",
+      "medium": "Medium",
+      "weak": "Weak",
+      "unknown": "Unknown"
+    },
+
+    "toast": {
+      "password_copied": "Password copied!",
+      "password_not_found": "Password not found",
+      "copy_error": "Copy error"
+    },
+    "issues": {
+      "reused": "Password reused",
+      "rotation_due": "Password should be rotated (>%days% days)",
+      "undecipherable": "Unable to decrypt (missing key or invalid data)",
+      "too_short": "Too short",
+      "too_common": "Too common password",
+      "contains_account_info": "Contains account-related information",
+      "simple_sequence": "Simple sequence detected",
+      "repetitions": "Repetitions detected",
+      "weak_password": "Weak password"
+    },
+    "recs": {
+      "unique_per_service": "Use a unique password per service (no reuse).",
+      "plan_rotation": "Plan a password change (rotation).",
+      "check_owner_key": "Check that the owner has an apiExtensionToken and the encrypted password is valid.",
+      "length_12_16": "Use 12–16+ characters (ideally 16+).",
+      "add_upper": "Add at least one uppercase letter.",
+      "add_lower": "Add at least one lowercase letter.",
+      "add_digit": "Add at least one digit.",
+      "add_symbol": "Add at least one special character (e.g., !@#…).",
+      "avoid_common": "Avoid well-known/common passwords (easy to guess).",
+      "avoid_account_info": "Avoid putting username/name/domain in the password.",
+      "avoid_sequences": "Avoid sequences (1234, qwerty, azerty…).",
+      "avoid_repetitions": "Avoid repetitions (aaa, 111…).",
+      "use_passphrase_or_generator": "Use a passphrase (4+ words) or a generator."
+    },
+    "notifications": {
+      "weak": {
+        "title": "Security: credential to improve",
+        "message": "A credential is weak. Consider strengthening it."
+      }
     }
   },
     "subscription": {
