@@ -103,29 +103,35 @@ private CredentialRepository $credentialRepository,
         $plainById = [];
         $hashCounts = [];
 
-        foreach ($allCreds as $cred) {
-            $owner = $cred->getUser();
-            $ownerKey = $owner?->getApiExtensionToken();
+$viewerKey = $viewer->getApiExtensionToken() ?? '';
 
-            if (!$ownerKey) {
-                $plainById[$cred->getId()] = null;
-                continue;
-            }
+foreach ($allCreds as $cred) {
+    $owner = $cred->getUser();
+    $ownerKey = $owner?->getApiExtensionToken();
 
-            // Clé = token du owner (sinon impossible de déchiffrer un password chiffré par lui)
-            $this->encryptionService->setEncryptionKey($ownerKey);
-            $plain = $this->encryptionService->decrypt((string) $cred->getPassword());
+    if (!$ownerKey) {
+        $plainById[$cred->getId()] = null;
+        continue;
+    }
 
-            // Remettre la clé du viewer (propreté)
-            $this->encryptionService->setEncryptionKey($viewerKey);
+    // ✅ utiliser le nouveau mode
+    $this->encryptionService->setKeyFromUserToken($ownerKey);
 
-            $plainById[$cred->getId()] = $plain !== '' ? $plain : null;
+    $plain = $this->encryptionService->decrypt((string) $cred->getPassword());
 
-            if ($plain !== '') {
-                $h = hash('sha256', $plain);
-                $hashCounts[$h] = ($hashCounts[$h] ?? 0) + 1;
-            }
-        }
+    // ✅ remettre la clé du viewer si tu veux garder une "propreté" globale
+    if ($viewerKey !== '') {
+        $this->encryptionService->setKeyFromUserToken($viewerKey);
+    }
+
+    $plainById[$cred->getId()] = $plain !== '' ? $plain : null;
+
+    if ($plain !== '') {
+        $h = hash('sha256', $plain);
+        $hashCounts[$h] = ($hashCounts[$h] ?? 0) + 1;
+    }
+}
+
 
         // 2e passage : analyse
         $items = [];
