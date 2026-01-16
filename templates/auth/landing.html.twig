@@ -252,10 +252,11 @@ img[loading="lazy"]{content-visibility:auto}
       <a href="#features" class="nav-link">{{ 'landing.nav.features'|trans }}</a>
       <a href="#how-it-works" class="nav-link">{{ 'landing.nav.how_it_works'|trans }}</a>
       <a href="#pricing" class="nav-link">{{ 'landing.nav.pricing'|trans }}</a>
-     <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
-       hreflang="{{ app.request.locale }}" class="nav-link">
-        {{ 'landing.footer.links.blog'|trans }}
-    </a>
+<a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
+   lang="{{ app.request.locale }}" class="nav-link">
+  {{ 'landing.footer.links.blog'|trans }}
+</a>
+
 
       <div class="nav-cta nav-cta-mobile">
         <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
