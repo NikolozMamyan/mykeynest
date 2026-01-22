@@ -249,29 +249,57 @@ public function apiCredentials(
 }
 
 
-    #[Route('/extention/api/credentials/{id}/reveal', name: 'api_credential_reveal', methods: ['POST', 'OPTIONS'])]
-    public function reveal(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
-    {
-        if ($pf = $this->preflight($request)) return $pf;
+   #[Route('/extention/api/credentials/{id}/reveal', name: 'api_credential_reveal', methods: ['POST', 'OPTIONS'])]
+public function reveal(
+    Request $request,
+    int $id,
+    CredentialRepository $credentialRepository,
+    SharedAccessRepository $sharedAccessRepo,
+    TeamRepository $teamRepo
+): JsonResponse {
+    if ($pf = $this->preflight($request)) return $pf;
 
-        $auth = $this->authenticate($request);
-        if (!$auth) return $this->unauthorized('Token manquant ou invalide');
-        if (isset($auth['rate_limited'])) return $auth['rate_limited'];
+    $auth = $this->authenticate($request);
+    if (!$auth) return $this->unauthorized('Token manquant ou invalide');
+    if (isset($auth['rate_limited'])) return $auth['rate_limited'];
 
-        $user = $auth['user'];
+    /** @var \App\Entity\User $user */
+    $user = $auth['user'];
 
-        $cred = $credentialRepository->find($id);
-        if (!$cred || $cred->getUser()?->getId() !== $user->getId()) {
-            return $this->cors($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
-        }
-
-        // ✅ reveal 1 seul secret
-$password = $this->encryptionService->decrypt((string) $cred->getPassword());
-
-
-        return $this->cors($this->json([
-            'id' => $cred->getId(),
-            'password' => $password,
-        ]));
+    $cred = $credentialRepository->find($id);
+    if (!$cred) {
+        return $this->cors($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
     }
+
+    $isOwner = ($cred->getUser()?->getId() === $user->getId());
+
+    // 1) SharedAccess direct (guest)
+    // -> idéalement une méthode repo dédiée (voir plus bas)
+    $hasDirectShare = $sharedAccessRepo->userHasAccessToCredential($user, $cred);
+
+    // 2) Shared via Team
+    // -> idéalement une méthode repo dédiée aussi
+    $hasTeamShare = $teamRepo->userHasTeamAccessToCredential($user, $cred);
+
+    if (!$isOwner && !$hasDirectShare && !$hasTeamShare) {
+        return $this->cors($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
+        // (tu peux aussi renvoyer 403, mais 404 évite de leak l’existence)
+    }
+
+    // ⚠️ IMPORTANT: déchiffrement avec la clé du OWNER (sinon un guest ne pourra pas decrypt)
+    $owner = $cred->getUser();
+    if (!$owner || !$owner->getApiExtensionToken()) {
+        return $this->cors($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT));
+    }
+
+    $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+
+    $password = $this->encryptionService->decrypt((string) $cred->getPassword());
+
+    return $this->cors($this->json([
+        'id' => $cred->getId(),
+        'password' => $password,
+    ]));
+}
+
 }

@@ -4,8 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Team;
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Credential;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Team>
@@ -52,5 +53,20 @@ public function findTeamWithCredentialsByUser(User $user): array
         ->getQuery()
         ->getResult();
 }
+public function userHasTeamAccessToCredential(User $user, Credential $cred): bool
+{
+    return (bool) $this->createQueryBuilder('t')
+        ->select('1')
+        ->join('t.members', 'tm')          // TeamMember
+        ->join('t.credentials', 'c')       // Credential
+        ->andWhere('tm.user = :user')
+        ->andWhere('c = :cred')
+        ->setParameter('user', $user)
+        ->setParameter('cred', $cred)
+        ->setMaxResults(1)
+        ->getQuery()
+        ->getOneOrNullResult();
+}
+
 
 }
