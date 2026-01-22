@@ -32,4 +32,25 @@ class TeamRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
+
+public function findTeamWithCredentialsByUser(User $user): array
+{
+    return $this->createQueryBuilder('t')
+        ->innerJoin('t.members', 'tm')
+        ->addSelect('tm')
+        ->innerJoin('tm.user', 'mu')
+        ->addSelect('mu')
+        ->innerJoin('t.owner', 'o')
+        ->addSelect('o')
+        ->andWhere('tm.user = :user')
+        ->setParameter('user', $user)
+        ->leftJoin('t.credentials', 'c')
+        ->addSelect('c')
+        ->addOrderBy('t.name', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
 }

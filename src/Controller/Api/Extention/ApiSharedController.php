@@ -4,15 +4,17 @@ namespace App\Controller\Api\Extention;
 
 use App\Entity\Credential;
 use App\Entity\Notification;
+use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
-use App\Repository\CredentialRepository;
 use App\Service\EncryptionService;
+use App\Repository\CredentialRepository;
+use App\Repository\SharedAccessRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ApiSharedController extends AbstractController
 {
@@ -148,29 +150,104 @@ class ApiSharedController extends AbstractController
         return $this->cors($this->json(['credentials' => $result]));
     }
 
-    #[Route('/extention/api/credentials/list', name: 'api_credential_list', methods: ['GET', 'OPTIONS'])]
-    public function apiCredentials(Request $request, CredentialRepository $credentialRepository): JsonResponse
-    {
-        if ($pf = $this->preflight($request)) return $pf;
+#[Route('/extention/api/credentials/list', name: 'api_credential_list', methods: ['GET', 'OPTIONS'])]
+public function apiCredentials(
+    Request $request,
+    CredentialRepository $credentialRepository,
+    SharedAccessRepository $sharedAccessRepo,
+    TeamRepository $teamRepo
+): JsonResponse {
+    if ($pf = $this->preflight($request)) return $pf;
 
-        $auth = $this->authenticate($request);
-        if (!$auth) return $this->unauthorized('Token manquant ou invalide');
-        if (isset($auth['rate_limited'])) return $auth['rate_limited'];
+    $auth = $this->authenticate($request);
+    if (!$auth) return $this->unauthorized('Token manquant ou invalide');
+    if (isset($auth['rate_limited'])) return $auth['rate_limited'];
 
-        $user = $auth['user'];
+    /** @var \App\Entity\User $user */
+    $user = $auth['user'];
 
-        $credentials = $credentialRepository->findCredentialsByUser($user);
+    // 1) Credentials perso
+    $credentials = $credentialRepository->findCredentialsByUser($user);
 
-        // ✅ pas de password
-        $result = array_map(fn (Credential $c) => [
-            'id'       => $c->getId(),
-            'domain'   => $c->getDomain(),
-            'username' => $c->getUsername(),
-            'name'     => $c->getName(),
-        ], $credentials);
+    // 2) Partages directs
+    $sharedAccess = $sharedAccessRepo->findSharedWith($user);
 
-        return $this->cors($this->json(['credentials' => $result]));
-    }
+    // 3) Teams + credentials
+    $teams = $teamRepo->findTeamWithCredentialsByUser($user);
+
+    // Helpers (évite de répéter)
+    $userPayload = static fn(\App\Entity\User $u) => [
+        'id'    => $u->getId(),
+        'email' => $u->getEmail(),
+        // optionnel : nom/prenom si tu as getters
+        // 'prenom' => $u->getPrenom(),
+        // 'nom' => $u->getNom(),
+    ];
+
+    $credentialPayload = static fn(\App\Entity\Credential $c) => [
+        'id'       => $c->getId(),
+        'domain'   => $c->getDomain(),
+        'username' => $c->getUsername(),
+        'name'     => $c->getName(),
+        // pas de password ✅
+    ];
+
+    // ---- credentials (perso)
+    $resultCredentials = array_map(
+        fn(\App\Entity\Credential $c) => $credentialPayload($c),
+        $credentials
+    );
+
+    // ---- sharedAccess (direct)
+    $resultSharedAccess = array_map(function (\App\Entity\SharedAccess $sa) use ($userPayload, $credentialPayload) {
+        return [
+            'id'        => $sa->getId(),
+            'createdAt' => $sa->getCreatedAt()?->format(DATE_ATOM),
+
+            // qui partage ?
+            'owner'     => $userPayload($sa->getOwner()),
+
+            // partagé avec qui ?
+            'guest'     => $userPayload($sa->getGuest()),
+
+            // quoi ?
+            'credential' => $credentialPayload($sa->getCredential()),
+        ];
+    }, $sharedAccess);
+
+    // ---- teamSharedAccess (teams)
+    $resultTeamSharedAccess = array_map(function (\App\Entity\Team $t) use ($userPayload, $credentialPayload) {
+        // members -> users (selon ton TeamMember)
+        $members = [];
+        foreach ($t->getMembers() as $tm) {
+            // si TeamMember a getUser()
+            $members[] = $userPayload($tm->getUser());
+        }
+
+        $teamCredentials = [];
+        foreach ($t->getCredentials() as $c) {
+            $teamCredentials[] = $credentialPayload($c);
+        }
+
+        return [
+            'team' => [
+                'id'        => $t->getId(),
+                'name'      => $t->getName(),
+                'createdAt' => $t->getCreatedAt()->format(DATE_ATOM),
+                'owner'     => $userPayload($t->getOwner()),
+                'members'   => $members,
+            ],
+            'credentials' => $teamCredentials,
+        ];
+    }, $teams);
+
+    return $this->cors($this->json([
+        'credentials'      => $resultCredentials,
+        'sharedAccess'     => $resultSharedAccess,
+        'teamSharedAccess' => $resultTeamSharedAccess,
+    ]));
+}
+
 
     #[Route('/extention/api/credentials/{id}/reveal', name: 'api_credential_reveal', methods: ['POST', 'OPTIONS'])]
     public function reveal(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
