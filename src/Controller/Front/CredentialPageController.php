@@ -7,6 +7,7 @@ use App\Form\CredentialType;
 use App\Service\CredentialManager;
 use App\Service\SecurityCheckerService;
 use App\Repository\CredentialRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SharedAccessRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,7 @@ final class CredentialPageController extends AbstractController
     public function __construct(
         private CredentialManager $credentialManager,
         private SecurityCheckerService $checker,
+        private EntityManagerInterface $entityManager
     ) {}
 
     #[Route('/app/credential', name: 'app_credential')]
@@ -40,6 +42,7 @@ final class CredentialPageController extends AbstractController
         $credential = new Credential();
         $form = $this->createForm(CredentialType::class, $credential, [
     'user' => $this->getUser(),
+    'is_edit' => false
 ]);
 
         $form->handleRequest($request);
@@ -70,32 +73,47 @@ final class CredentialPageController extends AbstractController
         ]);
     }
 
-    #[Route('/app/credential/{id}/edit', name: 'credential_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Credential $credential): Response
-    {
-        $originalEncryptedPassword = $credential->getPassword();
-        $decryptedPassword = $this->credentialManager->decryptPassword($credential);
-        $credential->setPassword($decryptedPassword);
+#[Route('/app/credential/{id}/edit', name: 'credential_edit', methods: ['GET', 'POST'])]
+public function edit(Request $request, Credential $credential): Response
+{
+    // Sauvegarder le mot de passe chiffré original
+    $originalEncryptedPassword = $credential->getPassword();
+    
+    // Déchiffrer le mot de passe pour la comparaison
+    $decryptedPassword = $this->credentialManager->decryptPassword($credential);
+    
+    $form = $this->createForm(CredentialType::class, $credential, [
+        'user' => $this->getUser(),
+        'is_edit' => true,
+    ]);
 
-        $form = $this->createForm(CredentialType::class, $credential, [
-    'user' => $this->getUser(),
-]);
+    $form->handleRequest($request);
 
-        $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Récupérer le nouveau mot de passe du formulaire (champ non mappé)
+        $newPassword = $form->get('password')->getData();
+        
+        // Si un nouveau mot de passe est fourni, on l'utilise
+        // Sinon on utilise le mot de passe déchiffré actuel
+        $passwordToUse = !empty($newPassword) ? $newPassword : $decryptedPassword;
+        
+        // Mettre temporairement le mot de passe dans l'entité pour que update() puisse le comparer
+        $credential->setPassword($passwordToUse);
+        
+        // Utiliser la méthode update du CredentialManager
+        $this->credentialManager->update($credential, $decryptedPassword, $originalEncryptedPassword);
+        
+        $this->addFlash('success', 'Identifiant mis à jour avec succès.');
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->credentialManager->update($credential, $decryptedPassword, $originalEncryptedPassword);
-            $this->addFlash('success', 'Identifiant mis à jour avec succès.');
-
-            return $this->redirectToRoute('app_credential');
-        }
-
-        return $this->render('credential/edit.html.twig', [
-            'form' => $form,
-            'heading' => 'Mes accès',
-            'credential' => $credential
-        ]);
+        return $this->redirectToRoute('app_credential');
     }
+
+    return $this->render('credential/edit.html.twig', [
+        'form' => $form,
+        'heading' => 'Mes accès',
+        'credential' => $credential
+    ]);
+}
 
     #[Route('/app/credential/{id}', name: 'credential_delete', methods: ['POST'])]
     public function delete(Request $request, Credential $credential): Response

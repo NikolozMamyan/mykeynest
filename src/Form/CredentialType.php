@@ -18,6 +18,7 @@ class CredentialType extends AbstractType
     {
         /** @var \App\Entity\User|null $user */
         $user = $options['user'] ?? null;
+        $isEdit = $options['is_edit'] ?? false;
 
         $builder
             ->add('name', TextType::class, [
@@ -34,7 +35,11 @@ class CredentialType extends AbstractType
             ])
             ->add('password', PasswordType::class, [
                 'label' => 'Mot de passe',
-                'attr' => ['placeholder' => '********'],
+                'required' => !$isEdit,
+                'mapped' => !$isEdit, // 👈 Non mappé en mode édition
+                'attr' => [
+                    'placeholder' => $isEdit ? 'Laissez vide pour conserver le mot de passe actuel' : '********'
+                ],
             ]);
 
         if ($user) {
@@ -43,9 +48,9 @@ class CredentialType extends AbstractType
                 'choice_label' => 'name',
                 'label'        => 'Équipes (optionnel)',
                 'multiple'     => true,
-                'expanded'     => true, // ou false si tu préfères un multiselect
+                'expanded'     => true,
                 'required'     => false,
-                'by_reference' => false, // 🔥 pour déclencher addTeam()
+                'by_reference' => false,
                 'query_builder' => function (TeamRepository $repo) use ($user) {
                     return $repo->createQueryBuilder('t')
                         ->join('t.members', 'm')
@@ -62,6 +67,7 @@ class CredentialType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Credential::class,
             'user'       => null,
+            'is_edit'    => false,
         ]);
     }
 }
