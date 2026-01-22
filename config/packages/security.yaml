@@ -32,7 +32,7 @@ security:
         # Public API
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout, roles: IS_AUTHENTICATED_FULLY }
 
         # API sécurisée
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }

@@ -125,7 +125,7 @@ final class AuthController extends AbstractController
         Cookie::create('AUTH_TOKEN')
             ->withValue($token)
             ->withHttpOnly(true)
-            ->withSecure(false)
+            ->withSecure(true)
             ->withPath('/')
             ->withExpires($expiresAt->getTimestamp())
     );
@@ -171,7 +171,7 @@ final class AuthController extends AbstractController
             Cookie::create('AUTH_TOKEN')
                 ->withValue($token)
                 ->withHttpOnly(true)
-                ->withSecure(false)
+                ->withSecure(true)
                 ->withPath('/')
                 ->withExpires($expiresAt->getTimestamp())
         );
