@@ -66,6 +66,7 @@
 
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+                        padding-top:50px;
         }
 
         body::before,
@@ -414,32 +415,7 @@ main {
 
 <body>
 
-<nav>
-<div class="nav-container">
-    {% include 'components/parts/logo.html.twig' %}
-
-    <div class="lang-switch">
-        {% if app.request.locale == 'fr' %}
-            <a href="{{ vm.url_fr }}" class="lang-option active" lang="fr" aria-current="true">
-                <span class="lang-flag">🇫🇷</span>
-
-            </a>
-            <a href="{{ vm.url_en }}" class="lang-option" lang="en" hreflang="en">
-                <span class="lang-flag">🇬🇧</span>
-
-            </a>
-        {% else %}
-            <a href="{{ vm.url_en }}" class="lang-option active" lang="en" aria-current="true">
-                <span class="lang-flag">🇬🇧</span>
-
-            </a>
-            <a href="{{ vm.url_fr }}" class="lang-option" lang="fr" hreflang="fr">
-                <span class="lang-flag">🇫🇷</span>
-
-            </a>
-        {% endif %}
-    </div>
-</nav>
+  {% include 'components/nav.html.twig' %}
 
 <main>
     {% block body %}{% endblock %}

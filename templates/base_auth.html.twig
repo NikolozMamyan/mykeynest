@@ -79,7 +79,13 @@
     </script>
   </head>
 
-  <body>
+  <body style="padding-top:50px;">
+  {% set route = app.request.attributes.get('_route') %}
+
+{% if route not in ['show_login', 'show_register'] %}
+  {% include 'components/nav.html.twig' %}
+{% endif %}
+
     {% block body %}{% endblock %}
   </body>
 </html>

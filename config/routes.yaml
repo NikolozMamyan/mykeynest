@@ -6,13 +6,13 @@ controllers:
 
 blog_index:
   path: /{_locale}/blog
-  controller: App\Controller\BlogController::index
+  controller: App\Controller\Front\Resources\BlogController::index
   requirements:
     _locale: fr|en
 
 
 blog_article_show:
   path: /{_locale}/blog/{slug}
-  controller: App\Controller\BlogController::show
+  controller: App\Controller\Front\Resources\BlogController::show
   requirements:
     _locale: fr|en    

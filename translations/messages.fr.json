@@ -248,6 +248,7 @@
         "blog": "Blog",
         "contact": "Contact",
         "help_center": "Centre d'aide",
+        "generator" : "Générateur",
         "documentation": "Documentation",
         "guides": "Guides",
         "privacy": "Confidentialité",
@@ -947,6 +948,94 @@
         "name_placeholder": "Ex: Équipe Marketing",
         "credentials_help": "Sélectionnez les credentials à partager immédiatement avec cette équipe"
       }
+    }
+  },
+   "public_generator": {
+    "hero": {
+      "title_before": "Créez des",
+      "title_highlight": "mots de passe",
+      "title_after": "ultra-sécurisés en un clic",
+      "subtitle": "Protégez vos comptes avec des mots de passe impossibles à craquer. Génération instantanée, personnalisation complète et sécurité maximale.",
+      "trust": {
+        "no_storage": "Aucun stockage",
+        "client_side": "100% côté client",
+        "open_source": "Open source"
+      }
+    },
+    "generator": {
+      "placeholder": "Cliquez pour générer",
+      "actions": {
+        "copy": "Copier le mot de passe",
+        "regenerate": "Régénérer"
+      },
+      "strength": {
+        "label": "Force du mot de passe",
+        "value": "-"
+      },
+      "length": {
+        "label": "Longueur du mot de passe"
+      },
+      "options": {
+        "uppercase": "Majuscules (A-Z)",
+        "lowercase": "Minuscules (a-z)",
+        "numbers": "Chiffres (0-9)",
+        "symbols": "Symboles (!@#$)"
+      },
+      "generate_button": "Générer"
+    },
+    "features": {
+      "title": "Pourquoi choisir notre générateur ?",
+      "subtitle": "La sécurité et la simplicité au service de vos données",
+      "items": [
+        {
+          "title": "Sécurité maximale",
+          "description": "Génération cryptographiquement sécurisée utilisant les algorithmes les plus robustes. Vos mots de passe sont impossibles à deviner ou à craquer."
+        },
+        {
+          "title": "Instantané et gratuit",
+          "description": "Créez des mots de passe en une fraction de seconde, sans inscription, sans limite et totalement gratuitement."
+        },
+        {
+          "title": "100% privé",
+          "description": "Tout se passe dans votre navigateur. Aucune donnée n'est envoyée à nos serveurs. Vos mots de passe restent totalement confidentiels."
+        },
+        {
+          "title": "Personnalisable",
+          "description": "Ajustez la longueur et choisissez les types de caractères selon vos besoins ou les exigences de chaque site web."
+        },
+        {
+          "title": "Analyse de force",
+          "description": "Visualisez instantanément la robustesse de votre mot de passe grâce à notre indicateur de force en temps réel."
+        },
+        {
+          "title": "Copie en un clic",
+          "description": "Copiez vos mots de passe générés directement dans votre presse-papiers pour une utilisation immédiate et pratique."
+        }
+      ]
+    },
+    "seo": {
+      "title": "Comment créer un mot de passe vraiment sécurisé ?",
+      "intro": "La sécurité de vos comptes en ligne commence par des mots de passe robustes. Notre générateur de mot de passe gratuit utilise des algorithmes cryptographiques avancés pour créer des combinaisons uniques et impossibles à deviner.",
+      "good_password_title": "Les caractéristiques d'un bon mot de passe",
+      "good_password_text": "Un mot de passe sécurisé doit combiner plusieurs éléments essentiels. Il doit être suffisamment long (au moins 12 caractères), mélanger différents types de caractères (majuscules, minuscules, chiffres et symboles), et surtout être unique pour chaque compte.",
+      "why_generator_title": "Pourquoi utiliser un générateur de mot de passe ?",
+      "why_generator_text": "Les mots de passe créés par les humains sont souvent prévisibles et vulnérables. Notre outil génère des mots de passe totalement aléatoires qui offrent une protection optimale contre les attaques par force brute et les tentatives de piratage. Chaque mot de passe généré est unique et cryptographiquement sûr.",
+      "tips_title": "Conseils pour gérer vos mots de passe",
+      "tips": [
+        "Utilisez un mot de passe différent pour chaque compte important",
+        "Privilégiez les mots de passe d'au moins 16 caractères",
+        "Activez l'authentification à deux facteurs quand c'est possible",
+        "Utilisez un gestionnaire de mots de passe sécurisé comme MykeyNest",
+        "Changez régulièrement vos mots de passe sensibles",
+        "Ne partagez jamais vos mots de passe par email ou SMS"
+      ],
+      "tech_title": "La technologie derrière notre générateur",
+      "tech_text": "Notre générateur utilise l'API Web Crypto native de votre navigateur pour produire des nombres véritablement aléatoires. Contrairement aux générateurs pseudo-aléatoires classiques, cette méthode garantit une entropie maximale et une sécurité cryptographique de niveau professionnel."
+    },
+    "cta": {
+      "title": "Prêt à sécuriser vos comptes ?",
+      "description": "Rejoignez des milliers d'utilisateurs qui protègent leurs données avec MykeyNest",
+      "button": "Créer un compte gratuit"
     }
   }
 }

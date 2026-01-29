@@ -19,38 +19,6 @@
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 @keyframes scaleIn { from {opacity:0; transform:scale(.95)} to {opacity:1; transform:scale(1)} }
 
-/* === NAVIGATION === */
-.landing-nav{
-  position:fixed; inset:0 0 auto 0; height:64px;
-  background:rgba(255,255,255,.98); backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--color-border); z-index:1000;
-  display:flex; align-items:center; padding:0;
-}
-.nav-container{ max-width:1280px; margin:0 auto; padding:0 1rem; display:flex; align-items:center; justify-content:space-between; width:100% }
-.landing-nav.scrolled{box-shadow:var(--shadow-sm)}
-.nav-toggle{ display:inline-flex; align-items:center; gap:.5rem; border:1px solid var(--color-border); background:#fff; border-radius:8px; padding:.5rem .75rem; width:50px;}
-.nav-links{
-  display:none; position:fixed; left:0; right:0; top:64px;
-  background:#fff; border-bottom:1px solid var(--color-border);
-  padding:1rem 1.25rem; gap:1rem; flex-direction:column;
-  z-index:999;
-}
-.nav-links.active{ display:flex; animation:fadeIn .2s ease }
-
-/* CTA desktop visible / CTA mobile cachés par défaut */
-.nav-cta{ display:none; gap:.75rem; align-items:center }
-.nav-cta-mobile{ display:flex; gap:.75rem; margin-top:.5rem }
-
-/* Overlay fond noir léger quand le menu est ouvert */
-.nav-overlay{
-  position:fixed; inset:64px 0 0 0; background:rgba(0,0,0,.35);
-  opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:998;
-}
-
-/* Liens du menu */
-.nav-link{color:var(--color-text-medium);text-decoration:none;font-weight:500;font-size:.95rem;transition:color .3s ease;position:relative}
-.nav-link:hover{color:var(--color-primary)}
-
 .btn{padding:.625rem 1.25rem;border-radius:var(--border-radius-sm);font-weight:600;font-size:.9rem;text-decoration:none;transition:all .3s ease;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;min-height:44px}
 .btn-outline{color:var(--color-text-dark);background:transparent;border:1px solid var(--color-border)}
 .btn-outline:hover{background:var(--color-bg-light);border-color:var(--color-primary);color:var(--color-primary)}
@@ -195,20 +163,14 @@
 
 
 /* === RESPONSIVE GLOBAL === */
-@media (min-width:1025px){
-  .nav-toggle{ display:none }
-  .nav-links{ display:flex; position:static; padding:0; flex-direction:row; gap:2rem; border:0; background:transparent }
-  .nav-cta{ display:flex }
-  .nav-cta-mobile{ display:none }
-  .nav-overlay{ display:none }
+
+
+@media (max-width: 900px){
+  .pricing-grid{grid-template-columns:1fr;max-width:720px}
 }
 @media (max-width: 1024px){
   .hero-content{grid-template-columns:1fr;gap:3rem}
-  .nav-links{display:none;position:fixed;inset:64px 0 auto 0;background:#fff;border-bottom:1px solid var(--color-border);padding:1rem 2rem;gap:1rem;flex-direction:column}
-  .nav-links.active{display:flex;animation:fadeIn .2s ease}
-}
-@media (max-width: 900px){
-  .pricing-grid{grid-template-columns:1fr;max-width:720px}
+
 }
 @media (max-width: 768px){
   .hero-text h1{font-size:2.25rem}
@@ -238,47 +200,6 @@
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 img[loading="lazy"]{content-visibility:auto}
 </style>
-
-{# ===================== NAVIGATION ===================== #}
-<nav class="landing-nav" id="navbar" role="navigation" aria-label="{{ 'landing.nav.aria'|trans }}">
-  <div class="nav-container">
-    {% include 'components/parts/logo.html.twig' %}
-
-    <button class="btn nav-toggle" id="mobile-menu-btn" aria-controls="primary-nav" aria-expanded="false">
-      <i class="fas fa-bars" aria-hidden="true"></i> {{ 'landing.nav.menu'|trans }}
-    </button>
-
-    <div class="nav-links" id="primary-nav">
-      <a href="#features" class="nav-link">{{ 'landing.nav.features'|trans }}</a>
-      <a href="#how-it-works" class="nav-link">{{ 'landing.nav.how_it_works'|trans }}</a>
-      <a href="#pricing" class="nav-link">{{ 'landing.nav.pricing'|trans }}</a>
-<a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
-   lang="{{ app.request.locale }}" class="nav-link">
-  {{ 'landing.footer.links.blog'|trans }}
-</a>
-
-
-      <div class="nav-cta nav-cta-mobile">
-        <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
-        <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
-      </div>
-    </div>
-
-    <div class="nav-cta">
-      <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
-      <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
-
-      <div class="nav-lang" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
-        {% include "components/parts/lang_switcher.html.twig" %}
-      </div>
-    </div>
-  </div>
-</nav>
-
-{# Overlay pour le menu mobile #}
-<div class="nav-overlay" id="nav-overlay"></div>
-
-
 {# ===================== HERO SECTION ===================== #}
 <section class="hero-section" role="banner" id="main-content">
   <div class="hero-content">
@@ -628,6 +549,7 @@ img[loading="lazy"]{content-visibility:auto}
     <li><a href="#">{{ 'landing.footer.links.help_center'|trans }}</a></li>
     <li><a href="#">{{ 'landing.footer.links.documentation'|trans }}</a></li>
     <li><a href="#">{{ 'landing.footer.links.guides'|trans }}</a></li>
+    <li><a href="{{path('app_public_generator')}}">{{ 'landing.footer.links.generator'|trans }}</a></li>
   </ul>
 </div>
   </div>
@@ -641,48 +563,6 @@ img[loading="lazy"]{content-visibility:auto}
 </footer>
 {# ===================== SCRIPTS ===================== #}
 <script defer>
-/* Navbar shadow on scroll */
-const navbar = document.getElementById('navbar');
-addEventListener('scroll', ()=> navbar.classList.toggle('scrolled', scrollY>50));
-
-/* Smooth scroll (respecte reduced motion) */
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-  a.addEventListener('click',e=>{
-    const id=a.getAttribute('href'); if(id==="#"||id==="#!") return;
-    const target=document.querySelector(id); if(!target) return;
-    e.preventDefault();
-    const offset=document.querySelector('.landing-nav').offsetHeight + 20;
-    const y = target.getBoundingClientRect().top + scrollY - offset;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) scrollTo(0,y);
-    else window.scrollTo({top:y,behavior:'smooth'});
-  });
-});
-
-/* Reveal animations via IntersectionObserver */
-const io = 'IntersectionObserver' in window ? new IntersectionObserver(es=>{
-  es.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.style.animation='fadeInUp .6s ease-out forwards';
-      io.unobserve(entry.target);
-    }
-  });
-},{threshold:.1, rootMargin:'0px 0px -50px 0px'}) : null;
-document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.feature-card,.step-card').forEach(el=>{
-    el.style.opacity='0'; el.style.animation='none'; io && io.observe(el);
-  });
-});
-
-/* Mobile menu toggle (accessibilité) */
-const toggle=document.getElementById('mobile-menu-btn');
-const nav=document.getElementById('primary-nav');
-if(toggle && nav){
-  toggle.addEventListener('click',()=>{
-    const open = nav.classList.toggle('active');
-    toggle.setAttribute('aria-expanded', String(open));
-  });
-}
-
 /* Lazy loading fallback pour images avec data-src */
 if('loading' in HTMLImageElement.prototype===false && 'IntersectionObserver' in window){
   const imgIO = new IntersectionObserver(es=>{

@@ -248,6 +248,7 @@
         "blog": "Blog",
         "contact": "Contact",
         "help_center": "Help center",
+        "generator" : "Generator",
         "documentation": "Documentation",
         "guides": "Guides",
         "privacy": "Privacy",
@@ -953,6 +954,94 @@
         "name_placeholder": "e.g. Marketing Team",
         "credentials_help": "Select the credentials to share with this team right away"
       }
+    }
+  },
+   "public_generator": {
+    "hero": {
+      "title_before": "Create",
+      "title_highlight": "passwords",
+      "title_after": "ultra-secure in one click",
+      "subtitle": "Protect your accounts with passwords that are impossible to crack. Instant generation, full customization and maximum security.",
+      "trust": {
+        "no_storage": "No storage",
+        "client_side": "100% client-side",
+        "open_source": "Open source"
+      }
+    },
+    "generator": {
+      "placeholder": "Click to generate",
+      "actions": {
+        "copy": "Copy password",
+        "regenerate": "Regenerate"
+      },
+      "strength": {
+        "label": "Password strength",
+        "value": "-"
+      },
+      "length": {
+        "label": "Password length"
+      },
+      "options": {
+        "uppercase": "Uppercase (A-Z)",
+        "lowercase": "Lowercase (a-z)",
+        "numbers": "Numbers (0-9)",
+        "symbols": "Symbols (!@#$)"
+      },
+      "generate_button": "Generate"
+    },
+    "features": {
+      "title": "Why choose our generator?",
+      "subtitle": "Security and simplicity for your data",
+      "items": [
+        {
+          "title": "Maximum security",
+          "description": "Cryptographically secure generation using the most robust algorithms. Your passwords are impossible to guess or crack."
+        },
+        {
+          "title": "Instant and free",
+          "description": "Create passwords in a fraction of a second, without registration, without limits and completely free."
+        },
+        {
+          "title": "100% private",
+          "description": "Everything happens in your browser. No data is sent to our servers. Your passwords remain fully confidential."
+        },
+        {
+          "title": "Customizable",
+          "description": "Adjust the length and choose character types according to your needs or website requirements."
+        },
+        {
+          "title": "Strength analysis",
+          "description": "Instantly visualize the strength of your password with our real-time strength indicator."
+        },
+        {
+          "title": "One-click copy",
+          "description": "Copy generated passwords directly to your clipboard for immediate and convenient use."
+        }
+      ]
+    },
+    "seo": {
+      "title": "How to create a truly secure password?",
+      "intro": "The security of your online accounts starts with strong passwords. Our free password generator uses advanced cryptographic algorithms to create unique and unguessable combinations.",
+      "good_password_title": "Characteristics of a strong password",
+      "good_password_text": "A secure password should combine several essential elements. It should be long enough (at least 12 characters), mix different character types (uppercase, lowercase, numbers and symbols), and above all be unique for each account.",
+      "why_generator_title": "Why use a password generator?",
+      "why_generator_text": "Human-created passwords are often predictable and vulnerable. Our tool generates completely random passwords that provide optimal protection against brute-force attacks and hacking attempts. Each generated password is unique and cryptographically secure.",
+      "tips_title": "Tips for managing your passwords",
+      "tips": [
+        "Use a different password for each important account",
+        "Prefer passwords of at least 16 characters",
+        "Enable two-factor authentication whenever possible",
+        "Use a secure password manager like MykeyNest",
+        "Regularly change sensitive passwords",
+        "Never share your passwords via email or SMS"
+      ],
+      "tech_title": "The technology behind our generator",
+      "tech_text": "Our generator uses your browser’s native Web Crypto API to produce truly random numbers. Unlike classic pseudo-random generators, this method guarantees maximum entropy and professional-grade cryptographic security."
+    },
+    "cta": {
+      "title": "Ready to secure your accounts?",
+      "description": "Join thousands of users who protect their data with MykeyNest",
+      "button": "Create a free account"
     }
   }
 }

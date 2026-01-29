@@ -296,11 +296,11 @@
         {% if app.request.locale == 'fr' %}
             <h2 class="cta-title">Prêt à sécuriser vos mots de passe ?</h2>
             <p class="cta-description">Créez votre coffre MyKeyNest et passez à des mots de passe uniques et robustes.</p>
-            <a href="/signup" class="cta-button">Essayer gratuitement</a>
+            <a href="{{path('show_register')}}" class="cta-button">Essayer gratuitement</a>
         {% else %}
             <h2 class="cta-title">Ready to secure your passwords?</h2>
             <p class="cta-description">Create your MyKeyNest vault and start using strong, unique passwords.</p>
-            <a href="/signup" class="cta-button">Try it free</a>
+            <a href="{{path('show_register')}}" class="cta-button">Try it free</a>
         {% endif %}
     </div>
 </footer>
