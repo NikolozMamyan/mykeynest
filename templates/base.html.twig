@@ -39,6 +39,8 @@
 
     {% block javascripts %}
       {% block importmap %}{{ importmap('app') }}{% endblock %}
+      <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
     {% endblock %}
   </head>
 
@@ -47,20 +49,42 @@
     {# ===== Layout wrapper ===== #}
     <div class="app-shell">
       {% if app.user %}
-        {% include "./components/header.html.twig" %}
-        {% include "./components/sidebar.html.twig" %}
-      {% endif %}
+        {# Header commun à tous les utilisateurs connectés #}
+        {% include './components/header.html.twig' %}
 
-      {# Backdrop sidebar #}
-      <div
-        class="sidebar-backdrop"
-        data-layout-target="backdrop"
-        data-action="click->layout#closeSidebar"
-        aria-hidden="true"
-      ></div>
+        {# Sidebar conditionnelle selon le rôle #}
+        {% if is_granted('ROLE_ADMIN') %}
+          {% include './components/sidebar_admin.html.twig' %}
+        {% elseif is_granted('ROLE_USER') %}
+          {% include './components/sidebar.html.twig' %}
+        {% endif %}
+
+        {# Backdrop sidebar (uniquement si une sidebar est affichée) #}
+        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_USER') %}
+          <div
+            class="sidebar-backdrop"
+            data-layout-target="backdrop"
+            data-action="click->layout#closeSidebar"
+            aria-hidden="true"
+          ></div>
+        {% endif %}
+      {% endif %}
 
       <div class="wrapper-layout">
         <main class="main-content" id="main-content" tabindex="-1">
+          {# ===== Flash messages ===== #}
+          {% if app.flashes is not empty %}
+            <div class="flash-messages-container">
+              {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                  <div class="alert alert-{{ type }}" role="alert">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          {% endif %}
+
           {# ===== Breadcrumb (optionnel) ===== #}
           {% block breadcrumb %}
             {% set currentRoute = app.request.attributes.get('_route') %}

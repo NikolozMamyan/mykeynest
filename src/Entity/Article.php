@@ -140,6 +140,8 @@ class Article
     {
         return $locale === 'fr' ? $this->coverAltFr : $this->coverAltEn;
     }
+public function getCoverAltFr(): ?string { return $this->coverAltFr; }
+public function getCoverAltEn(): ?string { return $this->coverAltEn; }
 
     // ✅ Helper: gives relative public path for Twig asset()
     public function getCoverPath(): string

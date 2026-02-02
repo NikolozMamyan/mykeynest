@@ -24,6 +24,12 @@ final class SitemapController extends AbstractController
             'weekly',
             '1.0'
         );
+        $urls[] = $this->entry(
+            $urlGenerator->generate('app_public_generator', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            new \DateTimeImmutable('now'),
+            'monthly',
+            '1.0'
+        );
 
         // ✅ Blog index par locale
         foreach (['fr', 'en'] as $locale) {

@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     uploads_avatar: '%kernel.project_dir%/public/uploads/avatars'
+    article_covers_dir: '%kernel.project_dir%/public/uploads/blog'
+    article_content_images_dir: '%kernel.project_dir%/public/uploads/blog/content'
 
 
 services:
