@@ -1,0 +1,92 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block body %}
+  <main class="container" style="max-width: 900px; margin: 40px auto; padding: 0 16px;">
+    <header style="margin-bottom: 24px;">
+      <h1 style="margin: 0 0 8px;">{{ page_title }}</h1>
+      <p style="margin: 0; opacity: .7;">
+        Dernière mise à jour : {{ updated_at|date('d/m/Y') }}
+      </p>
+    </header>
+<section style="margin: 16px 0 24px; padding: 12px 14px; border: 1px solid rgba(0,0,0,.1); border-radius: 10px;">
+  <strong>Éditeur / Marque</strong><br>
+  <span>{{ brand_note }}</span><br>
+  <small style="opacity:.75;">
+    Service opéré par {{ publisher_name }} sous la marque {{ brand_name }}.
+  </small>
+</section>
+
+    <section class="legal">
+      <h2>1. Objet</h2>
+      <p>
+        Les présentes CGU encadrent l’accès et l’utilisation du service KeyNest (le « Service »).
+        En utilisant le Service, l’Utilisateur accepte les présentes CGU.
+      </p>
+
+      <h2>2. Accès au Service</h2>
+      <p>
+        Le Service peut être modifié, suspendu ou interrompu à tout moment (maintenance, sécurité, évolution).
+      </p>
+
+      <h2>3. Sécurité, chiffrement, architecture</h2>
+      <p>
+        Le Service met en œuvre un chiffrement côté client et un fonctionnement de type « zero-knowledge » :
+        les données sont chiffrées avant stockage/transit.
+      </p>
+      <ul>
+        <li>Vous êtes responsable de la confidentialité de vos identifiants et secrets.</li>
+        <li>En cas de perte de votre secret principal / clé, la récupération peut être impossible.</li>
+      </ul>
+
+      <h2>4. Responsabilité de l’Utilisateur</h2>
+      <p>
+        L’Utilisateur est seul responsable de l’usage qu’il fait du Service, de la conservation de ses accès,
+        et de toute conséquence liée à une mauvaise manipulation, perte, ou compromission de ses secrets.
+      </p>
+
+      <h2>5. Limitation de responsabilité</h2>
+      <p>
+        Dans les limites autorisées par la loi applicable, le Service est fourni « en l’état »,
+        sans garantie d’absence d’erreurs, d’interruption ou d’invulnérabilité.
+        KeyNest ne saurait être tenu responsable des dommages indirects, pertes de données, pertes financières,
+        pertes d’exploitation, ou préjudices résultant de l’utilisation ou de l’impossibilité d’utiliser le Service.
+      </p>
+
+      <h2>6. Données personnelles</h2>
+      <p>
+        Le traitement des données personnelles est décrit dans la Politique de confidentialité.
+      </p>
+
+      <h2>7. Droit applicable</h2>
+      <p>
+        Les présentes CGU sont soumises au droit applicable du pays d’établissement de l’éditeur,
+        sous réserve des dispositions impératives applicables au consommateur.
+      </p>
+    </section>
+    <section style="margin-top: 32px; padding: 16px; border: 1px solid rgba(0,0,0,.1); border-radius: 12px;">
+  <h2 style="margin-top: 0;">Éditeur & Hébergement</h2>
+
+  <p>
+    <strong>Marque :</strong> {{ brand_name }}<br>
+    <strong>Éditeur :</strong> {{ publisher_name }}<br>
+    <strong>Fondateur :</strong> {{ founder_name }}
+  </p>
+
+  <p>
+    <strong>Contact :</strong>
+    <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+  </p>
+
+  <p>
+    <strong>Hébergement :</strong> {{ hosting_provider }}
+  </p>
+
+  <p style="opacity: .75; font-size: 0.9em;">
+    {{ brand_note }}
+  </p>
+</section>
+
+  </main>
+{% endblock %}

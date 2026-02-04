@@ -556,8 +556,14 @@ img[loading="lazy"]{content-visibility:auto}
   <div class="footer-bottom">
     <p>
       &copy; {{ "now"|date("Y") }} MykeyNest. {{ 'landing.footer.links.all_rights'|trans }} |
-      <a href="#">{{ 'landing.footer.links.privacy'|trans }}</a> |
-      <a href="#">{{ 'landing.footer.links.terms'|trans }}</a>
+<a href="{{ path('legal_cgu') }}">
+  {{ 'landing.footer.links.privacy'|trans }}
+</a>
+ |
+<a href="{{ path('legal_cgv') }}">
+  {{ 'landing.footer.links.terms'|trans }}
+</a>
+
     </p>
   </div>
 </footer>

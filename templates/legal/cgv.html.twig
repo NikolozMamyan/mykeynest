@@ -1,0 +1,94 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block body %}
+  <main class="container" style="max-width: 900px; margin: 40px auto; padding: 0 16px;">
+    <header style="margin-bottom: 24px;">
+      <h1 style="margin: 0 0 8px;">{{ page_title }}</h1>
+      <p style="margin: 0; opacity: .7;">
+        Dernière mise à jour : {{ updated_at|date('d/m/Y') }}
+      </p>
+    </header>
+<section style="margin: 16px 0 24px; padding: 12px 14px; border: 1px solid rgba(0,0,0,.1); border-radius: 10px;">
+  <strong>Éditeur / Marque</strong><br>
+  <span>{{ brand_note }}</span><br>
+  <small style="opacity:.75;">
+    Service opéré par {{ publisher_name }} sous la marque {{ brand_name }}.
+  </small>
+</section>
+
+    <section class="legal">
+      <h2>1. Objet</h2>
+      <p>
+        Les présentes CGV définissent les conditions de vente des abonnements et services payants proposés par KeyNest.
+      </p>
+
+      <h2>2. Prix & paiement</h2>
+      <p>
+        Les prix sont indiqués sur le site au moment de la commande. Le paiement s’effectue via les moyens proposés.
+      </p>
+
+      <h2>3. Abonnement, durée, renouvellement</h2>
+      <p>
+        L’abonnement est souscrit pour la durée choisie. Sauf mention contraire, il peut être renouvelé automatiquement.
+        L’Utilisateur peut résilier selon les modalités affichées dans son espace compte.
+      </p>
+
+      <h2>4. Droit de rétractation</h2>
+      <p>
+        Si applicable (consommateurs), le droit de rétractation peut être exclu pour les contenus/services numériques
+        fournis immédiatement après accord exprès et renoncement, conformément au droit en vigueur.
+      </p>
+
+      <h2>5. Disponibilité & support</h2>
+      <p>
+        KeyNest met en œuvre des moyens raisonnables pour assurer l’accès au Service, sans garantir une disponibilité
+        continue ou sans erreur.
+      </p>
+
+      <h2>6. Limitation de responsabilité commerciale</h2>
+      <p>
+        Dans les limites autorisées par la loi, KeyNest ne saurait être tenu responsable des dommages indirects,
+        pertes de données, pertes de chiffre d’affaires ou pertes d’exploitation.
+        En tout état de cause, la responsabilité de KeyNest, si elle devait être retenue,
+        est plafonnée au montant payé par l’Utilisateur au cours des 12 derniers mois.
+      </p>
+
+      <h2>7. Sécurité & données chiffrées</h2>
+      <p>
+        Les données étant chiffrées, l’Utilisateur est responsable de la conservation de ses secrets.
+        KeyNest ne garantit pas la récupération des données en cas de perte des éléments de déchiffrement.
+      </p>
+
+      <h2>8. Droit applicable</h2>
+      <p>
+        Les présentes CGV sont soumises au droit applicable du pays d’établissement de l’éditeur,
+        sous réserve des dispositions impératives applicables.
+      </p>
+    </section>
+    <section style="margin-top: 32px; padding: 16px; border: 1px solid rgba(0,0,0,.1); border-radius: 12px;">
+  <h2 style="margin-top: 0;">Éditeur & Hébergement</h2>
+
+  <p>
+    <strong>Marque :</strong> {{ brand_name }}<br>
+    <strong>Éditeur :</strong> {{ publisher_name }}<br>
+    <strong>Fondateur :</strong> {{ founder_name }}
+  </p>
+
+  <p>
+    <strong>Contact :</strong>
+    <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+  </p>
+
+  <p>
+    <strong>Hébergement :</strong> {{ hosting_provider }}
+  </p>
+
+  <p style="opacity: .75; font-size: 0.9em;">
+    {{ brand_note }}
+  </p>
+</section>
+
+  </main>
+{% endblock %}
