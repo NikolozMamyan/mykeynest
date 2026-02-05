@@ -69,6 +69,10 @@
         "label": "Log out",
         "desc": "Sign out"
       }
+    },
+     "upgrade": {
+      "label": "Upgrade",
+      "text": "Go PRO"
     }
   },
     "sidebar": {
@@ -345,6 +349,11 @@
       "confirm": {
         "delete": "Are you sure you want to delete this credential?"
       }
+    },
+     "pro_banner": {
+      "title": "Limit reached!",
+      "description": "You’ve reached the limit of 5 credentials. Upgrade to PRO to store unlimited credentials and unlock all premium features.",
+      "action": "Upgrade to PRO"
     }
   },
   "shared_access": {
@@ -386,6 +395,11 @@
         "confirm": "Confirm revocation",
         "loading": "Revoking..."
       }
+    },
+    "pro_banner": {
+      "title": "Sharing limit reached!",
+      "description": "You’ve reached the limit of 3 shared accesses. Upgrade to PRO for unlimited sharing and seamless collaboration.",
+      "action": "Upgrade to PRO"
     }
   },
     "extension": {
@@ -954,6 +968,11 @@
         "name_placeholder": "e.g. Marketing Team",
         "credentials_help": "Select the credentials to share with this team right away"
       }
+    },
+      "pro_banner": {
+      "title": "Limit reached!",
+      "description": "You’ve reached the limit for available teams. Upgrade to PRO to create unlimited teams and collaborate without limits.",
+      "action": "Upgrade to PRO"
     }
   },
    "public_generator": {

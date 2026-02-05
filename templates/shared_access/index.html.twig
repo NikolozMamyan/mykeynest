@@ -12,13 +12,47 @@
         <p class="hero-subtitle">{{ 'shared_access.index.hero.subtitle'|trans }}</p>
       </div>
 
-      <a href="{{ path('shared_access_new') }}" class="btn-primary">
-        <i class="fas fa-share-alt"></i>
-        <span>{{ 'shared_access.index.hero.new'|trans }}</span>
-      </a>
+{% if app.user.isSubscribed or sharedByMe|length < 3 %}
+  <a href="{{ path('shared_access_new') }}" class="btn-primary">
+    <i class="fas fa-share-alt"></i>
+    <span>{{ 'shared_access.index.hero.new'|trans }}</span>
+  </a>
+{% else %}
+  <div class="btn-primary btn-disabled" title="Passez à PRO pour partager plus d'accès">
+    <i class="fas fa-lock"></i>
+    <span>{{ 'shared_access.index.hero.new'|trans }}</span>
+  </div>
+{% endif %}
     </div>
   </div>
-
+{# PRO Upgrade Banner - Affiché seulement si non abonné et a déjà 3 partages #}
+{% if not app.user.isSubscribed and sharedByMe|length >= 3 %}
+  <div class="pro-upgrade-banner">
+    <div class="pro-banner-content">
+      <div class="pro-banner-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+        </svg>
+      </div>
+      <div class="pro-banner-text">
+        <h3>{{ 'shared_access.pro_banner.title'|trans|default('Limite de partage atteinte !') }}</h3>
+        <p>{{ 'shared_access.pro_banner.description'|trans|default('Vous avez atteint la limite de 3 partages d\'accès. Passez à PRO pour des partages illimités et collaborez sans restriction.') }}</p>
+        <div class="limit-info">
+          <i class="fas fa-users"></i>
+          <span>{{ sharedByMe|length }}/3 partages utilisés</span>
+        </div>
+      </div>
+    </div>
+    <a href="{{ path('app_subscription') }}" class="btn-upgrade-pro">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+      </svg>
+      {{ 'shared_access.pro_banner.action'|trans|default('Passer à PRO') }}
+    </a>
+  </div>
+{% endif %}
   <!-- Tabs -->
   <div class="tabs-wrapper">
     <div class="tabs-header">
@@ -788,7 +822,117 @@
     background: var(--color-bg-light);
     border-top: 1px solid var(--color-border);
   }
+/* Disabled Button */
+.btn-disabled {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  opacity: 0.6;
+}
 
+.btn-disabled:hover {
+  background: #e5e7eb !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* PRO Upgrade Banner */
+.pro-upgrade-banner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #fbbf24;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+  animation: slideInDown 0.4s ease-out;
+}
+
+.pro-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.pro-banner-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.pro-banner-icon svg {
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.pro-banner-text h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 0.25rem 0;
+}
+
+.pro-banner-text p {
+  font-size: 0.95rem;
+  color: #78350f;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pro-banner-text .limit-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.btn-upgrade-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.75rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-upgrade-pro:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+}
+
+.btn-upgrade-pro svg {
+  width: 20px;
+  height: 20px;
+}
   /* Animations */
   @keyframes fadeIn {
     from {
@@ -824,7 +968,20 @@
   /* Responsive */
   @media (max-width: 768px) {
 
+.pro-upgrade-banner {
+  flex-direction: column;
+  text-align: center;
+}
 
+.pro-banner-content {
+  flex-direction: column;
+  text-align: center;
+}
+
+.btn-upgrade-pro {
+  width: 100%;
+  justify-content: center;
+}
     .hero-section {
       padding: 1.5rem;
     }

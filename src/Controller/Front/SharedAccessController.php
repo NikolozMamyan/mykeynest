@@ -35,77 +35,131 @@ class SharedAccessController extends AbstractController
     }
     
     #[Route('/app/shared-access/new', name: 'shared_access_new', methods: ['GET', 'POST'])]
-    public function new(
-        Request $request, 
-        EntityManagerInterface $entityManager, 
-        UserRepository $userRepository,
-        CredentialRepository $credentialRepository
-    ): Response {
-        if ($request->isMethod('POST')) {
-            $email = $request->request->get('email');
-            $credentialIds = $request->get('credentials', []);
-            
-            // Vérifier si l'utilisateur existe
-            $guest = $userRepository->findOneBy(['email' => $email]);
-            if (!$guest) {
-                $this->addFlash('error', 'Aucun utilisateur trouvé avec cet email.');
-                return $this->redirectToRoute('shared_access_new');
-            }
-            
-            // Vérifier que l'utilisateur ne partage pas avec lui-même
-            if ($guest === $this->getUser()) {
-                $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-même.');
-                return $this->redirectToRoute('shared_access_new');
-            }
-            
-            $owner = $this->getUser();
-            $createdCount = 0;
-            
+public function new(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    UserRepository $userRepository,
+    CredentialRepository $credentialRepository
+): Response {
+    $owner = $this->getUser();
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+    if (!$owner) {
+        throw $this->createAccessDeniedException();
+    }
+
+    // ✅ règle abonnement
+    $hasSubscription = (bool) $owner->isSubscribed(); // adapte à ton projet
+    $limit = 3;
+
+    if ($request->isMethod('POST')) {
+        $email = $request->request->get('email');
+        $credentialIds = $request->request->all('credentials') ?? []; // plus safe que $request->get()
+
+        // Vérifier si l'utilisateur existe
+        $guest = $userRepository->findOneBy(['email' => $email]);
+        if (!$guest) {
+            $this->addFlash('error', 'Aucun utilisateur trouvé avec cet email.');
+            return $this->redirectToRoute('shared_access_new');
+        }
+
+        // Vérifier que l'utilisateur ne partage pas avec lui-même
+        if ($guest === $owner) {
+            $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-même.');
+            return $this->redirectToRoute('shared_access_new');
+        }
+
+        // ✅ 1) Si pas d'abonnement : vérifier la limite AVANT de persister
+        if (!$hasSubscription) {
+            // Compte des partages existants (ici: tous les partages créés par owner)
+            $existingCount = $entityManager->getRepository(SharedAccess::class)->count([
+                'owner' => $owner,
+            ]);
+
+            // Compter combien de "nouveaux" partages on s’apprête à créer
+            $newToCreate = 0;
+
             foreach ($credentialIds as $credentialId) {
                 $credential = $credentialRepository->find($credentialId);
-                
-                // Vérifier que l'identifiant appartient bien à l'utilisateur connecté
+
+                // appartient bien à owner
                 if (!$credential || $credential->getUser() !== $owner) {
                     continue;
                 }
-                
-                // Vérifier si ce partage existe déjà
+
+                // existe déjà ?
                 $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
                     'owner' => $owner,
                     'guest' => $guest,
-                    'credential' => $credential
+                    'credential' => $credential,
                 ]);
-                
+
                 if (!$existingAccess) {
-                    $sharedAccess = new SharedAccess();
-                    $sharedAccess->setOwner($owner);
-                    $sharedAccess->setGuest($guest);
-                    $sharedAccess->setCredential($credential);
-                    $sharedAccess->setCreatedAt(new \DateTimeImmutable());
-                    
-                    $entityManager->persist($sharedAccess);
-                    $createdCount++;
+                    $newToCreate++;
                 }
             }
-            
-            if ($createdCount > 0) {
-                $entityManager->flush();
-                $this->addFlash('success', $createdCount . ' identifiant(s) partagé(s) avec succès.');
-            } else {
-                $this->addFlash('info', 'Aucun nouvel identifiant n\'a été partagé.');
+
+            if (($existingCount + $newToCreate) > $limit) {
+                $remaining = max(0, $limit - $existingCount);
+                $this->addFlash(
+                    'warning',
+                    sprintf(
+                        'Limite atteinte : %d partages maximum sans abonnement. Il vous reste %d partage(s) possible(s).',
+                        $limit,
+                        $remaining
+                    )
+                );
+                return $this->redirectToRoute('shared_access_new');
             }
-            
-            return $this->redirectToRoute('shared_access_index');
         }
-        
-        // Récupérer les identifiants de l'utilisateur pour les afficher dans le formulaire
-        $credentials = $credentialRepository->findBy(['user' => $this->getUser()]);
-        
-        return $this->render('shared_access/new.html.twig', [
-            'credentials' => $credentials,
-            'heading' => 'Partages'
-        ]);
+
+        // ✅ 2) Ensuite seulement : persister
+        $createdCount = 0;
+
+        foreach ($credentialIds as $credentialId) {
+            $credential = $credentialRepository->find($credentialId);
+
+            if (!$credential || $credential->getUser() !== $owner) {
+                continue;
+            }
+
+            $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
+                'owner' => $owner,
+                'guest' => $guest,
+                'credential' => $credential
+            ]);
+
+            if (!$existingAccess) {
+                $sharedAccess = new SharedAccess();
+                $sharedAccess->setOwner($owner);
+                $sharedAccess->setGuest($guest);
+                $sharedAccess->setCredential($credential);
+                $sharedAccess->setCreatedAt(new \DateTimeImmutable());
+
+                $entityManager->persist($sharedAccess);
+                $createdCount++;
+            }
+        }
+
+        if ($createdCount > 0) {
+            $entityManager->flush();
+            $this->addFlash('success', $createdCount . ' identifiant(s) partagé(s) avec succès.');
+        } else {
+            $this->addFlash('info', 'Aucun nouvel identifiant n\'a été partagé.');
+        }
+
+        return $this->redirectToRoute('shared_access_index');
     }
+
+    // GET
+    $credentials = $credentialRepository->findBy(['user' => $owner]);
+
+    return $this->render('shared_access/new.html.twig', [
+        'credentials' => $credentials,
+        'heading' => 'Partages'
+    ]);
+}
+
     
     #[Route('/app/shared-access/{id}/revoke', name: 'shared_access_revoke', methods: ['POST'])]
     public function revoke(Request $request, SharedAccess $sharedAccess, EntityManagerInterface $entityManager): Response

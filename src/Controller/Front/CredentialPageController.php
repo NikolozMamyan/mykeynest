@@ -19,7 +19,8 @@ final class CredentialPageController extends AbstractController
     public function __construct(
         private CredentialManager $credentialManager,
         private SecurityCheckerService $checker,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private CredentialRepository $credentialRepository
     ) {}
 
     #[Route('/app/credential', name: 'app_credential')]
@@ -36,30 +37,54 @@ final class CredentialPageController extends AbstractController
         ]);
     }
 
-    #[Route('/app/credential/new', name: 'credential_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
-    {
-        $credential = new Credential();
-        $form = $this->createForm(CredentialType::class, $credential, [
-    'user' => $this->getUser(),
-    'is_edit' => false
-]);
+#[Route('/app/credential/new', name: 'credential_new', methods: ['GET', 'POST'])]
+public function new(Request $request): Response
+{
+    $user = $this->getUser();
+    if (!$user) {
+        throw $this->createAccessDeniedException();
+    }
 
-        $form->handleRequest($request);
+    // 1) Vérifier la limite si pas d'abonnement
+    // Adapte ces 2 lignes à ton projet (repo / relation / méthode)
+    $hasSubscription = (bool) $user->isSubscribed(); // ou $user->isSubscribed(), etc.
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->credentialManager->create($credential, $this->getUser());
-            $this->addFlash('success', 'Nouvel identifiant ajouté avec succès.');
-             $this->checker->buildReportAndNotify($this->getUser(), SecurityCheckerService::ROTATION_DAYS_DEFAULT);
+    if (!$hasSubscription) {
+        // Méthode A: via repository
+        $count = $this->credentialRepository->count(['user' => $user]);
+
+        // Méthode B: si relation Doctrine (ex: $user->getCredentials())
+        // $count = $user->getCredentials()->count();
+
+        if ($count >= 5) {
+            $this->addFlash('warning', 'Limite atteinte : 5 identifiants maximum sans abonnement.');
 
             return $this->redirectToRoute('app_credential');
         }
-
-        return $this->render('credential/new.html.twig', [
-            'form' => $form,
-            'heading' => 'Mes accès',
-        ]);
     }
+
+    // 2) Form / création
+    $credential = new Credential();
+    $form = $this->createForm(CredentialType::class, $credential, [
+        'user' => $user,
+        'is_edit' => false,
+    ]);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $this->credentialManager->create($credential, $user);
+        $this->addFlash('success', 'Nouvel identifiant ajouté avec succès.');
+        $this->checker->buildReportAndNotify($user, SecurityCheckerService::ROTATION_DAYS_DEFAULT);
+
+        return $this->redirectToRoute('app_credential');
+    }
+
+    return $this->render('credential/new.html.twig', [
+        'form' => $form,
+        'heading' => 'Mes accès',
+    ]);
+}
 
     #[Route('/app/credential/{id}', name: 'credential_show', methods: ['GET'])]
     public function show(Credential $credential): Response

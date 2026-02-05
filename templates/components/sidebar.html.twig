@@ -367,6 +367,40 @@
 .nav-section:nth-child(1) .nav-item:nth-child(5) {
   animation-delay: 0.2s;
 }
+/* === DISABLED NAV ITEMS === */
+.nav-item-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(0.7);
+}
+
+.nav-item-disabled:hover {
+  background: transparent;
+  transform: none;
+}
+
+.nav-item-badge-pro {
+  margin-left: auto;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: var(--color-white);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  letter-spacing: 0.5px;
+  animation: pulse-pro 2s ease-in-out infinite;
+}
+
+@keyframes pulse-pro {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);
+  }
+}
 
 </style>
 
@@ -424,34 +458,46 @@
     </div>
 
     <div class="nav-divider"></div>
+<!-- ===== Tools ===== -->
+<div class="nav-section">
+  <div class="nav-section-title">
+    {{ 'sidebar.sections.tools'|trans }}
+  </div>
 
-    <!-- ===== Tools ===== -->
-    <div class="nav-section">
-      <div class="nav-section-title">
-        {{ 'sidebar.sections.tools'|trans }}
-      </div>
+  <a href="{{ path('app_generator') }}"
+     class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
+    <i class="fas fa-wand-magic-sparkles"></i>
+    <span>{{ 'sidebar.items.generator'|trans }}</span>
+  </a>
 
-      <a href="{{ path('app_generator') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
-        <i class="fas fa-wand-magic-sparkles"></i>
-        <span>{{ 'sidebar.items.generator'|trans }}</span>
-      </a>
-
-      <a href="{{ path('app_note') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_note' ? 'active' : '' }}">
-        <i class="fas fa-note-sticky"></i>
-        <span>{{ 'sidebar.items.notes'|trans }}</span>
-      </a>
-
-      <a href="{{ path('app_security_checker') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
-        <i class="fas fa-shield-heart"></i>
-        <span>{{ 'sidebar.items.security_checker'|trans }}</span>
-      </a>
+  {% if app.user.isSubscribed %}
+    <a href="{{ path('app_note') }}"
+       class="nav-item {{ app.request.attributes.get('_route') == 'app_note' ? 'active' : '' }}">
+      <i class="fas fa-note-sticky"></i>
+      <span>{{ 'sidebar.items.notes'|trans }}</span>
+    </a>
+  {% else %}
+    <div class="nav-item nav-item-disabled">
+      <i class="fas fa-note-sticky"></i>
+      <span>{{ 'sidebar.items.notes'|trans }}</span>
+      <span class="nav-item-badge-pro">PRO</span>
     </div>
+  {% endif %}
 
-    <div class="nav-divider"></div>
-
+  {% if app.user.isSubscribed %}
+    <a href="{{ path('app_security_checker') }}"
+       class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
+      <i class="fas fa-shield-heart"></i>
+      <span>{{ 'sidebar.items.security_checker'|trans }}</span>
+    </a>
+  {% else %}
+    <div class="nav-item nav-item-disabled">
+      <i class="fas fa-shield-heart"></i>
+      <span>{{ 'sidebar.items.security_checker'|trans }}</span>
+      <span class="nav-item-badge-pro">PRO</span>
+    </div>
+  {% endif %}
+</div>
     <!-- ===== Settings ===== -->
     <div class="nav-section">
       <div class="nav-section-title">

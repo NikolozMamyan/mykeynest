@@ -37,41 +37,62 @@ class TeamPageController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, Security $security): Response
-    {
-        $user = $security->getUser();
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+public function new(Request $request, EntityManagerInterface $em, Security $security): Response
+{
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $team = new Team();
+    /** @var User $user */
+    $user = $security->getUser();
+    if (!$user) {
+        throw $this->createAccessDeniedException();
+    }
 
-        $form = $this->createForm(TeamType::class, $team, [
-            'user' => $user,
-        ]);
+    // ✅ 1) Bloquer si pas d'abonnement et limite atteinte
+    $hasSubscription = (bool) $user->isSubscribed(); // adapte: isSubscribed(), getSubscriptionActive(), etc.
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            // owner
-            $team->setOwner($user);
+    if (!$hasSubscription) {
+        // Méthode A: via repository (recommandé)
+        $countTeams = $em->getRepository(Team::class)->count(['owner' => $user]);
+        // ou si ta Team est liée autrement, adapte le critère (ex: ['createdBy' => $user])
 
-            // créateur = OWNER dans TeamMember
-            $member = new TeamMember();
-            $member->setTeam($team);
-            $member->setUser($user);
-            $member->setRole(TeamRole::OWNER);
-
-            $em->persist($team);
-            $em->persist($member);
-            $em->flush();
-
-            $this->addFlash('success', 'Équipe créée avec succès.');
-
+        if ($countTeams >= 1) {
+            $this->addFlash('warning', 'Limite atteinte : 1 équipes maximum sans abonnement.');
             return $this->redirectToRoute('app_team_index');
         }
-
-        return $this->render('team/new.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
+
+    // ✅ 2) Création normale
+    $team = new Team();
+
+    $form = $this->createForm(TeamType::class, $team, [
+        'user' => $user,
+    ]);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // owner
+        $team->setOwner($user);
+
+        // créateur = OWNER dans TeamMember
+        $member = new TeamMember();
+        $member->setTeam($team);
+        $member->setUser($user);
+        $member->setRole(TeamRole::OWNER);
+
+        $em->persist($team);
+        $em->persist($member);
+        $em->flush();
+
+        $this->addFlash('success', 'Équipe créée avec succès.');
+
+        return $this->redirectToRoute('app_team_index');
+    }
+
+    return $this->render('team/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
 
     #[Route('/{id}', name: 'show', methods: ['GET', 'POST'])]
     public function show(

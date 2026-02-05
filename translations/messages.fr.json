@@ -69,6 +69,10 @@
         "label": "Déconnexion",
         "desc": "Se déconnecter"
       }
+    },
+     "upgrade": {
+      "label": "Mise à niveau",
+      "text": "Passez à PRO"
     }
   },
   "sidebar": {
@@ -303,7 +307,7 @@
       }
     }
   },
-   "credential": {
+"credential": {
     "index": {
       "meta": {
         "title": "Gestionnaire de mots de passe"
@@ -345,6 +349,11 @@
       "confirm": {
         "delete": "Êtes-vous sûr de vouloir supprimer cet identifiant ?"
       }
+    },
+    "pro_banner": {
+      "title": "Limite atteinte !",
+      "description": "Vous avez atteint la limite de 5 credentials. Passez à PRO pour stocker des identifiants illimités et profiter de toutes les fonctionnalités premium.",
+      "action": "Passer à PRO"
     }
   },
   "shared_access": {
@@ -386,6 +395,11 @@
         "confirm": "Confirmer la révocation",
         "loading": "Révocation en cours..."
       }
+    },
+    "pro_banner": {
+      "title": "Limite de partage atteinte !",
+      "description": "Vous avez atteint la limite de 3 partages d'accès. Passez à PRO pour des partages illimités et collaborez sans restriction.",
+      "action": "Passer à PRO"
     }
   },
    "extension": {
@@ -948,6 +962,11 @@
         "name_placeholder": "Ex: Équipe Marketing",
         "credentials_help": "Sélectionnez les credentials à partager immédiatement avec cette équipe"
       }
+    },
+    "pro_banner": {
+      "title": "Limite atteinte !",
+      "description": "Vous avez atteint la limite de teams disponibles. Passez à PRO pour créer des équipes illimitées et collaborer sans restriction.",
+      "action": "Passer à PRO"
     }
   },
    "public_generator": {
