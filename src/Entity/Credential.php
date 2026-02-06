@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\SharedAccess;
 use App\Entity\Team;
 use App\Repository\CredentialRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -39,6 +40,11 @@ class Credential
     #[ORM\ManyToOne(inversedBy: 'credentials')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+    /**
+ * @var Collection<int, SharedAccess>
+ */
+#[ORM\OneToMany(mappedBy: 'credential', targetEntity: SharedAccess::class, orphanRemoval: true)]
+private Collection $sharedAccesses;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -56,6 +62,7 @@ private Collection $teams;
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->teams = new ArrayCollection();
+        $this->sharedAccesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -178,5 +185,35 @@ public function removeTeam(Team $team): static
 
     return $this;
 }
+/**
+ * @return Collection<int, SharedAccess>
+ */
+public function getSharedAccesses(): Collection
+{
+    return $this->sharedAccesses;
+}
+
+public function addSharedAccess(SharedAccess $sharedAccess): static
+{
+    if (!$this->sharedAccesses->contains($sharedAccess)) {
+        $this->sharedAccesses->add($sharedAccess);
+        $sharedAccess->setCredential($this);
+    }
+
+    return $this;
+}
+
+public function removeSharedAccess(SharedAccess $sharedAccess): static
+{
+    if ($this->sharedAccesses->removeElement($sharedAccess)) {
+        // set the owning side to null (unless already changed)
+        if ($sharedAccess->getCredential() === $this) {
+            $sharedAccess->setCredential(null); // ⚠️ attention credential est pas nullable
+        }
+    }
+
+    return $this;
+}
+
 
 }

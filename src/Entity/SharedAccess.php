@@ -21,7 +21,7 @@ class SharedAccess
     #[ORM\JoinColumn(nullable: false)]
     private ?User $guest = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'sharedAccesses')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Credential $credential = null;
 

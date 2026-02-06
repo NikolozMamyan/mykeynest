@@ -64,7 +64,11 @@ public function update(Credential $credential, string $decryptedPassword, string
      * Supprime un identifiant.
      */
     public function delete(Credential $credential): void
+    
     {
+            foreach ($credential->getSharedAccesses() as $share) {
+        $this->entityManager->remove($share);
+    }
         $this->entityManager->remove($credential);
         $this->entityManager->flush();
     }
