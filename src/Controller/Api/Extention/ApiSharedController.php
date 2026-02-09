@@ -8,6 +8,7 @@ use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\EncryptionService;
 use App\Repository\CredentialRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SharedAccessRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -301,5 +302,94 @@ public function reveal(
         'password' => $password,
     ]));
 }
-
+#[Route('/extention/api/credentials/create', name: 'api_credential_create', methods: ['POST', 'OPTIONS'])]
+public function createCredential(
+    Request $request,
+    CredentialRepository $credentialRepository,
+    EntityManagerInterface $em
+): JsonResponse {
+    if ($pf = $this->preflight($request)) return $pf;
+    
+    $auth = $this->authenticate($request);
+    if (!$auth) return $this->unauthorized('Token manquant ou invalide');
+    if (isset($auth['rate_limited'])) return $auth['rate_limited'];
+    
+    /** @var \App\Entity\User $user */
+    $user = $auth['user'];
+    
+    // Validation du JSON
+    try {
+        $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+    } catch (\JsonException) {
+        return $this->badRequest('Corps JSON invalide');
+    }
+    
+    // Validation des champs requis
+    $domain = $payload['domain'] ?? null;
+    $username = $payload['username'] ?? null;
+    $password = $payload['password'] ?? null;
+    $name = $payload['name'] ?? null;
+    
+    if (!is_string($domain) || trim($domain) === '') {
+        return $this->badRequest('Domaine manquant ou invalide');
+    }
+    
+    if (!is_string($username) || trim($username) === '') {
+        return $this->badRequest('Nom d\'utilisateur manquant ou invalide');
+    }
+    
+    if (!is_string($password) || trim($password) === '') {
+        return $this->badRequest('Mot de passe manquant ou invalide');
+    }
+    
+    // Normalisation du domaine
+    $domain = preg_replace('#^https?://#', '', $domain);
+    $domain = preg_replace('#^www\.#', '', $domain);
+    $domain = strtolower(trim($domain));
+    
+    // Nom par défaut si non fourni
+    if (!$name || trim($name) === '') {
+        $name = $domain . ' - ' . $username;
+    }
+    
+    // Vérifier si le credential existe déjà pour éviter les doublons
+    $existingCredential = $credentialRepository->findOneBy([
+        'user' => $user,
+        'domain' => $domain,
+        'username' => $username
+    ]);
+    
+    if ($existingCredential) {
+        return $this->cors($this->json([
+            'error' => 'Un credential existe déjà pour ce domaine et cet utilisateur',
+            'credentialId' => $existingCredential->getId()
+        ], Response::HTTP_CONFLICT));
+    }
+    
+    // Chiffrement du mot de passe avec la clé de l'utilisateur
+    $encryptedPassword = $this->encryptionService->encrypt($password);
+    
+    // Création du credential
+    $credential = new Credential();
+    $credential->setName($name);
+    $credential->setDomain($domain);
+    $credential->setUsername($username);
+    $credential->setPassword($encryptedPassword);
+    $credential->setUser($user);
+    
+    
+    $em->persist($credential);
+    $em->flush();
+    
+    return $this->cors($this->json([
+        'success' => true,
+        'credential' => [
+            'id' => $credential->getId(),
+            'name' => $credential->getName(),
+            'domain' => $credential->getDomain(),
+            'username' => $credential->getUsername(),
+            'createdAt' => $credential->getCreatedAt()->format(DATE_ATOM)
+        ]
+    ], Response::HTTP_CREATED));
+}
 }
