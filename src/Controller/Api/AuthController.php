@@ -85,7 +85,7 @@ final class AuthController extends AbstractController
         // 1) Bienvenue user
         $mailerService->send(
             $user->getEmail(),
-            'Welcome to MYKEYNEST 👋',
+            'Welcome to MYKEYNEST',
             'emails/welcome.html.twig',
             [
                 'user' => $user,
