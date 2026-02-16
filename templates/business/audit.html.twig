@@ -245,6 +245,29 @@
         .aud-hero { padding: 3rem 1.25rem 2.5rem; }
         .aud-layout { padding: 2rem 1.25rem 4rem; }
     }
+    .aud-proof-source {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--color-text-light);
+    margin-top: 0.25rem;
+}
+
+.aud-proof-source a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.aud-proof-source a:hover {
+    text-decoration: underline;
+}
+
+.aud-proof-disclaimer {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+    text-align: center;
+}
+
 </style>
 
 <main>
@@ -281,21 +304,52 @@
 
     <div class="aud-layout">
 
-        {# ── Stats proof ── #}
-        <div class="aud-proof">
-            <div>
-                <div class="aud-proof-stat-number">91%</div>
-                <div class="aud-proof-stat-label">{{ 'business.audit.proof.stat1'|trans }}</div>
-            </div>
-            <div>
-                <div class="aud-proof-stat-number">3×</div>
-                <div class="aud-proof-stat-label">{{ 'business.audit.proof.stat2'|trans }}</div>
-            </div>
-            <div>
-                <div class="aud-proof-stat-number">€18K</div>
-                <div class="aud-proof-stat-label">{{ 'business.audit.proof.stat3'|trans }}</div>
-            </div>
+{# ── Stats proof ── #}
+<div class="aud-proof">
+    <div>
+        <div class="aud-proof-stat-number">91%</div>
+        <div class="aud-proof-stat-label">
+            {{ 'business.audit.proof.stat1'|trans }}
+            <small class="aud-proof-source">
+                (Source :
+                <a href="https://www.ibm.com/reports/data-breach"
+                   target="_blank" rel="noopener nofollow">
+                    IBM Cost of a Data Breach Report
+                </a>)
+            </small>
         </div>
+    </div>
+
+    <div>
+        <div class="aud-proof-stat-number">3×</div>
+        <div class="aud-proof-stat-label">
+            Risque accru d’attaque en cas d’absence de formation cybersécurité
+            <small class="aud-proof-source">
+                (estimation basée sur études sectorielles phishing & sensibilisation)
+            </small>
+        </div>
+    </div>
+
+    <div>
+        <div class="aud-proof-stat-number">€18K</div>
+        <div class="aud-proof-stat-label">
+            Coût moyen d’un incident pour une PME
+            <small class="aud-proof-source">
+                (Source :
+                <a href="https://www.ssi.gouv.fr/"
+                   target="_blank" rel="noopener nofollow">
+                    ANSSI
+                </a>)
+            </small>
+        </div>
+    </div>
+</div>
+
+<p class="aud-proof-disclaimer">
+    Données indicatives issues de rapports publics. Les montants et pourcentages
+    peuvent varier selon la taille de l’entreprise et le secteur d’activité.
+</p>
+
 
         {# ── Services ── #}
         <div class="aud-section-eyebrow">{{ 'business.audit.services.eyebrow'|trans }}</div>
