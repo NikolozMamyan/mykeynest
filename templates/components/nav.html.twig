@@ -132,7 +132,13 @@
 
     <div class="nav-links" id="primary-nav">
       <div class="nav-lang nav-lang-mobile" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
-    {% include "components/parts/lang_switcher.html.twig" %}
+  {% set route = app.request.attributes.get('_route') %}
+
+{% if route starts with 'blog_' %}
+  {% include 'components/parts/blog_lang_switcher.html.twig' %}
+{% else %}
+  {% include 'components/parts/lang_switcher.html.twig' %}
+{% endif %}
   </div>
       <a href="/#features" class="nav-link">{{ 'landing.nav.features'|trans }}</a>
       <a href="/#how-it-works" class="nav-link">{{ 'landing.nav.how_it_works'|trans }}</a>
@@ -155,7 +161,15 @@
       <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
 
       <div class="nav-lang" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
-        {% include "components/parts/lang_switcher.html.twig" %}
+{% set route = app.request.attributes.get('_route') %}
+
+{% if route starts with 'blog_' %}
+  {% include 'components/parts/blog_lang_switcher.html.twig' %}
+{% else %}
+  {% include 'components/parts/lang_switcher.html.twig' %}
+{% endif %}
+
+  
       </div>
     </div>
   </div>
