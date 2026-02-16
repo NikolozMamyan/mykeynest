@@ -24,7 +24,7 @@
 },
 "email": {
     "welcome": {
-      "title": "Welcome to KeyNest",
+      "title": "Welcome to MYKEYNEST",
       "message": "We are delighted to welcome you, <strong>%email%</strong>! Complete your profile to fully enjoy the application.",
       "cta": "Complete my profile",
       "footer": "If you did not sign up for this account, you can safely ignore this email.",
@@ -251,6 +251,9 @@
         "about": "About",
         "blog": "Blog",
         "contact": "Contact",
+        "cyber_pme_solution": "SMB cybersecurity solution",
+        "password_manager_entreprise_comparatif": "Business password manager comparison",
+        "audit_cyber_pme": "SMB cybersecurity audit",
         "help_center": "Help center",
         "generator" : "Generator",
         "documentation": "Documentation",
@@ -1181,7 +1184,7 @@
       }
     }
   },
-   "help_article": {
+  "help_article": {
     "breadcrumb": {
       "aria": "Breadcrumb",
       "help_center": "Help center"
@@ -1227,6 +1230,274 @@
         "title": "No answer?",
         "desc": "Our team replies in under 2 hours on weekdays.",
         "cta": "Write to us"
+      }
+    }
+  },
+  "business": {
+    "solution": {
+      "meta": {
+        "title": "SMB Cybersecurity Solution — Password Management & Support | MykeyNest",
+        "description": "Complete cybersecurity solution for SMBs: AES-256 password management software, included maintenance, employee training and security audit. From €2.99/user/month.",
+        "keywords": "SMB cybersecurity solution, enterprise password manager, SMB security audit, cybersecurity training, business password manager"
+      },
+      "schema": {
+        "name": "MykeyNest — SMB Cybersecurity Solution",
+        "description": "Password management software for SMBs with maintenance, employee training and security audit included."
+      },
+      "hero": {
+        "eyebrow": "Enterprise solution",
+        "h1_before": "Cybersecurity solution for SMBs with",
+        "h1_highlight": "password management",
+        "h1_after": "and support included",
+        "subtitle": "Protect your business from day one. Software, maintenance, training and audit — all in one simple, affordable package.",
+        "cta_primary": "Start for free",
+        "cta_secondary": "Request an audit",
+        "trust": {
+          "no_commitment": "No commitment",
+          "setup": "Setup within 24h",
+          "support": "Support included"
+        }
+      },
+      "pillars": {
+        "eyebrow": "What's included",
+        "title": "A 360° solution for your SMB",
+        "subtitle": "Software, services and human support: everything you need to secure your business without hiring an in-house expert.",
+        "software": {
+          "title": "🔐 Software",
+          "item1": "AES-256 encryption",
+          "item2": "Zero-knowledge architecture",
+          "item3": "Secure sharing between team members",
+          "item4": "Built-in security audit"
+        },
+        "maintenance": {
+          "title": "🛠 Included maintenance",
+          "item1": "Dedicated technical support",
+          "item2": "Continuous 7-day support",
+          "item3": "Guided updates"
+        },
+        "training": {
+          "title": "🧑‍🏫 Employee training",
+          "item1": "Phishing awareness",
+          "item2": "Password best practices",
+          "item3": "Internal security procedures"
+        },
+        "audit": {
+          "title": "🧪 Security audit",
+          "item1": "Remote audit",
+          "item2": "On-site physical audit",
+          "item3": "Detailed vulnerability report"
+        }
+      },
+      "explore": {
+        "eyebrow": "Go further",
+        "title": "Explore our resources",
+        "subtitle": "Check out our comparison or discover our dedicated audit and training offer for SMBs.",
+        "comparatif": {
+          "label": "Comparison",
+          "title": "MykeyNest vs Bitwarden vs 1Password"
+        },
+        "audit": {
+          "label": "Services",
+          "title": "Cybersecurity Audit & Training"
+        }
+      },
+      "pricing": {
+        "eyebrow": "Transparent pricing",
+        "title": "One honest price, everything included",
+        "unit": "per user / month, no commitment",
+        "badge": "3× cheaper than competitors",
+        "description": "Up to 3 to 4 times cheaper than Bitwarden Teams or 1Password Business, with maintenance, training and audit included in the price.",
+        "cta": "Get started now",
+        "feature1": "Unlimited passwords",
+        "feature2": "Unlimited sharing",
+        "feature3": "2FA authentication",
+        "feature4": "Built-in security audit",
+        "feature5": "Employee training",
+        "feature6": "Priority support < 2h"
+      },
+      "cta": {
+        "title": "Ready to secure your SMB?",
+        "subtitle": "Join MykeyNest and protect your business data today.",
+        "primary": "Free trial — no credit card",
+        "secondary": "Contact our team"
+      }
+    },
+    "comparatif": {
+      "meta": {
+        "title": "MykeyNest vs Bitwarden vs 1Password: SMB comparison | MykeyNest",
+        "description": "Objective, factual comparison between MykeyNest, Bitwarden Teams and 1Password Business. Pricing, features, maintenance and training: which solution to choose for your SMB?",
+        "keywords": "enterprise password manager comparison, MykeyNest vs Bitwarden, MykeyNest vs 1Password, best SMB password manager"
+      },
+      "schema": {
+        "headline": "MykeyNest vs Bitwarden vs 1Password: which solution for SMBs?",
+        "description": "Factual comparison of enterprise password management solutions: pricing, security, included services."
+      },
+      "breadcrumb": {
+        "aria": "Breadcrumb",
+        "home": "Home",
+        "solution": "Enterprise solution",
+        "current": "Comparison"
+      },
+      "hero": {
+        "eyebrow": "Objective comparison",
+        "h1_vs": "vs",
+        "h1_and": "and",
+        "h1_suffix": "which solution for your SMB?",
+        "subtitle": "Factual comparison of features, pricing and included services. To help you make an informed decision.",
+        "disclaimer": "Public data — indicative prices as of 01/2026. Check official pricing."
+      },
+      "table": {
+        "eyebrow": "Comparison table",
+        "title": "Features & pricing at a glance",
+        "subtitle": "Comparison based on equivalent team and SMB offers.",
+        "aria": "Comparison of MykeyNest, Bitwarden and 1Password",
+        "badge_recommended": "Recommended",
+        "cat_pricing": "💰 Pricing",
+        "cat_security": "🔐 Security",
+        "cat_services": "🛠 Included services",
+        "row": {
+          "price_per_user": "Price / user / month",
+          "price_per_user_sub": "Team / SMB plan",
+          "free_trial": "Free trial",
+          "aes256": "AES-256 encryption",
+          "zero_knowledge": "Zero-knowledge architecture",
+          "2fa": "2FA authentication",
+          "audit": "Security audit",
+          "audit_sub": "Weak / compromised password detection",
+          "maintenance": "Included technical maintenance",
+          "maintenance_sub": "Support & guided updates",
+          "training": "Employee training",
+          "training_sub": "Phishing awareness & best practices",
+          "security_audit": "On-site security audit",
+          "security_audit_sub": "Vulnerability report",
+          "support": "Continuous support",
+          "french_support": "French-language support"
+        }
+      },
+      "why": {
+        "eyebrow": "Why choose MykeyNest",
+        "title": "4 reasons to choose us",
+        "subtitle": "Beyond price, MykeyNest is the only solution that truly supports your SMB.",
+        "price": {
+          "title": "3× cheaper",
+          "desc": "At €2.99/user/month, MykeyNest is up to 4 times cheaper than competitors for equivalent or superior features."
+        },
+        "maintenance": {
+          "title": "Maintenance included",
+          "desc": "No unanswered support tickets. Our team handles technical maintenance and guides you through every update."
+        },
+        "training": {
+          "title": "Training included",
+          "desc": "Your employees are trained in security best practices: phishing, passwords, and internal procedures."
+        },
+        "french": {
+          "title": "French team",
+          "desc": "French-language support, a team based in France, responses in under 2 hours on weekdays."
+        }
+      },
+      "cta": {
+        "title": "Convinced? Try for free.",
+        "subtitle": "Start without a credit card. Switch to the business plan when you're ready.",
+        "button": "Free trial — no commitment"
+      }
+    },
+    "audit": {
+      "meta": {
+        "title": "SMB Cybersecurity Audit & Training | MykeyNest",
+        "description": "Remote or on-site cybersecurity audit for SMBs + employee training on phishing awareness and best practices. Vulnerability report included.",
+        "keywords": "SMB cybersecurity audit, employee cybersecurity training, business phishing awareness, SMB vulnerability report"
+      },
+      "schema": {
+        "name": "SMB Cybersecurity Audit & Training",
+        "description": "Cybersecurity audit and employee training service for SMBs. Remote or on-site audit, vulnerability report and phishing awareness."
+      },
+      "breadcrumb": {
+        "aria": "Breadcrumb",
+        "home": "Home",
+        "solution": "Enterprise solution",
+        "current": "Audit & Training"
+      },
+      "hero": {
+        "eyebrow": "Audit & Training",
+        "h1_highlight": "Cybersecurity Audit & Training",
+        "h1_suffix": "to protect your SMB",
+        "subtitle": "91% of cyberattacks start with human error. We audit your vulnerabilities and train your teams so it doesn't happen to you.",
+        "pill1": "SMB cybersecurity audit",
+        "pill2": "Employee training",
+        "pill3": "Phishing awareness"
+      },
+      "proof": {
+        "stat1": "of cyberattacks start with human error (source: IBM)",
+        "stat2": "trained SMBs reduce security incidents",
+        "stat3": "average cost of a cyberattack for an SMB (source: ANSSI)"
+      },
+      "services": {
+        "eyebrow": "Our services",
+        "title": "Two complementary services",
+        "subtitle": "The audit identifies your vulnerabilities, training protects your teams. Together, they form your cybersecurity shield.",
+        "audit": {
+          "title": "Security audit",
+          "desc": "Complete analysis of your infrastructure to identify vulnerabilities before they are exploited.",
+          "item1": "Remote audit (network, password policies)",
+          "item2": "On-site physical audit if needed",
+          "item3": "Detailed vulnerability report with priorities",
+          "item4": "Personalized remediation plan"
+        },
+        "training": {
+          "title": "Employee training",
+          "desc": "Your teams are your first line of defense. We train them to recognize and avoid the most common threats.",
+          "item1": "Phishing awareness (simulations included)",
+          "item2": "Password best practices",
+          "item3": "Internal security procedures",
+          "item4": "Interactive workshop (in-person or remote)"
+        }
+      },
+      "process": {
+        "eyebrow": "How it works",
+        "title": "Our 4-step method",
+        "subtitle": "From first contact to final report, here's how we work with your SMB.",
+        "step1": {
+          "title": "Contact & initial assessment",
+          "desc": "A 30-minute call to understand your context, challenges and define the scope of the engagement."
+        },
+        "step2": {
+          "title": "Security audit",
+          "desc": "Analysis of your systems, password policies, access rights and infrastructure. Remote or on-site as needed."
+        },
+        "step3": {
+          "title": "Team training",
+          "desc": "Awareness session tailored to your sector: phishing, social engineering, day-to-day best practices."
+        },
+        "step4": {
+          "title": "Report & remediation plan",
+          "desc": "Delivery of a clear report with identified vulnerabilities, their criticality level and priority actions to take."
+        }
+      },
+      "faq": {
+        "eyebrow": "Frequently asked questions",
+        "title": "Your questions about the audit",
+        "q1": {
+          "question": "How long does an audit take?",
+          "answer": "A remote audit typically takes 2 to 3 business days. An on-site audit spans half a day to a full day depending on the size of your organisation. The report is delivered within 5 days of the engagement."
+        },
+        "q2": {
+          "question": "Do I need MykeyNest to benefit from the audit?",
+          "answer": "No. The audit and training are offered independently of our software. Of course, if the audit reveals password management issues, we can propose MykeyNest as a suitable solution."
+        },
+        "q3": {
+          "question": "Is the training suitable for non-technical employees?",
+          "answer": "Absolutely. Our training is designed for non-technical profiles: sales, HR, accounting… We use real-world examples from your sector to maximise understanding and retention."
+        },
+        "q4": {
+          "question": "What is the cost of an audit?",
+          "answer": "The price varies depending on the scope and size of your company. Contact us for a free personalised quote. As a MykeyNest Pro customer, you benefit from a built-in software security audit at no extra cost."
+        }
+      },
+      "cta": {
+        "title": "Ready to audit your security?",
+        "subtitle": "Contact us for a free 30-minute initial assessment.",
+        "primary": "Request a quote",
+        "secondary": "See the full solution"
       }
     }
   }

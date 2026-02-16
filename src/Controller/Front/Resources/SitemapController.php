@@ -114,6 +114,22 @@ final class SitemapController extends AbstractController
             }
         }
 
+        // ── Pages business / entreprise ──────────────────────────────────
+        $urls[] = $this->entry(
+            $urlGenerator->generate('business_solution', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $now, 'weekly', '0.9'
+        );
+
+        $urls[] = $this->entry(
+            $urlGenerator->generate('business_comparatif', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $now, 'monthly', '0.8'
+        );
+
+        $urls[] = $this->entry(
+            $urlGenerator->generate('business_audit', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            $now, 'weekly', '0.8'
+        );
+
         // ── Blog — index par locale ───────────────────────────────────────
         foreach (['fr', 'en'] as $locale) {
             $urls[] = $this->entry(

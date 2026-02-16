@@ -531,15 +531,34 @@ img[loading="lazy"]{content-visibility:auto}
 <div class="footer-links">
   <h4>{{ 'landing.footer.company'|trans }}</h4>
   <ul>
-    <li><a href="#">{{ 'landing.footer.links.about'|trans }}</a></li>
-   <li>
-    <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
-       hreflang="{{ app.request.locale }}">
-        {{ 'landing.footer.links.blog'|trans }}
-    </a>
-</li>
+    {# Solution PME (page pilier) #}
+    <li>
+      <a href="{{ path('business_solution') }}">
+        {{ 'landing.footer.links.cyber_pme_solution'|trans }}
+      </a>
+    </li>
 
-    <li><a href="/#contact">{{ 'landing.footer.links.contact'|trans }}</a></li>
+    {# Comparatif entreprise #}
+    <li>
+      <a href="{{ path('business_comparatif') }}">
+        {{ 'landing.footer.links.password_manager_entreprise_comparatif'|trans }}
+      </a>
+    </li>
+
+    {# Audit PME #}
+    <li>
+      <a href="{{ path('business_audit') }}">
+        {{ 'landing.footer.links.audit_cyber_pme'|trans }}
+      </a>
+    </li>
+
+    {# Blog (ok comme ça) #}
+    <li>
+      <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
+         hreflang="{{ app.request.locale }}">
+        {{ 'landing.footer.links.blog'|trans }}
+      </a>
+    </li>
   </ul>
 </div>
 

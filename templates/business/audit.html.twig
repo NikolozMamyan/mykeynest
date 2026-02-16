@@ -1,0 +1,425 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}{{ 'business.audit.meta.title'|trans }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ 'business.audit.meta.description'|trans }}">
+<meta name="keywords" content="{{ 'business.audit.meta.keywords'|trans }}">
+<meta property="og:title" content="{{ 'business.audit.meta.title'|trans }}">
+<meta property="og:description" content="{{ 'business.audit.meta.description'|trans }}">
+<meta property="og:type" content="website">
+<link rel="canonical" href="{{ app.request.uri }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "{{ 'business.audit.schema.name'|trans }}",
+  "description": "{{ 'business.audit.schema.description'|trans }}",
+  "provider": { "@type": "Organization", "name": "MykeyNest" },
+  "serviceType": ["Audit cybersécurité PME", "Formation cybersécurité collaborateurs"]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --color-primary:#059669; --color-primary-hover:rgba(16,185,129,0.15);
+        --color-white:#fff; --color-bg-light:#f8fafc; --color-bg-hover:#f1f5f9;
+        --color-text-dark:#1e293b; --color-text-medium:#475569; --color-text-muted:#64748b;
+        --color-text-light:#94a3b8; --color-border:#e2e8f0; --color-success:#10b981;
+        --shadow-sm:0 1px 3px rgba(0,0,0,0.05); --shadow-green:0 4px 14px rgba(5,150,105,0.2);
+        --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+        --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+        --shadow-xl:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);
+        --border-radius:12px; --border-radius-sm:8px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#f8fafc;color:var(--color-text-dark)}
+
+    /* ── Breadcrumb ── */
+    .aud-breadcrumb {
+        background: var(--color-white); border-bottom: 1px solid var(--color-border); padding: 0.875rem 2rem;
+    }
+    .aud-breadcrumb-inner {
+        max-width: 1100px; margin: 0 auto;
+        display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .aud-breadcrumb a { font-size: 0.8125rem; color: var(--color-text-muted); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+    .aud-breadcrumb a:hover { color: var(--color-primary); }
+    .aud-breadcrumb-sep { color: var(--color-text-light); font-size: 0.75rem; }
+    .aud-breadcrumb-current { font-size: 0.8125rem; font-weight: 600; color: var(--color-text-dark); }
+
+    /* ── Hero ── */
+    .aud-hero {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid var(--color-border);
+        padding: 4.5rem 2rem 4rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .aud-hero::before {
+        content:''; position:absolute; inset:0; pointer-events:none;
+        background: radial-gradient(circle at 25% 60%, rgba(5,150,105,0.1) 0%, transparent 55%),
+                    radial-gradient(circle at 78% 25%, rgba(16,185,129,0.07) 0%, transparent 50%);
+        animation: heroFloat 18s ease-in-out infinite;
+    }
+    @keyframes heroFloat{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+    .aud-hero-inner { max-width: 820px; margin: 0 auto; position: relative; z-index: 1; }
+    .aud-eyebrow {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        background: var(--color-white); border: 1px solid rgba(5,150,105,0.25);
+        border-radius: 2rem; padding: 0.4rem 1.1rem;
+        font-size: 0.75rem; font-weight: 700; color: var(--color-primary);
+        text-transform: uppercase; letter-spacing: 0.07em;
+        box-shadow: var(--shadow-sm); margin-bottom: 1.25rem;
+        animation: slideDown 0.5s ease-out both;
+    }
+    @keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+    .aud-hero h1 {
+        font-size: clamp(1.75rem, 4vw, 2.875rem); font-weight: 700;
+        color: var(--color-text-dark); line-height: 1.2; margin-bottom: 1.125rem;
+        animation: fadeUp 0.6s ease-out 0.15s both;
+    }
+    .aud-grad {
+        background: linear-gradient(135deg, var(--color-primary), #10b981);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .aud-hero-sub {
+        font-size: 1.0625rem; color: var(--color-text-medium); line-height: 1.7;
+        max-width: 640px; margin: 0 auto 2.25rem;
+        animation: fadeUp 0.6s ease-out 0.3s both;
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    .aud-hero-pills {
+        display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;
+        animation: fadeUp 0.6s ease-out 0.45s both;
+    }
+    .aud-pill {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        background: var(--color-white); border: 1px solid rgba(5,150,105,0.25);
+        border-radius: 2rem; padding: 0.4rem 1rem;
+        font-size: 0.8125rem; font-weight: 600; color: var(--color-text-medium);
+        box-shadow: var(--shadow-sm);
+    }
+    .aud-pill-dot { width: 6px; height: 6px; background: var(--color-primary); border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Layout ── */
+    .aud-layout { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem 5rem; }
+    .aud-section-eyebrow { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-primary); margin-bottom: 0.5rem; }
+    .aud-section-title { font-size: clamp(1.375rem, 2.5vw, 1.875rem); font-weight: 700; color: var(--color-text-dark); margin-bottom: 0.5rem; }
+    .aud-section-sub { font-size: 0.9375rem; color: var(--color-text-medium); margin-bottom: 2rem; line-height: 1.65; }
+
+    /* ── Service cards ── */
+    .aud-services {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 5rem;
+    }
+    .aud-service-card {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius); padding: 2.25rem;
+        transition: all 0.3s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden;
+    }
+    .aud-service-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--color-primary), #10b981);
+        transform: scaleX(0); transform-origin: left; transition: transform 0.3s;
+    }
+    .aud-service-card:hover { border-color: var(--color-primary); transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+    .aud-service-card:hover::before { transform: scaleX(1); }
+    .aud-service-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+    .aud-service-icon {
+        width: 3.25rem; height: 3.25rem;
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border: 1px solid rgba(5,150,105,0.2); border-radius: var(--border-radius-sm);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; flex-shrink: 0;
+        transition: transform 0.3s;
+    }
+    .aud-service-card:hover .aud-service-icon { transform: scale(1.1) rotate(-5deg); }
+    .aud-service-title { font-size: 1.125rem; font-weight: 700; color: var(--color-text-dark); }
+    .aud-service-desc { font-size: 0.9rem; color: var(--color-text-medium); line-height: 1.7; margin-bottom: 1.5rem; }
+    .aud-service-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .aud-service-list li {
+        display: flex; align-items: flex-start; gap: 0.625rem;
+        font-size: 0.875rem; color: var(--color-text-medium); line-height: 1.55;
+    }
+    .aud-li-check {
+        width: 1.25rem; height: 1.25rem;
+        background: linear-gradient(135deg, var(--color-primary), #10b981);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 0.5625rem; font-weight: 800;
+        flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── Process steps ── */
+    .aud-process { margin-bottom: 5rem; }
+    .aud-steps { display: flex; flex-direction: column; gap: 0; margin-top: 1.5rem; }
+    .aud-step {
+        display: grid; grid-template-columns: 3rem 1fr; gap: 1.25rem;
+        padding: 1.5rem 0; border-bottom: 1px dashed var(--color-border); align-items: flex-start;
+    }
+    .aud-step:last-child { border-bottom: none; }
+    .aud-step-num {
+        font-family: 'Space Mono', monospace; font-size: 1.25rem; font-weight: 700;
+        color: var(--color-primary); line-height: 1; padding-top: 2px;
+    }
+    .aud-step-content {}
+    .aud-step-title { font-size: 1rem; font-weight: 700; color: var(--color-text-dark); margin-bottom: 0.3rem; }
+    .aud-step-desc { font-size: 0.875rem; color: var(--color-text-medium); line-height: 1.65; }
+
+    /* ── Testimonial / Social proof ── */
+    .aud-proof {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius); padding: 2.5rem; margin-bottom: 5rem;
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; text-align: center;
+    }
+    .aud-proof-stat-number {
+        font-family: 'Space Mono', monospace; font-size: 2.5rem; font-weight: 700;
+        color: var(--color-primary); line-height: 1; margin-bottom: 0.25rem;
+    }
+    .aud-proof-stat-label { font-size: 0.8125rem; color: var(--color-text-muted); font-weight: 500; }
+
+    /* ── FAQ ── */
+    .aud-faq { margin-bottom: 4rem; }
+    .aud-faq-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+    .aud-faq-item {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius-sm); overflow: hidden; transition: border-color 0.2s;
+    }
+    .aud-faq-item.open { border-color: var(--color-primary); }
+    .aud-faq-btn {
+        width: 100%; padding: 1rem 1.25rem;
+        display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        cursor: pointer; background: none; border: none; text-align: left;
+        font-family: 'DM Sans', sans-serif;
+    }
+    .aud-faq-q { font-size: 0.9375rem; font-weight: 600; color: var(--color-text-dark); }
+    .aud-faq-chevron {
+        width: 1.125rem; height: 1.125rem; color: var(--color-text-muted); flex-shrink: 0;
+        transition: transform 0.3s, color 0.2s;
+    }
+    .aud-faq-item.open .aud-faq-chevron { transform: rotate(180deg); color: var(--color-primary); }
+    .aud-faq-body {
+        max-height: 0; overflow: hidden; padding: 0 1.25rem;
+        transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+    .aud-faq-item.open .aud-faq-body { max-height: 400px; padding-bottom: 1.25rem; }
+    .aud-faq-body p { font-size: 0.875rem; color: var(--color-text-medium); line-height: 1.7; }
+
+    /* ── CTA contact ── */
+    .aud-cta {
+        background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
+        border-radius: var(--border-radius); padding: 3.5rem 2.5rem;
+        display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center;
+        position: relative; overflow: hidden;
+    }
+    .aud-cta::before {
+        content:''; position:absolute; top:-50%; right:-5%; width:280px; height:280px;
+        background:rgba(255,255,255,0.07); border-radius:50%; pointer-events:none;
+    }
+    .aud-cta-text { position: relative; z-index: 1; }
+    .aud-cta-title { font-size: clamp(1.375rem, 3vw, 1.875rem); font-weight: 700; color: white; margin-bottom: 0.5rem; }
+    .aud-cta-sub { font-size: 1rem; color: rgba(255,255,255,0.88); }
+    .aud-cta-actions { display: flex; flex-direction: column; gap: 0.75rem; position: relative; z-index: 1; flex-shrink: 0; }
+    .aud-cta-btn-white {
+        padding: 0.875rem 1.75rem; background: white; color: var(--color-primary);
+        border-radius: var(--border-radius-sm); font-weight: 700; text-decoration: none;
+        text-align: center; transition: all 0.25s; box-shadow: var(--shadow-lg); white-space: nowrap;
+    }
+    .aud-cta-btn-white:hover { transform: translateY(-2px); box-shadow: var(--shadow-xl); }
+    .aud-cta-btn-ghost {
+        padding: 0.875rem 1.75rem; background: rgba(255,255,255,0.15); color: white;
+        border: 2px solid rgba(255,255,255,0.4); border-radius: var(--border-radius-sm);
+        font-weight: 600; text-decoration: none; text-align: center; transition: all 0.25s; white-space: nowrap;
+    }
+    .aud-cta-btn-ghost:hover { background: rgba(255,255,255,0.25); }
+
+    @media (max-width: 860px) {
+        .aud-services { grid-template-columns: 1fr; }
+        .aud-proof { grid-template-columns: 1fr; gap: 1.5rem; }
+        .aud-cta { grid-template-columns: 1fr; text-align: center; }
+        .aud-cta-actions { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+    }
+    @media (max-width: 560px) {
+        .aud-hero { padding: 3rem 1.25rem 2.5rem; }
+        .aud-layout { padding: 2rem 1.25rem 4rem; }
+    }
+</style>
+
+<main>
+    {# ── Breadcrumb ── #}
+    <nav class="aud-breadcrumb" aria-label="{{ 'business.audit.breadcrumb.aria'|trans }}">
+        <div class="aud-breadcrumb-inner">
+            <a href="{{ path('app_landing') }}">{{ 'business.audit.breadcrumb.home'|trans }}</a>
+            <span class="aud-breadcrumb-sep">›</span>
+            <a href="{{ path('business_solution') }}">{{ 'business.audit.breadcrumb.solution'|trans }}</a>
+            <span class="aud-breadcrumb-sep">›</span>
+            <span class="aud-breadcrumb-current">{{ 'business.audit.breadcrumb.current'|trans }}</span>
+        </div>
+    </nav>
+
+    {# ── Hero ── #}
+    <section class="aud-hero">
+        <div class="aud-hero-inner">
+            <div class="aud-eyebrow">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                {{ 'business.audit.hero.eyebrow'|trans }}
+            </div>
+            <h1>
+                <span class="aud-grad">{{ 'business.audit.hero.h1_highlight'|trans }}</span>
+                {{ 'business.audit.hero.h1_suffix'|trans }}
+            </h1>
+            <p class="aud-hero-sub">{{ 'business.audit.hero.subtitle'|trans }}</p>
+            <div class="aud-hero-pills">
+                <span class="aud-pill"><span class="aud-pill-dot"></span>{{ 'business.audit.hero.pill1'|trans }}</span>
+                <span class="aud-pill"><span class="aud-pill-dot"></span>{{ 'business.audit.hero.pill2'|trans }}</span>
+                <span class="aud-pill"><span class="aud-pill-dot"></span>{{ 'business.audit.hero.pill3'|trans }}</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="aud-layout">
+
+        {# ── Stats proof ── #}
+        <div class="aud-proof">
+            <div>
+                <div class="aud-proof-stat-number">91%</div>
+                <div class="aud-proof-stat-label">{{ 'business.audit.proof.stat1'|trans }}</div>
+            </div>
+            <div>
+                <div class="aud-proof-stat-number">3×</div>
+                <div class="aud-proof-stat-label">{{ 'business.audit.proof.stat2'|trans }}</div>
+            </div>
+            <div>
+                <div class="aud-proof-stat-number">€18K</div>
+                <div class="aud-proof-stat-label">{{ 'business.audit.proof.stat3'|trans }}</div>
+            </div>
+        </div>
+
+        {# ── Services ── #}
+        <div class="aud-section-eyebrow">{{ 'business.audit.services.eyebrow'|trans }}</div>
+        <h2 class="aud-section-title">{{ 'business.audit.services.title'|trans }}</h2>
+        <p class="aud-section-sub">{{ 'business.audit.services.subtitle'|trans }}</p>
+
+        <div class="aud-services">
+            {# Audit #}
+            <div class="aud-service-card">
+                <div class="aud-service-head">
+                    <div class="aud-service-icon" aria-hidden="true">🔍</div>
+                    <div class="aud-service-title">{{ 'business.audit.services.audit.title'|trans }}</div>
+                </div>
+                <p class="aud-service-desc">{{ 'business.audit.services.audit.desc'|trans }}</p>
+                <ul class="aud-service-list">
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.audit.item1'|trans }}</li>
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.audit.item2'|trans }}</li>
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.audit.item3'|trans }}</li>
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.audit.item4'|trans }}</li>
+                </ul>
+            </div>
+            {# Formation #}
+            <div class="aud-service-card">
+                <div class="aud-service-head">
+                    <div class="aud-service-icon" aria-hidden="true">🧑‍🏫</div>
+                    <div class="aud-service-title">{{ 'business.audit.services.training.title'|trans }}</div>
+                </div>
+                <p class="aud-service-desc">{{ 'business.audit.services.training.desc'|trans }}</p>
+                <ul class="aud-service-list">
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.training.item1'|trans }}</li>
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.training.item2'|trans }}</li>
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.training.item3'|trans }}</li>
+                    <li><span class="aud-li-check">✓</span>{{ 'business.audit.services.training.item4'|trans }}</li>
+                </ul>
+            </div>
+        </div>
+
+        {# ── Process ── #}
+        <div class="aud-process">
+            <div class="aud-section-eyebrow">{{ 'business.audit.process.eyebrow'|trans }}</div>
+            <h2 class="aud-section-title">{{ 'business.audit.process.title'|trans }}</h2>
+            <p class="aud-section-sub">{{ 'business.audit.process.subtitle'|trans }}</p>
+            <div class="aud-steps">
+                <div class="aud-step">
+                    <div class="aud-step-num">01</div>
+                    <div class="aud-step-content">
+                        <div class="aud-step-title">{{ 'business.audit.process.step1.title'|trans }}</div>
+                        <p class="aud-step-desc">{{ 'business.audit.process.step1.desc'|trans }}</p>
+                    </div>
+                </div>
+                <div class="aud-step">
+                    <div class="aud-step-num">02</div>
+                    <div class="aud-step-content">
+                        <div class="aud-step-title">{{ 'business.audit.process.step2.title'|trans }}</div>
+                        <p class="aud-step-desc">{{ 'business.audit.process.step2.desc'|trans }}</p>
+                    </div>
+                </div>
+                <div class="aud-step">
+                    <div class="aud-step-num">03</div>
+                    <div class="aud-step-content">
+                        <div class="aud-step-title">{{ 'business.audit.process.step3.title'|trans }}</div>
+                        <p class="aud-step-desc">{{ 'business.audit.process.step3.desc'|trans }}</p>
+                    </div>
+                </div>
+                <div class="aud-step">
+                    <div class="aud-step-num">04</div>
+                    <div class="aud-step-content">
+                        <div class="aud-step-title">{{ 'business.audit.process.step4.title'|trans }}</div>
+                        <p class="aud-step-desc">{{ 'business.audit.process.step4.desc'|trans }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ── FAQ ── #}
+        <div class="aud-faq">
+            <div class="aud-section-eyebrow">{{ 'business.audit.faq.eyebrow'|trans }}</div>
+            <h2 class="aud-section-title">{{ 'business.audit.faq.title'|trans }}</h2>
+            <div class="aud-faq-list">
+                {% set faqs = ['q1','q2','q3','q4'] %}
+                {% for faq in faqs %}
+                <div class="aud-faq-item">
+                    <button class="aud-faq-btn" aria-expanded="false">
+                        <span class="aud-faq-q">{{ ('business.audit.faq.' ~ faq ~ '.question')|trans }}</span>
+                        <svg class="aud-faq-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="aud-faq-body">
+                        <p>{{ ('business.audit.faq.' ~ faq ~ '.answer')|trans }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# ── CTA ── #}
+        <div class="aud-cta">
+            <div class="aud-cta-text">
+                <div class="aud-cta-title">{{ 'business.audit.cta.title'|trans }}</div>
+                <p class="aud-cta-sub">{{ 'business.audit.cta.subtitle'|trans }}</p>
+            </div>
+            <div class="aud-cta-actions">
+                <a href="mailto:contact@key-nest.com" class="aud-cta-btn-white">{{ 'business.audit.cta.primary'|trans }}</a>
+                <a href="{{ path('business_solution') }}" class="aud-cta-btn-ghost">{{ 'business.audit.cta.secondary'|trans }}</a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script>
+(function(){
+    document.querySelectorAll('.aud-faq-btn').forEach(function(btn){
+        btn.addEventListener('click',function(){
+            var item = btn.closest('.aud-faq-item');
+            var isOpen = item.classList.contains('open');
+            document.querySelectorAll('.aud-faq-item.open').forEach(function(el){
+                el.classList.remove('open');
+                el.querySelector('.aud-faq-btn').setAttribute('aria-expanded','false');
+            });
+            if(!isOpen){ item.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,402 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}{{ 'business.solution.meta.title'|trans }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ 'business.solution.meta.description'|trans }}">
+<meta name="keywords" content="{{ 'business.solution.meta.keywords'|trans }}">
+<meta property="og:title" content="{{ 'business.solution.meta.title'|trans }}">
+<meta property="og:description" content="{{ 'business.solution.meta.description'|trans }}">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="{{ app.request.uri }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ 'business.solution.schema.name'|trans }}",
+  "description": "{{ 'business.solution.schema.description'|trans }}",
+  "offers": { "@type": "Offer", "price": "2.99", "priceCurrency": "EUR", "priceSpecification": { "price": "2.99", "unitCode": "MON" } }
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --color-primary: #059669; --color-primary-hover: rgba(16,185,129,0.15);
+        --color-white: #ffffff; --color-bg-light: #f8fafc; --color-bg-hover: #f1f5f9;
+        --color-text-dark: #1e293b; --color-text-medium: #475569; --color-text-muted: #64748b;
+        --color-text-light: #94a3b8; --color-border: #e2e8f0; --color-success: #10b981;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+        --shadow-green: 0 4px 14px rgba(5,150,105,0.2);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);
+        --border-radius: 12px; --border-radius-sm: 8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f8fafc; color: var(--color-text-dark); }
+
+    /* ── Hero ── */
+    .bs-hero {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid var(--color-border);
+        padding: 5rem 2rem 4rem;
+        position: relative; overflow: hidden;
+    }
+    .bs-hero::before {
+        content: ''; position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(circle at 15% 40%, rgba(5,150,105,0.1) 0%, transparent 55%),
+                    radial-gradient(circle at 85% 20%, rgba(16,185,129,0.07) 0%, transparent 50%);
+        animation: heroFloat 20s ease-in-out infinite;
+    }
+    @keyframes heroFloat { 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
+    .bs-hero-inner { max-width: 900px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+    .bs-eyebrow {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        background: var(--color-white); border: 1px solid rgba(5,150,105,0.25);
+        border-radius: 2rem; padding: 0.45rem 1.25rem;
+        font-size: 0.8rem; font-weight: 700; color: var(--color-primary);
+        text-transform: uppercase; letter-spacing: 0.06em;
+        box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;
+        animation: slideDown 0.5s ease-out both;
+    }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+    .bs-hero h1 {
+        font-size: clamp(1.875rem, 4vw, 3rem); font-weight: 700;
+        color: var(--color-text-dark); line-height: 1.2; margin-bottom: 1.25rem;
+        animation: fadeUp 0.6s ease-out 0.15s both;
+    }
+    .bs-grad {
+        background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .bs-hero-sub {
+        font-size: 1.125rem; color: var(--color-text-medium); line-height: 1.7;
+        max-width: 680px; margin: 0 auto 2.5rem;
+        animation: fadeUp 0.6s ease-out 0.3s both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .bs-hero-actions {
+        display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+        animation: fadeUp 0.6s ease-out 0.45s both;
+    }
+    .bs-btn-primary {
+        padding: 0.875rem 2rem; background: linear-gradient(135deg, var(--color-primary), #10b981);
+        color: white; border-radius: var(--border-radius); font-size: 1rem; font-weight: 700;
+        text-decoration: none; transition: all 0.25s; box-shadow: var(--shadow-md);
+        display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .bs-btn-primary:hover { transform: translateY(-3px); box-shadow: var(--shadow-green); }
+    .bs-btn-outline {
+        padding: 0.875rem 2rem; background: var(--color-white);
+        color: var(--color-primary); border: 2px solid var(--color-primary);
+        border-radius: var(--border-radius); font-size: 1rem; font-weight: 700;
+        text-decoration: none; transition: all 0.25s;
+    }
+    .bs-btn-outline:hover { background: var(--color-primary-hover); transform: translateY(-2px); }
+    .bs-hero-trust {
+        display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;
+        margin-top: 2.5rem; animation: fadeUp 0.6s ease-out 0.6s both;
+    }
+    .bs-trust-item {
+        display: flex; align-items: center; gap: 0.4rem;
+        font-size: 0.8125rem; font-weight: 600; color: var(--color-text-muted);
+    }
+    .bs-trust-check {
+        width: 1.25rem; height: 1.25rem; background: var(--color-primary);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 0.625rem; font-weight: 800; flex-shrink: 0;
+    }
+
+    /* ── Layout ── */
+    .bs-layout { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem 5rem; }
+
+    /* ── Section header ── */
+    .bs-section-eyebrow {
+        font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.1em; color: var(--color-primary); margin-bottom: 0.5rem;
+    }
+    .bs-section-title {
+        font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;
+        color: var(--color-text-dark); margin-bottom: 0.625rem; line-height: 1.25;
+    }
+    .bs-section-sub { font-size: 1rem; color: var(--color-text-medium); margin-bottom: 2.5rem; line-height: 1.65; }
+
+    /* ── Feature pillars ── */
+    .bs-pillars { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 5rem; }
+    .bs-pillar {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius); padding: 2rem 1.75rem;
+        transition: all 0.3s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden;
+    }
+    .bs-pillar::after {
+        content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+        background: linear-gradient(90deg, var(--color-primary), #10b981);
+        transform: scaleX(0); transform-origin: left; transition: transform 0.3s;
+    }
+    .bs-pillar:hover { border-color: var(--color-primary); transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .bs-pillar:hover::after { transform: scaleX(1); }
+    .bs-pillar-icon {
+        width: 3rem; height: 3rem;
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border: 1px solid rgba(5,150,105,0.2); border-radius: var(--border-radius-sm);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.375rem; margin-bottom: 1.25rem;
+        transition: transform 0.3s;
+    }
+    .bs-pillar:hover .bs-pillar-icon { transform: scale(1.1) rotate(-4deg); }
+    .bs-pillar-title { font-size: 1rem; font-weight: 700; color: var(--color-text-dark); margin-bottom: 0.875rem; }
+    .bs-pillar-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .bs-pillar-list li {
+        font-size: 0.875rem; color: var(--color-text-medium);
+        display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.5;
+    }
+    .bs-pillar-list li::before {
+        content: '→'; color: var(--color-primary); font-weight: 700;
+        flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── Pricing ── */
+    .bs-pricing-wrap {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius); padding: 3rem; margin-bottom: 5rem;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
+        position: relative; overflow: hidden;
+    }
+    .bs-pricing-wrap::before {
+        content: ''; position: absolute; top: -60px; right: -60px;
+        width: 240px; height: 240px;
+        background: radial-gradient(circle, rgba(5,150,105,0.06), transparent 70%);
+        border-radius: 50%; pointer-events: none;
+    }
+    .bs-price-block { position: relative; z-index: 1; }
+    .bs-price-amount {
+        font-family: 'Space Mono', monospace;
+        font-size: 3.5rem; font-weight: 700; color: var(--color-primary);
+        line-height: 1; margin-bottom: 0.25rem;
+    }
+    .bs-price-unit { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 1rem; font-weight: 500; }
+    .bs-price-badge {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        background: #f0fdf4; border: 1px solid rgba(5,150,105,0.3);
+        color: var(--color-primary); padding: 0.35rem 0.875rem;
+        border-radius: 2rem; font-size: 0.8rem; font-weight: 700;
+    }
+    .bs-price-features { position: relative; z-index: 1; }
+    .bs-price-feature {
+        display: flex; align-items: flex-start; gap: 0.75rem;
+        padding: 0.625rem 0; border-bottom: 1px solid var(--color-border);
+        font-size: 0.9375rem; color: var(--color-text-medium);
+    }
+    .bs-price-feature:last-child { border-bottom: none; }
+    .bs-check-green {
+        width: 1.375rem; height: 1.375rem; background: linear-gradient(135deg, var(--color-primary), #10b981);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        color: white; flex-shrink: 0; font-size: 0.625rem; margin-top: 2px;
+    }
+
+    /* ── CTA ── */
+    .bs-cta {
+        background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
+        border-radius: var(--border-radius); padding: 3.5rem 2.5rem;
+        text-align: center; position: relative; overflow: hidden;
+    }
+    .bs-cta::before {
+        content: ''; position: absolute; top: -50%; right: -5%;
+        width: 300px; height: 300px; background: rgba(255,255,255,0.07);
+        border-radius: 50%; pointer-events: none;
+    }
+    .bs-cta-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: white; margin-bottom: 0.75rem; }
+    .bs-cta-sub { font-size: 1.0625rem; color: rgba(255,255,255,0.88); margin-bottom: 2rem; }
+    .bs-cta-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+    .bs-cta-btn-white {
+        padding: 0.875rem 2rem; background: white; color: var(--color-primary);
+        border-radius: var(--border-radius-sm); font-weight: 700; text-decoration: none;
+        transition: all 0.25s; box-shadow: var(--shadow-lg);
+    }
+    .bs-cta-btn-white:hover { transform: translateY(-3px); box-shadow: var(--shadow-xl); }
+    .bs-cta-btn-ghost {
+        padding: 0.875rem 2rem; background: rgba(255,255,255,0.15);
+        color: white; border: 2px solid rgba(255,255,255,0.4);
+        border-radius: var(--border-radius-sm); font-weight: 600; text-decoration: none; transition: all 0.25s;
+    }
+    .bs-cta-btn-ghost:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── Nav links to other pages ── */
+    .bs-nav-pages { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 5rem; }
+    .bs-nav-card {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius); padding: 1.75rem;
+        text-decoration: none; display: flex; align-items: center;
+        gap: 1.25rem; transition: all 0.25s;
+    }
+    .bs-nav-card:hover { border-color: var(--color-primary); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .bs-nav-icon {
+        width: 3rem; height: 3rem; background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border: 1px solid rgba(5,150,105,0.2); border-radius: var(--border-radius-sm);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.375rem; flex-shrink: 0;
+    }
+    .bs-nav-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-primary); margin-bottom: 0.25rem; }
+    .bs-nav-title { font-size: 0.9375rem; font-weight: 700; color: var(--color-text-dark); }
+
+    @media (max-width: 768px) {
+        .bs-hero { padding: 3.5rem 1.25rem 3rem; }
+        .bs-layout { padding: 2.5rem 1.25rem 4rem; }
+        .bs-pricing-wrap { grid-template-columns: 1fr; gap: 2rem; padding: 2rem; }
+        .bs-nav-pages { grid-template-columns: 1fr; }
+        .bs-pillars { grid-template-columns: 1fr; }
+    }
+</style>
+
+<main>
+    {# ── Hero ── #}
+    <section class="bs-hero">
+        <div class="bs-hero-inner">
+            <div class="bs-eyebrow">
+                <i class="fa-solid fa-building-shield" aria-hidden="true"></i>
+                {{ 'business.solution.hero.eyebrow'|trans }}
+            </div>
+            <h1>
+                {{ 'business.solution.hero.h1_before'|trans }}
+                <span class="bs-grad">{{ 'business.solution.hero.h1_highlight'|trans }}</span>
+                {{ 'business.solution.hero.h1_after'|trans }}
+            </h1>
+            <p class="bs-hero-sub">{{ 'business.solution.hero.subtitle'|trans }}</p>
+            <div class="bs-hero-actions">
+                <a href="{{ path('show_register') }}" class="bs-btn-primary">
+                    <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+                    {{ 'business.solution.hero.cta_primary'|trans }}
+                </a>
+                <a href="{{ path('business_audit') }}" class="bs-btn-outline">
+                    {{ 'business.solution.hero.cta_secondary'|trans }}
+                </a>
+            </div>
+            <div class="bs-hero-trust">
+                <div class="bs-trust-item"><span class="bs-trust-check">✓</span>{{ 'business.solution.hero.trust.no_commitment'|trans }}</div>
+                <div class="bs-trust-item"><span class="bs-trust-check">✓</span>{{ 'business.solution.hero.trust.setup'|trans }}</div>
+                <div class="bs-trust-item"><span class="bs-trust-check">✓</span>{{ 'business.solution.hero.trust.support'|trans }}</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="bs-layout">
+
+        {# ── 4 piliers ── #}
+        <div class="bs-section-eyebrow">{{ 'business.solution.pillars.eyebrow'|trans }}</div>
+        <h2 class="bs-section-title">{{ 'business.solution.pillars.title'|trans }}</h2>
+        <p class="bs-section-sub">{{ 'business.solution.pillars.subtitle'|trans }}</p>
+
+        <div class="bs-pillars">
+            {# Logiciel #}
+            <div class="bs-pillar">
+                <div class="bs-pillar-icon" aria-hidden="true">🔐</div>
+                <div class="bs-pillar-title">{{ 'business.solution.pillars.software.title'|trans }}</div>
+                <ul class="bs-pillar-list">
+                    <li>{{ 'business.solution.pillars.software.item1'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.software.item2'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.software.item3'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.software.item4'|trans }}</li>
+                </ul>
+            </div>
+            {# Maintenance #}
+            <div class="bs-pillar">
+                <div class="bs-pillar-icon" aria-hidden="true">🛠</div>
+                <div class="bs-pillar-title">{{ 'business.solution.pillars.maintenance.title'|trans }}</div>
+                <ul class="bs-pillar-list">
+                    <li>{{ 'business.solution.pillars.maintenance.item1'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.maintenance.item2'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.maintenance.item3'|trans }}</li>
+                </ul>
+            </div>
+            {# Formation #}
+            <div class="bs-pillar">
+                <div class="bs-pillar-icon" aria-hidden="true">🧑‍🏫</div>
+                <div class="bs-pillar-title">{{ 'business.solution.pillars.training.title'|trans }}</div>
+                <ul class="bs-pillar-list">
+                    <li>{{ 'business.solution.pillars.training.item1'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.training.item2'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.training.item3'|trans }}</li>
+                </ul>
+            </div>
+            {# Audit #}
+            <div class="bs-pillar">
+                <div class="bs-pillar-icon" aria-hidden="true">🧪</div>
+                <div class="bs-pillar-title">{{ 'business.solution.pillars.audit.title'|trans }}</div>
+                <ul class="bs-pillar-list">
+                    <li>{{ 'business.solution.pillars.audit.item1'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.audit.item2'|trans }}</li>
+                    <li>{{ 'business.solution.pillars.audit.item3'|trans }}</li>
+                </ul>
+            </div>
+        </div>
+
+        {# ── Liens vers les autres pages ── #}
+        <div class="bs-section-eyebrow">{{ 'business.solution.explore.eyebrow'|trans }}</div>
+        <h2 class="bs-section-title">{{ 'business.solution.explore.title'|trans }}</h2>
+        <p class="bs-section-sub">{{ 'business.solution.explore.subtitle'|trans }}</p>
+
+        <div class="bs-nav-pages">
+            <a href="{{ path('business_comparatif') }}" class="bs-nav-card">
+                <div class="bs-nav-icon" aria-hidden="true">⚖️</div>
+                <div>
+                    <div class="bs-nav-label">{{ 'business.solution.explore.comparatif.label'|trans }}</div>
+                    <div class="bs-nav-title">{{ 'business.solution.explore.comparatif.title'|trans }}</div>
+                </div>
+            </a>
+            <a href="{{ path('business_audit') }}" class="bs-nav-card">
+                <div class="bs-nav-icon" aria-hidden="true">🧪</div>
+                <div>
+                    <div class="bs-nav-label">{{ 'business.solution.explore.audit.label'|trans }}</div>
+                    <div class="bs-nav-title">{{ 'business.solution.explore.audit.title'|trans }}</div>
+                </div>
+            </a>
+        </div>
+
+        {# ── Tarif ── #}
+        <div class="bs-section-eyebrow">{{ 'business.solution.pricing.eyebrow'|trans }}</div>
+        <h2 class="bs-section-title">{{ 'business.solution.pricing.title'|trans }}</h2>
+
+        <div class="bs-pricing-wrap">
+            <div class="bs-price-block">
+                <div class="bs-price-amount">2,99€</div>
+                <div class="bs-price-unit">{{ 'business.solution.pricing.unit'|trans }}</div>
+                <div class="bs-price-badge">
+                    <i class="fa-solid fa-tags" aria-hidden="true"></i>
+                    {{ 'business.solution.pricing.badge'|trans }}
+                </div>
+                <p style="margin-top:1.25rem;font-size:0.9rem;color:var(--color-text-medium);line-height:1.65;">
+                    {{ 'business.solution.pricing.description'|trans }}
+                </p>
+                <a href="{{ path('show_register') }}" class="bs-btn-primary" style="margin-top:1.5rem;display:inline-flex;">
+                    {{ 'business.solution.pricing.cta'|trans }}
+                </a>
+            </div>
+            <div class="bs-price-features">
+                <div class="bs-price-feature"><span class="bs-check-green">✓</span>{{ 'business.solution.pricing.feature1'|trans }}</div>
+                <div class="bs-price-feature"><span class="bs-check-green">✓</span>{{ 'business.solution.pricing.feature2'|trans }}</div>
+                <div class="bs-price-feature"><span class="bs-check-green">✓</span>{{ 'business.solution.pricing.feature3'|trans }}</div>
+                <div class="bs-price-feature"><span class="bs-check-green">✓</span>{{ 'business.solution.pricing.feature4'|trans }}</div>
+                <div class="bs-price-feature"><span class="bs-check-green">✓</span>{{ 'business.solution.pricing.feature5'|trans }}</div>
+                <div class="bs-price-feature"><span class="bs-check-green">✓</span>{{ 'business.solution.pricing.feature6'|trans }}</div>
+            </div>
+        </div>
+
+        {# ── CTA final ── #}
+        <div class="bs-cta">
+            <h2 class="bs-cta-title">{{ 'business.solution.cta.title'|trans }}</h2>
+            <p class="bs-cta-sub">{{ 'business.solution.cta.subtitle'|trans }}</p>
+            <div class="bs-cta-actions">
+                <a href="{{ path('show_register') }}" class="bs-cta-btn-white">{{ 'business.solution.cta.primary'|trans }}</a>
+                <a href="mailto:contact@key-nest.com" class="bs-cta-btn-ghost">{{ 'business.solution.cta.secondary'|trans }}</a>
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}

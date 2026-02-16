@@ -24,7 +24,7 @@
 },
 "email": {
     "welcome": {
-      "title": "Bienvenue sur KeyNest",
+      "title": "Bienvenue sur MYKEYNEST",
       "message": "Nous sommes ravis de vous accueillir, <strong>%email%</strong> ! Complétez votre profil pour profiter pleinement de l'application.",
       "cta": "Compléter mon profil",
       "footer": "Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.",
@@ -247,6 +247,9 @@
         "features": "Fonctionnalités",
         "pricing": "Tarifs",
         "security": "Sécurité",
+        "cyber_pme_solution": "Solution cybersécurité PME",
+        "password_manager_entreprise_comparatif": "Comparatif password manager entreprise",
+        "audit_cyber_pme": "Audit cybersécurité PME",
         "extension": "Extension",
         "about": "À propos",
         "blog": "Blog",
@@ -1175,7 +1178,7 @@
       }
     }
   },
-   "help_article": {
+"help_article": {
     "breadcrumb": {
       "aria": "Fil d'Ariane",
       "help_center": "Centre d'aide"
@@ -1221,6 +1224,274 @@
         "title": "Pas de réponse ?",
         "desc": "Notre équipe répond en moins de 2h en semaine.",
         "cta": "Nous écrire"
+      }
+    }
+  },
+  "business": {
+    "solution": {
+      "meta": {
+        "title": "Solution cybersécurité PME — Gestion mots de passe & accompagnement | MykeyNest",
+        "description": "Solution de cybersécurité complète pour PME : logiciel de gestion des mots de passe AES-256, maintenance incluse, formation collaborateurs et audit de sécurité. Dès 2,99 €/utilisateur/mois.",
+        "keywords": "solution cybersécurité PME, gestionnaire mots de passe entreprise, audit sécurité PME, formation cybersécurité, password manager entreprise"
+      },
+      "schema": {
+        "name": "MykeyNest — Solution cybersécurité PME",
+        "description": "Logiciel de gestion des mots de passe pour PME avec maintenance, formation collaborateurs et audit de sécurité inclus."
+      },
+      "hero": {
+        "eyebrow": "Solution entreprise",
+        "h1_before": "Solution de cybersécurité pour PME avec",
+        "h1_highlight": "gestion des mots de passe",
+        "h1_after": "et accompagnement inclus",
+        "subtitle": "Protégez votre entreprise dès le premier jour. Logiciel, maintenance, formation et audit réunis en une seule offre simple et abordable.",
+        "cta_primary": "Démarrer gratuitement",
+        "cta_secondary": "Demander un audit",
+        "trust": {
+          "no_commitment": "Sans engagement",
+          "setup": "Mise en place en 24h",
+          "support": "Support inclus"
+        }
+      },
+      "pillars": {
+        "eyebrow": "Ce qui est inclus",
+        "title": "Une solution 360° pour votre PME",
+        "subtitle": "Logiciel, services et accompagnement humain : tout ce dont vous avez besoin pour sécuriser votre entreprise sans recruter un expert en interne.",
+        "software": {
+          "title": "🔐 Logiciel",
+          "item1": "Chiffrement AES-256",
+          "item2": "Architecture zero-knowledge",
+          "item3": "Partage sécurisé entre collaborateurs",
+          "item4": "Audit de sécurité intégré"
+        },
+        "maintenance": {
+          "title": "🛠 Maintenance incluse",
+          "item1": "Assistance technique dédiée",
+          "item2": "Support continu 7j/7",
+          "item3": "Mises à jour accompagnées"
+        },
+        "training": {
+          "title": "🧑‍🏫 Formation collaborateurs",
+          "item1": "Sensibilisation au phishing",
+          "item2": "Bonnes pratiques mots de passe",
+          "item3": "Procédures internes de sécurité"
+        },
+        "audit": {
+          "title": "🧪 Audit de sécurité",
+          "item1": "Audit à distance",
+          "item2": "Audit physique sur site",
+          "item3": "Rapport de vulnérabilité détaillé"
+        }
+      },
+      "explore": {
+        "eyebrow": "Aller plus loin",
+        "title": "Explorer nos ressources",
+        "subtitle": "Consultez notre comparatif ou découvrez notre offre d'audit et de formation dédiée aux PME.",
+        "comparatif": {
+          "label": "Comparatif",
+          "title": "MykeyNest vs Bitwarden vs 1Password"
+        },
+        "audit": {
+          "label": "Services",
+          "title": "Audit & Formation cybersécurité"
+        }
+      },
+      "pricing": {
+        "eyebrow": "Tarif transparent",
+        "title": "Un prix honnête, tout compris",
+        "unit": "par utilisateur / mois, sans engagement",
+        "badge": "3× moins cher que la concurrence",
+        "description": "Jusqu'à 3 à 4 fois moins cher que Bitwarden Teams ou 1Password Business, avec la maintenance, la formation et l'audit inclus dans le prix.",
+        "cta": "Commencer maintenant",
+        "feature1": "Mots de passe illimités",
+        "feature2": "Partages illimités",
+        "feature3": "Authentification 2FA",
+        "feature4": "Audit de sécurité intégré",
+        "feature5": "Formation collaborateurs",
+        "feature6": "Support prioritaire < 2h"
+      },
+      "cta": {
+        "title": "Prêt à sécuriser votre PME ?",
+        "subtitle": "Rejoignez MykeyNest et protégez vos données d'entreprise dès aujourd'hui.",
+        "primary": "Essai gratuit — sans carte bancaire",
+        "secondary": "Contacter notre équipe"
+      }
+    },
+    "comparatif": {
+      "meta": {
+        "title": "MykeyNest vs Bitwarden vs 1Password : comparatif pour PME | MykeyNest",
+        "description": "Comparatif objectif et factuel entre MykeyNest, Bitwarden Teams et 1Password Business. Prix, fonctionnalités, maintenance et formation : quelle solution choisir pour votre PME ?",
+        "keywords": "comparatif password manager entreprise, MykeyNest vs Bitwarden, MykeyNest vs 1Password, meilleur gestionnaire mots de passe PME"
+      },
+      "schema": {
+        "headline": "MykeyNest vs Bitwarden vs 1Password : quelle solution pour PME ?",
+        "description": "Comparatif factuel des solutions de gestion des mots de passe pour entreprises : prix, sécurité, services inclus."
+      },
+      "breadcrumb": {
+        "aria": "Fil d'Ariane",
+        "home": "Accueil",
+        "solution": "Solution entreprise",
+        "current": "Comparatif"
+      },
+      "hero": {
+        "eyebrow": "Comparatif objectif",
+        "h1_vs": "vs",
+        "h1_and": "et",
+        "h1_suffix": "quelle solution pour votre PME ?",
+        "subtitle": "Comparaison factuelle des fonctionnalités, prix et services inclus. Pour vous aider à choisir en connaissance de cause.",
+        "disclaimer": "Données publiques — prix indicatifs au 01/2026. Vérifiez les tarifs officiels."
+      },
+      "table": {
+        "eyebrow": "Tableau comparatif",
+        "title": "Fonctionnalités & prix en un coup d'œil",
+        "subtitle": "Comparaison basée sur les offres équivalentes destinées aux équipes et PME.",
+        "aria": "Comparatif MykeyNest, Bitwarden et 1Password",
+        "badge_recommended": "Recommandé",
+        "cat_pricing": "💰 Tarif",
+        "cat_security": "🔐 Sécurité",
+        "cat_services": "🛠 Services inclus",
+        "row": {
+          "price_per_user": "Prix / utilisateur / mois",
+          "price_per_user_sub": "Offre équipe / PME",
+          "free_trial": "Essai gratuit",
+          "aes256": "Chiffrement AES-256",
+          "zero_knowledge": "Architecture zero-knowledge",
+          "2fa": "Authentification 2FA",
+          "audit": "Audit de sécurité",
+          "audit_sub": "Détection mots de passe faibles / compromis",
+          "maintenance": "Maintenance technique incluse",
+          "maintenance_sub": "Assistance & mises à jour accompagnées",
+          "training": "Formation collaborateurs",
+          "training_sub": "Sensibilisation phishing & bonnes pratiques",
+          "security_audit": "Audit de sécurité sur site",
+          "security_audit_sub": "Rapport de vulnérabilité",
+          "support": "Support continu",
+          "french_support": "Support en français"
+        }
+      },
+      "why": {
+        "eyebrow": "Pourquoi choisir MykeyNest",
+        "title": "4 raisons de nous choisir",
+        "subtitle": "Au-delà du prix, MykeyNest est la seule solution qui accompagne vraiment votre PME.",
+        "price": {
+          "title": "3× moins cher",
+          "desc": "À 2,99 €/utilisateur/mois, MykeyNest est jusqu'à 4 fois moins cher que ses concurrents pour des fonctionnalités équivalentes ou supérieures."
+        },
+        "maintenance": {
+          "title": "Maintenance incluse",
+          "desc": "Pas de ticket de support sans réponse. Notre équipe s'occupe de la maintenance technique et vous accompagne à chaque mise à jour."
+        },
+        "training": {
+          "title": "Formation incluse",
+          "desc": "Vos collaborateurs sont formés aux bonnes pratiques de sécurité : phishing, mots de passe, procédures internes."
+        },
+        "french": {
+          "title": "Équipe française",
+          "desc": "Un support en français, une équipe basée en France, des réponses en moins de 2h en semaine."
+        }
+      },
+      "cta": {
+        "title": "Convaincu ? Essayez gratuitement.",
+        "subtitle": "Démarrez sans carte bancaire. Passez à l'offre entreprise quand vous êtes prêt.",
+        "button": "Essai gratuit — sans engagement"
+      }
+    },
+    "audit": {
+      "meta": {
+        "title": "Audit & Formation cybersécurité PME | MykeyNest",
+        "description": "Audit cybersécurité à distance ou sur site pour PME + formation des collaborateurs à la sensibilisation phishing et aux bonnes pratiques. Rapport de vulnérabilité inclus.",
+        "keywords": "audit cybersécurité PME, formation cybersécurité collaborateurs, sensibilisation phishing entreprise, rapport vulnérabilité PME"
+      },
+      "schema": {
+        "name": "Audit & Formation cybersécurité PME",
+        "description": "Service d'audit cybersécurité et de formation des collaborateurs pour PME. Audit à distance ou sur site, rapport de vulnérabilité et sensibilisation au phishing."
+      },
+      "breadcrumb": {
+        "aria": "Fil d'Ariane",
+        "home": "Accueil",
+        "solution": "Solution entreprise",
+        "current": "Audit & Formation"
+      },
+      "hero": {
+        "eyebrow": "Audit & Formation",
+        "h1_highlight": "Audit & Formation cybersécurité",
+        "h1_suffix": "pour protéger votre PME",
+        "subtitle": "91 % des cyberattaques commencent par une erreur humaine. Nous auditons vos vulnérabilités et formons vos équipes pour que ça ne vous arrive pas.",
+        "pill1": "Audit cybersécurité PME",
+        "pill2": "Formation collaborateurs",
+        "pill3": "Sensibilisation phishing"
+      },
+      "proof": {
+        "stat1": "des cyberattaques commencent par une erreur humaine (source : IBM)",
+        "stat2": "les PME formées réduisent les incidents de sécurité",
+        "stat3": "coût moyen d'une cyberattaque pour une PME (source : ANSSI)"
+      },
+      "services": {
+        "eyebrow": "Nos services",
+        "title": "Deux services complémentaires",
+        "subtitle": "L'audit identifie vos failles, la formation protège vos équipes. Ensemble, ils forment votre bouclier cybersécurité.",
+        "audit": {
+          "title": "Audit de sécurité",
+          "desc": "Analyse complète de votre infrastructure pour identifier les vulnérabilités avant qu'elles ne soient exploitées.",
+          "item1": "Audit à distance (réseau, politiques de mots de passe)",
+          "item2": "Audit physique sur site si nécessaire",
+          "item3": "Rapport de vulnérabilité détaillé avec priorités",
+          "item4": "Plan de remédiation personnalisé"
+        },
+        "training": {
+          "title": "Formation collaborateurs",
+          "desc": "Vos équipes sont votre premier rempart. Nous les formons à reconnaître et éviter les menaces les plus courantes.",
+          "item1": "Sensibilisation au phishing (simulations incluses)",
+          "item2": "Bonnes pratiques mots de passe",
+          "item3": "Procédures internes de sécurité",
+          "item4": "Atelier interactif en présentiel ou distanciel"
+        }
+      },
+      "process": {
+        "eyebrow": "Comment ça se passe",
+        "title": "Notre méthode en 4 étapes",
+        "subtitle": "De la prise de contact au rapport final, voici comment nous intervenons dans votre PME.",
+        "step1": {
+          "title": "Prise de contact & diagnostic initial",
+          "desc": "Échange de 30 minutes pour comprendre votre contexte, vos enjeux et définir le périmètre de l'intervention."
+        },
+        "step2": {
+          "title": "Audit de sécurité",
+          "desc": "Analyse de vos systèmes, politiques de mots de passe, accès et infrastructure. À distance ou sur site selon vos besoins."
+        },
+        "step3": {
+          "title": "Formation des équipes",
+          "desc": "Session de sensibilisation adaptée à votre secteur : phishing, ingénierie sociale, bonnes pratiques au quotidien."
+        },
+        "step4": {
+          "title": "Rapport & plan de remédiation",
+          "desc": "Livraison d'un rapport clair avec les vulnérabilités identifiées, leur niveau de criticité et les actions prioritaires à mener."
+        }
+      },
+      "faq": {
+        "eyebrow": "Questions fréquentes",
+        "title": "Vos questions sur l'audit",
+        "q1": {
+          "question": "Combien de temps dure un audit ?",
+          "answer": "Un audit à distance dure généralement 2 à 3 jours ouvrés. Un audit sur site s'étend sur une demi-journée à une journée complète selon la taille de votre structure. Le rapport est livré dans les 5 jours suivant l'intervention."
+        },
+        "q2": {
+          "question": "Faut-il avoir MykeyNest pour bénéficier de l'audit ?",
+          "answer": "Non. L'audit et la formation sont proposés indépendamment de notre logiciel. Bien sûr, si l'audit révèle des problèmes de gestion des mots de passe, nous pouvons vous proposer MykeyNest comme solution adaptée."
+        },
+        "q3": {
+          "question": "La formation est-elle adaptée à des collaborateurs non techniques ?",
+          "answer": "Absolument. Nos formations sont conçues pour des profils non techniques : commercial, RH, comptabilité… Nous utilisons des cas concrets issus de votre secteur pour maximiser la compréhension et la mémorisation."
+        },
+        "q4": {
+          "question": "Quel est le tarif d'un audit ?",
+          "answer": "Le tarif varie selon le périmètre et la taille de votre entreprise. Contactez-nous pour recevoir un devis personnalisé gratuit. En tant que client MykeyNest Pro, vous bénéficiez d'un audit de sécurité logiciel intégré sans surcoût."
+        }
+      },
+      "cta": {
+        "title": "Prêt à auditer votre sécurité ?",
+        "subtitle": "Contactez-nous pour un premier diagnostic gratuit de 30 minutes.",
+        "primary": "Demander un devis",
+        "secondary": "Voir la solution complète"
       }
     }
   }

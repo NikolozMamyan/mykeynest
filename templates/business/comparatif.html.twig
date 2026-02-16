@@ -1,0 +1,420 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}{{ 'business.comparatif.meta.title'|trans }}{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ 'business.comparatif.meta.description'|trans }}">
+<meta name="keywords" content="{{ 'business.comparatif.meta.keywords'|trans }}">
+<meta property="og:title" content="{{ 'business.comparatif.meta.title'|trans }}">
+<meta property="og:description" content="{{ 'business.comparatif.meta.description'|trans }}">
+<meta property="og:type" content="website">
+<link rel="canonical" href="{{ app.request.uri }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ 'business.comparatif.schema.headline'|trans }}",
+  "description": "{{ 'business.comparatif.schema.description'|trans }}",
+  "dateModified": "{{ "now"|date("Y-m-d") }}"
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --color-primary:#059669; --color-primary-hover:rgba(16,185,129,0.15);
+        --color-white:#fff; --color-bg-light:#f8fafc; --color-bg-hover:#f1f5f9;
+        --color-text-dark:#1e293b; --color-text-medium:#475569; --color-text-muted:#64748b;
+        --color-text-light:#94a3b8; --color-border:#e2e8f0; --color-success:#10b981;
+        --shadow-sm:0 1px 3px rgba(0,0,0,0.05); --shadow-green:0 4px 14px rgba(5,150,105,0.2);
+        --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+        --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+        --shadow-xl:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);
+        --border-radius:12px; --border-radius-sm:8px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:#f8fafc;color:var(--color-text-dark)}
+
+    /* ── Breadcrumb ── */
+    .cmp-breadcrumb {
+        background: var(--color-white); border-bottom: 1px solid var(--color-border);
+        padding: 0.875rem 2rem;
+    }
+    .cmp-breadcrumb-inner {
+        max-width: 1100px; margin: 0 auto;
+        display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .cmp-breadcrumb a {
+        font-size: 0.8125rem; color: var(--color-text-muted); text-decoration: none;
+        font-weight: 500; transition: color 0.2s;
+    }
+    .cmp-breadcrumb a:hover { color: var(--color-primary); }
+    .cmp-breadcrumb-sep { color: var(--color-text-light); font-size: 0.75rem; }
+    .cmp-breadcrumb-current { font-size: 0.8125rem; font-weight: 600; color: var(--color-text-dark); }
+
+    /* ── Hero ── */
+    .cmp-hero {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid var(--color-border);
+        padding: 4rem 2rem 3.5rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .cmp-hero::before {
+        content:''; position:absolute; inset:0; pointer-events:none;
+        background: radial-gradient(circle at 20% 50%, rgba(5,150,105,0.09) 0%,transparent 55%),
+                    radial-gradient(circle at 80% 20%, rgba(16,185,129,0.06) 0%,transparent 50%);
+    }
+    .cmp-hero-inner { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+    .cmp-eyebrow {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        background: var(--color-white); border: 1px solid rgba(5,150,105,0.25);
+        border-radius: 2rem; padding: 0.4rem 1.1rem;
+        font-size: 0.75rem; font-weight: 700; color: var(--color-primary);
+        text-transform: uppercase; letter-spacing: 0.07em;
+        box-shadow: var(--shadow-sm); margin-bottom: 1.25rem;
+        animation: slideDown 0.5s ease-out both;
+    }
+    @keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+    .cmp-hero h1 {
+        font-size: clamp(1.625rem, 3.5vw, 2.5rem); font-weight: 700;
+        color: var(--color-text-dark); line-height: 1.25; margin-bottom: 1rem;
+        animation: fadeUp 0.6s ease-out 0.15s both;
+    }
+    .cmp-grad {
+        background: linear-gradient(135deg, var(--color-primary), #10b981);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .cmp-hero-sub {
+        font-size: 1.0625rem; color: var(--color-text-medium); line-height: 1.7;
+        animation: fadeUp 0.6s ease-out 0.3s both;
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    .cmp-disclaimer {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: #fffbeb; border: 1px solid rgba(245,158,11,0.3);
+        border-radius: var(--border-radius-sm); padding: 0.4rem 0.875rem;
+        font-size: 0.75rem; font-weight: 600; color: #92400e;
+        margin-top: 1.25rem; animation: fadeUp 0.6s ease-out 0.45s both;
+    }
+
+    /* ── Layout ── */
+    .cmp-layout { max-width: 1100px; margin: 0 auto; padding: 3.5rem 2rem 5rem; }
+    .cmp-section-eyebrow {
+        font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.1em; color: var(--color-primary); margin-bottom: 0.5rem;
+    }
+    .cmp-section-title {
+        font-size: clamp(1.375rem, 2.5vw, 1.875rem); font-weight: 700;
+        color: var(--color-text-dark); margin-bottom: 0.5rem;
+    }
+    .cmp-section-sub { font-size: 0.9375rem; color: var(--color-text-medium); margin-bottom: 2rem; }
+
+    /* ── Comparison table ── */
+    .cmp-table-wrap {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius); overflow: hidden;
+        box-shadow: var(--shadow-md); margin-bottom: 4rem;
+    }
+    .cmp-table { width: 100%; border-collapse: collapse; }
+
+    /* Header row */
+    .cmp-table thead tr { background: var(--color-bg-light); }
+    .cmp-th-empty { width: 38%; padding: 1.25rem 1.5rem; }
+    .cmp-th {
+        padding: 1.25rem 1rem; text-align: center; vertical-align: middle;
+        border-left: 1px solid var(--color-border);
+    }
+    .cmp-th-mykeynest { background: linear-gradient(135deg, #f0fdf4, #ecfdf5); }
+    .cmp-th-logo {
+        font-size: 0.9375rem; font-weight: 800; color: var(--color-text-dark);
+        display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+    }
+    .cmp-th-logo .cmp-badge-winner {
+        font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+        background: linear-gradient(135deg, var(--color-primary), #10b981);
+        color: white; padding: 0.15rem 0.5rem; border-radius: 2rem;
+    }
+    .cmp-th-price {
+        font-family: 'Space Mono', monospace; font-size: 1.125rem; font-weight: 700;
+        color: var(--color-primary);
+    }
+    .cmp-th-price-other { color: var(--color-text-dark); }
+
+    /* Body rows */
+    .cmp-table tbody tr { border-top: 1px solid var(--color-border); transition: background 0.15s; }
+    .cmp-table tbody tr:hover { background: var(--color-bg-light); }
+    .cmp-table tbody tr.cmp-row-category {
+        background: var(--color-bg-light); border-top: 2px solid var(--color-border);
+    }
+    .cmp-td-feature {
+        padding: 1rem 1.5rem; font-size: 0.9rem; color: var(--color-text-dark); font-weight: 500;
+    }
+    .cmp-td-feature small { display: block; font-size: 0.75rem; color: var(--color-text-muted); font-weight: 400; margin-top: 0.1rem; }
+    .cmp-td-category-label {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--color-text-muted);
+    }
+    .cmp-td-val {
+        padding: 1rem; text-align: center; vertical-align: middle;
+        border-left: 1px solid var(--color-border); font-size: 0.9rem;
+    }
+    .cmp-td-mykeynest { background: rgba(5,150,105,0.03); }
+    .cmp-yes {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 1.75rem; height: 1.75rem;
+        background: linear-gradient(135deg, var(--color-primary), #10b981);
+        border-radius: 50%; color: white; font-size: 0.7rem; font-weight: 800;
+    }
+    .cmp-no {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 1.75rem; height: 1.75rem;
+        background: #fef2f2; border: 1.5px solid #fecaca;
+        border-radius: 50%; color: #ef4444; font-size: 0.875rem; font-weight: 700;
+    }
+    .cmp-partial {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 1.75rem; height: 1.75rem;
+        background: #fffbeb; border: 1.5px solid #fde68a;
+        border-radius: 50%; color: #d97706; font-size: 0.8rem;
+    }
+    .cmp-val-text { font-size: 0.8125rem; font-weight: 600; color: var(--color-text-medium); }
+
+    /* ── Why section ── */
+    .cmp-why-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.25rem; margin-bottom: 4rem;
+    }
+    .cmp-why-card {
+        background: var(--color-white); border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius); padding: 1.5rem;
+        transition: all 0.25s;
+    }
+    .cmp-why-card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); transform: translateY(-4px); }
+    .cmp-why-icon { font-size: 1.75rem; margin-bottom: 0.875rem; }
+    .cmp-why-title { font-size: 0.9375rem; font-weight: 700; color: var(--color-text-dark); margin-bottom: 0.4rem; }
+    .cmp-why-desc { font-size: 0.8125rem; color: var(--color-text-medium); line-height: 1.6; }
+
+    /* ── CTA ── */
+    .cmp-cta {
+        background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
+        border-radius: var(--border-radius); padding: 3rem 2.5rem;
+        text-align: center; position: relative; overflow: hidden;
+    }
+    .cmp-cta::before {
+        content:''; position:absolute; top:-50%; right:-5%; width:280px; height:280px;
+        background:rgba(255,255,255,0.07); border-radius:50%; pointer-events:none;
+    }
+    .cmp-cta-title { font-size: clamp(1.375rem, 3vw, 1.875rem); font-weight: 700; color: white; margin-bottom: 0.625rem; }
+    .cmp-cta-sub { font-size: 1rem; color: rgba(255,255,255,0.88); margin-bottom: 1.75rem; }
+    .cmp-cta-btn {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.875rem 2rem; background: white; color: var(--color-primary);
+        border-radius: var(--border-radius-sm); font-weight: 700; text-decoration: none;
+        box-shadow: var(--shadow-lg); transition: all 0.25s;
+    }
+    .cmp-cta-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-xl); }
+
+    @media (max-width: 640px) {
+        .cmp-table-wrap { overflow-x: auto; }
+        .cmp-hero { padding: 3rem 1.25rem 2.5rem; }
+        .cmp-layout { padding: 2rem 1.25rem 4rem; }
+        .cmp-td-feature, .cmp-th-empty { min-width: 160px; }
+    }
+</style>
+
+<main>
+    {# ── Breadcrumb ── #}
+    <nav class="cmp-breadcrumb" aria-label="{{ 'business.comparatif.breadcrumb.aria'|trans }}">
+        <div class="cmp-breadcrumb-inner">
+            <a href="{{ path('app_landing') }}">{{ 'business.comparatif.breadcrumb.home'|trans }}</a>
+            <span class="cmp-breadcrumb-sep">›</span>
+            <a href="{{ path('business_solution') }}">{{ 'business.comparatif.breadcrumb.solution'|trans }}</a>
+            <span class="cmp-breadcrumb-sep">›</span>
+            <span class="cmp-breadcrumb-current">{{ 'business.comparatif.breadcrumb.current'|trans }}</span>
+        </div>
+    </nav>
+
+    {# ── Hero ── #}
+    <section class="cmp-hero">
+        <div class="cmp-hero-inner">
+            <div class="cmp-eyebrow">
+                <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+                {{ 'business.comparatif.hero.eyebrow'|trans }}
+            </div>
+            <h1>
+                <span class="cmp-grad">MykeyNest</span>
+                {{ 'business.comparatif.hero.h1_vs'|trans }}
+                Bitwarden {{ 'business.comparatif.hero.h1_and'|trans }} 1Password
+                <br>{{ 'business.comparatif.hero.h1_suffix'|trans }}
+            </h1>
+            <p class="cmp-hero-sub">{{ 'business.comparatif.hero.subtitle'|trans }}</p>
+            <div class="cmp-disclaimer">
+                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                {{ 'business.comparatif.hero.disclaimer'|trans }}
+            </div>
+        </div>
+    </section>
+
+    <div class="cmp-layout">
+
+        {# ── Tableau comparatif ── #}
+        <div class="cmp-section-eyebrow">{{ 'business.comparatif.table.eyebrow'|trans }}</div>
+        <h2 class="cmp-section-title">{{ 'business.comparatif.table.title'|trans }}</h2>
+        <p class="cmp-section-sub">{{ 'business.comparatif.table.subtitle'|trans }}</p>
+
+        <div class="cmp-table-wrap">
+            <table class="cmp-table" aria-label="{{ 'business.comparatif.table.aria'|trans }}">
+                <thead>
+                    <tr>
+                        <th class="cmp-th-empty" scope="col"></th>
+                        <th class="cmp-th cmp-th-mykeynest" scope="col">
+                            <div class="cmp-th-logo">
+                                🔐 MykeyNest
+                                <span class="cmp-badge-winner">{{ 'business.comparatif.table.badge_recommended'|trans }}</span>
+                                <span class="cmp-th-price">2,99€</span>
+                            </div>
+                        </th>
+                        <th class="cmp-th" scope="col">
+                            <div class="cmp-th-logo">
+                                Bitwarden<br>
+                                <span class="cmp-th-price cmp-th-price-other">~10€+</span>
+                            </div>
+                        </th>
+                        <th class="cmp-th" scope="col">
+                            <div class="cmp-th-logo">
+                                1Password<br>
+                                <span class="cmp-th-price cmp-th-price-other">~12€+</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {# ── Tarif ── #}
+                    <tr class="cmp-row-category">
+                        <td class="cmp-td-category-label" colspan="4">{{ 'business.comparatif.table.cat_pricing'|trans }}</td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.price_per_user'|trans }}<small>{{ 'business.comparatif.table.row.price_per_user_sub'|trans }}</small></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-th-price">2,99€</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">~10€+</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">~12€+</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.free_trial'|trans }}</td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                    </tr>
+
+                    {# ── Sécurité ── #}
+                    <tr class="cmp-row-category">
+                        <td class="cmp-td-category-label" colspan="4">{{ 'business.comparatif.table.cat_security'|trans }}</td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.aes256'|trans }}</td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.zero_knowledge'|trans }}</td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.2fa'|trans }}</td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.audit'|trans }}<small>{{ 'business.comparatif.table.row.audit_sub'|trans }}</small></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                    </tr>
+
+                    {# ── Services inclus ── #}
+                    <tr class="cmp-row-category">
+                        <td class="cmp-td-category-label" colspan="4">{{ 'business.comparatif.table.cat_services'|trans }}</td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.maintenance'|trans }}<small>{{ 'business.comparatif.table.row.maintenance_sub'|trans }}</small></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.training'|trans }}<small>{{ 'business.comparatif.table.row.training_sub'|trans }}</small></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.security_audit'|trans }}<small>{{ 'business.comparatif.table.row.security_audit_sub'|trans }}</small></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.support'|trans }}</td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                    </tr>
+                    <tr>
+                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.french_support'|trans }}</td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">✓</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                        <td class="cmp-td-val"><span class="cmp-no">✕</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {# ── Pourquoi choisir MykeyNest ── #}
+        <div class="cmp-section-eyebrow">{{ 'business.comparatif.why.eyebrow'|trans }}</div>
+        <h2 class="cmp-section-title">{{ 'business.comparatif.why.title'|trans }}</h2>
+        <p class="cmp-section-sub">{{ 'business.comparatif.why.subtitle'|trans }}</p>
+
+        <div class="cmp-why-grid">
+            <div class="cmp-why-card">
+                <div class="cmp-why-icon">💰</div>
+                <div class="cmp-why-title">{{ 'business.comparatif.why.price.title'|trans }}</div>
+                <p class="cmp-why-desc">{{ 'business.comparatif.why.price.desc'|trans }}</p>
+            </div>
+            <div class="cmp-why-card">
+                <div class="cmp-why-icon">🛠</div>
+                <div class="cmp-why-title">{{ 'business.comparatif.why.maintenance.title'|trans }}</div>
+                <p class="cmp-why-desc">{{ 'business.comparatif.why.maintenance.desc'|trans }}</p>
+            </div>
+            <div class="cmp-why-card">
+                <div class="cmp-why-icon">🧑‍🏫</div>
+                <div class="cmp-why-title">{{ 'business.comparatif.why.training.title'|trans }}</div>
+                <p class="cmp-why-desc">{{ 'business.comparatif.why.training.desc'|trans }}</p>
+            </div>
+            <div class="cmp-why-card">
+                <div class="cmp-why-icon">🇫🇷</div>
+                <div class="cmp-why-title">{{ 'business.comparatif.why.french.title'|trans }}</div>
+                <p class="cmp-why-desc">{{ 'business.comparatif.why.french.desc'|trans }}</p>
+            </div>
+        </div>
+
+        {# ── CTA ── #}
+        <div class="cmp-cta">
+            <h2 class="cmp-cta-title">{{ 'business.comparatif.cta.title'|trans }}</h2>
+            <p class="cmp-cta-sub">{{ 'business.comparatif.cta.subtitle'|trans }}</p>
+            <a href="{{ path('show_register') }}" class="cmp-cta-btn">
+                <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+                {{ 'business.comparatif.cta.button'|trans }}
+            </a>
+        </div>
+
+    </div>
+</main>
+{% endblock %}
