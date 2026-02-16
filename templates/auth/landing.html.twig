@@ -546,9 +546,9 @@ img[loading="lazy"]{content-visibility:auto}
 <div class="footer-links">
   <h4>{{ 'landing.footer.resources'|trans }}</h4>
   <ul>
-    <li><a href="#">{{ 'landing.footer.links.help_center'|trans }}</a></li>
-    <li><a href="#">{{ 'landing.footer.links.documentation'|trans }}</a></li>
-    <li><a href="#">{{ 'landing.footer.links.guides'|trans }}</a></li>
+    <li><a href="{{path('app_help_center')}}">{{ 'landing.footer.links.help_center'|trans }}</a></li>
+    <li><a href="/help/center/demarrer">{{ 'landing.footer.links.documentation'|trans }}</a></li>
+    <li><a href="/help/center/partage">{{ 'landing.footer.links.guides'|trans }}</a></li>
     <li><a href="{{path('app_public_generator')}}">{{ 'landing.footer.links.generator'|trans }}</a></li>
   </ul>
 </div>

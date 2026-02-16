@@ -141,7 +141,7 @@
 {% endif %}
   </div>
       <a href="/#features" class="nav-link">{{ 'landing.nav.features'|trans }}</a>
-      <a href="/#how-it-works" class="nav-link">{{ 'landing.nav.how_it_works'|trans }}</a>
+      <a href="{{path('app_help_center')}}" class="nav-link">{{ 'landing.nav.how_it_works'|trans }}</a>
       <a href="/#pricing" class="nav-link">{{ 'landing.nav.pricing'|trans }}</a>
 
       <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"

@@ -1062,5 +1062,172 @@
       "description": "Join thousands of users who protect their data with MykeyNest",
       "button": "Create a free account"
     }
+  },
+    "help_center": {
+    "hero": {
+      "eyebrow": "Help center",
+      "title_line1": "How can we",
+      "title_highlight": "help you?",
+      "subtitle": "Guides, tutorials, and answers to all your questions about MykeyNest."
+    },
+    "search": {
+      "placeholder": "Search for an article, a feature…",
+      "aria": "Search in the help center",
+      "clear_aria": "Clear search"
+    },
+    "stats": {
+      "aria": "Help center statistics",
+      "articles": "Articles",
+      "categories": "Categories",
+      "response_time": "Response time",
+      "satisfaction": "Satisfaction"
+    },
+    "sections": {
+      "explore_label": "Browse by topic",
+      "all_categories_title": "All categories",
+      "all_categories_sub": "Find the help you need quickly."
+    },
+    "category": {
+      "articles_count": "{count, plural, one {# article} other {# articles}}"
+    },
+    "no_results": {
+      "title": "No results found",
+      "text": "Try other terms or",
+      "contact": "contact us"
+    },
+    "popular": {
+      "label": "Popular articles",
+      "title": "Frequently asked questions",
+      "sub": "The most viewed resources by our community."
+    },
+    "sidebar": {
+      "aria": "Contact us",
+      "write": {
+        "title": "Write to us",
+        "desc": "A specific question? Our team replies in under 2 hours on weekdays.",
+        "cta": "Send a message"
+      },
+      "status": {
+        "title": "Service status",
+        "desc": "All systems are operating normally.",
+        "cta": "View status"
+      }
+    },
+    "faq": {
+      "label": "Quick FAQ",
+      "title": "Answers at a glance",
+      "sub": "Questions everyone asks.",
+      "items": {
+        "q1": "Are my passwords really secure with MykeyNest?",
+        "a1": "Yes. Your data is encrypted locally with AES-256 before being sent to our servers. We use a zero-knowledge architecture: even our teams cannot read your passwords. Only your master password can decrypt them.",
+        "q2": "Can I use MykeyNest on multiple devices?",
+        "a2": "Absolutely. Multi-device sync is included in all plans. Your credentials are available on computer, smartphone, and tablet — always end-to-end encrypted.",
+        "q3": "Does the password generator store my passwords?",
+        "a3": "No. The generator runs entirely client-side using the browser's crypto.getRandomValues API. No data is sent to our servers. The password disappears as soon as you close the tab.",
+        "q4": "How do I upgrade to Pro?",
+        "a4": "From your personal space, go to Settings › Subscription and click “Upgrade to Pro”. Payment is securely handled by Stripe. Your account is upgraded instantly with no downtime.",
+        "q5": "Is MykeyNest open source?",
+        "a5": "Yes. The source code is publicly available on GitHub, allowing the community to audit security and contribute. Transparency is one of our core principles."
+      }
+    },
+    "cta": {
+      "title": "Didn’t find the answer?",
+      "desc": "Our team is available 7 days a week to help you.",
+      "support": "Contact support",
+      "create_account": "Create an account"
+    }
+  },
+   "help_category": {
+    "breadcrumb": {
+      "aria": "Breadcrumb",
+      "help_center": "Help center"
+    },
+    "hero": {
+      "label": "Category",
+      "articles_count": "{count, plural, one {# article} other {# articles}}",
+      "updated_regularly": "Updated regularly"
+    },
+    "filters": {
+      "aria": "Filter articles",
+      "all": "All",
+      "popular": "⭐ Popular",
+      "recent": "Recent"
+    },
+    "sort": {
+      "aria": "Sort articles",
+      "default": "Default sort",
+      "az": "A → Z",
+      "read": "Quick read"
+    },
+    "article": {
+      "popular_tag": "⭐ Popular",
+      "read_time": "%minutes% min read"
+    },
+    "empty": {
+      "title": "No articles in this category yet."
+    },
+    "sidebar": {
+      "aria": "Additional resources",
+      "quick_search": {
+        "title": "Quick search",
+        "placeholder": "Filter articles…",
+        "aria": "Filter articles in this category"
+      },
+      "other_categories": "Other categories",
+      "contact": {
+        "title": "No answer?",
+        "desc": "Our team is here for you. Reply in under 2 hours on weekdays.",
+        "cta": "Write to us"
+      }
+    }
+  },
+   "help_article": {
+    "breadcrumb": {
+      "aria": "Breadcrumb",
+      "help_center": "Help center"
+    },
+    "toc": {
+      "aria": "Table of contents",
+      "title": "In this article"
+    },
+    "back": {
+      "to_category": "Back to %category%"
+    },
+    "tags": {
+      "popular": "⭐ Popular"
+    },
+    "meta": {
+      "updated_on": "Updated on %date%",
+      "read_time": "%minutes% min read"
+    },
+    "helpful": {
+      "question": "Was this article helpful?",
+      "sub": "Your feedback helps us improve our documentation.",
+      "yes_aria": "Yes, this article helped me",
+      "no_aria": "No, this article did not help me",
+      "yes": "Yes",
+      "no": "No",
+      "thank_you": "Thanks for your feedback!"
+    },
+    "sidebar": {
+      "aria": "Resources and related articles",
+      "related": {
+        "title": "Related articles",
+        "time_short": "%minutes% min"
+      },
+      "share": {
+        "title": "Share",
+        "copy": "Copy",
+        "copy_title": "Copy link",
+        "copy_aria": "Copy the article link",
+        "email": "Email",
+        "email_aria": "Share by email"
+      },
+      "contact": {
+        "title": "No answer?",
+        "desc": "Our team replies in under 2 hours on weekdays.",
+        "cta": "Write to us"
+      }
+    }
   }
 }

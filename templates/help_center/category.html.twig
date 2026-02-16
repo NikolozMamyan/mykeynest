@@ -1,0 +1,825 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}{{ category.title }} | Centre d'aide | MykeyNest{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ category.description }}">
+<meta property="og:title" content="{{ category.title }} | Centre d'aide MykeyNest">
+<meta property="og:description" content="{{ category.description }}">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{#
+─────────────────────────────────────────────────────────────────────────────
+CONTROLLER — exemple de données à passer depuis HelpCenterController :
+
+$category = [
+    'slug'        => 'securite',
+    'icon'        => '🔐',
+    'title'       => 'Sécurité & Chiffrement',
+    'description' => 'Architecture zero-knowledge, AES-256, mot de passe maître et bonnes pratiques.',
+    'color'       => '#059669',   // optionnel, fallback sur --color-primary
+    'articleCount'=> 11,
+];
+
+$articles = [
+    [
+        'slug'      => 'zero-knowledge-explique',
+        'title'     => "Qu'est-ce que l'architecture zero-knowledge ?",
+        'excerpt'   => "Découvrez comment MykeyNest garantit que personne, même nous, ne peut accéder à vos mots de passe.",
+        'readTime'  => 4,
+        'popular'   => true,
+        'tags'      => ['sécurité', 'chiffrement', 'architecture'],
+        'updatedAt' => '2026-01-15',
+    ],
+    ...
+];
+─────────────────────────────────────────────────────────────────────────────
+#}
+
+{% block body %}
+<style>
+    :root {
+        --color-primary: #059669;
+        --color-primary-hover: rgba(16,185,129,0.15);
+        --color-white: #ffffff;
+        --color-bg-light: #f8fafc;
+        --color-bg-hover: #f1f5f9;
+        --color-text-dark: #1e293b;
+        --color-text-medium: #475569;
+        --color-text-muted: #64748b;
+        --color-text-light: #94a3b8;
+        --color-border: #e2e8f0;
+        --color-success: #10b981;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+        --shadow-green: 0 4px 14px rgba(5,150,105,0.18);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);
+        --border-radius: 12px;
+        --border-radius-sm: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f8fafc; color: var(--color-text-dark); }
+
+    /* ── Breadcrumb ── */
+    .cat-breadcrumb {
+        background: var(--color-white);
+        border-bottom: 1px solid var(--color-border);
+        padding: 0.875rem 2rem;
+    }
+
+    .cat-breadcrumb-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cat-breadcrumb a {
+        font-size: 0.8125rem;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .cat-breadcrumb a:hover { color: var(--color-primary); }
+
+    .cat-breadcrumb-sep {
+        color: var(--color-text-light);
+        font-size: 0.75rem;
+    }
+
+    .cat-breadcrumb-current {
+        font-size: 0.8125rem;
+        color: var(--color-text-dark);
+        font-weight: 600;
+    }
+
+    /* ── Hero ── */
+    .cat-hero {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid var(--color-border);
+        padding: 3.5rem 2rem 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cat-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 10% 50%, rgba(5,150,105,0.09) 0%, transparent 55%),
+            radial-gradient(circle at 85% 20%, rgba(16,185,129,0.06) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .cat-hero-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 2.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cat-hero-icon-wrap {
+        width: 5rem;
+        height: 5rem;
+        background: var(--color-white);
+        border: 2px solid rgba(5,150,105,0.2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.25rem;
+        box-shadow: var(--shadow-green);
+        flex-shrink: 0;
+        animation: iconPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes iconPop {
+        from { opacity:0; transform: scale(0.5) rotate(-10deg); }
+        to   { opacity:1; transform: scale(1) rotate(0deg); }
+    }
+
+    .cat-hero-text { flex: 1; min-width: 240px; }
+
+    .cat-hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-primary);
+        margin-bottom: 0.625rem;
+        animation: fadeUp 0.5s ease-out 0.1s both;
+    }
+
+    .cat-hero h1 {
+        font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+        font-weight: 700;
+        color: var(--color-text-dark);
+        margin-bottom: 0.75rem;
+        line-height: 1.2;
+        animation: fadeUp 0.5s ease-out 0.2s both;
+    }
+
+    .cat-hero-desc {
+        font-size: 1.0625rem;
+        color: var(--color-text-medium);
+        line-height: 1.65;
+        max-width: 560px;
+        animation: fadeUp 0.5s ease-out 0.3s both;
+    }
+
+    .cat-hero-meta {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-top: 1.25rem;
+        animation: fadeUp 0.5s ease-out 0.4s both;
+        flex-wrap: wrap;
+    }
+
+    .cat-hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: 2rem;
+        padding: 0.3rem 0.875rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--color-text-medium);
+    }
+
+    .cat-hero-pill .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--color-primary);
+        border-radius: 50%;
+    }
+
+    @keyframes fadeUp {
+        from { opacity:0; transform:translateY(18px); }
+        to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── Layout ── */
+    .cat-layout {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem 5rem;
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    /* ── Filter Bar ── */
+    .cat-filter-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cat-filter-pills {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cat-filter-pill {
+        padding: 0.4rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1.5px solid var(--color-border);
+        background: var(--color-white);
+        color: var(--color-text-medium);
+        transition: all 0.2s;
+        user-select: none;
+    }
+
+    .cat-filter-pill:hover,
+    .cat-filter-pill.active {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: white;
+    }
+
+    .cat-sort-select {
+        padding: 0.4rem 0.875rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius-sm);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--color-text-medium);
+        background: var(--color-white);
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .cat-sort-select:focus { border-color: var(--color-primary); }
+
+    /* ── Article Cards ── */
+    .cat-articles { display: flex; flex-direction: column; gap: 0.875rem; }
+
+    .cat-article-card {
+        background: var(--color-white);
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius);
+        padding: 1.5rem 1.75rem;
+        text-decoration: none;
+        display: flex;
+        gap: 1.25rem;
+        align-items: flex-start;
+        transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
+        position: relative;
+        overflow: hidden;
+        animation: cardIn 0.5s ease-out both;
+    }
+
+    .cat-article-card:nth-child(1) { animation-delay: 0.05s; }
+    .cat-article-card:nth-child(2) { animation-delay: 0.1s; }
+    .cat-article-card:nth-child(3) { animation-delay: 0.15s; }
+    .cat-article-card:nth-child(4) { animation-delay: 0.2s; }
+    .cat-article-card:nth-child(5) { animation-delay: 0.25s; }
+    .cat-article-card:nth-child(n+6) { animation-delay: 0.3s; }
+
+    @keyframes cardIn {
+        from { opacity:0; transform: translateY(12px); }
+        to   { opacity:1; transform: translateY(0); }
+    }
+
+    .cat-article-card::before {
+        content:'';
+        position:absolute;
+        left:0; top:0; bottom:0;
+        width:3px;
+        background: linear-gradient(180deg, var(--color-primary), #10b981);
+        transform: scaleY(0);
+        transition: transform 0.28s ease;
+        transform-origin: bottom;
+    }
+
+    .cat-article-card:hover {
+        border-color: var(--color-primary);
+        transform: translateX(4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .cat-article-card:hover::before { transform: scaleY(1); }
+
+    .cat-article-idx {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        background: #f0fdf4;
+        border-radius: 50%;
+        width: 2.25rem;
+        height: 2.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .cat-article-body { flex: 1; min-width: 0; }
+
+    .cat-article-tags {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+    }
+
+    .cat-tag {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-primary);
+        background: #f0fdf4;
+        border: 1px solid rgba(5,150,105,0.2);
+        padding: 0.15rem 0.5rem;
+        border-radius: 2rem;
+    }
+
+    .cat-tag-popular {
+        color: #b45309;
+        background: #fffbeb;
+        border-color: rgba(180,83,9,0.2);
+    }
+
+    .cat-article-title {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: var(--color-text-dark);
+        margin-bottom: 0.4rem;
+        line-height: 1.35;
+        transition: color 0.2s;
+    }
+
+    .cat-article-card:hover .cat-article-title { color: var(--color-primary); }
+
+    .cat-article-excerpt {
+        font-size: 0.875rem;
+        color: var(--color-text-medium);
+        line-height: 1.6;
+        margin-bottom: 0.875rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .cat-article-footer {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+    }
+
+    .cat-article-footer-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .cat-article-footer-item svg {
+        width: 0.875rem;
+        height: 0.875rem;
+    }
+
+    .cat-article-arrow {
+        width: 1.125rem;
+        height: 1.125rem;
+        color: var(--color-text-light);
+        flex-shrink: 0;
+        align-self: center;
+        transition: all 0.25s;
+    }
+
+    .cat-article-card:hover .cat-article-arrow {
+        color: var(--color-primary);
+        transform: translateX(4px);
+    }
+
+    /* ── Sidebar ── */
+    .cat-sidebar { position: sticky; top: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .cat-sidebar-card {
+        background: var(--color-white);
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .cat-sidebar-card:hover { border-color: rgba(5,150,105,0.3); box-shadow: var(--shadow-green); }
+
+    .cat-sidebar-title {
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--color-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .cat-sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--color-border);
+        text-decoration: none;
+        color: var(--color-text-dark);
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .cat-sidebar-link:last-child { border-bottom: none; padding-bottom: 0; }
+    .cat-sidebar-link:first-of-type { padding-top: 0; }
+
+    .cat-sidebar-link:hover { color: var(--color-primary); padding-left: 4px; }
+
+    .cat-sidebar-link-icon {
+        width: 1.75rem;
+        height: 1.75rem;
+        background: #f0fdf4;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 0.875rem;
+    }
+
+    /* Other categories */
+    .cat-other-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    /* Search in sidebar */
+    .cat-sidebar-search {
+        position: relative;
+    }
+
+    .cat-sidebar-search input {
+        width: 100%;
+        padding: 0.625rem 0.875rem 0.625rem 2.375rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--border-radius-sm);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.875rem;
+        background: var(--color-bg-light);
+        color: var(--color-text-dark);
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .cat-sidebar-search input:focus { border-color: var(--color-primary); background: var(--color-white); }
+
+    .cat-sidebar-search svg {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1rem;
+        height: 1rem;
+        color: var(--color-text-light);
+        pointer-events: none;
+    }
+
+    /* Contact card */
+    .cat-sidebar-contact {
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border-color: rgba(5,150,105,0.2);
+        text-align: center;
+    }
+
+    .cat-sidebar-contact-icon {
+        width: 3rem;
+        height: 3rem;
+        background: linear-gradient(135deg, var(--color-primary), #10b981);
+        border-radius: var(--border-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+
+    .cat-sidebar-contact-icon svg { width: 1.25rem; height: 1.25rem; color: white; }
+
+    .cat-sidebar-contact h3 {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--color-text-dark);
+        margin-bottom: 0.4rem;
+    }
+
+    .cat-sidebar-contact p {
+        font-size: 0.8125rem;
+        color: var(--color-text-medium);
+        line-height: 1.55;
+        margin-bottom: 1rem;
+    }
+
+    .cat-contact-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.6rem 1.25rem;
+        background: linear-gradient(135deg, var(--color-primary), #10b981);
+        color: white;
+        border-radius: var(--border-radius-sm);
+        font-size: 0.8125rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.25s;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .cat-contact-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-green); }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+        .cat-layout { grid-template-columns: 1fr; }
+        .cat-sidebar { position: static; }
+    }
+
+    @media (max-width: 560px) {
+        .cat-hero { padding: 2.5rem 1.25rem 2rem; }
+        .cat-layout { padding: 2rem 1.25rem 4rem; }
+        .cat-hero-icon-wrap { width: 4rem; height: 4rem; font-size: 1.75rem; }
+        .cat-filter-bar { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+
+<main>
+
+    {# ── Breadcrumb ── #}
+    <nav class="cat-breadcrumb" aria-label="{{ 'help_category.breadcrumb.aria'|trans }}">
+        <div class="cat-breadcrumb-inner">
+            <a href="{{ path('app_help_center') }}">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                {{ 'help_category.breadcrumb.help_center'|trans }}
+            </a>
+            <span class="cat-breadcrumb-sep">›</span>
+            <span class="cat-breadcrumb-current">{{ category.title }}</span>
+        </div>
+    </nav>
+
+    {# ── Hero ── #}
+    <section class="cat-hero">
+        <div class="cat-hero-inner">
+            <div class="cat-hero-icon-wrap" aria-hidden="true">{{ category.icon }}</div>
+
+            <div class="cat-hero-text">
+                <div class="cat-hero-label">
+                    <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                    {{ 'help_category.hero.label'|trans }}
+                </div>
+
+                <h1>{{ category.title }}</h1>
+                <p class="cat-hero-desc">{{ category.description }}</p>
+
+                <div class="cat-hero-meta">
+                    <span class="cat-hero-pill">
+                        <span class="dot" aria-hidden="true"></span>
+                        {{ 'help_category.hero.articles_count'|trans({ count: articles|length }) }}
+                    </span>
+
+                    <span class="cat-hero-pill">
+                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                        {{ 'help_category.hero.updated_regularly'|trans }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ── Main layout ── #}
+    <div class="cat-layout">
+
+        {# ── Article list ── #}
+        <div>
+            {# Filter bar #}
+            <div class="cat-filter-bar">
+                <div class="cat-filter-pills" role="group" aria-label="{{ 'help_category.filters.aria'|trans }}">
+                    <button class="cat-filter-pill active" data-filter="all">{{ 'help_category.filters.all'|trans }}</button>
+                    <button class="cat-filter-pill" data-filter="popular">{{ 'help_category.filters.popular'|trans }}</button>
+                    <button class="cat-filter-pill" data-filter="recent">{{ 'help_category.filters.recent'|trans }}</button>
+                </div>
+
+                <select class="cat-sort-select" id="catSort" aria-label="{{ 'help_category.sort.aria'|trans }}">
+                    <option value="default">{{ 'help_category.sort.default'|trans }}</option>
+                    <option value="az">{{ 'help_category.sort.az'|trans }}</option>
+                    <option value="read">{{ 'help_category.sort.read'|trans }}</option>
+                </select>
+            </div>
+
+            <div class="cat-articles" id="catArticleList">
+                {% for article in articles %}
+                    <a href="{{ path('app_help_article', { categorySlug: category.slug, articleSlug: article.slug }) }}"
+                       class="cat-article-card"
+                       data-popular="{{ article.popular ? 'true' : 'false' }}"
+                       data-readtime="{{ article.readTime }}"
+                       data-title="{{ article.title|lower }}">
+
+                        <div class="cat-article-idx" aria-hidden="true">
+                            {{ loop.index < 10 ? '0' ~ loop.index : loop.index }}
+                        </div>
+
+                        <div class="cat-article-body">
+                            <div class="cat-article-tags">
+                                {% if article.popular %}
+                                    <span class="cat-tag cat-tag-popular">{{ 'help_category.article.popular_tag'|trans }}</span>
+                                {% endif %}
+                                {% for tag in article.tags|slice(0, 2) %}
+                                    <span class="cat-tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <h2 class="cat-article-title">{{ article.title }}</h2>
+                            <p class="cat-article-excerpt">{{ article.excerpt }}</p>
+
+                            <div class="cat-article-footer">
+                                <span class="cat-article-footer-item">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    {{ 'help_category.article.read_time'|trans({ minutes: article.readTime }) }}
+                                </span>
+
+                                <span class="cat-article-footer-item">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    {{ article.updatedAt|date('d/m/Y') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <svg class="cat-article-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                {% else %}
+                    <div style="text-align:center;padding:3rem;color:var(--color-text-muted);">
+                        <p style="font-size:2rem;margin-bottom:0.75rem;">📭</p>
+                        <p>{{ 'help_category.empty.title'|trans }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# ── Sidebar ── #}
+        <aside class="cat-sidebar" aria-label="{{ 'help_category.sidebar.aria'|trans }}">
+
+            {# Quick search #}
+            <div class="cat-sidebar-card">
+                <div class="cat-sidebar-title">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    {{ 'help_category.sidebar.quick_search.title'|trans }}
+                </div>
+                <div class="cat-sidebar-search">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+                    </svg>
+                    <input
+                        type="search"
+                        id="catInlineSearch"
+                        placeholder="{{ 'help_category.sidebar.quick_search.placeholder'|trans }}"
+                        aria-label="{{ 'help_category.sidebar.quick_search.aria'|trans }}"
+                    >
+                </div>
+            </div>
+
+            {# Other categories #}
+            <div class="cat-sidebar-card">
+                <div class="cat-sidebar-title">
+                    <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+                    {{ 'help_category.sidebar.other_categories'|trans }}
+                </div>
+                <div class="cat-other-grid">
+                    {% for otherCat in otherCategories %}
+                        <a href="{{ path('app_help_category', { slug: otherCat.slug }) }}"
+                           class="cat-sidebar-link"
+                           {% if otherCat.slug == category.slug %}aria-current="page"{% endif %}>
+                            <span class="cat-sidebar-link-icon" aria-hidden="true">{{ otherCat.icon }}</span>
+                            {{ otherCat.title }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Contact #}
+            <div class="cat-sidebar-card cat-sidebar-contact">
+                <div class="cat-sidebar-contact-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                    </svg>
+                </div>
+                <h3>{{ 'help_category.sidebar.contact.title'|trans }}</h3>
+                <p>{{ 'help_category.sidebar.contact.desc'|trans }}</p>
+                <a href="mailto:contact@key-nest.com" class="cat-contact-btn">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8"/>
+                    </svg>
+                    {{ 'help_category.sidebar.contact.cta'|trans }}
+                </a>
+            </div>
+
+        </aside>
+    </div>
+
+</main>
+
+
+<script>
+(function () {
+    var cards = Array.from(document.querySelectorAll('.cat-article-card'));
+
+    /* ── Inline search ── */
+    document.getElementById('catInlineSearch').addEventListener('input', function () {
+        var q = this.value.toLowerCase().trim();
+        cards.forEach(function (c) {
+            var match = !q || c.dataset.title.includes(q) ||
+                        c.querySelector('.cat-article-excerpt').textContent.toLowerCase().includes(q);
+            c.style.display = match ? '' : 'none';
+        });
+    });
+
+    /* ── Filter pills ── */
+    document.querySelectorAll('.cat-filter-pill').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.cat-filter-pill').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+
+            var filter = btn.dataset.filter;
+            cards.forEach(function (c) {
+                var show = true;
+                if (filter === 'popular') show = c.dataset.popular === 'true';
+                c.style.display = show ? '' : 'none';
+            });
+        });
+    });
+
+    /* ── Sort ── */
+    var list = document.getElementById('catArticleList');
+    document.getElementById('catSort').addEventListener('change', function () {
+        var val = this.value;
+        var sorted = cards.slice().sort(function (a, b) {
+            if (val === 'az') return a.dataset.title.localeCompare(b.dataset.title);
+            if (val === 'read') return parseInt(a.dataset.readtime) - parseInt(b.dataset.readtime);
+            return 0; // default order preserved by DOM
+        });
+        sorted.forEach(function (c) { list.appendChild(c); });
+    });
+})();
+</script>
+
+{% endblock %}

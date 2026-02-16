@@ -1056,5 +1056,172 @@
       "description": "Rejoignez des milliers d'utilisateurs qui protègent leurs données avec MykeyNest",
       "button": "Créer un compte gratuit"
     }
+  },
+   "help_center": {
+    "hero": {
+      "eyebrow": "Centre d'aide",
+      "title_line1": "Comment pouvons-nous",
+      "title_highlight": "vous aider ?",
+      "subtitle": "Guides, tutoriels et réponses à toutes vos questions sur MykeyNest."
+    },
+    "search": {
+      "placeholder": "Rechercher un article, une fonctionnalité…",
+      "aria": "Rechercher dans le centre d'aide",
+      "clear_aria": "Effacer la recherche"
+    },
+    "stats": {
+      "aria": "Statistiques du centre d'aide",
+      "articles": "Articles",
+      "categories": "Catégories",
+      "response_time": "Temps de réponse",
+      "satisfaction": "Satisfaction"
+    },
+    "sections": {
+      "explore_label": "Explorer par thème",
+      "all_categories_title": "Toutes les catégories",
+      "all_categories_sub": "Trouvez rapidement l'aide dont vous avez besoin."
+    },
+    "category": {
+      "articles_count": "{count, plural, one {# article} other {# articles}}"
+    },
+    "no_results": {
+      "title": "Aucun résultat trouvé",
+      "text": "Essayez d'autres termes ou",
+      "contact": "contactez-nous"
+    },
+    "popular": {
+      "label": "Articles populaires",
+      "title": "Questions fréquentes",
+      "sub": "Les ressources les plus consultées par notre communauté."
+    },
+    "sidebar": {
+      "aria": "Nous contacter",
+      "write": {
+        "title": "Nous écrire",
+        "desc": "Une question spécifique ? Notre équipe répond en moins de 2h en semaine.",
+        "cta": "Envoyer un message"
+      },
+      "status": {
+        "title": "Statut du service",
+        "desc": "Tous les systèmes fonctionnent normalement.",
+        "cta": "Voir le statut"
+      }
+    },
+    "faq": {
+      "label": "FAQ rapide",
+      "title": "Réponses en un coup d'œil",
+      "sub": "Les questions que tout le monde se pose.",
+      "items": {
+        "q1": "Mes mots de passe sont-ils vraiment sécurisés chez MykeyNest ?",
+        "a1": "Oui. Vos données sont chiffrées localement avec AES-256 avant d'être envoyées sur nos serveurs. Nous utilisons une architecture zero-knowledge : même nos équipes ne peuvent pas lire vos mots de passe. Seul votre mot de passe maître peut les déchiffrer.",
+        "q2": "Puis-je utiliser MykeyNest sur plusieurs appareils ?",
+        "a2": "Absolument. La synchronisation multi-appareils est incluse dans tous les plans. Vos identifiants sont disponibles sur ordinateur, smartphone et tablette, toujours chiffrés de bout en bout.",
+        "q3": "Le générateur de mots de passe stocke-t-il mes mots de passe ?",
+        "a3": "Non. Le générateur fonctionne entièrement côté client grâce à l'API crypto.getRandomValues du navigateur. Aucune donnée n'est transmise à nos serveurs. Le mot de passe disparaît dès que vous fermez l'onglet.",
+        "q4": "Comment passer au plan Pro ?",
+        "a4": "Depuis votre espace personnel, rendez-vous dans Paramètres › Abonnement et cliquez sur « Passer au Pro ». Le paiement est sécurisé via Stripe. Votre compte est mis à niveau instantanément, sans interruption de service.",
+        "q5": "MykeyNest est-il open source ?",
+        "a5": "Oui. Le code source est publiquement accessible sur GitHub, ce qui permet à la communauté d'auditer la sécurité et de contribuer. La transparence est l'un de nos principes fondamentaux."
+      }
+    },
+    "cta": {
+      "title": "Vous n'avez pas trouvé la réponse ?",
+      "desc": "Notre équipe est disponible 7j/7 pour vous aider.",
+      "support": "Contacter le support",
+      "create_account": "Créer un compte"
+    }
+  },
+  "help_category": {
+    "breadcrumb": {
+      "aria": "Fil d'Ariane",
+      "help_center": "Centre d'aide"
+    },
+    "hero": {
+      "label": "Catégorie",
+      "articles_count": "{count, plural, one {# article} other {# articles}}",
+      "updated_regularly": "Mis à jour régulièrement"
+    },
+    "filters": {
+      "aria": "Filtrer les articles",
+      "all": "Tous",
+      "popular": "⭐ Populaires",
+      "recent": "Récents"
+    },
+    "sort": {
+      "aria": "Trier les articles",
+      "default": "Tri par défaut",
+      "az": "A → Z",
+      "read": "Lecture rapide"
+    },
+    "article": {
+      "popular_tag": "⭐ Populaire",
+      "read_time": "%minutes% min de lecture"
+    },
+    "empty": {
+      "title": "Aucun article dans cette catégorie pour le moment."
+    },
+    "sidebar": {
+      "aria": "Ressources complémentaires",
+      "quick_search": {
+        "title": "Recherche rapide",
+        "placeholder": "Filtrer les articles…",
+        "aria": "Filtrer les articles de cette catégorie"
+      },
+      "other_categories": "Autres catégories",
+      "contact": {
+        "title": "Pas de réponse ?",
+        "desc": "Notre équipe est là pour vous. Réponse en moins de 2h en semaine.",
+        "cta": "Nous écrire"
+      }
+    }
+  },
+   "help_article": {
+    "breadcrumb": {
+      "aria": "Fil d'Ariane",
+      "help_center": "Centre d'aide"
+    },
+    "toc": {
+      "aria": "Table des matières",
+      "title": "Dans cet article"
+    },
+    "back": {
+      "to_category": "Retour à %category%"
+    },
+    "tags": {
+      "popular": "⭐ Populaire"
+    },
+    "meta": {
+      "updated_on": "Mis à jour le %date%",
+      "read_time": "%minutes% min de lecture"
+    },
+    "helpful": {
+      "question": "Cet article vous a-t-il aidé ?",
+      "sub": "Votre avis nous aide à améliorer notre documentation.",
+      "yes_aria": "Oui, cet article m'a aidé",
+      "no_aria": "Non, cet article ne m'a pas aidé",
+      "yes": "Oui",
+      "no": "Non",
+      "thank_you": "Merci pour votre retour !"
+    },
+    "sidebar": {
+      "aria": "Ressources et articles liés",
+      "related": {
+        "title": "Articles liés",
+        "time_short": "%minutes% min"
+      },
+      "share": {
+        "title": "Partager",
+        "copy": "Copier",
+        "copy_title": "Copier le lien",
+        "copy_aria": "Copier le lien de l'article",
+        "email": "Email",
+        "email_aria": "Partager par email"
+      },
+      "contact": {
+        "title": "Pas de réponse ?",
+        "desc": "Notre équipe répond en moins de 2h en semaine.",
+        "cta": "Nous écrire"
+      }
+    }
   }
 }
