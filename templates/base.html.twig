@@ -23,7 +23,10 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-RG9YT46TFS');
+   // IMPORTANT: ne pas envoyer de page_view automatique
+  gtag('config', 'G-RG9YT46TFS', {
+    send_page_view: false
+  });
 </script>
 <!-- End Google Tag Manager -->
 
