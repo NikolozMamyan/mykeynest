@@ -4,17 +4,19 @@ namespace App\Controller\Front;
 
 use App\Entity\Credential;
 use App\Form\CredentialType;
+use App\Repository\CredentialRepository;
+use App\Repository\SharedAccessRepository;
 use App\Service\CredentialManager;
 use App\Service\SecurityCheckerService;
-use App\Repository\CredentialRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\SharedAccessRepository;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Throwable;
 
 final class CredentialPageController extends AbstractController
 {
@@ -290,6 +292,42 @@ public function importCredentials(Request $request): Response
 
     return $this->render('credential/import.html.twig', [
         'heading' => 'Importer des accès',
+    ]);
+}
+
+#[Route('/app/credential/{id}/details/modal', name: 'credential_details_modal', methods: ['GET'])]
+public function detailsModal(Credential $credential): Response
+{
+    $user = $this->getUser();
+    if (!$user || $credential->getUser() !== $user) {
+        throw $this->createAccessDeniedException();
+    }
+
+    return $this->render('credential/_details_modal.html.twig', [
+        'credential' => $credential,
+
+    ]);
+}
+
+#[Route('/app/credential/{id}/details', name: 'credential_details_update', methods: ['POST'])]
+public function detailsUpdate(Request $request, Credential $credential, EntityManagerInterface $entityManager): JsonResponse
+{
+    $user = $this->getUser();
+    if (!$user || $credential->getUser() !== $user) {
+        return $this->json(['success' => false, 'message' => 'Accès refusé'], 403);
+    }
+
+
+    $details = (string) $request->request->get('details', '');
+    $details = trim($details);
+
+    $credential->setDetails($details === '' ? null : $details);
+    $credential->setUpdatedAtValue();
+    $entityManager->flush();
+
+    return $this->json([
+        'success' => true,
+        'details' => $credential->getDetails(),
     ]);
 }
 

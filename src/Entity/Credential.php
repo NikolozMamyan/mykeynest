@@ -58,6 +58,9 @@ private Collection $sharedAccesses;
 #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'credentials')]
 private Collection $teams;
 
+#[ORM\Column(type: 'text', nullable: true)]
+private ?string $details = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -211,6 +214,17 @@ public function removeSharedAccess(SharedAccess $sharedAccess): static
             $sharedAccess->setCredential(null); // ⚠️ attention credential est pas nullable
         }
     }
+
+    return $this;
+}
+public function getDetails(): ?string
+{
+    return $this->details;
+}
+
+public function setDetails(?string $details): static
+{
+    $this->details = $details;
 
     return $this;
 }
