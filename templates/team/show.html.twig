@@ -223,12 +223,13 @@
 
 {# Modal pour ajouter des credentials #}
 {% if add_credentials_form is defined and add_credentials_form %}
-<div id="credentialsModal" class="modal">
+<div id="credentialsModal" class="modal" aria-hidden="true">
     <div class="modal-overlay" onclick="closeCredentialsModal()"></div>
-    <div class="modal-content">
+
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="credentialsModalTitle">
         <div class="modal-header">
-            <h2>{{ 'teams.show.credentials.modal.title'|trans }}</h2>
-            <button type="button" class="btn-close-modal" onclick="closeCredentialsModal()">
+            <h2 id="credentialsModalTitle">{{ 'teams.show.credentials.modal.title'|trans }}</h2>
+            <button type="button" class="btn-close-modal" onclick="closeCredentialsModal()" aria-label="Close">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -237,29 +238,93 @@
 
         <div class="modal-body">
             {{ form_start(add_credentials_form, {'attr': {'class': 'credentials-form'}}) }}
-                <div class="form-help-text-modal">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+
+            <div class="form-help-text-modal">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ 'teams.show.credentials.modal.help'|trans }}
+            </div>
+
+            {# Search + quick actions #}
+            <div class="credentials-toolbar">
+                <div class="credentials-search">
+                    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    {{ 'teams.show.credentials.modal.help'|trans }}
-                </div>
-
-                <div class="credentials-checkboxes">
-                    {{ form_widget(add_credentials_form.credentials) }}
-                    {{ form_errors(add_credentials_form.credentials) }}
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick="closeCredentialsModal()">
-                        {{ 'teams.show.credentials.modal.cancel'|trans }}
-                    </button>
-                    <button type="submit" class="btn-primary-modal">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        {{ 'teams.show.credentials.modal.submit'|trans }}
+                    <input
+                        id="credentialsSearch"
+                        type="text"
+                        class="credentials-search-input"
+                        placeholder="{{ 'Rechercher un credential…'|trans }}"
+                        autocomplete="off"
+                    />
+                    <button type="button" class="btn-clear-search" id="clearCredentialsSearch" aria-label="Clear" hidden>
+                        ✕
                     </button>
                 </div>
+
+                <div class="credentials-actions">
+                    <button type="button" class="btn-chip" id="selectAllCredentials">
+                        {{ 'Tout sélectionner'|trans }}
+                    </button>
+                    <button type="button" class="btn-chip" id="unselectAllCredentials">
+                        {{ 'Tout décocher'|trans }}
+                    </button>
+                    <span class="credentials-counter" id="credentialsCounter">
+                        0 / 0
+                    </span>
+                </div>
+            </div>
+
+            {# List #}
+            <div class="credentials-listbox" id="credentialsListbox">
+                <ul class="credentials-ul" id="credentialsUl">
+                    {% for child in add_credentials_form.credentials %}
+                        {# label texte pour la recherche #}
+                        {% set labelText = (child.vars.label ?? '')|trim %}
+                        <li class="credential-li" data-label="{{ labelText|lower }}">
+                            <label class="credential-option">
+                                {{ form_widget(child, {'attr': {'class': 'credential-checkbox'}}) }}
+
+                                <span class="credential-text">
+                                    <span class="credential-title">{{ labelText }}</span>
+                                    {# si tu as un domaine/extra à afficher, tu peux l’ajouter ici #}
+                                </span>
+
+                                <span class="credential-check" aria-hidden="true">
+                                    ✓
+                                </span>
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="credentials-empty" id="credentialsEmpty" hidden>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M20 20l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <p>{{ 'Aucun résultat.'|trans }}</p>
+                </div>
+            </div>
+
+            {{ form_errors(add_credentials_form.credentials) }}
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeCredentialsModal()">
+                    {{ 'teams.show.credentials.modal.cancel'|trans }}
+                </button>
+                <button type="submit" class="btn-primary-modal">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {{ 'teams.show.credentials.modal.submit'|trans }}
+                </button>
+            </div>
+
             {{ form_end(add_credentials_form) }}
         </div>
     </div>
@@ -273,745 +338,1063 @@
 </form>
 {% endif %}
 <style>
+/* =========================
+   TEAM SHOW – FULL CSS
+   (includes improved Credentials modal list + search)
+   ========================= */
+
 .team-show-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .team-show-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-medium);
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-medium);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .btn-back:hover {
-    color: var(--color-primary);
-    gap: 0.375rem;
+  color: var(--color-primary);
+  gap: 0.375rem;
 }
 
 .btn-back svg {
-    width: 20px;
-    height: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .btn-danger-outline {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    background: white;
-    color: var(--color-danger-start);
-    border: 1.5px solid var(--color-danger-start);
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    font-size: 0.9375rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: white;
+  color: var(--color-danger-start);
+  border: 1.5px solid var(--color-danger-start);
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-danger-outline:hover {
-    background: var(--color-danger-start);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  background: var(--color-danger-start);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .btn-danger-outline svg {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
-/* Team Info Card */
+/* =========================
+   Team Info Card
+   ========================= */
 .team-info-card {
-    background: var(--background-gradient);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    box-shadow: var(--shadow-sm);
+  background: var(--background-gradient);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .team-info-header {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .team-avatar-large {
-    width: 80px;
-    height: 80px;
-    border-radius: var(--border-radius);
-    background: var(--color-primary);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.75rem;
-    flex-shrink: 0;
-    box-shadow: var(--shadow-green);
+  width: 80px;
+  height: 80px;
+  border-radius: var(--border-radius);
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-green);
 }
 
 .team-details {
-    flex: 1;
+  flex: 1;
 }
 
 .team-title {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: var(--color-text-dark);
-    margin: 0 0 0.75rem 0;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 0.75rem 0;
 }
 
 .team-metadata {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
 }
 
 .metadata-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-medium);
-    font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-medium);
+  font-size: 0.9375rem;
 }
 
 .metadata-item svg {
-    width: 18px;
-    height: 18px;
-    color: var(--color-primary);
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
 }
 
-/* Section Card */
+/* =========================
+   Section Card
+   ========================= */
 .section-card {
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .section-header {
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid var(--color-border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .section-title {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .section-title svg {
-    width: 24px;
-    height: 24px;
-    color: var(--color-primary);
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary);
 }
 
 .section-title h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--color-text-dark);
-    margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin: 0;
 }
 
 .member-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 28px;
-    padding: 0 0.5rem;
-    background: var(--color-primary);
-    color: white;
-    border-radius: 14px;
-    font-size: 0.875rem;
-    font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 0.5rem;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .btn-add-small {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.5rem 1rem;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-add-small:hover {
-    background: #047857;
-    transform: translateY(-1px);
+  background: #047857;
+  transform: translateY(-1px);
 }
 
 .btn-add-small svg {
-    width: 16px;
-    height: 16px;
+  width: 16px;
+  height: 16px;
 }
 
-/* Credentials List */
+/* =========================
+   Credentials List (team page)
+   ========================= */
 .credentials-list {
-    padding: 1rem;
+  padding: 1rem;
 }
 
 .credential-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: var(--border-radius-sm);
-    transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--border-radius-sm);
+  transition: background 0.2s ease;
 }
 
 .credential-item:hover {
-    background: var(--color-bg-light);
+  background: var(--color-bg-light);
 }
 
 .credential-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--border-radius-sm);
-    background: var(--background-gradient);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-sm);
+  background: var(--background-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .credential-icon svg {
-    width: 20px;
-    height: 20px;
-    color: var(--color-primary);
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
 }
 
 .credential-info {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .credential-name {
-    font-weight: 600;
-    color: var(--color-text-dark);
-    margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin-bottom: 0.25rem;
 }
 
 .credential-url {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .remove-credential-form {
-    margin: 0;
+  margin: 0;
 }
 
-/* Empty State */
+/* =========================
+   Empty State
+   ========================= */
 .empty-members {
-    text-align: center;
-    padding: 3rem 2rem;
+  text-align: center;
+  padding: 3rem 2rem;
 }
 
 .empty-members svg {
-    width: 48px;
-    height: 48px;
-    color: var(--color-text-light);
-    margin-bottom: 1rem;
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-light);
+  margin-bottom: 1rem;
 }
 
 .empty-members p {
-    color: var(--color-text-medium);
-    margin: 0;
+  color: var(--color-text-medium);
+  margin: 0;
 }
 
-/* Members List */
+/* =========================
+   Members List
+   ========================= */
 .members-list {
-    padding: 1rem;
+  padding: 1rem;
 }
 
 .member-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: var(--border-radius-sm);
-    transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--border-radius-sm);
+  transition: background 0.2s ease;
 }
 
 .member-item:hover {
-    background: var(--color-bg-light);
+  background: var(--color-bg-light);
 }
 
 .member-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary), #047857);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 1rem;
-    flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #047857);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .member-info {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .member-email {
-    font-weight: 600;
-    color: var(--color-text-dark);
-    margin-bottom: 0.375rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin-bottom: 0.375rem;
 }
 
 .member-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .role-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.8125rem;
-    font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
 .role-badge svg {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 }
 
 .role-owner {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #92400e;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
 }
 
 .role-admin {
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-    color: #1e40af;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
 }
 
 .role-member {
-    background: var(--color-bg-light);
-    color: var(--color-text-medium);
+  background: var(--color-bg-light);
+  color: var(--color-text-medium);
 }
 
 .joined-date {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
 }
 
 .remove-member-form {
-    margin: 0;
+  margin: 0;
 }
 
 .btn-remove-member {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: transparent;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-remove-member:hover {
-    background: #fee2e2;
-    color: var(--color-danger-start);
+  background: #fee2e2;
+  color: var(--color-danger-start);
 }
 
 .btn-remove-member svg {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
-/* Add Member Form */
+/* =========================
+   Add Member Form
+   ========================= */
 .add-member-form {
-    padding: 2rem;
+  padding: 2rem;
 }
 
 .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 1rem;
-    align-items: end;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
 }
 
 .form-group-inline {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .form-label-inline {
-    font-weight: 600;
-    color: var(--color-text-dark);
-    font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  font-size: 0.875rem;
 }
 
 .form-input-inline,
 .form-select-inline {
-    padding: 0.75rem 1rem;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--border-radius-sm);
-    font-size: 0.9375rem;
-    color: var(--color-text-dark);
-    transition: all 0.2s ease;
-    background: white;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.9375rem;
+  color: var(--color-text-dark);
+  transition: all 0.2s ease;
+  background: white;
 }
 
 .form-input-inline:focus,
 .form-select-inline:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-hover);
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-hover);
 }
 
 .btn-add-member {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    font-size: 0.9375rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .btn-add-member:hover {
-    background: #047857;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-green);
+  background: #047857;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-green);
 }
 
 .btn-add-member svg {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
-/* Modal */
+/* =========================
+   Modal (generic)
+   ========================= */
 .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal.active {
-    display: flex;
+  display: flex;
 }
 
 .modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: var(--blur-background);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: var(--blur-background);
 }
 
 .modal-content {
-    position: relative;
-    background: white;
-    border-radius: var(--border-radius);
-    max-width: 600px;
-    width: 90%;
-    max-height: 80vh;
-    overflow: hidden;
-    box-shadow: var(--shadow-xl);
-    animation: modalSlideIn 0.3s ease;
+  position: relative;
+  background: white;
+  border-radius: var(--border-radius);
+  max-width: 680px;
+  width: 92%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  animation: modalSlideIn 0.3s ease;
 }
 
 @keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid var(--color-border);
-    background: var(--background-gradient);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--background-gradient);
 }
 
 .modal-header h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-text-dark);
-    margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0;
 }
 
 .btn-close-modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: transparent;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    color: var(--color-text-medium);
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-close-modal:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--color-text-dark);
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text-dark);
 }
 
 .btn-close-modal svg {
-    width: 20px;
-    height: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .modal-body {
-    padding: 2rem;
-    max-height: calc(80vh - 150px);
-    overflow-y: auto;
+  padding: 2rem;
+  max-height: calc(80vh - 150px);
+  overflow-y: auto;
 }
 
 .form-help-text-modal {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.875rem 1rem;
-    background: var(--color-bg-light);
-    border-radius: var(--border-radius-sm);
-    color: var(--color-text-medium);
-    font-size: 0.875rem;
-    line-height: 1.5;
-    margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  background: var(--color-bg-light);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-medium);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
 }
 
 .form-help-text-modal svg {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-    margin-top: 0.125rem;
-    color: var(--color-primary);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--color-primary);
 }
 
-.credentials-checkboxes {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 1rem;
-    background: var(--color-bg-light);
-    border-radius: var(--border-radius-sm);
-    margin-bottom: 1.5rem;
+/* =========================
+   Credentials modal: list + search + actions
+   ========================= */
+.credentials-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.credentials-checkboxes > div {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    padding: 0.75rem;
-    background: white;
-    border-radius: var(--border-radius-sm);
-    transition: all 0.2s ease;
+.credentials-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  gap: 0.5rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.credentials-checkboxes > div:hover {
-    box-shadow: var(--shadow-sm);
+.credentials-search:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-hover);
 }
 
-.credentials-checkboxes input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--color-primary);
+.search-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
-.credentials-checkboxes label {
-    cursor: pointer;
-    color: var(--color-text-dark);
-    font-size: 0.9375rem;
-    font-weight: 500;
-    user-select: none;
-    flex: 1;
+.credentials-search-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.95rem;
+  color: var(--color-text-dark);
+  background: transparent;
 }
 
-.credentials-checkboxes label:hover {
-    color: var(--color-primary);
+.btn-clear-search {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 8px;
 }
 
+.btn-clear-search:hover {
+  background: var(--color-bg-light);
+  color: var(--color-text-dark);
+}
+
+.credentials-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-chip {
+  border: 1.5px solid var(--color-border);
+  background: white;
+  color: var(--color-text-dark);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.btn-chip:hover {
+  background: var(--color-bg-light);
+  border-color: rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+.credentials-counter {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.6rem;
+  background: var(--color-bg-light);
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+}
+
+.credentials-listbox {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-bg-light);
+  padding: 0.75rem;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.credentials-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.credential-li {
+  margin: 0;
+}
+
+.credential-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.credential-option:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+.credential-checkbox {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.credential-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.credential-title {
+  font-weight: 700;
+  color: var(--color-text-dark);
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.credential-check {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 900;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
+}
+
+.credential-option.is-checked {
+  border-color: var(--color-primary);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.credential-option.is-checked .credential-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.credential-checkbox:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-primary-hover);
+  border-radius: 6px;
+}
+
+.credentials-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--color-text-medium);
+}
+
+.credentials-empty svg {
+  width: 42px;
+  height: 42px;
+  color: var(--color-text-light);
+  margin-bottom: 0.75rem;
+}
+
+.credentials-empty p {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* =========================
+   Modal actions
+   ========================= */
 .modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
 }
 
 .btn-secondary {
-    padding: 0.75rem 1.5rem;
-    background: white;
-    color: var(--color-text-dark);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    font-size: 0.9375rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: var(--color-text-dark);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-    background: var(--color-bg-light);
-    border-color: var(--color-text-medium);
+  background: var(--color-bg-light);
+  border-color: var(--color-text-medium);
 }
 
 .btn-primary-modal {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    font-weight: 600;
-    font-size: 0.9375rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .btn-primary-modal:hover {
-    background: #047857;
-    box-shadow: var(--shadow-green);
+  background: #047857;
+  box-shadow: var(--shadow-green);
 }
 
 .btn-primary-modal svg {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
+/* =========================
+   Responsive
+   ========================= */
 @media (max-width: 768px) {
-    .team-show-container {
-        padding: 1rem;
-    }
+  .team-show-container {
+    padding: 1rem;
+  }
 
-    .team-show-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
-    }
+  .team-show-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
 
-    .btn-danger-outline {
-        width: 100%;
-        justify-content: center;
-    }
+  .btn-danger-outline {
+    width: 100%;
+    justify-content: center;
+  }
 
-    .team-info-header {
-        flex-direction: column;
-        text-align: center;
-    }
+  .team-info-header {
+    flex-direction: column;
+    text-align: center;
+  }
 
-    .team-metadata {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
-    }
+  .team-metadata {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 
-    .btn-add-member {
-        width: 100%;
-    }
+  .btn-add-member {
+    width: 100%;
+  }
 
-    .modal-content {
-        width: 95%;
-    }
+  .modal-content {
+    width: 95%;
+  }
 
-    .modal-actions {
-        flex-direction: column;
-    }
+  .modal-actions {
+    flex-direction: column;
+  }
 
-    .btn-secondary,
-    .btn-primary-modal {
-        width: 100%;
-    }
+  .btn-secondary,
+  .btn-primary-modal {
+    width: 100%;
+  }
+
+  .credentials-counter {
+    margin-left: 0;
+  }
 }
 </style>
 <script>
 function openCredentialsModal() {
-    document.getElementById('credentialsModal').classList.add('active');
+    const modal = document.getElementById('credentialsModal');
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+
+    // Focus direct sur la recherche
+    const search = document.getElementById('credentialsSearch');
+    if (search) search.focus();
+
+    syncCredentialsUI();
 }
 
 function closeCredentialsModal() {
-    document.getElementById('credentialsModal').classList.remove('active');
+    const modal = document.getElementById('credentialsModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
 }
 
-function confirmDeleteTeam() {
-    if (confirm('Are you sure you want to delete this team? This action is irreversible and will also remove all members.')) {
-        document.getElementById('deleteTeamForm').submit();
-    }
+/* ===== Credentials UI ===== */
+function getCredentialItems() {
+    return Array.from(document.querySelectorAll('#credentialsUl .credential-li'));
 }
 
-// Fermer le modal avec la touche Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeCredentialsModal();
+function syncCredentialsUI() {
+    const items = getCredentialItems();
+    let checked = 0;
+    let visible = 0;
+
+    items.forEach(li => {
+        const checkbox = li.querySelector('input[type="checkbox"]');
+        const label = li.querySelector('.credential-option');
+        const isVisible = li.style.display !== 'none';
+
+        if (checkbox && label) {
+            label.classList.toggle('is-checked', checkbox.checked);
+            if (checkbox.checked) checked++;
+            if (isVisible) visible++;
+        }
+    });
+
+    const counter = document.getElementById('credentialsCounter');
+    if (counter) counter.textContent = `${checked} / ${items.length}`;
+
+    const empty = document.getElementById('credentialsEmpty');
+    if (empty) empty.hidden = (visible !== 0 || items.length === 0) ? true : false;
+}
+
+function filterCredentials(query) {
+    const q = (query || '').trim().toLowerCase();
+    const items = getCredentialItems();
+
+    let visible = 0;
+    items.forEach(li => {
+        const label = (li.getAttribute('data-label') || '');
+        const match = label.includes(q);
+        li.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+
+    const empty = document.getElementById('credentialsEmpty');
+    if (empty) empty.hidden = (visible !== 0 || items.length === 0);
+
+    syncCredentialsUI();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const search = document.getElementById('credentialsSearch');
+    const clearBtn = document.getElementById('clearCredentialsSearch');
+
+    if (search) {
+        search.addEventListener('input', () => {
+            filterCredentials(search.value);
+            if (clearBtn) clearBtn.hidden = search.value.length === 0;
+        });
     }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            if (!search) return;
+            search.value = '';
+            clearBtn.hidden = true;
+            filterCredentials('');
+            search.focus();
+        });
+    }
+
+    // Toggle au clic sur la ligne (et support label natif)
+    document.addEventListener('click', (e) => {
+        const option = e.target.closest('.credential-option');
+        if (!option) return;
+
+        const checkbox = option.querySelector('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        // si clic direct sur input, laisse le natif
+        if (e.target === checkbox) {
+            syncCredentialsUI();
+            return;
+        }
+
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        syncCredentialsUI();
+    });
+
+    // Update au changement (clavier / label)
+    document.addEventListener('change', (e) => {
+        if (e.target && e.target.matches('#credentialsUl input[type="checkbox"]')) {
+            syncCredentialsUI();
+        }
+    });
+
+    // Select all / unselect all (uniquement visibles)
+    const btnAll = document.getElementById('selectAllCredentials');
+    const btnNone = document.getElementById('unselectAllCredentials');
+
+    if (btnAll) {
+        btnAll.addEventListener('click', () => {
+            getCredentialItems().forEach(li => {
+                if (li.style.display === 'none') return;
+                const cb = li.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = true;
+            });
+            syncCredentialsUI();
+        });
+    }
+
+    if (btnNone) {
+        btnNone.addEventListener('click', () => {
+            getCredentialItems().forEach(li => {
+                if (li.style.display === 'none') return;
+                const cb = li.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = false;
+            });
+            syncCredentialsUI();
+        });
+    }
+
+    // Escape pour fermer
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeCredentialsModal();
+    });
+
+    // init
+    syncCredentialsUI();
 });
 </script>
 {% endblock %}
