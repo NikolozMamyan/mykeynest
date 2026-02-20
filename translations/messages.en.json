@@ -283,7 +283,8 @@
         "password_label": "Password",
         "submit": "Log in",
         "hint": "Don't have an account yet?",
-        "hint_link": "Sign up"
+        "hint_link": "Sign up",
+        "hint_link1": "Forgot your password?"
       }
     },
     "register": {

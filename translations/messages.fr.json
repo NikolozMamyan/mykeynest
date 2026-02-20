@@ -283,7 +283,8 @@
         "password_label": "Mot de passe",
         "submit": "Se connecter",
         "hint": "Pas encore de compte ?",
-        "hint_link": "S'inscrire"
+        "hint_link": "S'inscrire",
+        "hint_link1": "Mot de passe oublié ?"
       }
     },
     "register": {
