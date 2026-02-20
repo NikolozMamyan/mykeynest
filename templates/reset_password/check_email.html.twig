@@ -1,0 +1,149 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}Email de réinitialisation envoyé{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --color-primary: #059669;
+            --color-primary-hover: rgba(16,185,129,0.3);
+            --background-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            --color-white: #ffffff;
+            --color-bg-light: #f8fafc;
+            --color-text-dark: #1e293b;
+            --color-text-medium: #475569;
+            --color-text-muted: #64748b;
+            --color-border: #e2e8f0;
+            --color-warning: #f59e0b;
+            --shadow-green: 0 4px 12px var(--color-primary-hover);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            --blur-background: blur(10px);
+            --border-radius-sm: 8px;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--background-gradient); min-height: 100vh; }
+        .auth-layout {
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; padding: 40px 16px; position: relative; overflow: hidden;
+        }
+        .auth-layout::before {
+            content: ''; position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: .45; pointer-events: none;
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(5,150,105,.18) 0%, transparent 70%);
+            top: -60px; left: -80px;
+        }
+        .auth-card {
+            position: relative;
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: var(--blur-background);
+            -webkit-backdrop-filter: var(--blur-background);
+            border: 1px solid rgba(255,255,255,0.9);
+            border-radius: 20px; padding: 48px 44px;
+            width: 100%; max-width: 440px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(5,150,105,.06);
+            animation: cardIn .5s cubic-bezier(.22,1,.36,1) both;
+            text-align: center;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px) scale(.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .check-illustration {
+            width: 80px; height: 80px; border-radius: 20px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid rgba(5,150,105,.15);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 28px; box-shadow: var(--shadow-green);
+        }
+        .check-illustration svg { width: 38px; height: 38px; }
+        .auth-title {
+            font-family: 'Playfair Display', serif; font-size: 24px;
+            font-weight: 600; color: var(--color-text-dark); margin-bottom: 8px; line-height: 1.25;
+        }
+        .auth-subtitle {
+            font-size: 14px; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 0;
+        }
+        .expiry-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #fefce8; border: 1px solid #fef08a; color: #854d0e;
+            border-radius: 99px; padding: 5px 14px;
+            font-size: 12.5px; font-weight: 500; margin: 16px auto;
+        }
+        .steps-list {
+            background: var(--color-bg-light); border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm); padding: 16px 18px;
+            margin: 20px 0 24px; text-align: left;
+        }
+        .step-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            font-size: 13.5px; color: var(--color-text-medium);
+            line-height: 1.5; padding: 5px 0;
+        }
+        .step-item + .step-item {
+            border-top: 1px solid var(--color-border); margin-top: 5px; padding-top: 10px;
+        }
+        .step-num {
+            flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+            background: var(--color-primary); color: #fff;
+            font-size: 11px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; margin-top: 1px;
+        }
+        .retry-link {
+            font-size: 13.5px; color: var(--color-text-muted);
+            line-height: 1.6;
+        }
+        .retry-link a {
+            color: var(--color-primary); font-weight: 500;
+            text-decoration: none; transition: opacity .15s;
+        }
+        .retry-link a:hover { opacity: .75; }
+        @media (max-width: 500px) { .auth-card { padding: 36px 24px; } }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="auth-layout">
+    <div class="auth-card">
+
+        <div class="check-illustration">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="3"/>
+                <path d="M2 7l10 7 10-7"/>
+                <polyline points="8 14 10 16 14 12" stroke-width="2"/>
+            </svg>
+        </div>
+
+        <h1 class="auth-title">Check your inbox</h1>
+        <p class="auth-subtitle">
+            If an account matching your email exists, we just sent you a password reset link.
+        </p>
+
+        <div class="expiry-badge">
+            ⏱ {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}
+        </div>
+
+        <div class="steps-list">
+            <div class="step-item">
+                <div class="step-num">1</div>
+                Open your email inbox
+            </div>
+            <div class="step-item">
+                <div class="step-num">2</div>
+                Click the secure reset link in the email
+            </div>
+            <div class="step-item">
+                <div class="step-num">3</div>
+                Create your new password
+            </div>
+        </div>
+
+        <p class="retry-link">
+            Didn't receive anything? Check your spam folder or
+            <a href="{{ path('app_forgot_password_request') }}">try again</a>.
+        </p>
+
+    </div>
+</div>
+{% endblock %}

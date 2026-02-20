@@ -1,0 +1,207 @@
+{# ═══════════════════════════════════════════════════════
+   request.html.twig — Page de demande de réinitialisation
+══════════════════════════════════════════════════════════ #}
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}Mot de passe oublié{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --color-primary: #059669;
+            --color-primary-hover: rgba(16,185,129,0.3);
+            --background-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            --color-white: #ffffff;
+            --color-bg-light: #f8fafc;
+            --color-text-dark: #1e293b;
+            --color-text-medium: #475569;
+            --color-text-muted: #64748b;
+            --color-text-light: #94a3b8;
+            --color-border: #e2e8f0;
+            --shadow-green: 0 4px 12px var(--color-primary-hover);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            --blur-background: blur(10px);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--background-gradient); min-height: 100vh; }
+        .auth-layout {
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; padding: 40px 16px; position: relative; overflow: hidden;
+        }
+        .auth-layout::before, .auth-layout::after {
+            content: ''; position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: .45; pointer-events: none;
+        }
+        .auth-layout::before {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(5,150,105,.18) 0%, transparent 70%);
+            top: -60px; left: -80px;
+        }
+        .auth-layout::after {
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(16,185,129,.14) 0%, transparent 70%);
+            bottom: -40px; right: -60px;
+        }
+        .auth-card {
+            position: relative;
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: var(--blur-background);
+            -webkit-backdrop-filter: var(--blur-background);
+            border: 1px solid rgba(255,255,255,0.9);
+            border-radius: 20px; padding: 48px 44px;
+            width: 100%; max-width: 440px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(5,150,105,.06);
+            animation: cardIn .5s cubic-bezier(.22,1,.36,1) both;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px) scale(.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .icon-badge {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1px solid rgba(5,150,105,.15);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px; box-shadow: var(--shadow-green);
+        }
+        .icon-badge svg { width: 26px; height: 26px; }
+        .auth-title {
+            font-family: 'Playfair Display', serif; font-size: 26px;
+            font-weight: 600; color: var(--color-text-dark); margin-bottom: 8px; line-height: 1.25;
+        }
+        .auth-subtitle {
+            font-size: 14px; color: var(--color-text-muted);
+            line-height: 1.6; margin-bottom: 32px;
+        }
+        .alert-danger {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 12px 14px; border-radius: var(--border-radius-sm);
+            font-size: 13.5px; line-height: 1.5; margin-bottom: 24px;
+            background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+            animation: fadeIn .3s ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(-4px); } to { opacity:1; transform:none; } }
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block; font-size: 13px; font-weight: 500;
+            color: var(--color-text-medium); margin-bottom: 7px;
+        }
+        /* Twig renders the input — we style via Symfony form_themes or widget attrs */
+        .field input, .field .form-control {
+            width: 100%; padding: 12px 14px;
+            border: 1.5px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            font-family: 'DM Sans', sans-serif; font-size: 14.5px;
+            color: var(--color-text-dark); background: var(--color-white);
+            outline: none; transition: border-color .2s, box-shadow .2s;
+        }
+        .field input:focus, .field .form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3.5px rgba(5,150,105,.12);
+        }
+        .btn-primary-custom {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 13px; border: none;
+            border-radius: var(--border-radius-sm);
+            background: var(--color-primary); color: #fff;
+            font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+            cursor: pointer; box-shadow: var(--shadow-green);
+            transition: transform .15s, box-shadow .15s, background .15s; margin-top: 4px;
+        }
+        .btn-primary-custom:hover {
+            background: #047857;
+            box-shadow: 0 6px 18px rgba(5,150,105,.38);
+            transform: translateY(-1px);
+        }
+        .auth-footer {
+            margin-top: 24px; text-align: center;
+            font-size: 13.5px; color: var(--color-text-muted);
+        }
+        .auth-footer a {
+            color: var(--color-primary); font-weight: 500;
+            text-decoration: none; transition: opacity .15s;
+        }
+        .auth-footer a:hover { opacity: .75; }
+        @media (max-width: 500px) { .auth-card { padding: 36px 24px; } }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="auth-layout">
+    <div class="auth-card">
+
+        <div class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="3"/>
+                <path d="M2 7l10 7 10-7"/>
+            </svg>
+        </div>
+
+        {% for flash_error in app.flashes('reset_password_error') %}
+            <div class="alert-danger" role="alert">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {{ flash_error }}
+            </div>
+        {% endfor %}
+
+        <h1 class="auth-title">Forgot your password?</h1>
+        <p class="auth-subtitle">Enter your email address and we'll send you a secure link to reset your password.</p>
+
+        {{ form_start(requestForm, {attr: {novalidate: 'novalidate'}}) }}
+            <div class="field">
+                {{ form_label(requestForm.email) }}
+                {{ form_widget(requestForm.email, {attr: {placeholder: 'you@example.com'}}) }}
+                {{ form_errors(requestForm.email) }}
+            </div>
+
+            <button type="submit" class="btn-primary-custom">
+                Send reset link
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
+        {{ form_end(requestForm) }}
+
+        <div class="auth-footer">
+            <a href="{{ path('show_login') }}">← Back to sign in</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+
+{# ═══════════════════════════════════════════════════════
+   check_email.html.twig — Email envoyé
+══════════════════════════════════════════════════════════ #}
+{# NOTE: Copier ce bloc dans son propre fichier check_email.html.twig #}
+
+{#
+{% extends 'base.html.twig' %}
+{% block title %}Email de réinitialisation envoyé{% endblock %}
+{% block body %}
+<div class="auth-layout">
+    <div class="auth-card">
+        <div class="check-illustration">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 ..."/>
+                <path d="M16 2l2 2 4-4" stroke-width="2"/>
+            </svg>
+        </div>
+        <div class="check-text-center">
+            <h1 class="auth-title">Check your inbox</h1>
+            <p class="auth-subtitle">If an account matching your email exists, we just sent you a reset link.</p>
+            <div class="expiry-badge">
+                ⏱ {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}
+            </div>
+        </div>
+        ...
+    </div>
+</div>
+{% endblock %}
+#}

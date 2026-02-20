@@ -53,7 +53,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
         /** @var User $user */
         $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('show_login');
         }
 
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);

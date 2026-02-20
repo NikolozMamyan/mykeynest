@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reset your password</title>
+    <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+    <style>
+        body {
+            margin: 0; padding: 0;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f0fdf4;
+            -webkit-text-size-adjust: 100%;
+        }
+        .wrapper { width: 100%; background-color: #f0fdf4; padding: 40px 16px; }
+        .container { max-width: 560px; margin: 0 auto; }
+        /* Header */
+        .email-header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            border-radius: 16px 16px 0 0;
+            padding: 32px 40px;
+            text-align: center;
+        }
+        .logo {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-size: 20px; font-weight: 700; color: #ffffff; text-decoration: none;
+            letter-spacing: .02em;
+        }
+        .logo-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: rgba(255,255,255,.2);
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 18px; line-height: 36px;
+        }
+        /* Body */
+        .email-body {
+            background: #ffffff;
+            padding: 40px 40px 32px;
+        }
+        .greeting {
+            font-size: 22px; font-weight: 700;
+            color: #1e293b; margin: 0 0 16px;
+        }
+        p {
+            font-size: 15px; color: #475569;
+            line-height: 1.7; margin: 0 0 16px;
+        }
+        /* CTA Button */
+        .btn-wrap { text-align: center; margin: 28px 0 24px; }
+        .btn {
+            display: inline-block;
+            background: #059669; color: #ffffff;
+            text-decoration: none; border-radius: 10px;
+            padding: 14px 32px; font-size: 15px; font-weight: 600;
+            letter-spacing: .01em;
+        }
+        /* Fallback URL */
+        .fallback-box {
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            border-radius: 8px; padding: 14px 16px;
+            font-size: 12.5px; color: #64748b; word-break: break-all;
+            line-height: 1.6; margin-bottom: 20px;
+        }
+        .fallback-label { font-weight: 600; display: block; margin-bottom: 4px; }
+        /* Expiry notice */
+        .expiry-notice {
+            display: flex; align-items: center; gap: 8px;
+            background: #fefce8; border: 1px solid #fef08a;
+            border-radius: 8px; padding: 10px 14px;
+            font-size: 13px; color: #854d0e; font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .expiry-notice span { font-size: 16px; }
+        /* Divider */
+        .divider { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+        .warning { font-size: 13px; color: #94a3b8; line-height: 1.6; margin: 0; }
+        /* Footer */
+        .email-footer {
+            background: #f8fafc; border-top: 1px solid #e2e8f0;
+            border-radius: 0 0 16px 16px;
+            padding: 20px 40px; text-align: center;
+            font-size: 12px; color: #94a3b8; line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .email-header, .email-body, .email-footer { padding-left: 24px; padding-right: 24px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+<div class="container">
+
+    <!-- Header -->
+    <div class="email-header">
+        <div class="logo">
+            <span class="logo-icon">✦</span>
+            YourApp
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="email-body">
+        <p class="greeting">Hi there 👋</p>
+
+        <p>We received a request to reset the password for your account. Click the button below to choose a new password.</p>
+        <p>This link is unique to your account and can only be used once.</p>
+
+        <div class="btn-wrap">
+            <a href="{{ url('app_reset_password', {token: resetToken.token}) }}" class="btn">
+                🔑 Reset my password
+            </a>
+        </div>
+
+        <div class="fallback-box">
+            <span class="fallback-label">Or copy this link into your browser:</span>
+            {{ url('app_reset_password', {token: resetToken.token}) }}
+        </div>
+
+        <div class="expiry-notice">
+            <span>⏱</span>
+            This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+        </div>
+
+        <hr class="divider" />
+
+        <p class="warning">
+            If you didn't request a password reset, you can safely ignore this email.
+            Your password will not be changed. If you believe someone else requested this,
+            please contact our support team.
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="email-footer">
+        © {{ "now"|date("Y") }} YourApp · You received this email because a password reset was requested.<br />
+        This is an automated message, please do not reply.
+    </div>
+
+</div>
+</div>
+</body>
+</html>

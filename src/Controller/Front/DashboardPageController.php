@@ -28,7 +28,7 @@ final class DashboardPageController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('show_login');
         }
 
         // -------------------------

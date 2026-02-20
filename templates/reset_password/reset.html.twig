@@ -1,0 +1,183 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}Nouveau mot de passe{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --color-primary: #059669;
+            --color-primary-hover: rgba(16,185,129,0.3);
+            --background-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            --color-white: #ffffff;
+            --color-text-dark: #1e293b;
+            --color-text-medium: #475569;
+            --color-text-muted: #64748b;
+            --color-text-light: #94a3b8;
+            --color-border: #e2e8f0;
+            --shadow-green: 0 4px 12px var(--color-primary-hover);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            --blur-background: blur(10px);
+            --border-radius-sm: 8px;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--background-gradient); min-height: 100vh; }
+        .auth-layout {
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; padding: 40px 16px; position: relative; overflow: hidden;
+        }
+        .auth-layout::before {
+            content: ''; position: absolute; border-radius: 50%; filter: blur(80px); opacity: .45;
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(5,150,105,.18) 0%, transparent 70%);
+            top: -60px; left: -80px; pointer-events: none;
+        }
+        .auth-card {
+            position: relative;
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: var(--blur-background); -webkit-backdrop-filter: var(--blur-background);
+            border: 1px solid rgba(255,255,255,0.9);
+            border-radius: 20px; padding: 48px 44px;
+            width: 100%; max-width: 440px;
+            box-shadow: var(--shadow-xl), 0 0 0 1px rgba(5,150,105,.06);
+            animation: cardIn .5s cubic-bezier(.22,1,.36,1) both;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px) scale(.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .icon-badge {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1px solid rgba(5,150,105,.15);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px; box-shadow: var(--shadow-green);
+        }
+        .icon-badge svg { width: 26px; height: 26px; }
+        .auth-title {
+            font-family: 'Playfair Display', serif; font-size: 26px;
+            font-weight: 600; color: var(--color-text-dark); margin-bottom: 8px;
+        }
+        .auth-subtitle {
+            font-size: 14px; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 32px;
+        }
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block; font-size: 13px; font-weight: 500;
+            color: var(--color-text-medium); margin-bottom: 7px;
+        }
+        .field input, .field .form-control {
+            width: 100%; padding: 12px 14px;
+            border: 1.5px solid var(--color-border); border-radius: var(--border-radius-sm);
+            font-family: 'DM Sans', sans-serif; font-size: 14.5px;
+            color: var(--color-text-dark); background: var(--color-white);
+            outline: none; transition: border-color .2s, box-shadow .2s;
+        }
+        .field input:focus, .field .form-control:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3.5px rgba(5,150,105,.12);
+        }
+        /* Password strength */
+        .strength-bars { display: flex; gap: 5px; margin-top: 8px; }
+        .strength-bar {
+            flex: 1; height: 4px; border-radius: 99px;
+            background: var(--color-border); transition: background .3s;
+        }
+        .strength-bar.filled { background: var(--color-primary); }
+        .strength-label { font-size: 11.5px; color: var(--color-text-muted); margin-top: 5px; }
+        .btn-primary-custom {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 13px; border: none; border-radius: var(--border-radius-sm);
+            background: var(--color-primary); color: #fff;
+            font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+            cursor: pointer; box-shadow: var(--shadow-green);
+            transition: transform .15s, box-shadow .15s, background .15s; margin-top: 4px;
+        }
+        .btn-primary-custom:hover {
+            background: #047857;
+            box-shadow: 0 6px 18px rgba(5,150,105,.38);
+            transform: translateY(-1px);
+        }
+        .auth-footer {
+            margin-top: 24px; text-align: center;
+            font-size: 13.5px; color: var(--color-text-muted);
+        }
+        .auth-footer a { color: var(--color-primary); font-weight: 500; text-decoration: none; }
+        .auth-footer a:hover { opacity: .75; }
+        @media (max-width: 500px) { .auth-card { padding: 36px 24px; } }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="auth-layout">
+    <div class="auth-card">
+
+        <div class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+        </div>
+
+        <h1 class="auth-title">Create new password</h1>
+        <p class="auth-subtitle">Your new password must be at least 8 characters and include letters and numbers.</p>
+
+        {{ form_start(resetForm, {attr: {novalidate: 'novalidate', id: 'reset-form'}}) }}
+
+            <div class="field">
+                {{ form_label(resetForm.plainPassword.first, 'New password') }}
+                {{ form_widget(resetForm.plainPassword.first, {
+                    attr: {placeholder: '••••••••••••', id: 'pass-input', oninput: 'updateStrength(this.value)'}
+                }) }}
+                {{ form_errors(resetForm.plainPassword.first) }}
+                <div class="strength-bars">
+                    <div class="strength-bar" id="s1"></div>
+                    <div class="strength-bar" id="s2"></div>
+                    <div class="strength-bar" id="s3"></div>
+                    <div class="strength-bar" id="s4"></div>
+                </div>
+                <div class="strength-label" id="slabel">Enter a password</div>
+            </div>
+
+            <div class="field">
+                {{ form_label(resetForm.plainPassword.second, 'Confirm password') }}
+                {{ form_widget(resetForm.plainPassword.second, {attr: {placeholder: '••••••••••••'}}) }}
+                {{ form_errors(resetForm.plainPassword.second) }}
+            </div>
+
+            <button type="submit" class="btn-primary-custom">
+                Reset password
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </button>
+
+        {{ form_end(resetForm) }}
+
+        <div class="auth-footer">
+            <a href="{{ path('show_login') }}">← Back to sign in</a>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    function updateStrength(val) {
+        var score = 0;
+        if (val.length >= 6) score++;
+        if (val.length >= 10) score++;
+        if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        var labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+        for (var i = 1; i <= 4; i++) {
+            var bar = document.getElementById('s' + i);
+            if (i <= score) bar.classList.add('filled');
+            else bar.classList.remove('filled');
+        }
+        document.getElementById('slabel').textContent =
+            val.length === 0 ? 'Enter a password' : (labels[score] || 'Too short');
+    }
+    </script>
+{% endblock %}
+{% endblock %}
