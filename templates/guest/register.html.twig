@@ -1,0 +1,571 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}Créer mon compte{% endblock %}
+
+{% block body %}
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, var(--color-bg-light) 0%, #e0f2fe 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.register-wrapper {
+  background: var(--color-white);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), var(--shadow-sm);
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--color-border);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Colonne gauche - Hero */
+.register-hero {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--color-white);
+  position: relative;
+  overflow: hidden;
+}
+
+.register-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50%       { transform: scale(1.1); opacity: 0.3; }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-icon {
+  width: 72px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: var(--blur-background);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: var(--color-white);
+}
+
+.register-hero h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.register-hero p {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  margin: 0 0 2.5rem 0;
+  opacity: 0.9;
+}
+
+/* Carte invité */
+.guest-info-card {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+.guest-info-card .card-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.guest-info-card .card-value {
+  font-size: 1rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+/* Features */
+.hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 0.9375rem;
+  opacity: 0.9;
+}
+
+.feature-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: var(--color-white);
+  stroke-width: 2.5;
+}
+
+/* Colonne droite - Formulaire */
+.register-form-section {
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.widgets-toggles {
+  position: absolute;
+  display: flex;
+  gap: 10px;
+  top: 2rem;
+  right: 2rem;
+}
+
+.form-header {
+  margin-bottom: 2rem;
+}
+
+.form-header h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.025em;
+}
+
+.form-header p {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Email pre-filled  */
+.email-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1.5px solid rgba(5, 150, 105, 0.25);
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.email-display svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.email-display span {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+}
+
+/* Form */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-medium);
+  letter-spacing: 0.01em;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  color: var(--color-text-dark);
+  background: var(--color-white);
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-hover);
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-light);
+}
+
+/* Password strength */
+.password-strength {
+  height: 4px;
+  border-radius: 100px;
+  background: var(--color-border);
+  overflow: hidden;
+  margin-top: -0.5rem;
+}
+
+.password-strength-bar {
+  height: 100%;
+  border-radius: 100px;
+  width: 0%;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: -0.5rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-green);
+  font-family: inherit;
+  margin-top: 0.25rem;
+}
+
+.btn-submit:hover {
+  background: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+/* Flash messages */
+.flash-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.875rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  border-radius: 10px;
+  color: #991b1b;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.flash-error svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.flash-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.875rem 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #059669;
+  border-radius: 10px;
+  color: #065f46;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.flash-success svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.auth-hint {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.auth-hint a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-hint a:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 968px) {
+  .auth-container { padding: 0; }
+  .register-wrapper { display: flex; flex-direction: column-reverse; border-radius: 0; }
+  .register-hero { padding: 3rem 2rem; }
+  .register-hero h1 { font-size: 2rem; }
+  .register-form-section { padding: 3rem 2rem; }
+}
+
+@media (max-width: 480px) {
+  .register-hero { padding: 2rem 1.5rem; }
+  .register-hero h1 { font-size: 1.75rem; }
+  .register-form-section { padding: 2rem 1.5rem; }
+  .form-header h2 { font-size: 1.5rem; }
+}
+</style>
+
+<div class="auth-container">
+  <div class="register-wrapper">
+
+    {# ── Colonne gauche – Hero ── #}
+    <div class="register-hero">
+      <div class="hero-content">
+
+        <div class="hero-icon">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/>
+          </svg>
+        </div>
+
+        <h1>Bienvenue sur MYKEYNEST</h1>
+        <p>Vous avez été invité à rejoindre l'espace de gestion d'identifiants partagés. Créez votre mot de passe pour accéder à votre compte.</p>
+
+        {# Email de l'invité #}
+        <div class="guest-info-card">
+          <div class="card-label">Compte invité</div>
+          <div class="card-value">{{ user.email }}</div>
+        </div>
+
+        <div class="hero-features">
+          <div class="feature-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Accès sécurisé aux identifiants partagés
+          </div>
+          <div class="feature-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+            </svg>
+            Chiffrement de bout en bout
+          </div>
+          <div class="feature-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Lien à usage unique — expire après activation
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {# ── Colonne droite – Formulaire ── #}
+    <div class="register-form-section">
+
+      <div class="widgets-toggles">
+        {% include 'components/parts/theme_mode_btn.html.twig' %}
+        {% include 'components/parts/lang_switcher.html.twig' %}
+      </div>
+
+      <div class="form-header">
+        <h2>Créez votre mot de passe</h2>
+        <p>Plus qu'une étape pour accéder à vos identifiants partagés.</p>
+      </div>
+
+      {# Flash messages #}
+      {% for message in app.flashes('error') %}
+        <div class="flash-error">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+
+      {% for message in app.flashes('success') %}
+        <div class="flash-success">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+
+      {# Email pré-rempli (lecture seule) #}
+      <div class="email-display">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <span>{{ user.email }}</span>
+      </div>
+
+      <form class="register-form" method="post">
+        <input type="hidden" name="token" value="{{ token }}">
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="••••••••"
+            required
+            autocomplete="new-password"
+            minlength="8"
+            oninput="updateStrength(this.value)"
+          >
+          <div class="password-strength">
+            <div class="password-strength-bar" id="strengthBar"></div>
+          </div>
+          <span class="strength-hint" id="strengthHint">Minimum 8 caractères</span>
+        </div>
+
+        <div class="form-group">
+          <label for="password_confirm">Confirmer le mot de passe</label>
+          <input
+            type="password"
+            id="password_confirm"
+            name="password_confirm"
+            placeholder="••••••••"
+            required
+            autocomplete="new-password"
+            oninput="checkMatch()"
+          >
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          Créer mon compte →
+        </button>
+
+        <p class="auth-hint">
+          Déjà un compte ? <a href="{{ path('show_login') }}">Se connecter</a>
+        </p>
+      </form>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+const strengthBar  = document.getElementById('strengthBar');
+const strengthHint = document.getElementById('strengthHint');
+const submitBtn    = document.getElementById('submitBtn');
+const confirmInput = document.getElementById('password_confirm');
+const passwordInput = document.getElementById('password');
+
+function getStrength(password) {
+  let score = 0;
+  if (password.length >= 8)  score++;
+  if (password.length >= 12) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  return score;
+}
+
+function updateStrength(value) {
+  const score = getStrength(value);
+  const levels = [
+    { width: '0%',   color: '#e2e8f0', label: 'Minimum 8 caractères' },
+    { width: '20%',  color: '#ef4444', label: 'Très faible' },
+    { width: '40%',  color: '#f59e0b', label: 'Faible' },
+    { width: '60%',  color: '#eab308', label: 'Moyen' },
+    { width: '80%',  color: '#22c55e', label: 'Fort' },
+    { width: '100%', color: '#059669', label: 'Très fort' },
+  ];
+  const level = value.length === 0 ? levels[0] : levels[Math.min(score, 5)];
+  strengthBar.style.width    = level.width;
+  strengthBar.style.background = level.color;
+  strengthHint.textContent   = level.label;
+  checkMatch();
+}
+
+function checkMatch() {
+  const pw  = passwordInput.value;
+  const cpw = confirmInput.value;
+  const valid = pw.length >= 8 && (cpw === '' || pw === cpw);
+  submitBtn.disabled = !(pw.length >= 8 && pw === cpw);
+
+  if (cpw.length > 0) {
+    confirmInput.style.borderColor = pw === cpw ? '#059669' : '#ef4444';
+    confirmInput.style.boxShadow   = pw === cpw
+      ? '0 0 0 3px rgba(5,150,105,0.12)'
+      : '0 0 0 3px rgba(239,68,68,0.12)';
+  } else {
+    confirmInput.style.borderColor = '#e2e8f0';
+    confirmInput.style.boxShadow   = 'none';
+  }
+}
+
+// Disable submit by default until passwords match
+submitBtn.disabled = true;
+</script>
+
+{% endblock %}

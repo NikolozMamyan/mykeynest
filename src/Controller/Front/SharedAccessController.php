@@ -67,7 +67,7 @@ public function new(
         $guest = $userRepository->findOneBy(['email' => $email]);
      if (!$guest) {
     $token = bin2hex(random_bytes(32));
-    $expiresAt = (new \DateTimeImmutable('+1 hour'));
+    $expiresAt = (new \DateTimeImmutable('+6 hour'));
 
     $guest = new User(); // ✅ on crée directement $guest
     $guest->setEmail($email);
@@ -78,16 +78,12 @@ public function new(
     $guest->setTokenExpiresAt($expiresAt);
     $guest->regenerateApiExtensionToken();
 
-    $entityManager->persist($guest);
-    $entityManager->flush();
 
     $guestRegisterUrl = $urlGenerator->generate(
         'app_guest_register',
         ['token' => $token, 'email' => $email],
         UrlGeneratorInterface::ABSOLUTE_URL
     );
-
-    try {
         $mailer->send(
             $guest->getEmail(),
             'Welcome to MYKEYNEST',
@@ -98,16 +94,9 @@ public function new(
                 'expiresAt' => $expiresAt,
             ]
         );
-    } catch (\Exception $e) {
-        $logger->error('Failed to send registration email', [
-            'email' => $email,
-            'error' => $e->getMessage(),
-            'exception' => $e,
-        ]);
 
-        // ✅ pour voir direct en dev (optionnel)
-        $this->addFlash('error', 'Erreur envoi email: ' . $e->getMessage());
-    }
+    $entityManager->persist($guest);
+    $entityManager->flush();
 
     $this->addFlash('success', 'Une invitation a été envoyée à cet utilisateur.');
     return $this->redirectToRoute('shared_access_new');

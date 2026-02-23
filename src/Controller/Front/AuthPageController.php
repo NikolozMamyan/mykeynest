@@ -97,7 +97,7 @@ public function guestRegister(
     // Expiration
     if ($user->getTokenExpiresAt() && $user->getTokenExpiresAt() < new \DateTimeImmutable()) {
         $this->addFlash('error', 'Lien expiré. Demandez une nouvelle invitation.');
-        return $this->redirectToRoute('app_login'); // ou une page dédiée
+        return $this->redirectToRoute('show_login'); // ou une page dédiée
     }
 
     // Optionnel: vérifier que l'email du lien correspond
@@ -121,7 +121,7 @@ public function guestRegister(
         $em->flush();
 
         $this->addFlash('success', 'Compte créé. Vous pouvez vous connecter.');
-        return $this->redirectToRoute('app_login');
+        return $this->redirectToRoute('show_login');
     }
 
     return $this->render('guest/register.html.twig', [
