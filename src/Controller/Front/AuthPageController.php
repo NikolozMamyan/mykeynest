@@ -2,15 +2,15 @@
 
 namespace App\Controller\Front;
 
-use App\Service\TokenCleaner;
 use App\Repository\UserRepository;
+use App\Service\TokenCleaner;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 class AuthPageController extends AbstractController
 {
@@ -73,5 +73,61 @@ class AuthPageController extends AbstractController
     
         return $response;
     }
+
+    #[Route('/guest/register', name: 'app_guest_register', methods: ['GET', 'POST'])]
+public function guestRegister(
+    Request $request,
+    UserRepository $userRepository,
+    EntityManagerInterface $em,
+    UserPasswordHasherInterface $hasher
+): Response {
+    $token = $request->query->get('token');
+    $email = $request->query->get('email');
+
+    if (!$token) {
+        throw $this->createNotFoundException('Token manquant');
+    }
+
+    $user = $userRepository->findOneBy(['apiToken' => $token]);
+
+    if (!$user) {
+        throw $this->createNotFoundException('Token invalide');
+    }
+
+    // Expiration
+    if ($user->getTokenExpiresAt() && $user->getTokenExpiresAt() < new \DateTimeImmutable()) {
+        $this->addFlash('error', 'Lien expiré. Demandez une nouvelle invitation.');
+        return $this->redirectToRoute('app_login'); // ou une page dédiée
+    }
+
+    // Optionnel: vérifier que l'email du lien correspond
+    if ($email && strtolower($user->getEmail()) !== strtolower($email)) {
+        throw $this->createAccessDeniedException('Email mismatch');
+    }
+
+    if ($request->isMethod('POST')) {
+        $plainPassword = (string) $request->request->get('password');
+
+        // TODO: validations (longueur, confirmation, etc.)
+        $user->setPassword($hasher->hashPassword($user, $plainPassword));
+
+        // ✅ invalider le token après usage
+        $user->setApiToken(null);
+        $user->setTokenExpiresAt(null);
+
+        // ✅ activer le rôle final si besoin
+        $user->setRoles(['ROLE_USER']); // ou ROLE_GUEST + ROLE_USER selon ton système
+
+        $em->flush();
+
+        $this->addFlash('success', 'Compte créé. Vous pouvez vous connecter.');
+        return $this->redirectToRoute('app_login');
+    }
+
+    return $this->render('guest/register.html.twig', [
+        'user' => $user,
+        'token' => $token,
+    ]);
+}
     
 }
