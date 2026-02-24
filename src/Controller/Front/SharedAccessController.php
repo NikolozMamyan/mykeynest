@@ -24,218 +24,272 @@ class SharedAccessController extends AbstractController
     public function index(SharedAccessRepository $sharedAccessRepository): Response
     {
         $user = $this->getUser();
-        
-        // Récupérer les accès que l'utilisateur a partagés
-        $sharedByMe = $sharedAccessRepository->findBy(['owner' => $user]);
-        
-        // Récupérer les accès partagés avec l'utilisateur
+
+        $sharedByMe   = $sharedAccessRepository->findBy(['owner' => $user]);
         $sharedWithMe = $sharedAccessRepository->findBy(['guest' => $user]);
-        
+
         return $this->render('shared_access/index.html.twig', [
-            'sharedByMe' => $sharedByMe,
+            'sharedByMe'   => $sharedByMe,
             'sharedWithMe' => $sharedWithMe,
-            'heading' => 'Partages'
+            'heading'      => 'Partages',
         ]);
     }
-    
+
     #[Route('/app/shared-access/new', name: 'shared_access_new', methods: ['GET', 'POST'])]
-public function new(
-    Request $request,
-    EntityManagerInterface $entityManager,
-    UserRepository $userRepository,
-    MailerService $mailer,
-    LoggerInterface $logger,
-    UrlGeneratorInterface $urlGenerator,
-    CredentialRepository $credentialRepository
-): Response {
-    $owner = $this->getUser();
-    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
+        MailerService $mailer,
+        LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        CredentialRepository $credentialRepository
+    ): Response {
+        /** @var User $owner */
+        $owner = $this->getUser();
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-    if (!$owner) {
-        throw $this->createAccessDeniedException();
-    }
-
-    // ✅ règle abonnement
-    $hasSubscription = (bool) $owner->isSubscribed(); // adapte à ton projet
-    $limit = 3;
-
-    if ($request->isMethod('POST')) {
-        $email = $request->request->get('email');
-        $credentialIds = $request->request->all('credentials') ?? []; // plus safe que $request->get()
-
-        // Vérifier si l'utilisateur existe
-        $guest = $userRepository->findOneBy(['email' => $email]);
-     if (!$guest) {
-    $token = bin2hex(random_bytes(32));
-    $expiresAt = (new \DateTimeImmutable('+6 hour'));
-
-    $guest = new User(); // ✅ on crée directement $guest
-    $guest->setEmail($email);
-    $guest->setCompany('');
-    $guest->setPassword(''); // ⚠️ voir note sécurité plus bas
-    $guest->setRoles(['ROLE_GUEST']);
-    $guest->setApiToken($token);
-    $guest->setTokenExpiresAt($expiresAt);
-    $guest->regenerateApiExtensionToken();
-
-
-    $guestRegisterUrl = $urlGenerator->generate(
-        'app_guest_register',
-        ['token' => $token, 'email' => $email],
-        UrlGeneratorInterface::ABSOLUTE_URL
-    );
-        $mailer->send(
-            $guest->getEmail(),
-            'Welcome to MYKEYNEST',
-            'emails/register_guest.html.twig',
-            [
-                'user' => $guest,
-                'guest_register' => $guestRegisterUrl,
-                'expiresAt' => $expiresAt,
-            ]
-        );
-
-    $entityManager->persist($guest);
-    $entityManager->flush();
-
-    $this->addFlash('success', 'Une invitation a été envoyée à cet utilisateur.');
-    return $this->redirectToRoute('shared_access_new');
-}
-        // Vérifier que l'utilisateur ne partage pas avec lui-même
-        if ($guest === $owner) {
-            $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-même.');
-            return $this->redirectToRoute('shared_access_new');
+        if (!$owner) {
+            throw $this->createAccessDeniedException();
         }
 
-        // ✅ 1) Si pas d'abonnement : vérifier la limite AVANT de persister
-        if (!$hasSubscription) {
-            // Compte des partages existants (ici: tous les partages créés par owner)
-            $existingCount = $entityManager->getRepository(SharedAccess::class)->count([
-                'owner' => $owner,
-            ]);
+        $hasSubscription = (bool) $owner->isSubscribed();
+        $limit = 3;
 
-            // Compter combien de "nouveaux" partages on s’apprête à créer
-            $newToCreate = 0;
+        if ($request->isMethod('POST')) {
+            $email         = strtolower(trim((string) $request->request->get('email')));
+            $credentialIds = $request->request->all('credentials') ?? [];
+
+            $guest = $userRepository->findOneBy(['email' => $email]);
+
+            // ─── Cas 1 : utilisateur inexistant → créer un compte guest + envoyer l'invitation ───
+            if (!$guest) {
+                $token     = bin2hex(random_bytes(32));
+                $expiresAt = new \DateTimeImmutable('+6 hours');
+
+                $guest = new User();
+                $guest->setEmail($email);
+                $guest->setCompany('');
+                $guest->setPassword('');
+                $guest->setRoles(['ROLE_GUEST']);
+                $guest->setApiToken($token);
+                $guest->setTokenExpiresAt($expiresAt);
+                $guest->regenerateApiExtensionToken();
+
+                $entityManager->persist($guest);
+                $entityManager->flush(); // flush pour avoir l'ID avant de créer les SharedAccess
+
+                $guestRegisterUrl = $urlGenerator->generate(
+                    'app_guest_register',
+                    ['token' => $token, 'email' => $email],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+
+                $mailer->send(
+                    $guest->getEmail(),
+                    'Vous avez été invité sur MYKEYNEST',
+                    'emails/register_guest.html.twig',
+                    [
+                        'user'           => $guest,
+                        'guest_register' => $guestRegisterUrl,
+                        'expiresAt'      => $expiresAt,
+                    ]
+                );
+
+                $this->addFlash('success', 'Une invitation a été envoyée à ' . $email . '.');
+            }
+
+            // ─── Cas 2 : compte guest existant mais non activé → regénérer le token et renvoyer l'invitation ───
+            elseif (in_array('ROLE_GUEST', $guest->getRoles(), true) && $guest->getApiToken() !== null) {
+                $token     = bin2hex(random_bytes(32));
+                $expiresAt = new \DateTimeImmutable('+6 hours');
+
+                $guest->setApiToken($token);
+                $guest->setTokenExpiresAt($expiresAt);
+                $entityManager->flush();
+
+                $guestRegisterUrl = $urlGenerator->generate(
+                    'app_guest_register',
+                    ['token' => $token, 'email' => $email],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+
+                $mailer->send(
+                    $guest->getEmail(),
+                    'Vous avez été invité sur MYKEYNEST',
+                    'emails/register_guest.html.twig',
+                    [
+                        'user'           => $guest,
+                        'guest_register' => $guestRegisterUrl,
+                        'expiresAt'      => $expiresAt,
+                    ]
+                );
+
+                $this->addFlash('success', 'Une nouvelle invitation a été envoyée à ' . $email . '.');
+            }
+
+            // ─── Cas 3 : compte actif (ROLE_USER) → on notifie après création des partages ───
+            // (la notification est envoyée plus bas, après $entityManager->flush())
+
+            // ─── Garde : on ne peut pas partager avec soi-même ───
+            if ($guest === $owner) {
+                $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-même.');
+                return $this->redirectToRoute('shared_access_new');
+            }
+
+            // ─── Vérification de la limite d'abonnement ───
+            if (!$hasSubscription) {
+                $existingCount = $entityManager->getRepository(SharedAccess::class)->count(['owner' => $owner]);
+                $newToCreate   = 0;
+
+                foreach ($credentialIds as $credentialId) {
+                    $credential = $credentialRepository->find($credentialId);
+
+                    if (!$credential || $credential->getUser() !== $owner) {
+                        continue;
+                    }
+
+                    $exists = $entityManager->getRepository(SharedAccess::class)->findOneBy([
+                        'owner'      => $owner,
+                        'guest'      => $guest,
+                        'credential' => $credential,
+                    ]);
+
+                    if (!$exists) {
+                        $newToCreate++;
+                    }
+                }
+
+                if (($existingCount + $newToCreate) > $limit) {
+                    $remaining = max(0, $limit - $existingCount);
+                    $this->addFlash(
+                        'warning',
+                        sprintf(
+                            'Limite atteinte : %d partages maximum sans abonnement. Il vous reste %d partage(s) possible(s).',
+                            $limit,
+                            $remaining
+                        )
+                    );
+                    return $this->redirectToRoute('shared_access_new');
+                }
+            }
+
+            // ─── Création des SharedAccess ───
+            $createdCount = 0;
 
             foreach ($credentialIds as $credentialId) {
                 $credential = $credentialRepository->find($credentialId);
 
-                // appartient bien à owner
                 if (!$credential || $credential->getUser() !== $owner) {
                     continue;
                 }
 
-                // existe déjà ?
                 $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
-                    'owner' => $owner,
-                    'guest' => $guest,
+                    'owner'      => $owner,
+                    'guest'      => $guest,
                     'credential' => $credential,
                 ]);
 
                 if (!$existingAccess) {
-                    $newToCreate++;
+                    $sharedAccess = new SharedAccess();
+                    $sharedAccess->setOwner($owner);
+                    $sharedAccess->setGuest($guest);
+                    $sharedAccess->setCredential($credential);
+                    $sharedAccess->setCreatedAt(new \DateTimeImmutable());
+
+                    $entityManager->persist($sharedAccess);
+                    $createdCount++;
                 }
             }
 
-            if (($existingCount + $newToCreate) > $limit) {
-                $remaining = max(0, $limit - $existingCount);
-                $this->addFlash(
-                    'warning',
-                    sprintf(
-                        'Limite atteinte : %d partages maximum sans abonnement. Il vous reste %d partage(s) possible(s).',
-                        $limit,
-                        $remaining
-                    )
-                );
-                return $this->redirectToRoute('shared_access_new');
+            if ($createdCount > 0) {
+                $entityManager->flush();
+                $this->addFlash('success', $createdCount . ' identifiant(s) partagé(s) avec succès.');
+
+                // ─── Notification mail pour un compte actif (ROLE_USER) ───
+                $isActiveUser = in_array('ROLE_USER', $guest->getRoles(), true)
+                    && !in_array('ROLE_GUEST', $guest->getRoles(), true);
+
+                if ($isActiveUser) {
+                    // Récupérer uniquement les credentials nouvellement partagés pour le mail
+                    $sharedCredentials = [];
+                    foreach ($credentialIds as $credentialId) {
+                        $credential = $credentialRepository->find($credentialId);
+                        if ($credential && $credential->getUser() === $owner) {
+                            $sharedCredentials[] = $credential;
+                        }
+                    }
+
+                    $mailer->send(
+                        $guest->getEmail(),
+                        $owner->getEmail() . ' a partagé des identifiants avec vous',
+                        'emails/share_notification.html.twig',
+                        [
+                            'owner'       => $owner,
+                            'guest'       => $guest,
+                            'credentials' => $sharedCredentials,
+                            'app_url'     => $urlGenerator->generate(
+                                'shared_access_index',
+                                [],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            ),
+                        ]
+                    );
+                }
+            } else {
+                $this->addFlash('info', 'Aucun nouvel identifiant n\'a été partagé.');
             }
+
+            return $this->redirectToRoute('shared_access_index');
         }
 
-        // ✅ 2) Ensuite seulement : persister
-        $createdCount = 0;
+        // GET
+        $credentials = $credentialRepository->findBy(['user' => $owner]);
 
-        foreach ($credentialIds as $credentialId) {
-            $credential = $credentialRepository->find($credentialId);
-
-            if (!$credential || $credential->getUser() !== $owner) {
-                continue;
-            }
-
-            $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
-                'owner' => $owner,
-                'guest' => $guest,
-                'credential' => $credential
-            ]);
-
-            if (!$existingAccess) {
-                $sharedAccess = new SharedAccess();
-                $sharedAccess->setOwner($owner);
-                $sharedAccess->setGuest($guest);
-                $sharedAccess->setCredential($credential);
-                $sharedAccess->setCreatedAt(new \DateTimeImmutable());
-
-                $entityManager->persist($sharedAccess);
-                $createdCount++;
-            }
-        }
-
-        if ($createdCount > 0) {
-            $entityManager->flush();
-            $this->addFlash('success', $createdCount . ' identifiant(s) partagé(s) avec succès.');
-        } else {
-            $this->addFlash('info', 'Aucun nouvel identifiant n\'a été partagé.');
-        }
-
-        return $this->redirectToRoute('shared_access_index');
+        return $this->render('shared_access/new.html.twig', [
+            'credentials' => $credentials,
+            'heading'     => 'Partages',
+        ]);
     }
 
-    // GET
-    $credentials = $credentialRepository->findBy(['user' => $owner]);
-
-    return $this->render('shared_access/new.html.twig', [
-        'credentials' => $credentials,
-        'heading' => 'Partages'
-    ]);
-}
-
-    
     #[Route('/app/shared-access/{id}/revoke', name: 'shared_access_revoke', methods: ['POST'])]
-    public function revoke(Request $request, SharedAccess $sharedAccess, EntityManagerInterface $entityManager): Response
-    {
-        // Vérifier que l'accès partagé appartient à l'utilisateur connecté
+    public function revoke(
+        Request $request,
+        SharedAccess $sharedAccess,
+        EntityManagerInterface $entityManager
+    ): Response {
         if ($sharedAccess->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à révoquer cet accès partagé.');
         }
-        
-        if ($this->isCsrfTokenValid('revoke'.$sharedAccess->getId(), $request->request->get('_token'))) {
+
+        if ($this->isCsrfTokenValid('revoke' . $sharedAccess->getId(), $request->request->get('_token'))) {
             $entityManager->remove($sharedAccess);
             $entityManager->flush();
             $this->addFlash('success', 'Accès partagé révoqué avec succès.');
         }
-        
+
         return $this->redirectToRoute('shared_access_index');
     }
-    
+
     #[Route('/app/shared-access/view/{id}', name: 'shared_access_view_credential', methods: ['GET'])]
     public function viewSharedCredential(
-        SharedAccess $sharedAccess, 
+        SharedAccess $sharedAccess,
         EncryptionService $encryptionService
     ): Response {
         $user = $this->getUser();
-        
-        // Vérifier que l'utilisateur est l'invité à qui cet accès a été partagé
+
         if ($sharedAccess->getGuest() !== $user) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à voir cet identifiant.');
         }
-        
-        $credential = $sharedAccess->getCredential();
+
+        $credential        = $sharedAccess->getCredential();
         $decryptedPassword = $encryptionService->decrypt($credential->getPassword());
-        
+
         return $this->render('shared_access/view_credential.html.twig', [
-            'credential' => $credential,
+            'credential'        => $credential,
             'decryptedPassword' => $decryptedPassword,
-            'owner' => $sharedAccess->getOwner(),
-            'heading' => 'Partages'
+            'owner'             => $sharedAccess->getOwner(),
+            'heading'           => 'Partages',
         ]);
     }
 }
