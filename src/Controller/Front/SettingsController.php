@@ -123,4 +123,20 @@ public function preferences(Request $request, EntityManagerInterface $em): Respo
         'form' => $form->createView(),
     ]);
 }
+
+#[Route('/app/settings/subscription/manage', name: 'app_user_subscription_manage')]
+    public function subscriptionManage(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+    if (!$user) {
+        throw $this->createAccessDeniedException();
+    }
+
+    if ($user->isSubscribed()) {
+        return $this->redirectToRoute('app_subscription_portal');
+    }
+
+    return $this->redirectToRoute('app_subscription');
+    }
 }
