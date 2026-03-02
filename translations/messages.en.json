@@ -847,6 +847,45 @@
       "universities": "Universities"
     }
   },
+  "guest_register": {
+    "title_page": "Create my account",
+    "hero": {
+      "title": "Welcome to MYKEYNEST",
+      "subtitle": "You’ve been invited to join the shared credentials workspace. Create your password to access your account.",
+      "guest_card_label": "Invited account",
+      "features": {
+        "secure_access": "Secure access to shared credentials",
+        "e2ee": "End-to-end encryption",
+        "one_time_link": "One-time link — expires after activation"
+      }
+    },
+    "form": {
+      "header_title": "Create your password",
+      "header_subtitle": "Just one more step to access your shared credentials.",
+      "email_readonly_label": "Email address",
+      "password_label": "Password",
+      "password_placeholder": "••••••••",
+      "password_hint_default": "Minimum 8 characters",
+      "password_confirm_label": "Confirm password",
+      "password_confirm_placeholder": "••••••••",
+      "submit": "Create my account →",
+      "already_account": "Already have an account?",
+      "login_link": "Sign in"
+    },
+    "strength": {
+      "min": "Minimum 8 characters",
+      "very_weak": "Very weak",
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "very_strong": "Very strong"
+    },
+    "token": {
+      "missing": "Invalid invitation link.",
+      "expired": "This invitation link has expired.",
+      "already_used": "This link has already been used."
+    }
+  },
 "settings": {
   "title": "Settings",
 

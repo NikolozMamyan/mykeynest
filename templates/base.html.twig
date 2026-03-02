@@ -76,7 +76,7 @@
       <div class="wrapper-layout">
         <main class="main-content" id="main-content" tabindex="-1">
           {# ===== Flash messages ===== #}
-          {% if app.flashes is not empty %}
+          {# {% if app.flashes is not empty %}
             <div class="flash-messages-container">
               {% for type, messages in app.flashes %}
                 {% for message in messages %}
@@ -86,7 +86,7 @@
                 {% endfor %}
               {% endfor %}
             </div>
-          {% endif %}
+          {% endif %} #}
 
           {# ===== Breadcrumb (optionnel) ===== #}
           {% block breadcrumb %}

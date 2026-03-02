@@ -83,6 +83,7 @@ public function guestRegister(
 ): Response {
     $token = $request->query->get('token');
     $email = $request->query->get('email');
+    
 
     if (!$token) {
         throw $this->createNotFoundException('Token manquant');
@@ -93,6 +94,10 @@ public function guestRegister(
     if (!$user) {
         throw $this->createNotFoundException('Token invalide');
     }
+    if (!in_array('ROLE_GUEST', $user->getRoles(), true)) {
+            $this->addFlash('error', 'Invitation déjà utilisée.');
+        return $this->redirectToRoute('show_login');
+}
 
     // Expiration
     if ($user->getTokenExpiresAt() && $user->getTokenExpiresAt() < new \DateTimeImmutable()) {
@@ -107,9 +112,11 @@ public function guestRegister(
 
     if ($request->isMethod('POST')) {
         $plainPassword = (string) $request->request->get('password');
+        $company =  (string) $request->request->get('company');
 
         // TODO: validations (longueur, confirmation, etc.)
         $user->setPassword($hasher->hashPassword($user, $plainPassword));
+        $user->setCompany($company);
 
         // ✅ invalider le token après usage
         $user->setApiToken(null);
