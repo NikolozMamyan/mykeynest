@@ -30,13 +30,16 @@ final class CredentialPageController extends AbstractController
     #[Route('/app/credential', name: 'app_credential')]
     public function index(
         SharedAccessRepository $sharedAccessRepository,
-        CredentialRepository $credentialRepository
+        CredentialRepository $credentialRepository,
+        
     ): Response {
         $user = $this->getUser();
+        $sharedAccesses = $sharedAccessRepository->findBy(['guest' => $user]);
+
 
         return $this->render('credential/index.html.twig', [
             'credentials' => $credentialRepository->findByUser($user),
-            'sharedAccesses' => $sharedAccessRepository->findSharedWith($user),
+            'sharedAccesses' => $sharedAccesses,
             'heading' => 'Mes accès',
         ]);
     }
