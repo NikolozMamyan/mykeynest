@@ -3,76 +3,135 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block body %}
-  <main class="container" style="max-width: 900px; margin: 40px auto; padding: 0 16px;">
-    <header style="margin-bottom: 24px;">
-      <h1 style="margin: 0 0 8px;">{{ page_title }}</h1>
-      <p style="margin: 0; opacity: .7;">
-        Dernière mise à jour : {{ updated_at|date('d/m/Y') }}
-      </p>
-    </header>
-<section style="margin: 16px 0 24px; padding: 12px 14px; border: 1px solid rgba(0,0,0,.1); border-radius: 10px;">
-  <strong>Éditeur / Marque</strong><br>
-  <span>{{ brand_note }}</span><br>
-  <small style="opacity:.75;">
-    Service opéré par {{ publisher_name }} sous la marque {{ brand_name }}.
-  </small>
-</section>
+  <style>
+    .legal-wrap{max-width:900px;margin:48px auto;padding:0 16px}
+    .legal-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:18px 18px;box-shadow:0 10px 30px rgba(0,0,0,.04)}
+    .legal-header{margin-bottom:18px}
+    .legal-title{margin:0 0 6px;letter-spacing:-.02em;font-size:32px;line-height:1.15}
+    .legal-meta{margin:0;color:rgba(0,0,0,.6);font-size:14px}
 
-    <section class="legal">
-      <h2>1. Objet</h2>
-      <p>
-        Les présentes CGV définissent les conditions de vente des abonnements et services payants proposés par MYKEYNEST.
-      </p>
+    .legal-badge{display:flex;gap:12px;align-items:flex-start;margin:14px 0 22px;padding:14px 14px;border:1px solid rgba(0,0,0,.08);border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.00))}
+    .legal-badge strong{display:block;margin-bottom:4px}
+    .legal-badge small{display:block;margin-top:6px;color:rgba(0,0,0,.6)}
 
-      <h2>2. Prix & paiement</h2>
-      <p>
-        Les prix sont indiqués sur le site au moment de la commande. Le paiement s’effectue via les moyens proposés.
-      </p>
+    .legal{padding-top:4px}
+    .legal h2{margin:22px 0 10px;font-size:18px;line-height:1.25;letter-spacing:-.01em}
+    .legal p{margin:0 0 10px;color:rgba(0,0,0,.82);line-height:1.7}
+    .legal ul{margin:8px 0 0 18px;color:rgba(0,0,0,.82);line-height:1.7}
+    .legal li{margin:6px 0}
 
-      <h2>3. Abonnement, durée, renouvellement</h2>
-      <p>
-        L’abonnement est souscrit pour la durée choisie. Sauf mention contraire, il peut être renouvelé automatiquement.
-        L’Utilisateur peut résilier selon les modalités affichées dans son espace compte.
-      </p>
+    .legal-footer{margin-top:26px;padding:16px;border:1px solid rgba(0,0,0,.08);border-radius:14px;background:#fff}
+    .legal-footer h2{margin:0 0 10px;font-size:18px}
+    .legal-footer p{margin:0 0 10px;color:rgba(0,0,0,.82);line-height:1.7}
+    .legal-footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+    .legal-note{opacity:.75;font-size:.95em;margin:0}
 
-      <h2>4. Droit de rétractation</h2>
-      <p>
-        Si applicable (consommateurs), le droit de rétractation peut être exclu pour les contenus/services numériques
-        fournis immédiatement après accord exprès et renoncement, conformément au droit en vigueur.
-      </p>
+    .legal-toc{margin:14px 0 0;padding:12px 14px;border:1px dashed rgba(0,0,0,.14);border-radius:12px}
+    .legal-toc a{color:inherit;text-decoration:none}
+    .legal-toc a:hover{text-decoration:underline}
+    .legal-toc ol{margin:8px 0 0 18px;line-height:1.7}
 
-      <h2>5. Disponibilité & support</h2>
-      <p>
-        MYKEYNEST met en œuvre des moyens raisonnables pour assurer l’accès au Service, sans garantir une disponibilité
-        continue ou sans erreur.
-      </p>
+    @media (max-width: 520px){
+      .legal-title{font-size:26px}
+      .legal-badge{flex-direction:column}
+    }
+  </style>
 
-      <h2>6. Limitation de responsabilité commerciale</h2>
-      <p>
-        Dans les limites autorisées par la loi, MYKEYNEST ne saurait être tenu responsable des dommages indirects,
-        pertes de données, pertes de chiffre d’affaires ou pertes d’exploitation.
-        En tout état de cause, la responsabilité de MYKEYNEST, si elle devait être retenue,
-        est plafonnée au montant payé par l’Utilisateur au cours des 12 derniers mois.
-      </p>
+  <main class="legal-wrap">
+    <section class="legal-card">
+      <header class="legal-header">
+        <h1 class="legal-title">{{ page_title }}</h1>
+        <p class="legal-meta">Dernière mise à jour : {{ updated_at|date('d/m/Y') }}</p>
 
-      <h2>7. Sécurité & données chiffrées</h2>
-      <p>
-        Les données étant chiffrées, l’Utilisateur est responsable de la conservation de ses secrets.
-        MYKEYNEST ne garantit pas la récupération des données en cas de perte des éléments de déchiffrement.
-      </p>
+        <nav class="legal-toc" aria-label="Sommaire">
+          <strong>Sommaire</strong>
+          <ol>
+            <li><a href="#cgv-1">Objet</a></li>
+            <li><a href="#cgv-2">Prix & paiement</a></li>
+            <li><a href="#cgv-3">Abonnement</a></li>
+            <li><a href="#cgv-4">Rétractation</a></li>
+            <li><a href="#cgv-5">Disponibilité & support</a></li>
+            <li><a href="#cgv-6">Limitation</a></li>
+            <li><a href="#cgv-7">Sécurité</a></li>
+            <li><a href="#cgv-8">Droit applicable</a></li>
+          </ol>
+        </nav>
+      </header>
 
-      <h2>8. Droit applicable</h2>
-      <p>
-        Les présentes CGV sont soumises au droit applicable du pays d’établissement de l’éditeur,
-        sous réserve des dispositions impératives applicables.
-      </p>
-    </section>
-    <section style="margin-top: 32px; padding: 16px; border: 1px solid rgba(0,0,0,.1); border-radius: 12px;">
-  <h2 style="margin-top: 0;">Éditeur & Hébergement</h2>
+      <section class="legal-badge">
+        <div>
+          <strong>Éditeur / Marque</strong>
+          <div>{{ brand_note }}</div>
+          <small>Service opéré par {{ publisher_name }} sous la marque {{ brand_name }}.</small>
+        </div>
+      </section>
+
+      <section class="legal">
+        <h2 id="cgv-1">1. Objet</h2>
+        <p>
+          Les présentes CGV définissent les conditions de vente des abonnements et services payants proposés par MYKEYNEST.
+        </p>
+
+        <h2 id="cgv-2">2. Prix & paiement</h2>
+        <p>
+          Les prix sont indiqués sur le site au moment de la commande. Le paiement s’effectue via les moyens proposés.
+        </p>
+
+        <h2 id="cgv-3">3. Abonnement, durée, renouvellement</h2>
+        <p>
+          L’abonnement est souscrit pour la durée choisie. Sauf mention contraire, il peut être renouvelé automatiquement.
+          L’Utilisateur peut résilier selon les modalités affichées dans son espace compte.
+        </p>
+
+        <h2 id="cgv-4">4. Droit de rétractation</h2>
+        <p>
+          Si applicable (consommateurs), le droit de rétractation peut être exclu pour les contenus/services numériques
+          fournis immédiatement après accord exprès et renoncement, conformément au droit en vigueur.
+        </p>
+
+        <h2 id="cgv-5">5. Disponibilité & support</h2>
+        <p>
+          MYKEYNEST met en œuvre des moyens raisonnables pour assurer l’accès au Service, sans garantir une disponibilité
+          continue ou sans erreur.
+        </p>
+
+        <h2 id="cgv-6">6. Limitation de responsabilité commerciale</h2>
+        <p>
+          Dans les limites autorisées par la loi, MYKEYNEST ne saurait être tenu responsable des dommages indirects,
+          pertes de données, pertes de chiffre d’affaires ou pertes d’exploitation.
+          En tout état de cause, la responsabilité de MYKEYNEST, si elle devait être retenue,
+          est plafonnée au montant payé par l’Utilisateur au cours des 12 derniers mois.
+        </p>
+
+        <h2 id="cgv-7">7. Sécurité & données chiffrées</h2>
+        <p>
+          Les données étant chiffrées, l’Utilisateur est responsable de la conservation de ses secrets.
+          MYKEYNEST ne garantit pas la récupération des données en cas de perte des éléments de déchiffrement.
+        </p>
+
+        <h2 id="cgv-8">8. Droit applicable</h2>
+        <p>
+          Les présentes CGV sont soumises au droit applicable du pays d’établissement de l’éditeur,
+          sous réserve des dispositions impératives applicables.
+        </p>
+      </section>
+
+     <section class="legal-footer">
+  <h2>Éditeur & Hébergement</h2>
 
   <p>
-    <strong>Marque :</strong> {{ brand_name }}<br>
-    <strong>Éditeur :</strong> {{ publisher_name }}<br>
+    <strong>Service :</strong> {{ brand_name }}
+  </p>
+
+  <p>
+    <strong>Entreprise :</strong><br>
+    OptiWeb Solutions<br>
+    Mamyan Nikoloz – Entrepreneur individuel<br>
+    SIREN : 852 249 408<br>
+    SIRET : 85224940800026
+  </p>
+
+  <p>
     <strong>Fondateur :</strong> {{ founder_name }}
   </p>
 
@@ -85,10 +144,9 @@
     <strong>Hébergement :</strong> {{ hosting_provider }}
   </p>
 
-  <p style="opacity: .75; font-size: 0.9em;">
+  <p class="legal-note">
     {{ brand_note }}
   </p>
 </section>
-
   </main>
 {% endblock %}

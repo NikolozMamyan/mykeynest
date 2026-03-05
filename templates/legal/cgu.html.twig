@@ -3,74 +3,132 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block body %}
-  <main class="container" style="max-width: 900px; margin: 40px auto; padding: 0 16px;">
-    <header style="margin-bottom: 24px;">
-      <h1 style="margin: 0 0 8px;">{{ page_title }}</h1>
-      <p style="margin: 0; opacity: .7;">
-        Dernière mise à jour : {{ updated_at|date('d/m/Y') }}
-      </p>
-    </header>
-<section style="margin: 16px 0 24px; padding: 12px 14px; border: 1px solid rgba(0,0,0,.1); border-radius: 10px;">
-  <strong>Éditeur / Marque</strong><br>
-  <span>{{ brand_note }}</span><br>
-  <small style="opacity:.75;">
-    Service opéré par {{ publisher_name }} sous la marque {{ brand_name }}.
-  </small>
-</section>
+  <style>
+    .legal-wrap{max-width:900px;margin:48px auto;padding:0 16px}
+    .legal-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:18px 18px;box-shadow:0 10px 30px rgba(0,0,0,.04)}
+    .legal-header{margin-bottom:18px}
+    .legal-title{margin:0 0 6px;letter-spacing:-.02em;font-size:32px;line-height:1.15}
+    .legal-meta{margin:0;color:rgba(0,0,0,.6);font-size:14px}
 
-    <section class="legal">
-      <h2>1. Objet</h2>
-      <p>
-        Les présentes CGU encadrent l’accès et l’utilisation du service MYKEYNEST (le « Service »).
-        En utilisant le Service, l’Utilisateur accepte les présentes CGU.
-      </p>
+    .legal-badge{display:flex;gap:12px;align-items:flex-start;margin:14px 0 22px;padding:14px 14px;border:1px solid rgba(0,0,0,.08);border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.00))}
+    .legal-badge strong{display:block;margin-bottom:4px}
+    .legal-badge small{display:block;margin-top:6px;color:rgba(0,0,0,.6)}
 
-      <h2>2. Accès au Service</h2>
-      <p>
-        Le Service peut être modifié, suspendu ou interrompu à tout moment (maintenance, sécurité, évolution).
-      </p>
+    .legal{padding-top:4px}
+    .legal h2{margin:22px 0 10px;font-size:18px;line-height:1.25;letter-spacing:-.01em}
+    .legal p{margin:0 0 10px;color:rgba(0,0,0,.82);line-height:1.7}
+    .legal ul{margin:8px 0 0 18px;color:rgba(0,0,0,.82);line-height:1.7}
+    .legal li{margin:6px 0}
 
-      <h2>3. Sécurité, chiffrement, architecture</h2>
-      <p>
-        Le Service met en œuvre un chiffrement côté client et un fonctionnement de type « zero-knowledge » :
-        les données sont chiffrées avant stockage/transit.
-      </p>
-      <ul>
-        <li>Vous êtes responsable de la confidentialité de vos identifiants et secrets.</li>
-        <li>En cas de perte de votre secret principal / clé, la récupération peut être impossible.</li>
-      </ul>
+    .legal-footer{margin-top:26px;padding:16px;border:1px solid rgba(0,0,0,.08);border-radius:14px;background:#fff}
+    .legal-footer h2{margin:0 0 10px;font-size:18px}
+    .legal-footer p{margin:0 0 10px;color:rgba(0,0,0,.82);line-height:1.7}
+    .legal-footer a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+    .legal-note{opacity:.75;font-size:.95em;margin:0}
 
-      <h2>4. Responsabilité de l’Utilisateur</h2>
-      <p>
-        L’Utilisateur est seul responsable de l’usage qu’il fait du Service, de la conservation de ses accès,
-        et de toute conséquence liée à une mauvaise manipulation, perte, ou compromission de ses secrets.
-      </p>
+    .legal-toc{margin:14px 0 0;padding:12px 14px;border:1px dashed rgba(0,0,0,.14);border-radius:12px}
+    .legal-toc a{color:inherit;text-decoration:none}
+    .legal-toc a:hover{text-decoration:underline}
+    .legal-toc ol{margin:8px 0 0 18px;line-height:1.7}
 
-      <h2>5. Limitation de responsabilité</h2>
-      <p>
-        Dans les limites autorisées par la loi applicable, le Service est fourni « en l’état »,
-        sans garantie d’absence d’erreurs, d’interruption ou d’invulnérabilité.
-        MYKEYNEST ne saurait être tenu responsable des dommages indirects, pertes de données, pertes financières,
-        pertes d’exploitation, ou préjudices résultant de l’utilisation ou de l’impossibilité d’utiliser le Service.
-      </p>
+    @media (max-width: 520px){
+      .legal-title{font-size:26px}
+      .legal-badge{flex-direction:column}
+    }
+  </style>
 
-      <h2>6. Données personnelles</h2>
-      <p>
-        Le traitement des données personnelles est décrit dans la Politique de confidentialité.
-      </p>
+  <main class="legal-wrap">
+    <section class="legal-card">
+      <header class="legal-header">
+        <h1 class="legal-title">{{ page_title }}</h1>
+        <p class="legal-meta">Dernière mise à jour : {{ updated_at|date('d/m/Y') }}</p>
 
-      <h2>7. Droit applicable</h2>
-      <p>
-        Les présentes CGU sont soumises au droit applicable du pays d’établissement de l’éditeur,
-        sous réserve des dispositions impératives applicables au consommateur.
-      </p>
-    </section>
-    <section style="margin-top: 32px; padding: 16px; border: 1px solid rgba(0,0,0,.1); border-radius: 12px;">
-  <h2 style="margin-top: 0;">Éditeur & Hébergement</h2>
+        <nav class="legal-toc" aria-label="Sommaire">
+          <strong>Sommaire</strong>
+          <ol>
+            <li><a href="#cgu-1">Objet</a></li>
+            <li><a href="#cgu-2">Accès au Service</a></li>
+            <li><a href="#cgu-3">Sécurité, chiffrement</a></li>
+            <li><a href="#cgu-4">Responsabilité</a></li>
+            <li><a href="#cgu-5">Limitation</a></li>
+            <li><a href="#cgu-6">Données personnelles</a></li>
+            <li><a href="#cgu-7">Droit applicable</a></li>
+          </ol>
+        </nav>
+      </header>
+
+      <section class="legal-badge">
+        <div>
+          <strong>Éditeur / Marque</strong>
+          <div>{{ brand_note }}</div>
+          <small>Service opéré par {{ publisher_name }} sous la marque {{ brand_name }}.</small>
+        </div>
+      </section>
+
+      <section class="legal">
+        <h2 id="cgu-1">1. Objet</h2>
+        <p>
+          Les présentes CGU encadrent l’accès et l’utilisation du service MYKEYNEST (le « Service »).
+          En utilisant le Service, l’Utilisateur accepte les présentes CGU.
+        </p>
+
+        <h2 id="cgu-2">2. Accès au Service</h2>
+        <p>
+          Le Service peut être modifié, suspendu ou interrompu à tout moment (maintenance, sécurité, évolution).
+        </p>
+
+        <h2 id="cgu-3">3. Sécurité, chiffrement, architecture</h2>
+        <p>
+          Le Service met en œuvre un chiffrement côté client et un fonctionnement de type « zero-knowledge » :
+          les données sont chiffrées avant stockage/transit.
+        </p>
+        <ul>
+          <li>Vous êtes responsable de la confidentialité de vos identifiants et secrets.</li>
+          <li>En cas de perte de votre secret principal / clé, la récupération peut être impossible.</li>
+        </ul>
+
+        <h2 id="cgu-4">4. Responsabilité de l’Utilisateur</h2>
+        <p>
+          L’Utilisateur est seul responsable de l’usage qu’il fait du Service, de la conservation de ses accès,
+          et de toute conséquence liée à une mauvaise manipulation, perte, ou compromission de ses secrets.
+        </p>
+
+        <h2 id="cgu-5">5. Limitation de responsabilité</h2>
+        <p>
+          Dans les limites autorisées par la loi applicable, le Service est fourni « en l’état »,
+          sans garantie d’absence d’erreurs, d’interruption ou d’invulnérabilité.
+          MYKEYNEST ne saurait être tenu responsable des dommages indirects, pertes de données, pertes financières,
+          pertes d’exploitation, ou préjudices résultant de l’utilisation ou de l’impossibilité d’utiliser le Service.
+        </p>
+
+        <h2 id="cgu-6">6. Données personnelles</h2>
+        <p>
+          Le traitement des données personnelles est décrit dans la Politique de confidentialité.
+        </p>
+
+        <h2 id="cgu-7">7. Droit applicable</h2>
+        <p>
+          Les présentes CGU sont soumises au droit applicable du pays d’établissement de l’éditeur,
+          sous réserve des dispositions impératives applicables au consommateur.
+        </p>
+      </section>
+
+    <section class="legal-footer">
+  <h2>Éditeur & Hébergement</h2>
 
   <p>
-    <strong>Marque :</strong> {{ brand_name }}<br>
-    <strong>Éditeur :</strong> {{ publisher_name }}<br>
+    <strong>Service :</strong> {{ brand_name }}
+  </p>
+
+  <p>
+    <strong>Entreprise :</strong><br>
+    OptiWeb Solutions<br>
+    Mamyan Nikoloz – Entrepreneur individuel<br>
+    SIREN : 852 249 408<br>
+    SIRET : 85224940800026
+  </p>
+
+  <p>
     <strong>Fondateur :</strong> {{ founder_name }}
   </p>
 
@@ -83,10 +141,9 @@
     <strong>Hébergement :</strong> {{ hosting_provider }}
   </p>
 
-  <p style="opacity: .75; font-size: 0.9em;">
+  <p class="legal-note">
     {{ brand_note }}
   </p>
 </section>
-
   </main>
 {% endblock %}

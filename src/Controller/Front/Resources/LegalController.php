@@ -10,9 +10,9 @@ final class LegalController extends AbstractController
 private function commonVars(): array
 {
     return [
-        'brand_name' => 'MyKeyNest',
+        'brand_name' => 'MYKEYNEST',
         'publisher_name' => 'OptiWebSolutions',
-        'brand_note' => 'MyKeyNest est une marque (sous-brand) de OptiWebSolutions.',
+        'brand_note' => 'MYKEYNEST est une marque (sous-brand) de OptiWebSolutions.',
         'founder_name' => 'Nikoloz Mamyan',
         'contact_email' => 'nikoloz.mamyan@gmail.com',
         'hosting_provider' => 'o2switch',
