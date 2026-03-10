@@ -3,7 +3,8 @@ import AuthController from "./auth_controller.js";
 import PasswordToggleController  from "./credention/password-toggle_controller.js";
 import PasswordStrengthController   from "./credention/password-strength_controller.js";
 import LayoutController   from "./components/layout_controller.js";
-import GeneratorController from './generator/generator_controller.js'
+import GeneratorController from './generator/generator_controller.js';
+import SessionManagerController from "./session_manager_controller.js";
 
 
 
@@ -14,3 +15,4 @@ application.register('password-toggle', PasswordToggleController);
 application.register('password-strength', PasswordStrengthController);
 application.register("layout", LayoutController);
 application.register('generator', GeneratorController)
+application.register('session-manager', SessionManagerController)

@@ -2,115 +2,230 @@
 
 namespace App\Security;
 
-use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use App\Service\SessionManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class ApiTokenAuthenticator extends AbstractAuthenticator
 {
+    private const PUBLIC_EXACT_PATHS = [
+        '/api/register',
+        '/api/login',
+        '/api/logout',
+        '/api/forgot-password',
+        '/api/reset-password',
+        '/api/reset-password/verify',
+        '/stripe/webhook',
+
+        '/',
+        '/login',
+        '/register',
+        '/forgot-password',
+        '/reset-password',
+    ];
+
+    private const PUBLIC_PREFIXES = [
+        '/reset-password/',
+        '/verify-email/',
+        '/public/',
+    ];
+
+    private const ASSET_PREFIXES = [
+        '/assets',
+        '/build',
+        '/bundles',
+        '/images',
+        '/img',
+        '/css',
+        '/js',
+        '/fonts',
+        '/uploads',
+        '/media',
+    ];
+
+    private const PUBLIC_FILES = [
+        '/favicon.ico',
+        '/robots.txt',
+        '/sitemap.xml',
+    ];
+
     public function __construct(
-        private UserRepository $userRepository,
-        private EntityManagerInterface $em
-    ) {}
+        private SessionManager $sessionManager
+    ) {
+    }
 
     public function supports(Request $request): ?bool
     {
-        $path = $request->getPathInfo();
+        $path = $this->normalizePath($request->getPathInfo());
+        // 🔍 DEBUG - À RETIRER APRÈS
+    error_log('=== AUTH DEBUG ===');
+    error_log('Path: ' . $path);
+    error_log('All cookies: ' . json_encode($request->cookies->all()));
+    error_log('AUTH_TOKEN cookie: ' . ($request->cookies->get('AUTH_TOKEN') ?? 'NOT FOUND'));
+    error_log('Headers Authorization: ' . ($request->headers->get('Authorization') ?? 'NOT FOUND'));
+    // 🔍 FIN DEBUG
 
-        // API publiques
-        if (in_array($path, ['/api/register', '/api/login', '/api/logout', '/stripe/webhook'], true)) {
+        if ($this->isPublicPath($path)) {
             return false;
         }
 
-        // Pages publiques
-        if (in_array($path, ['/login', '/register'], true)) {
+        if ($this->isAssetPath($path)) {
             return false;
         }
 
-        // Assets (à adapter selon ton projet)
-        if (str_starts_with($path, '/assets')) {
+        if ($this->isDevToolPath($path)) {
             return false;
         }
 
-        // Protéger /api/* et /app* (IMPORTANT: /app sans slash aussi)
-        return str_starts_with($path, '/api/') || str_starts_with($path, '/app');
+        return $this->isProtectedPath($path);
     }
 
-    public function authenticate(Request $request): Passport
-    {
-        $token = null;
 
-        $authHeader = $request->headers->get('Authorization');
-        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
-            $token = substr($authHeader, 7);
-        }
 
-        if (!$token) {
-            $token = $request->cookies->get('AUTH_TOKEN');
-        }
+public function authenticate(Request $request): Passport
+{
+    error_log('🔥🔥🔥 ApiTokenAuthenticator::authenticate() APPELÉ pour ' . $request->getPathInfo());
+    error_log('🔥🔥🔥 Token extrait: ' . ($this->extractToken($request) ?? 'NULL'));
+    
+    $plainToken = $this->extractToken($request);
 
-        if (!$token) {
-            throw new CustomUserMessageAuthenticationException('No token provided');
-        }
-
-        $userRepository = $this->userRepository;
-        $em = $this->em;
-
-        return new SelfValidatingPassport(
-            new UserBadge($token, function (string $token) use ($userRepository, $em) {
-                $user = $userRepository->findOneBy(['apiToken' => $token]);
-
-                if (!$user) {
-                    throw new CustomUserMessageAuthenticationException('Invalid API Token');
-                }
-
-                $expiresAt = $user->getTokenExpiresAt();
-                if ($expiresAt && $expiresAt < new \DateTimeImmutable()) {
-                    throw new CustomUserMessageAuthenticationException('Token expired');
-                }
-
-                // 🔄 refresh
-                $user->setTokenExpiresAt((new \DateTimeImmutable())->modify('+1 hour'));
-                $em->persist($user);
-                $em->flush();
-
-                return $user;
-            })
-        );
+    if (!$plainToken) {
+        throw new CustomUserMessageAuthenticationException('No token provided');
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
+    $session = $this->sessionManager->findActiveSessionByPlainToken($plainToken);
+
+    if (!$session) {
+        throw new CustomUserMessageAuthenticationException('Session invalide, expirée ou révoquée');
+    }
+
+    $user = $session->getUser();
+
+    if (!$user) {
+        throw new CustomUserMessageAuthenticationException('Utilisateur introuvable');
+    }
+
+    $this->sessionManager->touch($session);
+
+    return new SelfValidatingPassport(
+        new UserBadge(
+            $user->getUserIdentifier(),
+            fn() => $user
+        )
+    );
+}
+    public function onAuthenticationSuccess(
+        Request $request,
+        TokenInterface $token,
+        string $firewallName
+    ): ?Response {
         return null;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-        $path = $request->getPathInfo();
+    public function onAuthenticationFailure(
+        Request $request,
+        AuthenticationException $exception
+    ): ?Response {
+        $path = $this->normalizePath($request->getPathInfo());
 
-        // API => JSON
         if (str_starts_with($path, '/api/')) {
-            return new JsonResponse(['error' => $exception->getMessage()], 401);
+            $response = new JsonResponse([
+                'error' => $exception->getMessage(),
+            ], Response::HTTP_UNAUTHORIZED);
+
+            $response->headers->clearCookie('AUTH_TOKEN', '/');
+
+            return $response;
         }
 
-        // HTML => redirect login + next
-        $next = $request->getRequestUri();
-
-        $response = new RedirectResponse('/login?next=' . rawurlencode($next));
-
-        // Optionnel mais utile pour éviter boucle si cookie invalide
+        $response = new RedirectResponse('/login?next=' . rawurlencode($request->getRequestUri()));
         $response->headers->clearCookie('AUTH_TOKEN', '/');
 
         return $response;
+    }
+
+    private function extractToken(Request $request): ?string
+    {
+        $authHeader = $request->headers->get('Authorization');
+
+        if (is_string($authHeader) && preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            $token = trim($matches[1]);
+
+            if ($token !== '') {
+                return $token;
+            }
+        }
+
+        $cookieToken = $request->cookies->get('AUTH_TOKEN');
+
+        if (is_string($cookieToken)) {
+            $cookieToken = trim($cookieToken);
+
+            if ($cookieToken !== '') {
+                return $cookieToken;
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizePath(string $path): string
+    {
+        $normalized = rtrim($path, '/');
+
+        return $normalized === '' ? '/' : $normalized;
+    }
+
+    private function isPublicPath(string $path): bool
+    {
+        if (in_array($path, self::PUBLIC_EXACT_PATHS, true)) {
+            return true;
+        }
+
+        if (in_array($path, self::PUBLIC_FILES, true)) {
+            return true;
+        }
+
+        foreach (self::PUBLIC_PREFIXES as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isAssetPath(string $path): bool
+    {
+        foreach (self::ASSET_PREFIXES as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isDevToolPath(string $path): bool
+    {
+        return str_starts_with($path, '/_wdt')
+            || str_starts_with($path, '/_profiler');
+    }
+
+    private function isProtectedPath(string $path): bool
+    {
+        return $path === '/app'
+            || str_starts_with($path, '/app/')
+            || str_starts_with($path, '/api/');
     }
 }
