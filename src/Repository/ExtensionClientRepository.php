@@ -7,9 +7,6 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<ExtensionClient>
- */
 class ExtensionClientRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -38,6 +35,20 @@ class ExtensionClientRepository extends ServiceEntityRepository
             ->andWhere('ec.user = :user')
             ->setParameter('user', $user)
             ->orderBy('ec.lastSeenAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return ExtensionClient[]
+     */
+    public function findBlockedByUser(User $user): array
+    {
+        return $this->createQueryBuilder('ec')
+            ->andWhere('ec.user = :user')
+            ->andWhere('ec.isBlocked = true')
+            ->setParameter('user', $user)
+            ->orderBy('ec.blockedAt', 'DESC')
             ->getQuery()
             ->getResult();
     }

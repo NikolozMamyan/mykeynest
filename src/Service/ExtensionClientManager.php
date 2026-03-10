@@ -15,9 +15,14 @@ final class ExtensionClientManager
         private ExtensionClientRepository $extensionClientRepository
     ) {}
 
-    public function resolveFromRequest(User $user, Request $request): ExtensionClient
+    /**
+     * @return array{client: ExtensionClient, installationToken: ?string, isNew: bool}
+     */
+    public function resolveFromRequest(User $user, Request $request): array
     {
         $clientId = $this->extractRequiredHeader($request, 'X-Extension-Client-Id');
+        $installationToken = $this->cleanNullable($request->headers->get('X-Extension-Installation-Token'));
+
         $deviceLabel = $this->cleanNullable($request->headers->get('X-Device-Label'));
         $browserName = $this->cleanNullable($request->headers->get('X-Browser-Name'));
         $browserVersion = $this->cleanNullable($request->headers->get('X-Browser-Version'));
@@ -29,31 +34,79 @@ final class ExtensionClientManager
         $userAgent = $request->headers->get('User-Agent');
         $ipAddress = $request->getClientIp();
 
-        $client = $this->extensionClientRepository->findOneByUserAndClientId($user, $clientId);
+        $existingClient = $this->extensionClientRepository->findOneByUserAndClientId($user, $clientId);
 
-        if (!$client) {
-            $client = new ExtensionClient();
-            $client->setUser($user);
-            $client->setClientId($clientId);
-            $client->setFirstSeenAt(new \DateTimeImmutable());
+        if ($existingClient) {
+            $this->assertAllowed($existingClient);
+
+            if (!$installationToken) {
+                throw new \RuntimeException('Installation token manquant pour cette extension');
+            }
+
+            $this->assertInstallationTokenMatches($existingClient, $installationToken);
+
+            $this->hydrateClient(
+                $existingClient,
+                $deviceLabel,
+                $browserName,
+                $browserVersion,
+                $osName,
+                $osVersion,
+                $extensionVersion,
+                $manifestVersion,
+                $originType,
+                $ipAddress,
+                $userAgent
+            );
+
+            $this->entityManager->flush();
+
+            return [
+                'client' => $existingClient,
+                'installationToken' => null,
+                'isNew' => false,
+            ];
         }
 
-        $client->setDeviceLabel($deviceLabel);
-        $client->setBrowserName($browserName);
-        $client->setBrowserVersion($browserVersion);
-        $client->setOsName($osName);
-        $client->setOsVersion($osVersion);
-        $client->setExtensionVersion($extensionVersion);
-        $client->setManifestVersion($manifestVersion);
-        $client->setOriginType($originType);
-        $client->setLastIpAddress($ipAddress);
-        $client->setLastUserAgent($userAgent);
-        $client->touch();
+        $this->assertNoBlockedFingerprintReuse(
+            $user,
+            $deviceLabel,
+            $browserName,
+            $osName,
+            $userAgent,
+            $ipAddress
+        );
+
+        $plainInstallationToken = bin2hex(random_bytes(32));
+
+        $client = new ExtensionClient();
+        $client->setUser($user);
+        $client->setClientId($clientId);
+        $client->setClientSecretHash($this->hashInstallationToken($plainInstallationToken));
+        $client->setFirstSeenAt(new \DateTimeImmutable());
+
+        $this->hydrateClient(
+            $client,
+            $deviceLabel,
+            $browserName,
+            $browserVersion,
+            $osName,
+            $osVersion,
+            $extensionVersion,
+            $manifestVersion,
+            $originType,
+            $ipAddress,
+            $userAgent
+        );
 
         $this->entityManager->persist($client);
         $this->entityManager->flush();
 
-        return $client;
+        return [
+            'client' => $client,
+            'installationToken' => $plainInstallationToken,
+            'isNew' => true,
+        ];
     }
 
     public function assertAllowed(ExtensionClient $client): void
@@ -73,13 +126,15 @@ final class ExtensionClientManager
 
     public function block(ExtensionClient $client, ?string $reason = null): void
     {
+        $reason = $reason ?: 'Bloqué par l’utilisateur';
+
         $client->setIsBlocked(true);
         $client->setBlockedAt(new \DateTimeImmutable());
-        $client->setBlockedReason($reason ?: 'Bloqué par l’utilisateur');
+        $client->setBlockedReason($reason);
 
         $client->setIsRevoked(true);
         $client->setRevokedAt(new \DateTimeImmutable());
-        $client->setRevokedReason($reason ?: 'Bloqué par l’utilisateur');
+        $client->setRevokedReason($reason);
 
         $client->touch();
 
@@ -91,7 +146,6 @@ final class ExtensionClientManager
         $client->setIsBlocked(false);
         $client->setBlockedAt(null);
         $client->setBlockedReason(null);
-
         $client->touch();
 
         $this->entityManager->flush();
@@ -105,6 +159,124 @@ final class ExtensionClientManager
         $client->touch();
 
         $this->entityManager->flush();
+    }
+
+    public function rotateInstallationToken(ExtensionClient $client): string
+    {
+        $plainInstallationToken = bin2hex(random_bytes(32));
+        $client->setClientSecretHash($this->hashInstallationToken($plainInstallationToken));
+        $client->touch();
+
+        $this->entityManager->flush();
+
+        return $plainInstallationToken;
+    }
+
+    private function assertInstallationTokenMatches(ExtensionClient $client, string $plainToken): void
+    {
+        $storedHash = $client->getClientSecretHash();
+
+        if (!$storedHash) {
+            throw new \RuntimeException('Installation non initialisée correctement');
+        }
+
+        $incomingHash = $this->hashInstallationToken($plainToken);
+
+        if (!hash_equals($storedHash, $incomingHash)) {
+            throw new \RuntimeException('Installation token invalide');
+        }
+    }
+
+    private function hashInstallationToken(string $plainToken): string
+    {
+        return hash('sha256', $plainToken);
+    }
+
+    private function hydrateClient(
+        ExtensionClient $client,
+        ?string $deviceLabel,
+        ?string $browserName,
+        ?string $browserVersion,
+        ?string $osName,
+        ?string $osVersion,
+        ?string $extensionVersion,
+        ?string $manifestVersion,
+        ?string $originType,
+        ?string $ipAddress,
+        ?string $userAgent
+    ): void {
+        $client->setDeviceLabel($deviceLabel);
+        $client->setBrowserName($browserName);
+        $client->setBrowserVersion($browserVersion);
+        $client->setOsName($osName);
+        $client->setOsVersion($osVersion);
+        $client->setExtensionVersion($extensionVersion);
+        $client->setManifestVersion($manifestVersion);
+        $client->setOriginType($originType);
+        $client->setLastIpAddress($ipAddress);
+        $client->setLastUserAgent($userAgent);
+        $client->touch();
+    }
+
+    private function assertNoBlockedFingerprintReuse(
+        User $user,
+        ?string $deviceLabel,
+        ?string $browserName,
+        ?string $osName,
+        ?string $userAgent,
+        ?string $ipAddress
+    ): void {
+        $blockedClients = $this->extensionClientRepository->findBlockedByUser($user);
+
+        foreach ($blockedClients as $blockedClient) {
+            $score = 0;
+
+            if ($this->sameNormalized($blockedClient->getDeviceLabel(), $deviceLabel)) {
+                $score += 3;
+            }
+
+            if ($this->sameNormalized($blockedClient->getBrowserName(), $browserName)) {
+                $score += 2;
+            }
+
+            if ($this->sameNormalized($blockedClient->getOsName(), $osName)) {
+                $score += 2;
+            }
+
+            if ($this->sameNormalized($blockedClient->getLastUserAgent(), $userAgent)) {
+                $score += 4;
+            }
+
+            if ($blockedClient->getLastIpAddress() && $ipAddress && $blockedClient->getLastIpAddress() === $ipAddress) {
+                $score += 1;
+            }
+
+            if ($score >= 5) {
+                throw new \RuntimeException(
+                    'Nouvelle installation refusée : cette extension ressemble à une installation précédemment bloquée'
+                );
+            }
+        }
+    }
+
+    private function sameNormalized(?string $a, ?string $b): bool
+    {
+        $a = $this->normalizeFingerprintValue($a);
+        $b = $this->normalizeFingerprintValue($b);
+
+        return $a !== null && $b !== null && $a === $b;
+    }
+
+    private function normalizeFingerprintValue(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim(mb_strtolower($value));
+        $value = preg_replace('/\s+/', ' ', $value);
+
+        return $value === '' ? null : $value;
     }
 
     private function extractRequiredHeader(Request $request, string $name): string
@@ -130,6 +302,6 @@ final class ExtensionClientManager
 
         $value = trim($value);
 
-        return $value === '' ? null : mb_substr($value, 0, 255);
+        return $value === '' ? null : mb_substr($value, 0, 1000);
     }
 }

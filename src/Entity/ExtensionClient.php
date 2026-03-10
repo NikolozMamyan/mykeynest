@@ -24,6 +24,9 @@ class ExtensionClient
     #[ORM\Column(name: 'client_id', length: 128)]
     private ?string $clientId = null;
 
+    #[ORM\Column(name: 'client_secret_hash', length: 64, nullable: true)]
+    private ?string $clientSecretHash = null;
+
     #[ORM\Column(name: 'device_label', length: 255, nullable: true)]
     private ?string $deviceLabel = null;
 
@@ -95,8 +98,9 @@ class ExtensionClient
 
     public function touch(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
-        $this->lastSeenAt = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable();
+        $this->updatedAt = $now;
+        $this->lastSeenAt = $now;
     }
 
     public function getId(): ?int
@@ -123,6 +127,17 @@ class ExtensionClient
     public function setClientId(string $clientId): static
     {
         $this->clientId = trim($clientId);
+        return $this;
+    }
+
+    public function getClientSecretHash(): ?string
+    {
+        return $this->clientSecretHash;
+    }
+
+    public function setClientSecretHash(?string $clientSecretHash): static
+    {
+        $this->clientSecretHash = $clientSecretHash;
         return $this;
     }
 
