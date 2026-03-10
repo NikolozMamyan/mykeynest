@@ -307,10 +307,19 @@ class ApiSharedController extends AbstractController
         if (!$owner || !$owner->getApiExtensionToken()) {
             return $this->cors($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT));
         }
+      
+$owner = $cred->getUser();
+
 
         $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
         $password = $this->encryptionService->decrypt((string) $cred->getPassword());
-
+        dd([
+    'owner_id' => $owner?->getId(),
+    'has_token' => (bool) $owner?->getApiExtensionToken(),
+    'token_prefix' => $owner?->getApiExtensionToken() ? substr($owner->getApiExtensionToken(), 0, 8) : null,
+    'app_secret_present' => isset($_ENV['APP_SECRET']) && $_ENV['APP_SECRET'] !== '',
+    'encrypted_prefix' => substr((string) $cred->getPassword(), 0, 20),
+]);
         return $this->cors($this->json([
             'id' => $cred->getId(),
             'password' => $password,
