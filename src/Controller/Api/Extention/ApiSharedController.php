@@ -3,38 +3,43 @@
 namespace App\Controller\Api\Extention;
 
 use App\Entity\Credential;
-use App\Entity\Notification;
+use App\Entity\ExtensionClient;
+use App\Entity\User;
+use App\Repository\CredentialRepository;
+use App\Repository\SharedAccessRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\EncryptionService;
-use App\Repository\CredentialRepository;
+use App\Service\ExtensionClientManager;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\SharedAccessRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Attribute\Route;
 
 class ApiSharedController extends AbstractController
 {
     public function __construct(
         private EncryptionService $encryptionService,
         private UserRepository $userRepository,
-        private RateLimiterFactory $extensionApiLimiter, // ✅ rate limit
+        private RateLimiterFactory $extensionApiLimiter,
+        private ExtensionClientManager $extensionClientManager,
     ) {}
 
     private function cors(JsonResponse $res): JsonResponse
     {
-        // Exemple: "chrome-extension://abcd1234" (à mettre dans .env)
         $origin = $_ENV['EXTENSION_ORIGIN'] ?? '';
         if ($origin !== '') {
             $res->headers->set('Access-Control-Allow-Origin', $origin);
             $res->headers->set('Vary', 'Origin');
         }
 
-        $res->headers->set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+        $res->headers->set(
+            'Access-Control-Allow-Headers',
+            'Authorization, Content-Type, X-Extension-Client-Id, X-Extension-Version, X-Extension-Manifest-Version, X-Device-Label, X-Browser-Name, X-Browser-Version, X-OS-Name, X-OS-Version, X-Extension-Origin'
+        );
         $res->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         $res->headers->set('Access-Control-Max-Age', '600');
 
@@ -46,6 +51,7 @@ class ApiSharedController extends AbstractController
         if ($request->getMethod() === 'OPTIONS') {
             return $this->cors(new JsonResponse(null, Response::HTTP_NO_CONTENT));
         }
+
         return null;
     }
 
@@ -59,16 +65,26 @@ class ApiSharedController extends AbstractController
         return $this->cors($this->json(['error' => $msg], Response::HTTP_BAD_REQUEST));
     }
 
+    private function forbidden(string $msg): JsonResponse
+    {
+        return $this->cors($this->json(['error' => $msg], Response::HTTP_FORBIDDEN));
+    }
+
     private function rateLimit(Request $request, string $tokenKey): ?JsonResponse
     {
-        // clé = token + IP (évite bruteforce / scraping)
         $ip = (string) ($request->getClientIp() ?? 'unknown');
-        $limiter = $this->extensionApiLimiter->create($tokenKey.'|'.$ip);
+        $limiter = $this->extensionApiLimiter->create($tokenKey . '|' . $ip);
         $limit = $limiter->consume(1);
 
         if (!$limit->isAccepted()) {
             $res = $this->json(['error' => 'Too many requests'], Response::HTTP_TOO_MANY_REQUESTS);
-            $res->headers->set('Retry-After', (string) $limit->getRetryAfter()->getTimestamp());
+
+            $retryAfter = $limit->getRetryAfter();
+            if ($retryAfter instanceof \DateTimeInterface) {
+                $seconds = max(1, $retryAfter->getTimestamp() - time());
+                $res->headers->set('Retry-After', (string) $seconds);
+            }
+
             return $this->cors($res);
         }
 
@@ -81,12 +97,17 @@ class ApiSharedController extends AbstractController
         if (!$authHeader) {
             return null;
         }
+
         if (!preg_match('/Bearer\s+(\S+)/', $authHeader, $matches)) {
             return null;
         }
+
         return $matches[1];
     }
 
+    /**
+     * @return array{user: User, client: ExtensionClient}|array{rate_limited: JsonResponse}|null
+     */
     private function authenticate(Request $request): ?array
     {
         $token = $this->getBearerToken($request);
@@ -94,35 +115,48 @@ class ApiSharedController extends AbstractController
             return null;
         }
 
-        // ✅ rate limit dès qu'on a un token (même invalide)
         if ($rl = $this->rateLimit($request, $token)) {
-            // on renverra directement une réponse 429 au controller
             return ['rate_limited' => $rl];
         }
 
         $user = $this->userRepository->findOneBy(['apiExtensionToken' => $token]);
-        if (!$user) {
+        if (!$user instanceof User) {
             return null;
         }
 
-        // ✅ clé dérivée serveur (protège offline decrypt)
-        $this->encryptionService->setKeyFromUserToken($user->getApiExtensionToken());
+        $this->encryptionService->setKeyFromUserToken((string) $user->getApiExtensionToken());
 
-        return ['user' => $user];
+        try {
+            $client = $this->extensionClientManager->resolveFromRequest($user, $request);
+            $this->extensionClientManager->assertAllowed($client);
+        } catch (\RuntimeException $e) {
+            return ['rate_limited' => $this->forbidden($e->getMessage())];
+        }
+
+        return [
+            'user' => $user,
+            'client' => $client,
+        ];
     }
 
     #[Route('/extention/api/search', name: 'api_credential_search', methods: ['POST', 'OPTIONS'])]
     public function apiSearch(Request $request, CredentialRepository $credentialRepository): JsonResponse
     {
-        if ($pf = $this->preflight($request)) return $pf;
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
 
         $auth = $this->authenticate($request);
-        if (!$auth) return $this->unauthorized('Token manquant ou invalide');
-        if (isset($auth['rate_limited'])) return $auth['rate_limited'];
+        if (!$auth) {
+            return $this->unauthorized('Token manquant ou invalide');
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
 
+        /** @var User $user */
         $user = $auth['user'];
 
-        // ✅ JSON obligatoire
         try {
             $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
@@ -140,7 +174,6 @@ class ApiSharedController extends AbstractController
 
         $credentials = $credentialRepository->findByDomainAndUser($domain, $user);
 
-        // ✅ pas de password ici
         $result = array_map(fn (Credential $c) => [
             'id'       => $c->getId(),
             'domain'   => $c->getDomain(),
@@ -151,245 +184,225 @@ class ApiSharedController extends AbstractController
         return $this->cors($this->json(['credentials' => $result]));
     }
 
-#[Route('/extention/api/credentials/list', name: 'api_credential_list', methods: ['GET', 'OPTIONS'])]
-public function apiCredentials(
-    Request $request,
-    CredentialRepository $credentialRepository,
-    SharedAccessRepository $sharedAccessRepo,
-    TeamRepository $teamRepo
-): JsonResponse {
-    if ($pf = $this->preflight($request)) return $pf;
-
-    $auth = $this->authenticate($request);
-    if (!$auth) return $this->unauthorized('Token manquant ou invalide');
-    if (isset($auth['rate_limited'])) return $auth['rate_limited'];
-
-    /** @var \App\Entity\User $user */
-    $user = $auth['user'];
-
-    // 1) Credentials perso
-    $credentials = $credentialRepository->findCredentialsByUser($user);
-
-    // 2) Partages directs
-    $sharedAccess = $sharedAccessRepo->findSharedWith($user);
-
-    // 3) Teams + credentials
-    $teams = $teamRepo->findTeamWithCredentialsByUser($user);
-
-    // Helpers (évite de répéter)
-    $userPayload = static fn(\App\Entity\User $u) => [
-        'id'    => $u->getId(),
-        'email' => $u->getEmail(),
-        // optionnel : nom/prenom si tu as getters
-        // 'prenom' => $u->getPrenom(),
-        // 'nom' => $u->getNom(),
-    ];
-
-    $credentialPayload = static fn(\App\Entity\Credential $c) => [
-        'id'       => $c->getId(),
-        'domain'   => $c->getDomain(),
-        'username' => $c->getUsername(),
-        'name'     => $c->getName(),
-        // pas de password ✅
-    ];
-
-    // ---- credentials (perso)
-    $resultCredentials = array_map(
-        fn(\App\Entity\Credential $c) => $credentialPayload($c),
-        $credentials
-    );
-
-    // ---- sharedAccess (direct)
-    $resultSharedAccess = array_map(function (\App\Entity\SharedAccess $sa) use ($userPayload, $credentialPayload) {
-        return [
-            'id'        => $sa->getId(),
-            'createdAt' => $sa->getCreatedAt()?->format(DATE_ATOM),
-
-            // qui partage ?
-            'owner'     => $userPayload($sa->getOwner()),
-
-            // partagé avec qui ?
-            'guest'     => $userPayload($sa->getGuest()),
-
-            // quoi ?
-            'credential' => $credentialPayload($sa->getCredential()),
-        ];
-    }, $sharedAccess);
-
-    // ---- teamSharedAccess (teams)
-    $resultTeamSharedAccess = array_map(function (\App\Entity\Team $t) use ($userPayload, $credentialPayload) {
-        // members -> users (selon ton TeamMember)
-        $members = [];
-        foreach ($t->getMembers() as $tm) {
-            // si TeamMember a getUser()
-            $members[] = $userPayload($tm->getUser());
+    #[Route('/extention/api/credentials/list', name: 'api_credential_list', methods: ['GET', 'OPTIONS'])]
+    public function apiCredentials(
+        Request $request,
+        CredentialRepository $credentialRepository,
+        SharedAccessRepository $sharedAccessRepo,
+        TeamRepository $teamRepo
+    ): JsonResponse {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
         }
 
-        $teamCredentials = [];
-        foreach ($t->getCredentials() as $c) {
-            $teamCredentials[] = $credentialPayload($c);
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized('Token manquant ou invalide');
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
         }
 
-        return [
-            'team' => [
-                'id'        => $t->getId(),
-                'name'      => $t->getName(),
-                'createdAt' => $t->getCreatedAt()->format(DATE_ATOM),
-                'owner'     => $userPayload($t->getOwner()),
-                'members'   => $members,
-            ],
-            'credentials' => $teamCredentials,
+        /** @var User $user */
+        $user = $auth['user'];
+
+        $credentials = $credentialRepository->findCredentialsByUser($user);
+        $sharedAccess = $sharedAccessRepo->findSharedWith($user);
+        $teams = $teamRepo->findTeamWithCredentialsByUser($user);
+
+        $userPayload = static fn(User $u) => [
+            'id' => $u->getId(),
+            'email' => $u->getEmail(),
         ];
-    }, $teams);
 
-    return $this->cors($this->json([
-        'credentials'      => $resultCredentials,
-        'sharedAccess'     => $resultSharedAccess,
-        'teamSharedAccess' => $resultTeamSharedAccess,
-    ]));
-}
+        $credentialPayload = static fn(Credential $c) => [
+            'id' => $c->getId(),
+            'domain' => $c->getDomain(),
+            'username' => $c->getUsername(),
+            'name' => $c->getName(),
+        ];
 
+        $resultCredentials = array_map(
+            fn(Credential $c) => $credentialPayload($c),
+            $credentials
+        );
 
-   #[Route('/extention/api/credentials/{id}/reveal', name: 'api_credential_reveal', methods: ['POST', 'OPTIONS'])]
-public function reveal(
-    Request $request,
-    int $id,
-    CredentialRepository $credentialRepository,
-    SharedAccessRepository $sharedAccessRepo,
-    TeamRepository $teamRepo
-): JsonResponse {
-    if ($pf = $this->preflight($request)) return $pf;
+        $resultSharedAccess = array_map(function ($sa) use ($userPayload, $credentialPayload) {
+            return [
+                'id' => $sa->getId(),
+                'createdAt' => $sa->getCreatedAt()?->format(DATE_ATOM),
+                'owner' => $userPayload($sa->getOwner()),
+                'guest' => $userPayload($sa->getGuest()),
+                'credential' => $credentialPayload($sa->getCredential()),
+            ];
+        }, $sharedAccess);
 
-    $auth = $this->authenticate($request);
-    if (!$auth) return $this->unauthorized('Token manquant ou invalide');
-    if (isset($auth['rate_limited'])) return $auth['rate_limited'];
+        $resultTeamSharedAccess = array_map(function ($t) use ($userPayload, $credentialPayload) {
+            $members = [];
+            foreach ($t->getMembers() as $tm) {
+                $members[] = $userPayload($tm->getUser());
+            }
 
-    /** @var \App\Entity\User $user */
-    $user = $auth['user'];
+            $teamCredentials = [];
+            foreach ($t->getCredentials() as $c) {
+                $teamCredentials[] = $credentialPayload($c);
+            }
 
-    $cred = $credentialRepository->find($id);
-    if (!$cred) {
-        return $this->cors($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
-    }
+            return [
+                'team' => [
+                    'id' => $t->getId(),
+                    'name' => $t->getName(),
+                    'createdAt' => $t->getCreatedAt()->format(DATE_ATOM),
+                    'owner' => $userPayload($t->getOwner()),
+                    'members' => $members,
+                ],
+                'credentials' => $teamCredentials,
+            ];
+        }, $teams);
 
-    $isOwner = ($cred->getUser()?->getId() === $user->getId());
-
-    // 1) SharedAccess direct (guest)
-    // -> idéalement une méthode repo dédiée (voir plus bas)
-    $hasDirectShare = $sharedAccessRepo->userHasAccessToCredential($user, $cred);
-
-    // 2) Shared via Team
-    // -> idéalement une méthode repo dédiée aussi
-    $hasTeamShare = $teamRepo->userHasTeamAccessToCredential($user, $cred);
-
-    if (!$isOwner && !$hasDirectShare && !$hasTeamShare) {
-        return $this->cors($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
-        // (tu peux aussi renvoyer 403, mais 404 évite de leak l’existence)
-    }
-
-    // ⚠️ IMPORTANT: déchiffrement avec la clé du OWNER (sinon un guest ne pourra pas decrypt)
-    $owner = $cred->getUser();
-    if (!$owner || !$owner->getApiExtensionToken()) {
-        return $this->cors($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT));
-    }
-
-    $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
-
-    $password = $this->encryptionService->decrypt((string) $cred->getPassword());
-
-    return $this->cors($this->json([
-        'id' => $cred->getId(),
-        'password' => $password,
-    ]));
-}
-#[Route('/extention/api/credentials/create', name: 'api_credential_create', methods: ['POST', 'OPTIONS'])]
-public function createCredential(
-    Request $request,
-    CredentialRepository $credentialRepository,
-    EntityManagerInterface $em
-): JsonResponse {
-    if ($pf = $this->preflight($request)) return $pf;
-    
-    $auth = $this->authenticate($request);
-    if (!$auth) return $this->unauthorized('Token manquant ou invalide');
-    if (isset($auth['rate_limited'])) return $auth['rate_limited'];
-    
-    /** @var \App\Entity\User $user */
-    $user = $auth['user'];
-    
-    // Validation du JSON
-    try {
-        $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-    } catch (\JsonException) {
-        return $this->badRequest('Corps JSON invalide');
-    }
-    
-    // Validation des champs requis
-    $domain = $payload['domain'] ?? null;
-    $username = $payload['username'] ?? null;
-    $password = $payload['password'] ?? null;
-    $name = $payload['name'] ?? null;
-    
-    if (!is_string($domain) || trim($domain) === '') {
-        return $this->badRequest('Domaine manquant ou invalide');
-    }
-    
-    if (!is_string($username) || trim($username) === '') {
-        return $this->badRequest('Nom d\'utilisateur manquant ou invalide');
-    }
-    
-    if (!is_string($password) || trim($password) === '') {
-        return $this->badRequest('Mot de passe manquant ou invalide');
-    }
-    
-    // Normalisation du domaine
-    $domain = preg_replace('#^https?://#', '', $domain);
-    $domain = preg_replace('#^www\.#', '', $domain);
-    $domain = strtolower(trim($domain));
-    
-    // Nom par défaut si non fourni
-    if (!$name || trim($name) === '') {
-        $name = $domain . ' - ' . $username;
-    }
-    
-    // Vérifier si le credential existe déjà pour éviter les doublons
-    $existingCredential = $credentialRepository->findOneBy([
-        'user' => $user,
-        'domain' => $domain,
-        'username' => $username
-    ]);
-    
-    if ($existingCredential) {
         return $this->cors($this->json([
-            'error' => 'Un credential existe déjà pour ce domaine et cet utilisateur',
-            'credentialId' => $existingCredential->getId()
-        ], Response::HTTP_CONFLICT));
+            'credentials' => $resultCredentials,
+            'sharedAccess' => $resultSharedAccess,
+            'teamSharedAccess' => $resultTeamSharedAccess,
+        ]));
     }
-    
-    // Chiffrement du mot de passe avec la clé de l'utilisateur
-    $encryptedPassword = $this->encryptionService->encrypt($password);
-    
-    // Création du credential
-    $credential = new Credential();
-    $credential->setName($name);
-    $credential->setDomain($domain);
-    $credential->setUsername($username);
-    $credential->setPassword($encryptedPassword);
-    $credential->setUser($user);
-    
-    
-    $em->persist($credential);
-    $em->flush();
-    
-    return $this->cors($this->json([
-        'success' => true,
-        'credential' => [
-            'id' => $credential->getId(),
-            'name' => $credential->getName(),
-            'domain' => $credential->getDomain(),
-            'username' => $credential->getUsername(),
-            'createdAt' => $credential->getCreatedAt()->format(DATE_ATOM)
-        ]
-    ], Response::HTTP_CREATED));
-}
+
+    #[Route('/extention/api/credentials/{id}/reveal', name: 'api_credential_reveal', methods: ['POST', 'OPTIONS'])]
+    public function reveal(
+        Request $request,
+        int $id,
+        CredentialRepository $credentialRepository,
+        SharedAccessRepository $sharedAccessRepo,
+        TeamRepository $teamRepo
+    ): JsonResponse {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
+
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized('Token manquant ou invalide');
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
+
+        /** @var User $user */
+        $user = $auth['user'];
+
+        $cred = $credentialRepository->find($id);
+        if (!$cred) {
+            return $this->cors($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
+        }
+
+        $isOwner = ($cred->getUser()?->getId() === $user->getId());
+        $hasDirectShare = $sharedAccessRepo->userHasAccessToCredential($user, $cred);
+        $hasTeamShare = $teamRepo->userHasTeamAccessToCredential($user, $cred);
+
+        if (!$isOwner && !$hasDirectShare && !$hasTeamShare) {
+            return $this->cors($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND));
+        }
+
+        $owner = $cred->getUser();
+        if (!$owner || !$owner->getApiExtensionToken()) {
+            return $this->cors($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT));
+        }
+
+        $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+        $password = $this->encryptionService->decrypt((string) $cred->getPassword());
+
+        return $this->cors($this->json([
+            'id' => $cred->getId(),
+            'password' => $password,
+        ]));
+    }
+
+    #[Route('/extention/api/credentials/create', name: 'api_credential_create', methods: ['POST', 'OPTIONS'])]
+    public function createCredential(
+        Request $request,
+        CredentialRepository $credentialRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
+
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized('Token manquant ou invalide');
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
+
+        /** @var User $user */
+        $user = $auth['user'];
+
+        try {
+            $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $this->badRequest('Corps JSON invalide');
+        }
+
+        $domain = $payload['domain'] ?? null;
+        $username = $payload['username'] ?? null;
+        $password = $payload['password'] ?? null;
+        $name = $payload['name'] ?? null;
+
+        if (!is_string($domain) || trim($domain) === '') {
+            return $this->badRequest('Domaine manquant ou invalide');
+        }
+
+        if (!is_string($username) || trim($username) === '') {
+            return $this->badRequest('Nom d\'utilisateur manquant ou invalide');
+        }
+
+        if (!is_string($password) || trim($password) === '') {
+            return $this->badRequest('Mot de passe manquant ou invalide');
+        }
+
+        $domain = preg_replace('#^https?://#', '', $domain);
+        $domain = preg_replace('#^www\.#', '', $domain);
+        $domain = strtolower(trim($domain));
+
+        if (!$name || trim($name) === '') {
+            $name = $domain . ' - ' . $username;
+        }
+
+        $existingCredential = $credentialRepository->findOneBy([
+            'user' => $user,
+            'domain' => $domain,
+            'username' => $username,
+        ]);
+
+        if ($existingCredential) {
+            return $this->cors($this->json([
+                'error' => 'Un credential existe déjà pour ce domaine et cet utilisateur',
+                'credentialId' => $existingCredential->getId(),
+            ], Response::HTTP_CONFLICT));
+        }
+
+        $encryptedPassword = $this->encryptionService->encrypt($password);
+
+        $credential = new Credential();
+        $credential->setName($name);
+        $credential->setDomain($domain);
+        $credential->setUsername($username);
+        $credential->setPassword($encryptedPassword);
+        $credential->setUser($user);
+
+        $entityManager->persist($credential);
+        $entityManager->flush();
+
+        return $this->cors($this->json([
+            'success' => true,
+            'credential' => [
+                'id' => $credential->getId(),
+                'name' => $credential->getName(),
+                'domain' => $credential->getDomain(),
+                'username' => $credential->getUsername(),
+                'createdAt' => $credential->getCreatedAt()?->format(DATE_ATOM),
+            ],
+        ], Response::HTTP_CREATED));
+    }
 }

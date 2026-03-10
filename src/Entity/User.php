@@ -4,10 +4,11 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\ExtensionClient;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -82,9 +83,16 @@ private ?string $phone = null;
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $receiveSecurityEmails = false;
 
+    /**
+ * @var Collection<int, ExtensionClient>
+ */
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: ExtensionClient::class, orphanRemoval: true)]
+private Collection $extensionClients;
+
 
 public function __construct()
 {
+      $this->extensionClients = new ArrayCollection();
 }
 
     public function getId(): ?int
@@ -327,4 +335,32 @@ public function setPhone(?string $phone): self
         $this->receiveSecurityEmails = $receiveSecurityEmails;
         return $this;
     }
+    /**
+ * @return Collection<int, ExtensionClient>
+ */
+public function getExtensionClients(): Collection
+{
+    return $this->extensionClients;
+}
+
+public function addExtensionClient(ExtensionClient $extensionClient): static
+{
+    if (!$this->extensionClients->contains($extensionClient)) {
+        $this->extensionClients->add($extensionClient);
+        $extensionClient->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeExtensionClient(ExtensionClient $extensionClient): static
+{
+    if ($this->extensionClients->removeElement($extensionClient)) {
+        if ($extensionClient->getUser() === $this) {
+            $extensionClient->setUser(null);
+        }
+    }
+
+    return $this;
+}
 }
