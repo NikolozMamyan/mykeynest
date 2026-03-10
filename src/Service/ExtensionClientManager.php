@@ -19,31 +19,43 @@ final class ExtensionClientManager
      * @return array{client: ExtensionClient, installationToken: ?string, isNew: bool}
      */
     public function resolveFromRequest(User $user, Request $request): array
-    {
-        $clientId = $this->extractRequiredHeader($request, 'X-Extension-Client-Id');
-        $installationToken = $this->cleanNullable($request->headers->get('X-Extension-Installation-Token'));
+{
+    $clientId = $this->extractRequiredHeader($request, 'X-Extension-Client-Id');
+    $installationToken = $this->cleanNullable($request->headers->get('X-Extension-Installation-Token'));
 
-        $deviceLabel = $this->cleanNullable($request->headers->get('X-Device-Label'));
-        $browserName = $this->cleanNullable($request->headers->get('X-Browser-Name'));
-        $browserVersion = $this->cleanNullable($request->headers->get('X-Browser-Version'));
-        $osName = $this->cleanNullable($request->headers->get('X-OS-Name'));
-        $osVersion = $this->cleanNullable($request->headers->get('X-OS-Version'));
-        $extensionVersion = $this->cleanNullable($request->headers->get('X-Extension-Version'));
-        $manifestVersion = $this->cleanNullable($request->headers->get('X-Extension-Manifest-Version'));
-        $originType = $this->cleanNullable($request->headers->get('X-Extension-Origin'));
-        $userAgent = $request->headers->get('User-Agent');
-        $ipAddress = $request->getClientIp();
+    $deviceLabel = $this->cleanNullable($request->headers->get('X-Device-Label'));
+    $browserName = $this->cleanNullable($request->headers->get('X-Browser-Name'));
+    $browserVersion = $this->cleanNullable($request->headers->get('X-Browser-Version'));
+    $osName = $this->cleanNullable($request->headers->get('X-OS-Name'));
+    $osVersion = $this->cleanNullable($request->headers->get('X-OS-Version'));
+    $extensionVersion = $this->cleanNullable($request->headers->get('X-Extension-Version'));
+    $manifestVersion = $this->cleanNullable($request->headers->get('X-Extension-Manifest-Version'));
+    $originType = $this->cleanNullable($request->headers->get('X-Extension-Origin'));
+    $userAgent = $request->headers->get('User-Agent');
+    $ipAddress = $request->getClientIp();
 
-        $existingClient = $this->extensionClientRepository->findOneByUserAndClientId($user, $clientId);
+    $existingClients = $this->extensionClientRepository->findByUserOrderByLastSeen($user);
 
-        if ($existingClient) {
-            $this->assertAllowed($existingClient);
+    if (count($existingClients) > 1) {
+        throw new \RuntimeException(
+            'Configuration invalide : plusieurs installations extension existent déjà pour ce compte'
+        );
+    }
 
-            if (!$installationToken) {
-                throw new \RuntimeException('Installation token manquant pour cette extension');
-            }
+    $existingClient = $existingClients[0] ?? null;
 
-            $this->assertInstallationTokenMatches($existingClient, $installationToken);
+    if ($existingClient instanceof ExtensionClient) {
+        $this->assertAllowed($existingClient);
+
+        if ($existingClient->getClientId() !== $clientId) {
+            throw new \RuntimeException(
+                'Nouvelle installation refusée. Une installation extension existe déjà pour ce compte.'
+            );
+        }
+
+        if (!$existingClient->getClientSecretHash()) {
+            $plainInstallationToken = bin2hex(random_bytes(32));
+            $existingClient->setClientSecretHash($this->hashInstallationToken($plainInstallationToken));
 
             $this->hydrateClient(
                 $existingClient,
@@ -63,30 +75,19 @@ final class ExtensionClientManager
 
             return [
                 'client' => $existingClient,
-                'installationToken' => null,
+                'installationToken' => $plainInstallationToken,
                 'isNew' => false,
             ];
         }
 
-        $this->assertNoBlockedFingerprintReuse(
-            $user,
-            $deviceLabel,
-            $browserName,
-            $osName,
-            $userAgent,
-            $ipAddress
-        );
+        if (!$installationToken) {
+            throw new \RuntimeException('Installation token manquant pour cette extension');
+        }
 
-        $plainInstallationToken = bin2hex(random_bytes(32));
-
-        $client = new ExtensionClient();
-        $client->setUser($user);
-        $client->setClientId($clientId);
-        $client->setClientSecretHash($this->hashInstallationToken($plainInstallationToken));
-        $client->setFirstSeenAt(new \DateTimeImmutable());
+        $this->assertInstallationTokenMatches($existingClient, $installationToken);
 
         $this->hydrateClient(
-            $client,
+            $existingClient,
             $deviceLabel,
             $browserName,
             $browserVersion,
@@ -99,15 +100,46 @@ final class ExtensionClientManager
             $userAgent
         );
 
-        $this->entityManager->persist($client);
         $this->entityManager->flush();
 
         return [
-            'client' => $client,
-            'installationToken' => $plainInstallationToken,
-            'isNew' => true,
+            'client' => $existingClient,
+            'installationToken' => null,
+            'isNew' => false,
         ];
     }
+
+    $plainInstallationToken = bin2hex(random_bytes(32));
+
+    $client = new ExtensionClient();
+    $client->setUser($user);
+    $client->setClientId($clientId);
+    $client->setClientSecretHash($this->hashInstallationToken($plainInstallationToken));
+    $client->setFirstSeenAt(new \DateTimeImmutable());
+
+    $this->hydrateClient(
+        $client,
+        $deviceLabel,
+        $browserName,
+        $browserVersion,
+        $osName,
+        $osVersion,
+        $extensionVersion,
+        $manifestVersion,
+        $originType,
+        $ipAddress,
+        $userAgent
+    );
+
+    $this->entityManager->persist($client);
+    $this->entityManager->flush();
+
+    return [
+        'client' => $client,
+        'installationToken' => $plainInstallationToken,
+        'isNew' => true,
+    ];
+}
 
     public function assertAllowed(ExtensionClient $client): void
     {
