@@ -1,489 +1,634 @@
 {% extends 'base_auth.html.twig' %}
 
-{% block title %}MykeyNest — Gestionnaire de mots de passe sécurisé{% endblock %}
-
-{# SEO de la page #}
-{% block description %}MykeyNest — gestionnaire de mots de passe sécurisé : chiffrement AES-256, zero-knowledge, 2FA, auto-remplissage, synchronisation multi-appareils. Essai gratuit.{% endblock %}
-{% block og_title %}MykeyNest — Gestionnaire de mots de passe sécurisé{% endblock %}
-{% block og_description %}Protégez vos identifiants avec un coffre-fort numérique chiffré AES-256. Essai gratuit.{% endblock %}
-{% block twitter_title %}MykeyNest — Gestionnaire de mots de passe sécurisé{% endblock %}
-{% block twitter_description %}Chiffrement AES-256, 2FA, audit de sécurité, auto-remplissage.{% endblock %}
+{% block title %}MykeyNest — Gestionnaire de mots de passe sécurisé pour PME{% endblock %}
+{% block description %}MykeyNest — gestionnaire de mots de passe sécurisé : chiffrement AES-256, zero-knowledge, 2FA, installation hashée & signée, auto-remplissage. Solution PME 100% européenne. Essai gratuit 14 jours.{% endblock %}
+{% block og_title %}MykeyNest — Gestionnaire de mots de passe sécurisé pour PME{% endblock %}
+{% block og_description %}Protégez vos identifiants avec un coffre-fort numérique chiffré AES-256. Installation hashée & signée. Solution 100% européenne. Essai gratuit 14 jours.{% endblock %}
+{% block twitter_title %}MykeyNest — Gestionnaire de mots de passe sécurisé pour PME{% endblock %}
+{% block twitter_description %}Chiffrement AES-256, 2FA, installation hashée, audit de sécurité, auto-remplissage. PME & équipes.{% endblock %}
 
 {% block body %}
-
 <style>
-/* === ANIMATIONS GLOBALES === */
-@keyframes fadeInUp { from {opacity:0; transform:translateY(30px)} to {opacity:1; transform:translateY(0)} }
-@keyframes fadeIn { from {opacity:0} to {opacity:1} }
-@keyframes slideInLeft { from {opacity:0; transform:translateX(-30px)} to {opacity:1; transform:translateX(0)} }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes scaleIn { from {opacity:0; transform:scale(.95)} to {opacity:1; transform:scale(1)} }
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
-.btn{padding:.625rem 1.25rem;border-radius:var(--border-radius-sm);font-weight:600;font-size:.9rem;text-decoration:none;transition:all .3s ease;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;min-height:44px}
-.btn-outline{color:var(--color-text-dark);background:transparent;border:1px solid var(--color-border)}
-.btn-outline:hover{background:var(--color-bg-light);border-color:var(--color-primary);color:var(--color-primary)}
-.btn-primary{background:var(--color-primary);color:var(--color-white);border:1px solid var(--color-primary)}
-.btn-primary:hover{background:#047857;box-shadow:var(--shadow-green);animation:pulse 1.5s ease-in-out infinite}
+/* KEYFRAMES */
+@keyframes fadeInUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
+@keyframes shimmer  { 0%{background-position:-200% center} 100%{background-position:200% center} }
+@keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(300%)} }
+@keyframes badgePop { 0%{transform:scale(.85);opacity:0} 80%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
 
-/* === HERO SECTION === */
-.hero-section{padding:8rem 2rem 4rem;max-width:1280px;margin:0 auto;min-height:90vh;display:flex;align-items:center;scroll-margin-top:80px}
-.hero-content{display:grid;grid-template-columns:1.1fr 1fr;gap:4rem;align-items:center;width:100%}
-.hero-text{animation:fadeInUp .8s ease-out}
-.hero-text h1{font-size:clamp(2rem,4vw+1rem,3.5rem);font-weight:800;color:var(--color-text-dark);line-height:1.1;margin-bottom:1.5rem;letter-spacing:-.02em}
-.hero-text h1 .highlight{color:var(--color-primary);position:relative}
-.hero-text .subtitle{font-size:1.25rem;color:var(--color-text-medium);line-height:1.6;margin-bottom:2rem;max-width:600px}
-.hero-cta{display:flex;gap:1rem;align-items:center;margin-bottom:2rem;flex-wrap:wrap}
-.btn-large{padding:.875rem 1.75rem;font-size:1rem}
-.trust-indicators{display:flex;gap:2rem;align-items:center;padding-top:2rem;border-top:1px solid var(--color-border);margin-top:2rem;flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:.5rem;color:var(--color-text-medium);font-size:.9rem}
-.trust-item i{color:var(--color-success);font-size:1.1rem}
-.hero-visual{position:relative;animation:fadeInUp .8s ease-out .2s backwards}
-.hero-mockup{background:var(--color-white);border-radius:var(--border-radius);padding:1.5rem;box-shadow:var(--shadow-xl);border:1px solid var(--color-border);position:relative}
-.mockup-window{background:var(--color-bg-light);border-radius:var(--border-radius-sm);overflow:hidden}
-.mockup-header{display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;background:var(--color-white);border-bottom:1px solid var(--color-border)}
-.mockup-dot{width:10px;height:10px;border-radius:50%;background:var(--color-border)}
-.mockup-dot:nth-child(1){background:#ef4444}.mockup-dot:nth-child(2){background:#f59e0b}.mockup-dot:nth-child(3){background:var(--color-success)}
-.mockup-content{padding:1.5rem}
-.credential-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--color-white);border-radius:var(--border-radius-sm);margin-bottom:.75rem;border:1px solid var(--color-border);transition:all .3s ease}
-.credential-item:hover{border-color:var(--color-primary);box-shadow:var(--shadow-sm)}
-.credential-icon{width:40px;height:40px;background:var(--background-gradient);border-radius:var(--border-radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:1.25rem}
-.credential-info h4{font-size:.95rem;font-weight:600;color:var(--color-text-dark);margin-bottom:.125rem}
-.credential-info p{font-size:.85rem;color:var(--color-text-muted)}
+/* RESET */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0 }
+html { -webkit-text-size-adjust:100% }
+body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--color-text-dark); background:var(--color-white); overflow-x:hidden }
 
-/* === SUPPRESSION STATS SECTION === */
+/* VISIBILITY HELPERS */
+.show-sm  { display:none }
+@media(min-width:480px)  { .show-sm  { display:block } }
+@media(min-width:480px)  { .hide-sm  { display:none !important } }
+@media(min-width:768px)  { .show-md  { display:block } }
+@media(min-width:768px)  { .hide-md  { display:none !important } }
+@media(min-width:1024px) { .show-lg  { display:block } }
+@media(min-width:1024px) { .hide-lg  { display:none !important } }
 
-/* === FEATURES SECTION — 100% responsive === */
-.features-section{padding:6rem 2rem;background:var(--color-white)}
-.section-container{max-width:1280px;margin:0 auto}
-.section-header{text-align:center;max-width:700px;margin:0 auto 3rem}
-.section-label{display:inline-block;padding:.5rem 1rem;background:var(--background-gradient);color:var(--color-primary);font-weight:600;font-size:.85rem;border-radius:50px;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em}
-.section-header h2{font-size:clamp(1.5rem,2.5vw+1rem,2.5rem);font-weight:800;color:var(--color-text-dark);margin-bottom:1rem;letter-spacing:-.02em}
-.section-header p{font-size:1.125rem;color:var(--color-text-medium);line-height:1.6}
+/* BUTTONS */
+.btn { padding:.625rem 1.25rem; border-radius:var(--border-radius-sm); font-weight:700; font-size:.9rem; text-decoration:none; transition:all .2s ease; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:44px; font-family:inherit; white-space:nowrap }
+.btn-outline { color:var(--color-text-dark); background:transparent; border:1.5px solid var(--color-border) }
+.btn-outline:hover { background:var(--color-bg-light); border-color:var(--color-primary); color:var(--color-primary) }
+.btn-primary { background:var(--color-primary); color:var(--color-white); border:1.5px solid var(--color-primary) }
+.btn-primary:hover { background:#047857; box-shadow:var(--shadow-green) }
+.btn-lg { padding:.875rem 1.75rem; font-size:1rem }
+.btn-w { width:100% }
+@media(min-width:480px) { .btn-w { width:auto } }
 
-/* Nouveau grid : colonnes fluides, pas de spans rigides */
-.features-grid{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  justify-content: center;
-}
-.feature-card{
-  flex: 1 1 260px;
-  max-width: 340px;
-  padding:1.5rem;
-  background:var(--color-white);border:1px solid var(--color-border);
-  border-radius:var(--border-radius);transition:all .3s ease;
-}
-.feature-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-5px);border-color:var(--color-primary)}
-.feature-icon{width:56px;height:56px;background:var(--background-gradient);border-radius:var(--border-radius-sm);display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:1.5rem;margin-bottom:.5rem;flex:0 0 auto}
-.feature-card h3{font-size:1.1rem;font-weight:700;color:var(--color-text-dark);margin:0}
-.feature-card p{color:var(--color-text-medium);line-height:1.55;font-size:.95rem;margin:0}
-@media (max-width: 420px){
-  .features-grid{grid-template-columns: 1fr; gap:1rem}
-}
+/* LAYOUT */
+.wrap { width:100%; max-width:1280px; margin:0 auto; padding:0 1.25rem }
+@media(min-width:640px)  { .wrap { padding:0 1.75rem } }
+@media(min-width:1024px) { .wrap { padding:0 2rem } }
 
-/* === HOW IT WORKS — 100% responsive === */
-.how-it-works-section{padding:6rem 2rem;background:var(--background-gradient)}
-.steps-grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap:1.5rem;
-  margin-top:2.5rem;
-  align-items:stretch;
-}
-.step-card{
-  text-align:center; position:relative;
-  padding:1.25rem 1rem;
-  background:var(--color-white);
-  border:1px solid var(--color-border);
-  border-radius:var(--border-radius);
-  height:100%;
-  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-}
-.step-number{width:56px;height:56px;background:var(--color-primary);color:var(--color-white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:800;margin:0 0 1rem;box-shadow:var(--shadow-green);flex:0 0 auto}
-.step-card h3{font-size:1.1rem;font-weight:700;color:var(--color-text-dark);margin:.25rem 0 .5rem}
-.step-card p{color:var(--color-text-medium);line-height:1.55;margin:0}
-@media (max-width:420px){
-  .step-number{width:48px;height:48px;font-size:1.1rem}
-}
+/* SECTION HEADER */
+.sh { text-align:center; max-width:680px; margin:0 auto 2.5rem }
+@media(min-width:768px) { .sh { margin-bottom:3.5rem } }
+.sh-label { display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .875rem; background:var(--background-gradient); color:var(--color-primary); font-weight:700; font-size:.72rem; border-radius:50px; margin-bottom:.875rem; text-transform:uppercase; letter-spacing:.07em; border:1px solid rgba(5,150,105,.15) }
+.sh h2 { font-size:1.6rem; font-weight:800; color:var(--color-text-dark); margin-bottom:.75rem; letter-spacing:-.022em; line-height:1.2 }
+@media(min-width:768px)  { .sh h2 { font-size:2.1rem } }
+@media(min-width:1024px) { .sh h2 { font-size:2.5rem } }
+.sh p { font-size:.9rem; color:var(--color-text-medium); line-height:1.65 }
+@media(min-width:768px) { .sh p { font-size:1rem } }
 
-/* === PRICING SECTION === */
-.pricing-section{padding:6rem 2rem;background:var(--color-white)}
-.pricing-grid{max-width:1100px;margin:0 auto;display:grid;gap:2rem;grid-template-columns:repeat(2,1fr)}
-.pricing-card{border:1px solid var(--color-border);border-radius:var(--border-radius);padding:2rem;background:#fff;transition:transform .2s ease, box-shadow .2s ease}
-.pricing-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
-.pricing-card.popular{border-color:var(--color-primary);box-shadow:var(--shadow-green)}
-.pricing-price{font-weight:800;font-size:2rem;margin:.5rem 0}
-.pricing-features{list-style:none;padding:0;margin:1rem 0}
-.pricing-features li{display:flex;gap:.5rem;align-items:flex-start;margin:.35rem 0;color:var(--color-text-medium)}
-.badge{display:inline-block;background:var(--background-gradient);color:var(--color-primary);border-radius:999px;padding:.25rem .6rem;font-size:.75rem;font-weight:700}
+/* ===================== HERO ===================== */
+.hero { padding:5.5rem 1.25rem 3rem; max-width:1280px; margin:0 auto }
+@media(min-width:640px)  { .hero { padding:6.5rem 1.75rem 3.5rem } }
+@media(min-width:1024px) { .hero { padding:8rem 2rem 5rem; min-height:90vh; display:flex; align-items:center } }
 
-/* === CTA SECTION === */
-.cta-section{padding:6rem 2rem;background:var(--color-white)}
-.cta-container{max-width:900px;margin:0 auto;text-align:center;padding:4rem 3rem;background:var(--background-gradient);border-radius:var(--border-radius);border:1px solid var(--color-border)}
-.cta-container h2{font-size:2.5rem;font-weight:800;color:var(--color-text-dark);margin-bottom:1rem;letter-spacing:-.02em}
-.cta-container p{font-size:1.125rem;color:var(--color-text-medium);margin-bottom:2rem}
-.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.hero-inner { display:flex; flex-direction:column; gap:2.5rem; width:100% }
+@media(min-width:1024px) { .hero-inner { display:grid; grid-template-columns:1.15fr 1fr; gap:4.5rem; align-items:center } }
 
-/* === FAQ SECTION === */
-.faq-section{padding:6rem 2rem;background:var(--color-white)}
-.faq-grid{display:grid;gap:1.5rem;max-width:900px;margin:0 auto}
-.faq-item{background:var(--color-white);border:1px solid var(--color-border);border-radius:var(--border-radius);padding:1.5rem;transition:all .3s ease;cursor:pointer}
-.faq-item:hover{border-color:var(--color-primary);box-shadow:var(--shadow-sm)}
-.faq-item summary{font-size:1.125rem;font-weight:600;color:var(--color-text-dark);list-style:none;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.faq-item summary::-webkit-details-marker{display:none}
-.faq-item summary::after{content:'+';font-size:1.5rem;color:var(--color-primary);font-weight:300;transition:transform .3s ease}
-.faq-item[open] summary::after{content:'−';transform:rotate(180deg)}
-.faq-item p{margin-top:1rem;color:var(--color-text-medium);line-height:1.6;padding-left:.5rem}
+.hero-text { animation:fadeInUp .7s ease-out both }
+.hero-eyebrow { display:inline-flex; align-items:center; gap:.4rem; padding:.32rem .8rem; background:var(--background-gradient); border:1px solid rgba(5,150,105,.2); border-radius:50px; font-size:.72rem; font-weight:700; color:var(--color-primary); margin-bottom:1rem; text-transform:uppercase; letter-spacing:.03em }
+.hero-h1 { font-size:1.875rem; font-weight:800; color:var(--color-text-dark); line-height:1.15; margin-bottom:1rem; letter-spacing:-.022em }
+@media(min-width:480px)  { .hero-h1 { font-size:2.25rem } }
+@media(min-width:768px)  { .hero-h1 { font-size:2.75rem } }
+@media(min-width:1024px) { .hero-h1 { font-size:3.2rem; letter-spacing:-.03em } }
+.hero-h1 .hl { color:var(--color-primary) }
+.hero-sub { font-size:.9rem; color:var(--color-text-medium); line-height:1.65; margin-bottom:1.75rem }
+@media(min-width:768px) { .hero-sub { font-size:1.08rem; max-width:520px } }
+.hero-cta { display:flex; flex-direction:column; gap:.75rem; margin-bottom:.625rem }
+@media(min-width:480px) { .hero-cta { flex-direction:row; flex-wrap:wrap; gap:.875rem } }
+.hero-hint { font-size:.76rem; color:var(--color-text-muted); display:flex; align-items:center; gap:.3rem; margin-bottom:1.75rem }
+.trust { display:flex; flex-direction:column; gap:.6rem; padding-top:1.5rem; border-top:1px solid var(--color-border) }
+@media(min-width:480px) { .trust { flex-direction:row; flex-wrap:wrap; gap:1.25rem } }
+.trust-item { display:flex; align-items:center; gap:.4rem; color:var(--color-text-medium); font-size:.8rem }
+.trust-item i { color:var(--color-success); font-size:.875rem; flex-shrink:0 }
 
-/* === FOOTER === */
-.footer {background: var(--color-bg-light);color: var(--color-text-dark);padding: 3rem 2rem 1.5rem;box-shadow: var(--shadow-sm)}
+/* VAULT MOCKUP */
+.hero-vis { position:relative; animation:fadeInUp .8s ease-out .12s both }
+.hero-vis::before { content:''; position:absolute; inset:-16px; background:radial-gradient(ellipse at 60% 40%,rgba(5,150,105,.07) 0%,transparent 70%); pointer-events:none; z-index:0 }
+.vault { position:relative; z-index:1; background:var(--color-white); border-radius:14px; padding:1rem; box-shadow:0 16px 48px rgba(0,0,0,.09),0 0 0 1px var(--color-border); overflow:visible }
+@media(min-width:480px) { .vault { padding:1.25rem; border-radius:16px } }
+.vault-bar { display:flex; align-items:center; gap:.55rem; padding:.5rem .7rem; background:var(--color-bg-light); border-bottom:1px solid var(--color-border); border-radius:10px 10px 0 0; margin:-1rem -1rem .875rem }
+@media(min-width:480px) { .vault-bar { margin:-1.25rem -1.25rem 1.125rem } }
+.vdots { display:flex; gap:.28rem }
+.vdot { width:9px; height:9px; border-radius:50% }
+.vdot:nth-child(1){background:#ef4444}.vdot:nth-child(2){background:#f59e0b}.vdot:nth-child(3){background:var(--color-success)}
+.vault-title { flex:1; text-align:center; font-size:.68rem; font-weight:600; color:var(--color-text-muted); font-family:'JetBrains Mono',monospace }
+.vault-search { display:flex; align-items:center; gap:.5rem; background:var(--color-bg-light); border:1px solid var(--color-border); border-radius:var(--border-radius-sm); padding:.4rem .7rem; margin-bottom:.75rem }
+.vault-search i { color:var(--color-text-muted); font-size:.78rem; flex-shrink:0 }
+.vault-search input { border:none; background:transparent; outline:none; font-size:.78rem; color:var(--color-text-dark); flex:1; font-family:inherit; min-width:0 }
+.cred-list { display:flex; flex-direction:column; gap:.375rem }
+/* Extra credentials cachés sur < 480px */
+.cred-extra { display:none }
+@media(min-width:480px) { .cred-extra { display:flex } }
+.cred { display:flex; align-items:center; gap:.7rem; padding:.55rem .7rem; background:var(--color-white); border-radius:8px; border:1px solid var(--color-border); transition:border-color .18s }
+.cred:hover { border-color:var(--color-primary) }
+.cred-logo { width:30px; height:30px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0 }
+.cred-logo.g{background:#fff5f5;color:#ea4335} .cred-logo.f{background:#eff6ff;color:#1877f2}
+.cred-logo.gh{background:#f8fafc;color:#1e293b}  .cred-logo.s{background:#f5f3ff;color:#6366f1}
+.cred-logo.a{background:#fffbeb;color:#f59e0b}
+.cred-body { flex:1; min-width:0 }
+.cred-body b { display:block; font-size:.76rem; font-weight:700; color:var(--color-text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.cred-body span { font-size:.68rem; color:var(--color-text-muted) }
+.sdots { display:flex; gap:2px; flex-shrink:0 }
+.sd { width:5px; height:5px; border-radius:50%; background:var(--color-border) }
+.sd.ok { background:var(--color-success) } .sd.mid { background:var(--color-warning) }
+.cred-lock { color:var(--color-text-muted); font-size:.72rem; opacity:.5; flex-shrink:0 }
+.hash-badge { position:absolute; bottom:-11px; right:.875rem; background:var(--color-text-dark); color:var(--color-white); border-radius:7px; padding:.38rem .7rem; display:flex; align-items:center; gap:.4rem; font-family:'JetBrains Mono',monospace; font-size:.62rem; box-shadow:0 4px 14px rgba(0,0,0,.22); animation:badgePop .6s ease-out .8s both; white-space:nowrap; z-index:2 }
+.hash-ok { display:flex; align-items:center; gap:.25rem; color:var(--color-success) }
+.sec-pill { position:absolute; top:-12px; left:.875rem; background:var(--color-primary); color:var(--color-white); border-radius:50px; padding:.28rem .7rem; font-size:.68rem; font-weight:700; display:flex; align-items:center; gap:.3rem; animation:badgePop .5s ease-out .45s both; box-shadow:var(--shadow-green); z-index:2; white-space:nowrap }
 
-.footer-content {max-width: 1280px;margin: 0 auto;display: grid;grid-template-columns: 2fr 1fr 1fr 1fr;gap: 3rem;margin-bottom: 2rem}
+/* ===================== STRIP ===================== */
+.strip { background:var(--color-text-dark); padding:.875rem 1.25rem; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none }
+.strip::-webkit-scrollbar { display:none }
+.strip-inner { display:flex; align-items:center; gap:1.25rem; width:max-content }
+@media(min-width:900px) { .strip-inner { width:auto; max-width:1280px; margin:0 auto; justify-content:space-around } }
+.s-item { display:flex; align-items:center; gap:.45rem; color:rgba(255,255,255,.82); font-size:.78rem; font-weight:500; white-space:nowrap; flex-shrink:0 }
+.s-item i { color:var(--color-primary); font-size:.85rem }
+.s-div { width:1px; height:18px; background:rgba(255,255,255,.14); flex-shrink:0 }
 
-.footer-brand h3 {color: var(--color-primary);font-size: 1.25rem;margin-bottom: 1rem;display: flex;align-items: center;gap: .5rem}
+/* ===================== FEATURES ===================== */
+.feat-section { padding:4rem 1.25rem; background:var(--color-bg-light); position:relative; overflow:hidden }
+@media(min-width:640px)  { .feat-section { padding:5rem 1.75rem } }
+@media(min-width:1024px) { .feat-section { padding:6.5rem 2rem } }
+.feat-section::before { content:''; position:absolute; top:-80px; right:-80px; width:340px; height:340px; background:radial-gradient(circle,rgba(5,150,105,.05) 0%,transparent 70%); pointer-events:none }
 
-.footer-brand p {line-height: 1.6;margin-bottom: 1.5rem;color: var(--color-text-medium)}
+.feat-layout { display:flex; flex-direction:column; gap:1.25rem }
+@media(min-width:1024px) { .feat-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start } }
 
-.footer-links h4 {color: var(--color-text-dark);font-size: 1rem;margin-bottom: 1rem;font-weight: 600}
-
-.footer-links ul {list-style: none;}
-
-.footer-links li {margin-bottom: .5rem;}
-
-.footer-links a { color: var(--color-text-muted);text-decoration: none;transition: color .3s ease;font-size: .9rem}
-
-.footer-links a:hover {color: var(--color-primary);}
-
-.footer-bottom {max-width: 1280px; margin: 0 auto; padding-top: 2rem; border-top: 1px solid var(--color-border);text-align: center;color: var(--color-text-muted);font-size: .9rem;}
-
-.footer-bottom a {color: var(--color-text-medium);text-decoration: none;}
-
-.footer-bottom a:hover {color: var(--color-primary)}
-
-
-/* === RESPONSIVE GLOBAL === */
-
-
-@media (max-width: 900px){
-  .pricing-grid{grid-template-columns:1fr;max-width:720px}
-}
-@media (max-width: 1024px){
-  .hero-content{grid-template-columns:1fr;gap:3rem}
-
-}
-@media (max-width: 768px){
-  .hero-text h1{font-size:2.25rem}
-  .section-header h2{font-size:1.75rem}
-  .footer-content{grid-template-columns:1fr}
-  .cta-container{padding:3rem 2rem}
-  .hero-cta{flex-direction:column;width:100%}
-  .btn-large{width:100%;justify-content:center}
-}
-@media (max-width: 640px){
-  .hero-section{padding:6rem 1rem 3rem;min-height:auto}
-  .hero-text h1{font-size:2rem}
-  .hero-text .subtitle{font-size:1.05rem}
-  .trust-indicators{flex-direction:column;gap:1rem;align-items:flex-start}
+/* Grande carte hero (hashing) */
+.fhero { background:var(--color-text-dark); border-radius:var(--border-radius); padding:1.75rem; display:flex; flex-direction:column; gap:1.125rem; position:relative; overflow:hidden }
+@media(min-width:1024px) { .fhero { grid-row:span 2; padding:2.25rem } }
+.fhero::before { content:''; position:absolute; bottom:-50px; right:-50px; width:180px; height:180px; background:radial-gradient(circle,rgba(5,150,105,.22) 0%,transparent 70%); pointer-events:none }
+.fhero-icon { width:48px; height:48px; background:rgba(5,150,105,.18); border:1px solid rgba(5,150,105,.32); border-radius:var(--border-radius-sm); display:flex; align-items:center; justify-content:center; color:#34d399; font-size:1.4rem }
+.fhero h3 { font-size:1.2rem; font-weight:800; color:#f8fafc; line-height:1.25; letter-spacing:-.018em }
+@media(min-width:768px) { .fhero h3 { font-size:1.35rem } }
+.fhero p { color:#94a3b8; line-height:1.65; font-size:.875rem }
+.fhero-tag { display:inline-flex; align-items:center; gap:.3rem; padding:.28rem .7rem; background:rgba(5,150,105,.18); border:1px solid rgba(5,150,105,.28); color:#34d399; border-radius:50px; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; width:fit-content }
+/* Mini terminal : visible seulement si assez large */
+.fhero-term { display:none }
+@media(min-width:560px) {
+  .fhero-term { display:block; background:#0f172a; border-radius:8px; padding:.8rem 1rem; font-family:'JetBrains Mono',monospace; font-size:.68rem; line-height:1.7; border:1px solid #1e293b }
+  .ftl { display:flex; gap:.5rem }
+  .ftp{color:#334155} .ftv{color:#34d399} .fte{color:#f87171} .ftw{color:#fbbf24}
 }
 
-/*Focus */
-*:focus-visible{outline:3px solid var(--color-primary);outline-offset:2px}
+/* Grille droite */
+.feat-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.125rem }
+@media(max-width:420px) { .feat-grid { grid-template-columns:1fr } }
 
-/* Effet CTA */
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.fc { background:var(--color-white); border:1px solid var(--color-border); border-radius:var(--border-radius); padding:1.125rem; display:flex; flex-direction:column; gap:.7rem; transition:all .22s ease; position:relative; overflow:hidden }
+.fc::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--color-primary); transform:scaleX(0); transform-origin:left; transition:transform .22s ease }
+.fc:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px) }
+.fc:hover::after { transform:scaleX(1) }
+.fc.accent { background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border-color:rgba(5,150,105,.18) }
+.fc.accent::after { transform:scaleX(1) }
+.fc.dark { background:var(--color-text-dark); border-color:transparent }
+.fc.dark h3 { color:#f8fafc }
+.fc.dark p { color:#94a3b8 }
+.fc.dark .fci { background:rgba(5,150,105,.18); border-color:rgba(5,150,105,.28); color:#34d399 }
+/* Cartes wide : cachées < 560px, span 2 cols ≥ 560px */
+.fc.wide { display:none }
+@media(min-width:560px) {
+  .fc.wide { display:flex; grid-column:span 2; flex-direction:row; align-items:center; gap:1rem }
+  .fc-bdy { flex:1 }
+  .fc-stat { text-align:right; flex-shrink:0 }
+  .fc-stat-n { font-size:1.625rem; font-weight:800; color:var(--color-primary); line-height:1; display:block }
+  .fc-stat-l { font-size:.68rem; color:var(--color-text-muted); white-space:nowrap }
+}
+.fci { width:38px; height:38px; background:var(--background-gradient); border:1px solid rgba(5,150,105,.16); border-radius:var(--border-radius-sm); display:flex; align-items:center; justify-content:center; color:var(--color-primary); font-size:1.05rem; flex-shrink:0 }
+.fc h3 { font-size:.875rem; font-weight:700; color:var(--color-text-dark); line-height:1.3 }
+.fc p  { color:var(--color-text-medium); line-height:1.55; font-size:.8rem }
 
-/* ===== UTILITAIRES ===== */
-.visually-hidden{position:absolute!important;clip:rect(1px,1px,1px,1px);padding:0;border:0;height:1px;width:1px;overflow:hidden;white-space:nowrap}
-:root{--container:max(min(92vw,1280px),320px)}
-.section-container,.nav-container,.footer-bottom,.footer-content{max-width:var(--container)}
-@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-img[loading="lazy"]{content-visibility:auto}
+/* ===================== HOW IT WORKS ===================== */
+.how { padding:4rem 1.25rem; background:var(--color-white) }
+@media(min-width:640px)  { .how { padding:5rem 1.75rem } }
+@media(min-width:1024px) { .how { padding:6rem 2rem } }
+.steps { display:flex; flex-direction:column; gap:.875rem; margin-top:2rem }
+@media(min-width:600px) { .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; margin-top:2.5rem; position:relative } }
+@media(min-width:600px) {
+  .steps::before { content:''; position:absolute; top:35px; left:calc(16.5% + 28px); right:calc(16.5% + 28px); height:2px; background:repeating-linear-gradient(90deg,var(--color-primary) 0,var(--color-primary) 6px,transparent 6px,transparent 12px); opacity:.22; pointer-events:none }
+}
+.step { display:flex; align-items:flex-start; gap:.875rem; padding:1.125rem; background:var(--color-bg-light); border:1px solid var(--color-border); border-radius:var(--border-radius); transition:all .22s ease }
+@media(min-width:600px) { .step { flex-direction:column; align-items:center; text-align:center; padding:1.75rem 1.125rem } }
+.step:hover { box-shadow:var(--shadow-md); border-color:var(--color-primary); background:var(--color-white) }
+.step-n { width:46px; height:46px; min-width:46px; background:var(--color-primary); color:var(--color-white); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.05rem; font-weight:800; box-shadow:var(--shadow-green); flex-shrink:0 }
+@media(min-width:600px) { .step-n { width:52px; height:52px; min-width:52px; margin-bottom:.25rem } }
+.step-body { flex:1 }
+@media(min-width:600px) { .step-body { flex:unset } }
+.step h3 { font-size:.9rem; font-weight:700; color:var(--color-text-dark); margin-bottom:.3rem }
+@media(min-width:600px) { .step h3 { font-size:1rem; margin-bottom:.45rem } }
+.step p { color:var(--color-text-medium); line-height:1.6; font-size:.82rem }
+
+/* ===================== SECURITY ===================== */
+.sec-section { padding:4rem 1.25rem; background:var(--color-bg-light) }
+@media(min-width:640px)  { .sec-section { padding:5rem 1.75rem } }
+@media(min-width:1024px) { .sec-section { padding:6rem 2rem } }
+.sec-inner { max-width:1280px; margin:0 auto; display:flex; flex-direction:column; gap:2.5rem }
+@media(min-width:1024px) { .sec-inner { display:grid; grid-template-columns:1fr 1fr; gap:4.5rem; align-items:center } }
+.sec-text .sh-label { margin-bottom:.875rem }
+.sec-h2 { font-size:1.45rem; font-weight:800; color:var(--color-text-dark); letter-spacing:-.02em; line-height:1.2; margin-bottom:.875rem }
+@media(min-width:768px) { .sec-h2 { font-size:2rem } }
+.sec-intro { font-size:.875rem; color:var(--color-text-medium); line-height:1.65; margin-bottom:1.5rem }
+@media(min-width:768px) { .sec-intro { font-size:.975rem } }
+.sec-pts { display:flex; flex-direction:column; gap:.875rem }
+.sp { display:flex; gap:.8rem; align-items:flex-start }
+.sp-ico { width:38px; height:38px; min-width:38px; background:var(--background-gradient); border:1px solid rgba(5,150,105,.18); border-radius:var(--border-radius-sm); display:flex; align-items:center; justify-content:center; color:var(--color-primary); font-size:.95rem }
+.sp-body b { display:block; font-size:.85rem; font-weight:700; color:var(--color-text-dark); margin-bottom:.18rem }
+.sp-body p { font-size:.78rem; color:var(--color-text-medium); line-height:1.55; margin:0 }
+/* Terminal : caché mobile, visible 768px+ */
+.terminal { display:none }
+@media(min-width:768px) {
+  .terminal { display:block; background:#0f172a; border-radius:var(--border-radius); overflow:hidden; box-shadow:0 20px 52px rgba(0,0,0,.2); border:1px solid #1e293b; position:relative }
+  .t-bar { display:flex; align-items:center; gap:.45rem; padding:.65rem 1.125rem; background:#1e293b; border-bottom:1px solid #334155 }
+  .t-dots { display:flex; gap:.28rem }
+  .t-dot { width:9px; height:9px; border-radius:50% }
+  .t-dot:nth-child(1){background:#ef4444} .t-dot:nth-child(2){background:#f59e0b} .t-dot:nth-child(3){background:#22c55e}
+  .t-title { flex:1; text-align:center; font-size:.66rem; font-weight:600; color:#64748b; font-family:'JetBrains Mono',monospace }
+  .t-body { padding:1.25rem; font-family:'JetBrains Mono',monospace; font-size:.72rem; line-height:1.8 }
+  .tl { display:flex; align-items:flex-start; gap:.6rem; margin-bottom:.18rem }
+  .tp{color:#334155;flex-shrink:0} .tc{color:#94a3b8} .tv{color:#34d399} .tw{color:#fbbf24} .te{color:#f87171} .tok{color:#34d399;font-weight:700}
+  .t-scan { position:absolute; inset:0; background:linear-gradient(to bottom,transparent,rgba(52,211,153,.04),transparent); height:40%; animation:scanline 3s linear infinite; pointer-events:none }
+  .t-chain { display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.25rem; border-top:1px solid #1e293b; gap:.4rem }
+  .tnode { width:38px; height:38px; background:rgba(5,150,105,.13); border:1px solid rgba(5,150,105,.28); border-radius:7px; display:flex; align-items:center; justify-content:center; color:var(--color-primary); font-size:.875rem; flex-shrink:0 }
+  .tarrow { flex:1; height:1px; background:repeating-linear-gradient(90deg,#334155 0,#334155 4px,transparent 4px,transparent 8px) }
+}
+
+/* ===================== PRICING ===================== */
+.pricing { padding:4rem 1.25rem; background:var(--color-white) }
+@media(min-width:640px)  { .pricing { padding:5rem 1.75rem } }
+@media(min-width:1024px) { .pricing { padding:6rem 2rem } }
+.p-grid { max-width:920px; margin:0 auto; display:flex; flex-direction:column; gap:1.5rem }
+@media(min-width:680px) { .p-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem } }
+.p-card { border:1px solid var(--color-border); border-radius:var(--border-radius); padding:1.75rem; background:var(--color-white); transition:all .22s ease; position:relative }
+.p-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg) }
+.p-card.pop { border-color:var(--color-primary); box-shadow:0 0 0 1px var(--color-primary),var(--shadow-green) }
+.p-eye { font-size:.7rem; font-weight:700; color:var(--color-primary); text-transform:uppercase; letter-spacing:.07em; margin-bottom:.4rem }
+.p-card h3 { font-size:1.25rem; font-weight:800; color:var(--color-text-dark); margin-bottom:.2rem }
+.p-tag { font-size:.8rem; color:var(--color-text-muted); margin-bottom:1rem }
+.p-price { font-weight:800; font-size:1.875rem; color:var(--color-text-dark); margin:.6rem 0 .2rem }
+.p-price small { font-size:.8rem; font-weight:500; color:var(--color-text-muted) }
+.p-feats { list-style:none; margin:1rem 0 1.5rem; display:flex; flex-direction:column; gap:.45rem }
+.p-feats li { display:flex; gap:.5rem; align-items:flex-start; color:var(--color-text-medium); font-size:.85rem; line-height:1.4 }
+.p-feats li i { color:var(--color-success); font-size:.78rem; margin-top:.22rem; flex-shrink:0 }
+.pop-badge { position:absolute; top:-13px; left:50%; transform:translateX(-50%); background:var(--color-primary); color:var(--color-white); border-radius:50px; padding:.28rem 1.1rem; font-size:.68rem; font-weight:800; white-space:nowrap; box-shadow:var(--shadow-green); letter-spacing:.04em; text-transform:uppercase }
+.p-note { font-size:.72rem; color:var(--color-text-muted); text-align:center; margin-top:.6rem; padding:.4rem; background:var(--color-bg-light); border-radius:6px }
+
+/* ===================== FAQ ===================== */
+.faq { padding:4rem 1.25rem; background:var(--color-bg-light) }
+@media(min-width:640px)  { .faq { padding:5rem 1.75rem } }
+@media(min-width:1024px) { .faq { padding:6rem 2rem } }
+.faq-list { display:flex; flex-direction:column; gap:.6rem; max-width:800px; margin:0 auto }
+.faq-item { background:var(--color-white); border:1px solid var(--color-border); border-radius:var(--border-radius); transition:all .2s ease }
+.faq-item:hover { border-color:rgba(5,150,105,.28) }
+.faq-item[open] { border-color:rgba(5,150,105,.32); box-shadow:0 2px 14px rgba(5,150,105,.08) }
+.faq-item summary { font-size:.875rem; font-weight:700; color:var(--color-text-dark); list-style:none; display:flex; justify-content:space-between; align-items:center; padding:.95rem 1.125rem; cursor:pointer; gap:.875rem }
+@media(min-width:640px) { .faq-item summary { font-size:.925rem; padding:1.1rem 1.375rem } }
+.faq-item summary::-webkit-details-marker { display:none }
+.faq-tog { width:26px; height:26px; min-width:26px; border-radius:50%; background:var(--background-gradient); border:1px solid rgba(5,150,105,.18); display:flex; align-items:center; justify-content:center; color:var(--color-primary); font-size:.78rem; transition:all .2s; font-style:normal; line-height:1 }
+.faq-item[open] .faq-tog { background:var(--color-primary); color:var(--color-white); border-color:var(--color-primary); transform:rotate(45deg) }
+.faq-ans { padding:0 1.125rem .875rem; color:var(--color-text-medium); line-height:1.7; font-size:.85rem }
+@media(min-width:640px) { .faq-ans { padding:0 1.375rem 1.1rem; font-size:.9rem } }
+
+/* ===================== CTA ===================== */
+.cta-sec { padding:4rem 1.25rem; background:var(--color-white) }
+@media(min-width:640px)  { .cta-sec { padding:5rem 1.75rem } }
+@media(min-width:1024px) { .cta-sec { padding:6rem 2rem } }
+.cta-box { max-width:800px; margin:0 auto; text-align:center; padding:2.5rem 1.5rem; background:var(--color-white); border-radius:var(--border-radius); border:1px solid var(--color-border); box-shadow:var(--shadow-xl); position:relative; overflow:hidden }
+@media(min-width:640px) { .cta-box { padding:3.5rem 2.5rem } }
+.cta-box::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--color-primary),#10b981,var(--color-primary)); background-size:200%; animation:shimmer 3s linear infinite }
+.cta-box h2 { font-size:1.5rem; font-weight:800; color:var(--color-text-dark); margin-bottom:.875rem; letter-spacing:-.02em; line-height:1.2 }
+@media(min-width:640px)  { .cta-box h2 { font-size:1.875rem } }
+@media(min-width:1024px) { .cta-box h2 { font-size:2.25rem } }
+.cta-box p { font-size:.875rem; color:var(--color-text-medium); margin-bottom:2rem; line-height:1.65 }
+@media(min-width:640px) { .cta-box p { font-size:.975rem } }
+.cta-btns { display:flex; flex-direction:column; gap:.75rem; align-items:center }
+@media(min-width:480px) { .cta-btns { flex-direction:row; justify-content:center; flex-wrap:wrap; gap:.875rem } }
+.cta-note { margin-top:1.25rem; font-size:.75rem; color:var(--color-text-muted); display:flex; align-items:center; justify-content:center; gap:.3rem; flex-wrap:wrap }
+
+/* ===================== FOOTER ===================== */
+.footer { background:var(--color-bg-light); padding:2.5rem 1.25rem 1.25rem; border-top:1px solid var(--color-border) }
+@media(min-width:640px) { .footer { padding:3rem 1.75rem 1.5rem } }
+.foot-grid { max-width:1280px; margin:0 auto 2rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem }
+@media(min-width:768px) { .foot-grid { grid-template-columns:2fr 1fr 1fr 1fr; gap:2.5rem } }
+.foot-brand { grid-column:span 2 }
+@media(min-width:768px) { .foot-brand { grid-column:auto } }
+.foot-brand p { line-height:1.65; color:var(--color-text-medium); margin-top:.625rem; font-size:.85rem }
+.foot-col h4 { color:var(--color-text-dark); font-size:.78rem; margin-bottom:.875rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em }
+.foot-col ul { list-style:none }
+.foot-col li { margin-bottom:.4rem }
+.foot-col a { color:var(--color-text-muted); text-decoration:none; transition:color .18s; font-size:.825rem }
+.foot-col a:hover { color:var(--color-primary) }
+.foot-bottom { max-width:1280px; margin:0 auto; padding-top:1.5rem; border-top:1px solid var(--color-border); text-align:center; color:var(--color-text-muted); font-size:.8rem }
+.foot-bottom a { color:var(--color-text-medium); text-decoration:none }
+.foot-bottom a:hover { color:var(--color-primary) }
+
+/* FOCUS */
+*:focus-visible { outline:3px solid var(--color-primary); outline-offset:2px }
+.sr-only { position:absolute!important; clip:rect(1px,1px,1px,1px); padding:0; border:0; height:1px; width:1px; overflow:hidden; white-space:nowrap }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important } }
 </style>
-{# ===================== HERO SECTION ===================== #}
-<section class="hero-section" role="banner" id="main-content">
-  <div class="hero-content">
+
+{# ======================== HERO ======================== #}
+<section class="hero" role="banner" id="main-content">
+  <div class="hero-inner">
     <div class="hero-text">
-      <h1>
+      <div class="hero-eyebrow" aria-hidden="true">
+        <i class="fas fa-shield-halved"></i> AES-256 · Zero-Knowledge · RGPD
+      </div>
+      <h1 class="hero-h1">
         {{ 'landing.hero.title_before'|trans }}
-        <span class="highlight">{{ 'landing.hero.title_highlight'|trans }}</span>
+        <span class="hl">{{ 'landing.hero.title_highlight'|trans }}</span>
       </h1>
-
-      <p class="subtitle">{{ 'landing.hero.subtitle'|trans }}</p>
-
+      <p class="hero-sub">{{ 'landing.hero.subtitle'|trans }}</p>
       <div class="hero-cta">
-        
-         <a href="{{ path('show_register') }}"
-          class="btn btn-primary btn-large"
-          aria-label="{{ 'landing.hero.cta_start_aria'|trans }}"
-        >
+        <a href="{{ path('show_register') }}" class="btn btn-primary btn-lg btn-w" aria-label="{{ 'landing.hero.cta_start_aria'|trans }}">
           <i class="fas fa-rocket" aria-hidden="true"></i> {{ 'landing.hero.cta_start'|trans }}
         </a>
-        <a href="#features" class="btn btn-outline btn-large">{{ 'landing.hero.cta_discover'|trans }}</a>
+        <a href="#features" class="btn btn-outline btn-lg btn-w">{{ 'landing.hero.cta_discover'|trans }}</a>
       </div>
-
-      <div class="trust-indicators" aria-label="{{ 'landing.hero.trust_aria'|trans }}">
-        <div class="trust-item">
-          <i class="fas fa-shield-check" aria-hidden="true"></i>
-          <span>{{ 'landing.hero.trust.aes'|trans }}</span>
-        </div>
-        <div class="trust-item">
-          <i class="fas fa-lock" aria-hidden="true"></i>
-          <span>{{ 'landing.hero.trust.zeroknowledge'|trans }}</span>
-        </div>
-        <div class="trust-item">
-          <i class="fas fa-code-branch" aria-hidden="true"></i>
-          <span>{{ 'landing.hero.trust.opensource'|trans }}</span>
-        </div>
+      <p class="hero-hint"><i class="fas fa-circle-check"></i> Essai gratuit 14 jours — sans carte bancaire</p>
+      <div class="trust" aria-label="{{ 'landing.hero.trust_aria'|trans }}">
+        <div class="trust-item"><i class="fas fa-shield-check"></i><span>{{ 'landing.hero.trust.aes'|trans }}</span></div>
+        <div class="trust-item"><i class="fas fa-lock"></i><span>{{ 'landing.hero.trust.zeroknowledge'|trans }}</span></div>
+        <div class="trust-item"><i class="fas fa-fingerprint"></i><span>{{ 'landing.hero.trust.hashed'|trans }}</span></div>
       </div>
     </div>
 
-    <div class="hero-visual" aria-hidden="true">
-      <div class="hero-mockup">
-        <div class="mockup-window">
-          <div class="mockup-header">
-            <div class="mockup-dot"></div>
-            <div class="mockup-dot"></div>
-            <div class="mockup-dot"></div>
+    <div class="hero-vis" aria-hidden="true">
+      <div class="sec-pill"><i class="fas fa-shield-check"></i> Coffre-fort AES-256</div>
+      <div class="vault">
+        <div class="vault-bar">
+          <div class="vdots"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div>
+          <span class="vault-title">MyKeyNest — Vault</span>
+        </div>
+        <div class="vault-search">
+          <i class="fas fa-magnifying-glass"></i>
+          <input type="text" placeholder="Rechercher un accès…" tabindex="-1" readonly>
+        </div>
+        <div class="cred-list">
+          <div class="cred">
+            <div class="cred-logo g"><i class="fab fa-google"></i></div>
+            <div class="cred-body"><b>{{ 'landing.hero.mock.gmail'|trans }}</b><span>email@example.com</span></div>
+            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
+            <i class="fas fa-lock cred-lock"></i>
           </div>
-          <div class="mockup-content">
-            <div class="credential-item">
-              <div class="credential-icon"><i class="fab fa-google" aria-hidden="true"></i></div>
-              <div class="credential-info">
-                <h4>{{ 'landing.hero.mock.gmail'|trans }}</h4>
-                <p>email@example.com</p>
-              </div>
-            </div>
-            <div class="credential-item">
-              <div class="credential-icon"><i class="fab fa-facebook" aria-hidden="true"></i></div>
-              <div class="credential-info">
-                <h4>{{ 'landing.hero.mock.facebook'|trans }}</h4>
-                <p>••••••••</p>
-              </div>
-            </div>
-            <div class="credential-item">
-              <div class="credential-icon"><i class="fab fa-github" aria-hidden="true"></i></div>
-              <div class="credential-info">
-                <h4>{{ 'landing.hero.mock.github'|trans }}</h4>
-                <p>developer@mail.com</p>
-              </div>
-            </div>
+          <div class="cred">
+            <div class="cred-logo f"><i class="fab fa-facebook"></i></div>
+            <div class="cred-body"><b>{{ 'landing.hero.mock.facebook'|trans }}</b><span>••••••••••••</span></div>
+            <div class="sdots"><div class="sd mid"></div><div class="sd mid"></div><div class="sd mid"></div><div class="sd"></div></div>
+            <i class="fas fa-lock cred-lock"></i>
           </div>
+          <div class="cred">
+            <div class="cred-logo gh"><i class="fab fa-github"></i></div>
+            <div class="cred-body"><b>{{ 'landing.hero.mock.github'|trans }}</b><span>developer@mail.com</span></div>
+            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
+            <i class="fas fa-lock cred-lock"></i>
+          </div>
+          <div class="cred cred-extra">
+            <div class="cred-logo s"><i class="fab fa-stripe-s"></i></div>
+            <div class="cred-body"><b>Stripe Dashboard</b><span>admin@company.com</span></div>
+            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
+            <i class="fas fa-lock cred-lock"></i>
+          </div>
+          <div class="cred cred-extra">
+            <div class="cred-logo a"><i class="fab fa-aws"></i></div>
+            <div class="cred-body"><b>AWS Console</b><span>ops@company.com</span></div>
+            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
+            <i class="fas fa-lock cred-lock"></i>
+          </div>
+        </div>
+        <div class="hash-badge">
+          <span style="color:#64748b;">HASH</span>
+          <span>0x8f2a…c3e1</span>
+          <span class="hash-ok"><i class="fas fa-circle-check"></i> OK</span>
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
+{# STRIP #}
+<div class="strip" aria-hidden="true">
+  <div class="strip-inner">
+    <div class="s-item"><i class="fas fa-certificate"></i> AES-256</div>
+    <div class="s-div"></div>
+    <div class="s-item"><i class="fas fa-fingerprint"></i> Installation Hashée</div>
+    <div class="s-div"></div>
+    <div class="s-item"><i class="fas fa-euro-sign"></i> Données en Europe</div>
+    <div class="s-div"></div>
+    <div class="s-item"><i class="fas fa-user-secret"></i> Zero-Knowledge</div>
+    <div class="s-div"></div>
+    <div class="s-item"><i class="fas fa-check-double"></i> RGPD</div>
+  </div>
+</div>
 
-{# ===================== FEATURES SECTION ===================== #}
-<section class="features-section" id="features">
-  <div class="section-container">
-    <div class="section-header">
-      <span class="section-label">{{ 'landing.features.label'|trans }}</span>
+{# ======================== FEATURES ======================== #}
+<section class="feat-section" id="features">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-bolt"></i> {{ 'landing.features.label'|trans }}</span>
       <h2>{{ 'landing.features.title'|trans }}</h2>
       <p>{{ 'landing.features.subtitle'|trans }}</p>
     </div>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
-        <h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.e2e_text'|trans }}</p>
+    <div class="feat-layout">
+      <div class="fhero">
+        <div class="fhero-icon"><i class="fas fa-fingerprint"></i></div>
+        <span class="fhero-tag"><i class="fas fa-star"></i> {{ 'landing.features.cards.hashed_tag'|trans }}</span>
+        <h3>{{ 'landing.features.cards.hashed_title'|trans }}</h3>
+        <p>{{ 'landing.features.cards.hashed_text'|trans }}</p>
+        <div class="fhero-term" aria-hidden="true">
+          <div class="ftl"><span class="ftp">›</span><span class="ftv">HASH_STATUS : SIGNED & VERIFIED ✓</span></div>
+          <div class="ftl"><span class="ftp">›</span><span class="fte">attack → HASH_MISMATCH — denied</span></div>
+          <div class="ftl"><span class="ftp"> </span><span class="ftw">VAULT : LOCKED</span></div>
+        </div>
       </div>
-
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i></div>
-        <h3>{{ 'landing.features.cards.generator_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.generator_text'|trans }}</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-mobile-screen" aria-hidden="true"></i></div>
-        <h3>{{ 'landing.features.cards.sync_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.sync_text'|trans }}</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-share-nodes" aria-hidden="true"></i></div>
-        <h3>{{ 'landing.features.cards.share_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.share_text'|trans }}</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-shield-heart" aria-hidden="true"></i></div>
-        <h3>{{ 'landing.features.cards.audit_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.audit_text'|trans }}</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-bolt" aria-hidden="true"></i></div>
-        <h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.autofill_text'|trans }}</p>
+      <div class="feat-grid">
+        <div class="fc accent">
+          <div class="fci"><i class="fas fa-shield-halved"></i></div>
+          <div><h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3><p>{{ 'landing.features.cards.e2e_text'|trans }}</p></div>
+        </div>
+        <div class="fc dark">
+          <div class="fci"><i class="fas fa-mobile-screen-button"></i></div>
+          <div><h3>{{ 'landing.features.cards.twofactor_title'|trans }}</h3><p>{{ 'landing.features.cards.twofactor_text'|trans }}</p></div>
+        </div>
+        <div class="fc">
+          <div class="fci"><i class="fas fa-wand-magic-sparkles"></i></div>
+          <div><h3>{{ 'landing.features.cards.generator_title'|trans }}</h3><p>{{ 'landing.features.cards.generator_text'|trans }}</p></div>
+        </div>
+        <div class="fc">
+          <div class="fci"><i class="fas fa-shield-heart"></i></div>
+          <div><h3>{{ 'landing.features.cards.audit_title'|trans }}</h3><p>{{ 'landing.features.cards.audit_text'|trans }}</p></div>
+        </div>
+        <div class="fc wide">
+          <div class="fci"><i class="fas fa-bolt"></i></div>
+          <div class="fc-bdy"><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
+          <div class="fc-stat"><span class="fc-stat-n">2s</span><span class="fc-stat-l">connexion</span></div>
+        </div>
+        <div class="fc wide accent">
+          <div class="fci"><i class="fas fa-share-nodes"></i></div>
+          <div class="fc-bdy"><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
+          <div class="fc-stat"><span class="fc-stat-n">E2E</span><span class="fc-stat-l">chiffré</span></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-
-{# ===================== HOW IT WORKS SECTION ===================== #}
-<section class="how-it-works-section" id="how-it-works">
-  <div class="section-container">
-    <div class="section-header">
-      <span class="section-label">{{ 'landing.how.label'|trans }}</span>
+{# ======================== HOW IT WORKS ======================== #}
+<section class="how" id="how-it-works">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-map"></i> {{ 'landing.how.label'|trans }}</span>
       <h2>{{ 'landing.how.title'|trans }}</h2>
       <p>{{ 'landing.how.subtitle'|trans }}</p>
     </div>
-
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-number">1</div>
-        <h3>{{ 'landing.how.steps.s1_title'|trans }}</h3>
-        <p>{{ 'landing.how.steps.s1_text'|trans }}</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s1_title'|trans }}</h3><p>{{ 'landing.how.steps.s1_text'|trans }}</p></div>
       </div>
-
-      <div class="step-card">
-        <div class="step-number">2</div>
-        <h3>{{ 'landing.how.steps.s2_title'|trans }}</h3>
-        <p>{{ 'landing.how.steps.s2_text'|trans }}</p>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s2_title'|trans }}</h3><p>{{ 'landing.how.steps.s2_text'|trans }}</p></div>
       </div>
-
-      <div class="step-card">
-        <div class="step-number">3</div>
-        <h3>{{ 'landing.how.steps.s3_title'|trans }}</h3>
-        <p>{{ 'landing.how.steps.s3_text'|trans }}</p>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s3_title'|trans }}</h3><p>{{ 'landing.how.steps.s3_text'|trans }}</p></div>
       </div>
     </div>
   </div>
 </section>
 
+{# ======================== SECURITY ======================== #}
+<section class="sec-section" id="security" aria-labelledby="sec-h2">
+  <div class="wrap">
+    <div class="sec-inner">
+      <div class="sec-text">
+        <span class="sh-label"><i class="fas fa-fingerprint"></i> {{ 'landing.security.label'|trans }}</span>
+        <h2 class="sec-h2" id="sec-h2">{{ 'landing.security.title'|trans }}</h2>
+        <p class="sec-intro">{{ 'landing.security.intro'|trans }}</p>
+        <div class="sec-pts">
+          <div class="sp">
+            <div class="sp-ico"><i class="fas fa-fingerprint"></i></div>
+            <div class="sp-body"><b>{{ 'landing.security.points.p1_title'|trans }}</b><p>{{ 'landing.security.points.p1_text'|trans }}</p></div>
+          </div>
+          <div class="sp">
+            <div class="sp-ico"><i class="fas fa-link-slash"></i></div>
+            <div class="sp-body"><b>{{ 'landing.security.points.p2_title'|trans }}</b><p>{{ 'landing.security.points.p2_text'|trans }}</p></div>
+          </div>
+          <div class="sp">
+            <div class="sp-ico"><i class="fas fa-database"></i></div>
+            <div class="sp-body"><b>{{ 'landing.security.points.p3_title'|trans }}</b><p>{{ 'landing.security.points.p3_text'|trans }}</p></div>
+          </div>
+          <div class="sp">
+            <div class="sp-ico"><i class="fas fa-file-shield"></i></div>
+            <div class="sp-body"><b>{{ 'landing.security.points.p4_title'|trans }}</b><p>{{ 'landing.security.points.p4_text'|trans }}</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="terminal" aria-hidden="true">
+        <div class="t-bar">
+          <div class="t-dots"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>
+          <span class="t-title">mykeynest — registre de confiance</span>
+        </div>
+        <div class="t-body">
+          <div class="tl"><span class="tp">›</span><span class="tc">verify_install --id 0x8f2a</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">ID_INSTALL&nbsp; : 0x8f2a...c3e1</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">HASH_STATUS : SIGNED & VERIFIED ✓</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">INTEGRITY&nbsp;&nbsp; : PASS</span></div>
+          <br>
+          <div class="tl"><span class="tp">›</span><span class="tc">simulate_attack --replay-hash</span></div>
+          <div class="tl"><span class="tp"> </span><span class="te">ERROR : HASH_MISMATCH — Access denied</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tw">ALERT : Unauthorized attempt logged</span></div>
+          <div class="tl"><span class="tp"> </span><span class="te">VAULT : LOCKED — Session terminated</span></div>
+          <br>
+          <div class="tl"><span class="tp">›</span><span class="tc">status</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tok">✓ Vault secure. Zero data exposed.</span></div>
+        </div>
+        <div class="t-chain">
+          <div class="tnode"><i class="fas fa-puzzle-piece"></i></div>
+          <div class="tarrow"></div>
+          <div class="tnode"><i class="fas fa-file-signature"></i></div>
+          <div class="tarrow"></div>
+          <div class="tnode"><i class="fas fa-lock"></i></div>
+          <div class="tarrow"></div>
+          <div class="tnode"><i class="fas fa-shield-check"></i></div>
+        </div>
+        <div class="t-scan"></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-{# ===================== PRICING SECTION ===================== #}
-<section class="pricing-section" id="pricing" aria-label="{{ 'landing.pricing.aria'|trans }}">
-  <div class="section-container">
-    <div class="section-header">
-      <span class="section-label">{{ 'landing.pricing.label'|trans }}</span>
+{# ======================== PRICING ======================== #}
+<section class="pricing" id="pricing" aria-label="{{ 'landing.pricing.aria'|trans }}">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-tag"></i> {{ 'landing.pricing.label'|trans }}</span>
       <h2>{{ 'landing.pricing.title'|trans }}</h2>
       <p>{{ 'landing.pricing.subtitle'|trans }}</p>
     </div>
-
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <div class="badge">{{ 'landing.pricing.plan.free_badge'|trans }}</div>
+    <div class="p-grid">
+      <div class="p-card">
+        <p class="p-eye">{{ 'landing.pricing.plan.free_badge'|trans }}</p>
         <h3>{{ 'landing.pricing.plan.basic_name'|trans }}</h3>
-        <p class="pricing-price">0€ <span class="stat-label">{{ 'landing.pricing.plan.per_month'|trans }}</span></p>
-        <ul class="pricing-features">
-          <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_1'|trans }}</li>
-<li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_2'|trans }}</li>
-<li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_3'|trans }}</li>
-<li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.basic_4'|trans }}</li>
-</ul>
-<a href="{{ path('show_register') }}" class="btn btn-outline" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">
-{{ 'landing.pricing.plan.basic_try'|trans }}
-</a>
-</div>
-  <div class="pricing-card popular" aria-label="{{ 'landing.pricing.plan.pro_reco_aria'|trans }}">
-    <div class="badge">{{ 'landing.pricing.plan.popular_badge'|trans }}</div>
-    <h3>{{ 'landing.pricing.plan.pro_name'|trans }}</h3>
-    <p class="pricing-price">2,99€ <span class="stat-label">{{ 'landing.pricing.plan.per_month'|trans }}</span></p>
-    <ul class="pricing-features">
-      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_1'|trans }}</li>
-      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_2'|trans }}</li>
-      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_3'|trans }}</li>
-      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_4'|trans }}</li>
-      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_5'|trans }}</li>
-      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_6'|trans }}</li>
-      <li><i class="fas fa-check" aria-hidden="true"></i> {{ 'landing.pricing.plan.features.pro_7'|trans }}</li>
-    </ul>
-    <a href="{{ path('show_register') }}" class="btn btn-primary" aria-label="{{ 'landing.pricing.plan.pro_aria'|trans }}">
-      {{ 'landing.pricing.plan.pro_choose'|trans }}
-    </a>
-  </div>
-</div>
+        <p class="p-tag">{{ 'landing.pricing.plan.basic_tagline'|trans }}</p>
+        <p class="p-price">0€ <small>{{ 'landing.pricing.plan.per_month'|trans }}</small></p>
+        <ul class="p-feats">
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_1'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_2'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_3'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_4'|trans }}</li>
+        </ul>
+        <a href="{{ path('show_register') }}" class="btn btn-outline" style="width:100%" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">{{ 'landing.pricing.plan.basic_try'|trans }}</a>
+      </div>
+      <div class="p-card pop" aria-label="{{ 'landing.pricing.plan.pro_reco_aria'|trans }}">
+        <div class="pop-badge">{{ 'landing.pricing.plan.popular_badge'|trans }}</div>
+        <p class="p-eye">{{ 'landing.pricing.plan.pro_name'|trans }}</p>
+        <h3>Plan Pro</h3>
+        <p class="p-tag">{{ 'landing.pricing.plan.pro_tagline'|trans }}</p>
+        <p class="p-price">2,99€ <small>{{ 'landing.pricing.plan.per_month'|trans }}</small></p>
+        <ul class="p-feats">
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_1'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_2'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_3'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_4'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_5'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_6'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_7'|trans }}</li>
+          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_8'|trans }}</li>
+        </ul>
+        <a href="{{ path('show_register') }}" class="btn btn-primary" style="width:100%" aria-label="{{ 'landing.pricing.plan.pro_aria'|trans }}">{{ 'landing.pricing.plan.pro_choose'|trans }}</a>
+        <p class="p-note"><i class="fas fa-tag"></i> {{ 'landing.pricing.plan.pro_annual'|trans }}</p>
+      </div>
+    </div>
   </div>
 </section>
-{# ===================== FAQ SECTION ===================== #}
-<section class="faq-section">
-  <div class="section-container">
-    <div class="section-header">
-      <span class="section-label">{{ 'landing.faq.label'|trans }}</span>
+
+{# ======================== FAQ ======================== #}
+<section class="faq">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-circle-question"></i> {{ 'landing.faq.label'|trans }}</span>
       <h2>{{ 'landing.faq.title'|trans }}</h2>
       <p>{{ 'landing.faq.subtitle'|trans }}</p>
     </div>
-<div class="faq-grid">
-  <details class="faq-item">
-    <summary>{{ 'landing.faq.items.q1'|trans }}</summary>
-    <p>{{ 'landing.faq.items.a1'|trans }}</p>
-  </details>
-
-  <details class="faq-item">
-    <summary>{{ 'landing.faq.items.q2'|trans }}</summary>
-    <p>{{ 'landing.faq.items.a2'|trans }}</p>
-  </details>
-
-  <details class="faq-item">
-    <summary>{{ 'landing.faq.items.q3'|trans }}</summary>
-    <p>{{ 'landing.faq.items.a3'|trans }}</p>
-  </details>
-
-  <details class="faq-item">
-    <summary>{{ 'landing.faq.items.q4'|trans }}</summary>
-    <p>{{ 'landing.faq.items.a4'|trans }}</p>
-  </details>
-
-  <details class="faq-item">
-    <summary>{{ 'landing.faq.items.q5'|trans }}</summary>
-    <p>{{ 'landing.faq.items.a5'|trans }}</p>
-  </details>
-
-  <details class="faq-item">
-    <summary>{{ 'landing.faq.items.q6'|trans }}</summary>
-    <p>{{ 'landing.faq.items.a6'|trans }}</p>
-  </details>
-</div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q1'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a1'|trans }}</div></details>
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q2'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a2'|trans }}</div></details>
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q3'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a3'|trans }}</div></details>
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q4'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a4'|trans }}</div></details>
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q5'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a5'|trans }}</div></details>
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q6'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a6'|trans }}</div></details>
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q7'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a7'|trans }}</div></details>
+      <details class="faq-item"><summary>{{ 'landing.faq.items.q8'|trans }} <i class="faq-tog">+</i></summary><div class="faq-ans">{{ 'landing.faq.items.a8'|trans }}</div></details>
+    </div>
   </div>
 </section>
+
+{# ======================== CONTACT ======================== #}
 <div class="contact-page" id="contact">
-  <!-- Contact Content -->
   <div class="contact-container">
-  <!-- Left Side - Info -->
     <div class="contact-info">
       <h1>{{ 'landing.contact.title'|trans }}</h1>
-      <p class="subtitle">
-        {{ 'landing.contact.subtitle'|trans }}
-      </p>
-
+      <p class="subtitle">{{ 'landing.contact.subtitle'|trans }}</p>
       <div class="contact-methods">
         <div class="contact-method">
-          <div class="contact-method-icon">
-            <i class="fas fa-envelope"></i>
-          </div>
+          <div class="contact-method-icon"><i class="fas fa-envelope"></i></div>
           <div class="contact-method-content">
             <h3>{{ 'landing.contact.info.email_title'|trans }}</h3>
-            <p>
-              <a href="mailto:contact@key-nest.com">contact@key-nest.com</a>
-            </p>
+            <p><a href="mailto:contact@key-nest.com">contact@key-nest.com</a></p>
           </div>
         </div>
-
         <div class="contact-method">
-          <div class="contact-method-icon">
-            <i class="fas fa-headset"></i>
-          </div>
+          <div class="contact-method-icon"><i class="fas fa-headset"></i></div>
           <div class="contact-method-content">
             <h3>{{ 'landing.contact.info.support_title'|trans }}</h3>
-            <p>
-              {{ 'landing.contact.info.support_text'|trans }}<br>
-              {{ 'landing.contact.info.support_time'|trans|raw }}
-            </p>
+            <p>{{ 'landing.contact.info.support_text'|trans }}<br>{{ 'landing.contact.info.support_time'|trans|raw }}</p>
           </div>
         </div>
-
         <div class="contact-method">
-          <div class="contact-method-icon">
-            <i class="fas fa-clock"></i>
-          </div>
+          <div class="contact-method-icon"><i class="fas fa-clock"></i></div>
           <div class="contact-method-content">
             <h3>{{ 'landing.contact.info.hours_title'|trans }}</h3>
             <p>{{ 'landing.contact.info.hours_text'|trans|raw }}</p>
@@ -491,153 +636,92 @@ img[loading="lazy"]{content-visibility:auto}
         </div>
       </div>
     </div>
-{# Section contact existante #}
-{% include "auth/contact/contact.html.twig" %}
-
+    {% include "auth/contact/contact.html.twig" %}
   </div>
 </div>
-{# ===================== CTA SECTION ===================== #}
-<section class="cta-section">
-  <div class="cta-container">
-    <h2>{{ 'landing.cta.title'|trans }}</h2>
-    <p>{{ 'landing.cta.subtitle'|trans }}</p>
-    <div class="cta-buttons">
-      <a href="{{ path('show_register') }}" class="btn btn-primary btn-large">
-        <i class="fas fa-rocket" aria-hidden="true"></i> {{ 'landing.cta.start'|trans }}
-      </a>
-      <a href="{{ path('show_login') }}" class="btn btn-outline btn-large">
-        {{ 'landing.cta.login'|trans }}
-      </a>
+
+{# ======================== CTA ======================== #}
+<section class="cta-sec">
+  <div class="wrap">
+    <div class="cta-box">
+      <h2>{{ 'landing.cta.title'|trans }}</h2>
+      <p>{{ 'landing.cta.subtitle'|trans }}</p>
+      <div class="cta-btns">
+        <a href="{{ path('show_register') }}" class="btn btn-primary btn-lg btn-w">
+          <i class="fas fa-rocket"></i> {{ 'landing.cta.start'|trans }}
+        </a>
+        <a href="{{ path('show_login') }}" class="btn btn-outline btn-lg btn-w">{{ 'landing.cta.login'|trans }}</a>
+      </div>
+      <p class="cta-note"><i class="fas fa-circle-check"></i> {{ 'landing.cta.note'|trans }}</p>
     </div>
   </div>
 </section>
-{# ===================== FOOTER ===================== #}
+
+{# ======================== FOOTER ======================== #}
 <footer class="footer" role="contentinfo">
-  <div class="footer-content">
-    <div class="footer-brand">
+  <div class="foot-grid">
+    <div class="foot-brand">
       {% include 'components/parts/logo.html.twig' %}
       <p>{{ 'landing.footer.brand_text'|trans }}</p>
     </div>
-<div class="footer-links">
-  <h4>{{ 'landing.footer.product'|trans }}</h4>
-  <ul>
-    <li><a href="#features">{{ 'landing.footer.links.features'|trans }}</a></li>
-    <li><a href="#pricing">{{ 'landing.footer.links.pricing'|trans }}</a></li>
-    <li><a href="#how-it-works">{{ 'landing.footer.links.security'|trans }}</a></li>
-    <li><a href="#">{{ 'landing.footer.links.extension'|trans }}</a></li>
-  </ul>
-</div>
-
-<div class="footer-links">
-  <h4>{{ 'landing.footer.company'|trans }}</h4>
-  <ul>
-    {# Solution PME (page pilier) #}
-    <li>
-      <a href="{{ path('business_solution') }}">
-        {{ 'landing.footer.links.cyber_pme_solution'|trans }}
-      </a>
-    </li>
-
-    {# Comparatif entreprise #}
-    <li>
-      <a href="{{ path('business_comparatif') }}">
-        {{ 'landing.footer.links.password_manager_entreprise_comparatif'|trans }}
-      </a>
-    </li>
-
-    {# Audit PME #}
-    <li>
-      <a href="{{ path('business_audit') }}">
-        {{ 'landing.footer.links.audit_cyber_pme'|trans }}
-      </a>
-    </li>
-
-    {# Blog (ok comme ça) #}
-    <li>
-      <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
-         hreflang="{{ app.request.locale }}">
-        {{ 'landing.footer.links.blog'|trans }}
-      </a>
-    </li>
-  </ul>
-</div>
-
-<div class="footer-links">
-  <h4>{{ 'landing.footer.resources'|trans }}</h4>
-  <ul>
-    <li><a href="{{path('app_help_center')}}">{{ 'landing.footer.links.help_center'|trans }}</a></li>
-    <li><a href="/help/center/demarrer">{{ 'landing.footer.links.documentation'|trans }}</a></li>
-    <li><a href="/help/center/partage">{{ 'landing.footer.links.guides'|trans }}</a></li>
-    <li><a href="{{path('app_public_generator')}}">{{ 'landing.footer.links.generator'|trans }}</a></li>
-  </ul>
-</div>
+    <div class="foot-col">
+      <h4>{{ 'landing.footer.product'|trans }}</h4>
+      <ul>
+        <li><a href="#features">{{ 'landing.footer.links.features'|trans }}</a></li>
+        <li><a href="#pricing">{{ 'landing.footer.links.pricing'|trans }}</a></li>
+        <li><a href="#security">{{ 'landing.footer.links.security'|trans }}</a></li>
+        <li><a href="#">{{ 'landing.footer.links.extension'|trans }}</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>{{ 'landing.footer.company'|trans }}</h4>
+      <ul>
+        <li><a href="{{ path('business_solution') }}">{{ 'landing.footer.links.cyber_pme_solution'|trans }}</a></li>
+        <li><a href="{{ path('business_comparatif') }}">{{ 'landing.footer.links.password_manager_entreprise_comparatif'|trans }}</a></li>
+        <li><a href="{{ path('business_audit') }}">{{ 'landing.footer.links.audit_cyber_pme'|trans }}</a></li>
+        <li><a href="{{ path('blog_index', { _locale: app.request.locale }) }}" hreflang="{{ app.request.locale }}">{{ 'landing.footer.links.blog'|trans }}</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>{{ 'landing.footer.resources'|trans }}</h4>
+      <ul>
+        <li><a href="{{ path('app_help_center') }}">{{ 'landing.footer.links.help_center'|trans }}</a></li>
+        <li><a href="/help/center/demarrer">{{ 'landing.footer.links.documentation'|trans }}</a></li>
+        <li><a href="/help/center/partage">{{ 'landing.footer.links.guides'|trans }}</a></li>
+        <li><a href="{{ path('app_public_generator') }}">{{ 'landing.footer.links.generator'|trans }}</a></li>
+      </ul>
+    </div>
   </div>
-  <div class="footer-bottom">
-    <p>
-      &copy; {{ "now"|date("Y") }} MykeyNest. {{ 'landing.footer.links.all_rights'|trans }} |
-<a href="{{ path('legal_cgu') }}">
-  {{ 'landing.footer.links.privacy'|trans }}
-</a>
- |
-<a href="{{ path('legal_cgv') }}">
-  {{ 'landing.footer.links.terms'|trans }}
-</a>
-
+  <div class="foot-bottom">
+    <p>&copy; {{ "now"|date("Y") }} MykeyNest. {{ 'landing.footer.links.all_rights'|trans }} |
+      <a href="{{ path('legal_cgu') }}">{{ 'landing.footer.links.privacy'|trans }}</a> |
+      <a href="{{ path('legal_cgv') }}">{{ 'landing.footer.links.terms'|trans }}</a>
     </p>
   </div>
 </footer>
-{# ===================== SCRIPTS ===================== #}
+
+{# SCRIPTS #}
 <script defer>
-/* Lazy loading fallback pour images avec data-src */
 if('loading' in HTMLImageElement.prototype===false && 'IntersectionObserver' in window){
-  const imgIO = new IntersectionObserver(es=>{
-    es.forEach(entry=>{
-      if(entry.isIntersecting){
-        const img=entry.target;
-        if(img.dataset.src){ img.src=img.dataset.src; img.classList.add('loaded'); imgIO.unobserve(img); }
-      }
-    });
-  });
-  document.querySelectorAll('img[data-src]').forEach(img=>imgIO.observe(img));
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const img=e.target;if(img.dataset.src){img.src=img.dataset.src;img.classList.add('loaded');io.unobserve(img);}}}));
+  document.querySelectorAll('img[data-src]').forEach(img=>io.observe(img));
 }
+document.querySelectorAll('.faq-item').forEach(el=>{
+  el.addEventListener('toggle',()=>{const t=el.querySelector('.faq-tog');if(t)t.textContent=el.open?'−':'+';});
+});
 </script>
-{# ===================== JSON-LD FAQ (SEO) TRADUIT ===================== #}
+
+{# JSON-LD FAQ #}
 <script type="application/ld+json">
-{
-  "@context":"https://schema.org",
-  "@type":"FAQPage",
-  "mainEntity":[
-    {
-      "@type":"Question",
-      "name":"{{ 'landing.faq.items.q1'|trans|e('js') }}",
-      "acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a1'|trans|e('js') }}"}
-    },
-    {
-      "@type":"Question",
-      "name":"{{ 'landing.faq.items.q2'|trans|e('js') }}",
-      "acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a2'|trans|e('js') }}"}
-    },
-    {
-      "@type":"Question",
-      "name":"{{ 'landing.faq.items.q3'|trans|e('js') }}",
-      "acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a3'|trans|e('js') }}"}
-    },
-    {
-      "@type":"Question",
-      "name":"{{ 'landing.faq.items.q4'|trans|e('js') }}",
-      "acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a4'|trans|e('js') }}"}
-    },
-    {
-      "@type":"Question",
-      "name":"{{ 'landing.faq.items.q5'|trans|e('js') }}",
-      "acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a5'|trans|e('js') }}"}
-    },
-    {
-      "@type":"Question",
-      "name":"{{ 'landing.faq.items.q6'|trans|e('js') }}",
-      "acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a6'|trans|e('js') }}"}
-    }
-  ]
-}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"{{ 'landing.faq.items.q1'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a1'|trans|e('js') }}"}},
+  {"@type":"Question","name":"{{ 'landing.faq.items.q2'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a2'|trans|e('js') }}"}},
+  {"@type":"Question","name":"{{ 'landing.faq.items.q3'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a3'|trans|e('js') }}"}},
+  {"@type":"Question","name":"{{ 'landing.faq.items.q4'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a4'|trans|e('js') }}"}},
+  {"@type":"Question","name":"{{ 'landing.faq.items.q5'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a5'|trans|e('js') }}"}},
+  {"@type":"Question","name":"{{ 'landing.faq.items.q6'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a6'|trans|e('js') }}"}},
+  {"@type":"Question","name":"{{ 'landing.faq.items.q7'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a7'|trans|e('js') }}"}},
+  {"@type":"Question","name":"{{ 'landing.faq.items.q8'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a8'|trans|e('js') }}"}}
+]}
 </script>
 {% endblock %}

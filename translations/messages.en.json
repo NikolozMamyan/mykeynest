@@ -95,7 +95,7 @@
       "logout": "Log out"
     }
   },
-  "landing": {
+   "landing": {
     "nav": {
       "menu": "Menu",
       "features": "Features",
@@ -108,13 +108,15 @@
     "hero": {
       "title_before": "Manage your passwords securely,",
       "title_highlight": "all in one place",
-      "subtitle": "A simple, secure, and modern password manager. AES-256 encryption, zero-knowledge architecture, and multi-device synchronization. Try it for free.",
+      "subtitle": "A simple, secure, and modern password manager. AES-256 encryption, zero-knowledge architecture, and hashed & signed installation. Try it for free.",
       "cta_start": "Get started for free",
+      "cta_start_aria": "Create a free account on MykeyNest",
       "cta_discover": "Learn more",
+      "trust_aria": "MykeyNest security guarantees",
       "trust": {
         "aes": "AES-256 encryption",
         "zeroknowledge": "Zero-knowledge",
-        "opensource": "Open Source"
+        "hashed": "Hashed & signed installation"
       },
       "mock": {
         "gmail": "Gmail",
@@ -129,16 +131,19 @@
       "cards": {
         "e2e_title": "End-to-end encryption",
         "e2e_text": "Your data is encrypted locally with AES-256 before being synchronized. Only you can access it.",
+        "hashed_title": "Hashed & signed installation",
+        "hashed_text": "Every deployment generates a unique cryptographic fingerprint. If the code is modified or copied, access is instantly revoked.",
+        "hashed_tag": "New",
         "generator_title": "Password generator",
         "generator_text": "Create strong and unique passwords in one click for all your accounts.",
-        "sync_title": "Multi-device synchronization",
-        "sync_text": "Access your credentials from your computer, smartphone, or tablet.",
         "share_title": "Secure sharing",
         "share_text": "Share your credentials securely with your family or team.",
         "audit_title": "Security audit",
         "audit_text": "Identify weak, reused, or compromised passwords to better protect them.",
         "autofill_title": "Auto-fill",
-        "autofill_text": "Log in automatically to your favorite sites using the browser extension."
+        "autofill_text": "Log in automatically to your favorite sites using the browser extension.",
+        "twofactor_title": "Two-factor authentication (2FA)",
+        "twofactor_text": "Add an extra layer of security to your account with two-factor authentication."
       }
     },
     "how": {
@@ -154,8 +159,24 @@
         "s3_text": "Log in securely on all your devices thanks to synchronization."
       }
     },
+    "security": {
+      "label": "Unbreakable security",
+      "title": "You alone control access",
+      "intro": "Every MykeyNest extension installation generates a unique cryptographic fingerprint (hash). Access is strictly tied to your instance — impossible to impersonate, even with your credentials.",
+      "points": {
+        "p1_title": "Hardware Signature",
+        "p1_text": "Access is tied to your specific instance. An attacker on another device is blocked even with your credentials.",
+        "p2_title": "Integrity Proof",
+        "p2_text": "If the extension is modified or tampered with, the hash changes instantly and access is revoked.",
+        "p3_title": "Trust Registry",
+        "p3_text": "Only integrity proofs are recorded server-side — never sensitive data itself.",
+        "p4_title": "Complete Audit Logs",
+        "p4_text": "Every access attempt is logged with a cryptographic timestamp for your security audits."
+      }
+    },
     "pricing": {
       "label": "Pricing",
+      "aria": "MykeyNest pricing plans",
       "title": "A simple and transparent plan",
       "subtitle": "Start for free, upgrade to premium when you need it.",
       "plan": {
@@ -163,12 +184,15 @@
         "popular_badge": "Recommended",
         "per_month": "/ month",
         "basic_name": "Free",
+        "basic_tagline": "For individuals and freelancers",
         "basic_try": "Get started",
         "basic_aria": "Start with the free plan",
         "pro_name": "Pro",
+        "pro_tagline": "For SMBs, agencies and teams",
         "pro_choose": "Choose Pro",
         "pro_aria": "Choose the Pro plan",
         "pro_reco_aria": "Recommended offer",
+        "pro_annual": "Annual billing available — save up to 20%",
         "features": {
           "basic_1": "5 passwords",
           "basic_2": "Up to 5 shares",
@@ -180,39 +204,40 @@
           "pro_4": "Security audit",
           "pro_5": "Secure notes",
           "pro_6": "Priority support",
-          "pro_7": "All features"
+          "pro_7": "Hashed & signed installation",
+          "pro_8": "All features"
         }
       }
     },
     "contact": {
-  "label": "Contact",
-  "title": "Get in touch",
-  "subtitle": "A question or an issue? Our team is here to help. We reply within 24 hours.",
-  "form": {
-    "title": "Send us a message",
-    "subtitle": "Fields marked with * are required",
-    "full_name": "Full name",
-    "email": "Email",
-    "subject": "Subject",
-    "subject_demo": "Request a demo",
-    "name_placeholder": "John Doe",
-    "email_placeholder": "example@email.com",
-    "subject_support": "Support",
-    "subject_other": "Other",
-    "message": "Message",
-    "message_placeholder": "Tell us what you need…",
-    "submit": "Send",
-    "sending": "Sending..."
-  },
-  "info": {
-    "email_title": "Email",
-    "support_title": "Support",
-    "support_text": "Available 24/7",
-    "support_time": "Response time: <strong>&lt; 2h</strong>",
-    "hours_title": "Hours",
-    "hours_text": "Mon - Fri: 9am - 6pm<br>Sat - Sun: 10am - 4pm"
-  }
-},
+      "label": "Contact",
+      "title": "Get in touch",
+      "subtitle": "A question or an issue? Our team is here to help. We reply within 24 hours.",
+      "form": {
+        "title": "Send us a message",
+        "subtitle": "Fields marked with * are required",
+        "full_name": "Full name",
+        "email": "Email",
+        "subject": "Subject",
+        "subject_demo": "Request a demo",
+        "name_placeholder": "John Doe",
+        "email_placeholder": "example@email.com",
+        "subject_support": "Support",
+        "subject_other": "Other",
+        "message": "Message",
+        "message_placeholder": "Tell us what you need…",
+        "submit": "Send",
+        "sending": "Sending..."
+      },
+      "info": {
+        "email_title": "Email",
+        "support_title": "Support",
+        "support_text": "Available 24/7",
+        "support_time": "Response time: <strong>&lt; 2h</strong>",
+        "hours_title": "Hours",
+        "hours_text": "Mon - Fri: 9am - 6pm<br>Sat - Sun: 10am - 4pm"
+      }
+    },
     "faq": {
       "label": "Frequently asked questions",
       "title": "Your questions about MykeyNest",
@@ -226,27 +251,32 @@
         "a3": "Yes, no credit card required. You can use MykeyNest for free with basic features. The Pro plan unlocks advanced features.",
         "q4": "Can I use MykeyNest on multiple devices?",
         "a4": "Yes, your passwords are automatically synchronized across all your devices: computer, smartphone, and tablet.",
-        "q5": "What happens if I forget my master password?",
-        "a5": "We cannot recover it for you (zero-knowledge). That’s why it’s essential to keep it safe. You can set up emergency recovery.",
-        "q6": "Is MykeyNest open source?",
-        "a6": "Yes, the code is publicly available. This allows the community to verify the application's security and contribute improvements."
+        "q5": "What is a hashed installation and how does it protect me?",
+        "a5": "Every MykeyNest extension installation generates a unique cryptographic fingerprint tied to your instance. If an attacker tries to reuse your credentials on another device, the hash won't match and access is denied. If the extension is modified or corrupted, the integrity check fails and the vault locks automatically.",
+        "q6": "What happens if I forget my master password?",
+        "a6": "We cannot recover it for you (zero-knowledge). That's why it's essential to keep it safe. You can set up emergency recovery.",
+        "q7": "Is MykeyNest GDPR compliant?",
+        "a7": "Yes. MykeyNest is a 100% European solution: your data is hosted in Europe and never transferred to third-party servers outside the EU. The zero-knowledge architecture ensures we never have access to your passwords in plain text. GDPR compliance is built-in, not an afterthought.",
+        "q8": "How does two-factor authentication (2FA) work?",
+        "a8": "2FA adds an extra layer of security: in addition to your master password, a temporary code is required at each login. Available via an authenticator app (TOTP) or email."
       }
     },
     "cta": {
       "title": "Ready to secure your credentials?",
       "subtitle": "Join MykeyNest today and protect your digital life with ease.",
+      "note": "14-day free trial · No credit card required · Cancel anytime",
       "start": "Get started for free",
       "login": "Log in"
     },
     "footer": {
-      "brand_text": "A modern password manager that combines security, simplicity, and transparency.",
+      "brand_text": "A modern password manager that combines security, simplicity, and privacy. 100% European solution.",
       "product": "Product",
       "company": "Company",
       "resources": "Resources",
       "links": {
         "features": "Features",
         "pricing": "Pricing",
-        "security": "Security",
+        "security": "Security & Hash",
         "extension": "Extension",
         "about": "About",
         "blog": "Blog",
@@ -255,7 +285,7 @@
         "password_manager_entreprise_comparatif": "Business password manager comparison",
         "audit_cyber_pme": "SMB cybersecurity audit",
         "help_center": "Help center",
-        "generator" : "Generator",
+        "generator": "Generator",
         "documentation": "Documentation",
         "guides": "Guides",
         "privacy": "Privacy",

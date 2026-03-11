@@ -108,13 +108,15 @@
     "hero": {
       "title_before": "Gérez vos mots de passe en toute sécurité,",
       "title_highlight": "en un seul endroit",
-      "subtitle": "Un gestionnaire de mots de passe simple, sécurisé et moderne. Chiffrement AES-256, architecture zero-knowledge et synchronisation multi-appareils. Essayez gratuitement.",
+      "subtitle": "Un gestionnaire de mots de passe simple, sécurisé et moderne. Chiffrement AES-256, architecture zero-knowledge et installation hashée & signée. Essayez gratuitement.",
       "cta_start": "Commencer gratuitement",
+      "cta_start_aria": "Créer un compte gratuit sur MykeyNest",
       "cta_discover": "En savoir plus",
+      "trust_aria": "Garanties de sécurité MykeyNest",
       "trust": {
         "aes": "Chiffrement AES-256",
         "zeroknowledge": "Zero-knowledge",
-        "opensource": "Open Source"
+        "hashed": "Installation hashée & signée"
       },
       "mock": {
         "gmail": "Gmail",
@@ -129,16 +131,19 @@
       "cards": {
         "e2e_title": "Chiffrement de bout en bout",
         "e2e_text": "Vos données sont chiffrées localement avec AES-256 avant d'être synchronisées. Seul vous y avez accès.",
+        "hashed_title": "Installation hashée & signée",
+        "hashed_text": "Chaque déploiement génère une empreinte cryptographique unique. Si le code est modifié ou copié, l'accès est révoqué instantanément.",
+        "hashed_tag": "Nouveau",
         "generator_title": "Générateur de mots de passe",
         "generator_text": "Créez des mots de passe robustes et uniques en un clic pour tous vos comptes.",
-        "sync_title": "Synchronisation multi-appareils",
-        "sync_text": "Accédez à vos identifiants depuis votre ordinateur, smartphone ou tablette.",
         "share_title": "Partage sécurisé",
         "share_text": "Partagez vos identifiants en toute sécurité avec vos proches ou votre équipe.",
         "audit_title": "Audit de sécurité",
         "audit_text": "Identifiez vos mots de passe faibles, réutilisés ou compromis pour mieux les protéger.",
         "autofill_title": "Auto-remplissage",
-        "autofill_text": "Connectez-vous automatiquement sur vos sites favoris grâce à l'extension navigateur."
+        "autofill_text": "Connectez-vous automatiquement sur vos sites favoris grâce à l'extension navigateur.",
+        "twofactor_title": "Double authentification (2FA)",
+        "twofactor_text": "Ajoutez une couche de sécurité supplémentaire à votre compte avec l'authentification à deux facteurs."
       }
     },
     "how": {
@@ -154,8 +159,24 @@
         "s3_text": "Connectez-vous sur tous vos appareils en toute sécurité grâce à la synchronisation."
       }
     },
+    "security": {
+      "label": "Sécurité inviolable",
+      "title": "Vous seul êtes le maître de l'accès",
+      "intro": "Chaque installation de l'extension MykeyNest génère une empreinte cryptographique unique (hash). L'accès est strictement lié à votre instance — impossible à usurper, même avec vos identifiants.",
+      "points": {
+        "p1_title": "Signature Matérielle",
+        "p1_text": "L'accès est lié à votre instance spécifique. Un malfaiteur sur un autre poste est bloqué même avec vos codes.",
+        "p2_title": "Preuve d'Intégrité",
+        "p2_text": "Si l'extension est modifiée ou falsifiée, le hash change instantanément et l'accès est révoqué.",
+        "p3_title": "Registre de Confiance",
+        "p3_text": "Seules les preuves d'intégrité sont enregistrées côté serveur — jamais les données sensibles.",
+        "p4_title": "Logs d'Audit Complets",
+        "p4_text": "Chaque tentative d'accès est tracée avec horodatage cryptographique pour vos audits de sécurité."
+      }
+    },
     "pricing": {
       "label": "Tarifs",
+      "aria": "Grilles tarifaires MykeyNest",
       "title": "Une offre simple et transparente",
       "subtitle": "Commencez gratuitement, passez au premium quand vous en ressentez le besoin.",
       "plan": {
@@ -163,12 +184,15 @@
         "popular_badge": "Recommandé",
         "per_month": "/ mois",
         "basic_name": "Gratuit",
+        "basic_tagline": "Pour les particuliers et freelances",
         "basic_try": "Commencer",
         "basic_aria": "Commencer avec le plan gratuit",
         "pro_name": "Pro",
+        "pro_tagline": "Pour les PME, agences et équipes",
         "pro_choose": "Choisir Pro",
         "pro_aria": "Choisir le plan Pro",
         "pro_reco_aria": "Offre recommandée",
+        "pro_annual": "Facturation annuelle disponible — économisez jusqu'à 20%",
         "features": {
           "basic_1": "5 mots de passe",
           "basic_2": "5 partages maximum",
@@ -180,39 +204,40 @@
           "pro_4": "Audit de sécurité",
           "pro_5": "Notes sécurisées",
           "pro_6": "Support prioritaire",
-          "pro_7": "Toutes les fonctionnalités"
+          "pro_7": "Installation hashée & signée",
+          "pro_8": "Toutes les fonctionnalités"
         }
       }
     },
     "contact": {
-  "label": "Contact",
-  "title": "Contactez-nous",
-  "subtitle": "Une question ? Un problème ? Notre équipe est là pour vous aider. Réponse sous 24 heures.",
-  "form": {
-    "title": "Envoyez-nous un message",
-    "subtitle": "Tous les champs marqués d'un * sont obligatoires",
-    "full_name": "Nom complet",
-    "email": "Email",
-    "subject": "Sujet",
-    "subject_demo": "Demande de démo",
-    "name_placeholder": "Jean Dupont",
-    "email_placeholder": "exemple@email.com",
-    "subject_support": "Support",
-    "subject_other": "Autre",
-    "message": "Message",
-    "message_placeholder": "Expliquez votre demande…",
-    "submit": "Envoyer",
-    "sending": "Envoi en cours..."
-  },
-  "info": {
-    "email_title": "Email",
-    "support_title": "Support",
-    "support_text": "Disponible 24/7",
-    "support_time": "Temps de réponse : <strong>&lt; 2h</strong>",
-    "hours_title": "Horaires",
-    "hours_text": "Lun - Ven : 9h - 18h<br>Sam - Dim : 10h - 16h"
-  }
-},
+      "label": "Contact",
+      "title": "Contactez-nous",
+      "subtitle": "Une question ? Un problème ? Notre équipe est là pour vous aider. Réponse sous 24 heures.",
+      "form": {
+        "title": "Envoyez-nous un message",
+        "subtitle": "Tous les champs marqués d'un * sont obligatoires",
+        "full_name": "Nom complet",
+        "email": "Email",
+        "subject": "Sujet",
+        "subject_demo": "Demande de démo",
+        "name_placeholder": "Jean Dupont",
+        "email_placeholder": "exemple@email.com",
+        "subject_support": "Support",
+        "subject_other": "Autre",
+        "message": "Message",
+        "message_placeholder": "Expliquez votre demande…",
+        "submit": "Envoyer",
+        "sending": "Envoi en cours..."
+      },
+      "info": {
+        "email_title": "Email",
+        "support_title": "Support",
+        "support_text": "Disponible 24/7",
+        "support_time": "Temps de réponse : <strong>&lt; 2h</strong>",
+        "hours_title": "Horaires",
+        "hours_text": "Lun - Ven : 9h - 18h<br>Sam - Dim : 10h - 16h"
+      }
+    },
     "faq": {
       "label": "Questions fréquentes",
       "title": "Vos questions sur MykeyNest",
@@ -226,36 +251,41 @@
         "a3": "Oui, aucune carte bancaire requise. Vous pouvez utiliser MykeyNest gratuitement avec les fonctionnalités de base. Le plan Pro débloque des fonctionnalités avancées.",
         "q4": "Puis-je utiliser MykeyNest sur plusieurs appareils ?",
         "a4": "Oui, vos mots de passe sont automatiquement synchronisés sur tous vos appareils : ordinateur, smartphone et tablette.",
-        "q5": "Que se passe-t-il si j'oublie mon mot de passe maître ?",
-        "a5": "Nous ne pouvons pas le récupérer pour vous (zero-knowledge). C'est pourquoi il est essentiel de le conserver en lieu sûr. Vous pouvez configurer une récupération d'urgence.",
-        "q6": "MykeyNest est-il open source ?",
-        "a6": "Oui, le code est disponible publiquement. Cela permet à la communauté de vérifier la sécurité de l'application et d'apporter des améliorations."
+        "q5": "Qu'est-ce que l'installation hashée et en quoi me protège-t-elle ?",
+        "a5": "Chaque installation de l'extension MykeyNest génère une empreinte cryptographique unique liée à votre instance. Si un attaquant tente de réutiliser vos identifiants sur un autre appareil, le hash ne correspond pas et l'accès est refusé. Si l'extension est modifiée ou corrompue, l'intégrité est détectée et le coffre-fort se verrouille automatiquement.",
+        "q6": "Que se passe-t-il si j'oublie mon mot de passe maître ?",
+        "a6": "Nous ne pouvons pas le récupérer pour vous (zero-knowledge). C'est pourquoi il est essentiel de le conserver en lieu sûr. Vous pouvez configurer une récupération d'urgence.",
+        "q7": "MykeyNest est-il conforme au RGPD ?",
+        "a7": "Oui. MykeyNest est une solution 100% européenne : vos données sont hébergées en Europe et ne transitent jamais vers des serveurs tiers hors UE. L'architecture zero-knowledge garantit que nous n'avons jamais accès à vos mots de passe en clair. La conformité RGPD est native.",
+        "q8": "Comment fonctionne la double authentification (2FA) ?",
+        "a8": "Le 2FA ajoute une couche de sécurité supplémentaire : en plus de votre mot de passe maître, un code temporaire est requis à chaque connexion. Disponible avec une application d'authentification (TOTP) ou par email."
       }
     },
     "cta": {
       "title": "Prêt à sécuriser vos identifiants ?",
       "subtitle": "Rejoignez MykeyNest dès aujourd'hui et protégez votre vie numérique simplement.",
+      "note": "Essai gratuit 14 jours · Sans carte bancaire · Résiliable à tout moment",
       "start": "Commencer gratuitement",
       "login": "Se connecter"
     },
     "footer": {
-      "brand_text": "Un gestionnaire de mots de passe moderne qui allie sécurité, simplicité et transparence.",
+      "brand_text": "Un gestionnaire de mots de passe moderne qui allie sécurité, simplicité et confidentialité. Solution 100% européenne.",
       "product": "Produit",
       "company": "Entreprise",
       "resources": "Ressources",
       "links": {
         "features": "Fonctionnalités",
         "pricing": "Tarifs",
-        "security": "Sécurité",
-        "cyber_pme_solution": "Solution cybersécurité PME",
-        "password_manager_entreprise_comparatif": "Comparatif password manager entreprise",
-        "audit_cyber_pme": "Audit cybersécurité PME",
+        "security": "Sécurité & Hash",
         "extension": "Extension",
         "about": "À propos",
         "blog": "Blog",
         "contact": "Contact",
+        "cyber_pme_solution": "Solution cybersécurité PME",
+        "password_manager_entreprise_comparatif": "Comparatif password manager entreprise",
+        "audit_cyber_pme": "Audit cybersécurité PME",
         "help_center": "Centre d'aide",
-        "generator" : "Générateur",
+        "generator": "Générateur",
         "documentation": "Documentation",
         "guides": "Guides",
         "privacy": "Confidentialité",
