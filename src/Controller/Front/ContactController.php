@@ -18,19 +18,14 @@ public function send(Request $request, MailerService $mailer): Response
     $reason = trim((string) $request->request->get('reason', ''));
     $message = trim((string) $request->request->get('message', ''));
 
-    // 🔁 Page précédente (fallback si absent)
-    $referer = $request->headers->get('referer');
-    $redirectUrl = $referer ?: $this->generateUrl('app_landing');
-
-    // validations
     if ($name === '' || $email === '' || $reason === '' || $message === '') {
         $this->addFlash('error', 'Tous les champs sont obligatoires.');
-        return $this->redirect($redirectUrl . '#contact');
+        return $this->redirect($this->generateUrl('app_landing') . '#contact');
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $this->addFlash('error', 'Adresse e-mail invalide.');
-        return $this->redirect($redirectUrl . '#contact');
+        return $this->redirect($this->generateUrl('app_landing') . '#contact');
     }
 
     $reasonMap = [
@@ -58,7 +53,7 @@ public function send(Request $request, MailerService $mailer): Response
 
     $this->addFlash('success', 'Thanks! Your message has been sent.');
 
-    return $this->redirect($redirectUrl . '#contact');
+    return $this->redirect($this->generateUrl('app_landing') . '#contact');
 }
 
 }
