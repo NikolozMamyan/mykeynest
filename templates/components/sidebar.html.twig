@@ -443,6 +443,11 @@
         <span>{{ 'sidebar.items.credentials'|trans }}</span>
         <span class="nav-item-badge" data-layout-target="passLength"></span>
       </a>
+      <a href="{{ path('app_sessions_manager') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'app_sessions_manager' ? 'active' : '' }}">
+        <i class="fas fa-display"></i>
+        <span>Sessions Manager</span>
+      </a>
 
       <a href="{{ path('shared_access_index') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'shared_access_index' ? 'active' : '' }}">
