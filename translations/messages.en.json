@@ -142,8 +142,8 @@
         "audit_text": "Identify weak, reused, or compromised passwords to better protect them.",
         "autofill_title": "Auto-fill",
         "autofill_text": "Log in automatically to your favorite sites using the browser extension.",
-        "twofactor_title": "Two-factor authentication (2FA)",
-        "twofactor_text": "Add an extra layer of security to your account with two-factor authentication."
+        "twofactor_title": "Session Management",
+        "twofactor_text": "Manage and secure your account's active sessions."
       }
     },
     "how": {

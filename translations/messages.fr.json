@@ -142,8 +142,8 @@
         "audit_text": "Identifiez vos mots de passe faibles, réutilisés ou compromis pour mieux les protéger.",
         "autofill_title": "Auto-remplissage",
         "autofill_text": "Connectez-vous automatiquement sur vos sites favoris grâce à l'extension navigateur.",
-        "twofactor_title": "Double authentification (2FA)",
-        "twofactor_text": "Ajoutez une couche de sécurité supplémentaire à votre compte avec l'authentification à deux facteurs."
+        "twofactor_title": "Gestion des sessions",
+        "twofactor_text": "Gérez et sécurisez les sessions actives de votre compte."
       }
     },
     "how": {
