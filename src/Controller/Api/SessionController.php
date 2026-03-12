@@ -16,7 +16,8 @@ final class SessionController extends AbstractController
     #[Route('', name: 'api_sessions_list', methods: ['GET'])]
     public function list(
         Request $request,
-        UserSessionRepository $userSessionRepository
+        UserSessionRepository $userSessionRepository,
+        SessionManager $sessionManager
     ): JsonResponse {
         $user = $this->getUser();
 
@@ -26,31 +27,81 @@ final class SessionController extends AbstractController
 
         $currentToken = $request->cookies->get('AUTH_TOKEN');
         $currentHash = $currentToken ? hash('sha256', $currentToken) : null;
+        $currentDeviceId = $sessionManager->getCurrentDeviceId();
 
         $sessions = $userSessionRepository->findBy(
             ['user' => $user],
             ['lastActivityAt' => 'DESC']
         );
 
-        $data = [];
+        $devices = [];
 
         foreach ($sessions as $session) {
-            $data[] = [
+            $deviceId = $session->getDeviceId() ?? ('legacy-' . $session->getId());
+
+            if (!isset($devices[$deviceId])) {
+                $devices[$deviceId] = [
+                    'deviceId' => $deviceId,
+                    'deviceName' => $session->getDeviceName(),
+                    'userAgent' => $session->getUserAgent(),
+                    'ipAddress' => $session->getIpAddress(),
+                    'createdAt' => $session->getCreatedAt()?->format(DATE_ATOM),
+                    'lastActivityAt' => $session->getLastActivityAt()?->format(DATE_ATOM),
+                    'expiresAt' => $session->getExpiresAt()?->format(DATE_ATOM),
+                    'isRevoked' => $session->isRevoked(),
+                    'isBlocked' => $session->isBlocked(),
+                    'blockedReason' => $session->getBlockedReason(),
+                    'isCurrent' => $currentDeviceId !== null && $currentDeviceId === $session->getDeviceId(),
+                    'sessionCount' => 0,
+                    'sessions' => [],
+                ];
+            }
+
+            $devices[$deviceId]['sessionCount']++;
+
+            $devices[$deviceId]['sessions'][] = [
                 'id' => $session->getId(),
-                'deviceName' => $session->getDeviceName(),
-                'userAgent' => $session->getUserAgent(),
-                'ipAddress' => $session->getIpAddress(),
                 'createdAt' => $session->getCreatedAt()?->format(DATE_ATOM),
                 'lastActivityAt' => $session->getLastActivityAt()?->format(DATE_ATOM),
                 'expiresAt' => $session->getExpiresAt()?->format(DATE_ATOM),
                 'isRevoked' => $session->isRevoked(),
-                'isBlocked' => $session->isBlocked(), // ✅ AJOUTÉ
-                'blockedReason' => $session->getBlockedReason(), // ✅ AJOUTÉ
-                'isCurrent' => $currentHash === $session->getTokenHash(),
+                'isBlocked' => $session->isBlocked(),
+                'isCurrentSession' => $currentHash === $session->getTokenHash(),
             ];
+
+            if (
+                $session->getLastActivityAt() !== null
+                && (
+                    $devices[$deviceId]['lastActivityAt'] === null
+                    || $session->getLastActivityAt()->format(DATE_ATOM) > $devices[$deviceId]['lastActivityAt']
+                )
+            ) {
+                $devices[$deviceId]['lastActivityAt'] = $session->getLastActivityAt()?->format(DATE_ATOM);
+            }
+
+            if ($currentHash === $session->getTokenHash()) {
+                $devices[$deviceId]['isCurrent'] = true;
+            }
+
+            if ($session->isBlocked()) {
+                $devices[$deviceId]['isBlocked'] = true;
+                $devices[$deviceId]['blockedReason'] = $session->getBlockedReason();
+            }
+
+            if (!$devices[$deviceId]['deviceName'] && $session->getDeviceName()) {
+                $devices[$deviceId]['deviceName'] = $session->getDeviceName();
+            }
+
+            if (!$devices[$deviceId]['userAgent'] && $session->getUserAgent()) {
+                $devices[$deviceId]['userAgent'] = $session->getUserAgent();
+            }
+
+            if (!$devices[$deviceId]['ipAddress'] && $session->getIpAddress()) {
+                $devices[$deviceId]['ipAddress'] = $session->getIpAddress();
+            }
         }
 
-        return new JsonResponse($data);
+        return new JsonResponse(array_values($devices));
     }
 
     #[Route('/{id}', name: 'api_sessions_revoke', methods: ['DELETE'])]
@@ -87,10 +138,9 @@ final class SessionController extends AbstractController
         return $response;
     }
 
-    // ✅ NOUVEAU : Bloquer une session
-    #[Route('/{id}/block', name: 'api_sessions_block', methods: ['POST'])]
-    public function block(
-        int $id,
+    #[Route('/devices/{deviceId}/block', name: 'api_devices_block', methods: ['POST'])]
+    public function blockDevice(
+        string $deviceId,
         Request $request,
         UserSessionRepository $userSessionRepository,
         SessionManager $sessionManager
@@ -101,36 +151,37 @@ final class SessionController extends AbstractController
             return new JsonResponse(['error' => 'Non authentifié'], 401);
         }
 
-        $session = $userSessionRepository->find($id);
+        $currentDeviceId = $sessionManager->getCurrentDeviceId();
 
-        if (!$session || $session->getUser()?->getId() !== $user->getId()) {
-            return new JsonResponse(['error' => 'Session introuvable'], 404);
+        if ($currentDeviceId !== null && hash_equals($currentDeviceId, $deviceId)) {
+            return new JsonResponse([
+                'error' => 'Vous ne pouvez pas bloquer l’appareil actuellement utilisé.',
+            ], 400);
+        }
+
+        $targetSession = $userSessionRepository->findOneBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+        ]);
+
+        if (!$targetSession) {
+            return new JsonResponse(['error' => 'Appareil introuvable'], 404);
         }
 
         $data = json_decode($request->getContent(), true);
         $reason = $data['reason'] ?? 'Bloqué par l\'utilisateur';
 
-        $currentToken = $request->cookies->get('AUTH_TOKEN');
-        $currentHash = $currentToken ? hash('sha256', $currentToken) : null;
-        $isCurrent = $currentHash === $session->getTokenHash();
+        $count = $sessionManager->blockDevice($user, $deviceId, $reason);
 
-        $sessionManager->block($session, $reason);
-
-        $response = new JsonResponse([
-            'message' => 'Session bloquée. L\'appareil ne pourra plus se reconnecter.',
+        return new JsonResponse([
+            'message' => 'Appareil bloqué. Les connexions existantes ont été révoquées.',
+            'affectedSessions' => $count,
         ]);
-
-        if ($isCurrent) {
-            $response->headers->clearCookie('AUTH_TOKEN', '/');
-        }
-
-        return $response;
     }
 
-    // ✅ NOUVEAU : Débloquer une session
-    #[Route('/{id}/unblock', name: 'api_sessions_unblock', methods: ['POST'])]
-    public function unblock(
-        int $id,
+    #[Route('/devices/{deviceId}/unblock', name: 'api_devices_unblock', methods: ['POST'])]
+    public function unblockDevice(
+        string $deviceId,
         UserSessionRepository $userSessionRepository,
         SessionManager $sessionManager
     ): JsonResponse {
@@ -140,16 +191,20 @@ final class SessionController extends AbstractController
             return new JsonResponse(['error' => 'Non authentifié'], 401);
         }
 
-        $session = $userSessionRepository->find($id);
+        $targetSession = $userSessionRepository->findOneBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+        ]);
 
-        if (!$session || $session->getUser()?->getId() !== $user->getId()) {
-            return new JsonResponse(['error' => 'Session introuvable'], 404);
+        if (!$targetSession) {
+            return new JsonResponse(['error' => 'Appareil introuvable'], 404);
         }
 
-        $sessionManager->unblock($session);
+        $count = $sessionManager->unblockDevice($user, $deviceId);
 
         return new JsonResponse([
-            'message' => 'Session débloquée. L\'appareil peut à nouveau se connecter.',
+            'message' => 'Appareil débloqué.',
+            'affectedSessions' => $count,
         ]);
     }
 

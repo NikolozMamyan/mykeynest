@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: UserSessionRepository::class)]
 #[ORM\Table(name: 'user_session')]
 #[ORM\Index(columns: ['token_hash'], name: 'idx_user_session_token_hash')]
+#[ORM\Index(columns: ['device_id'], name: 'idx_user_session_device_id')]
 class UserSession
 {
     #[ORM\Id]
@@ -21,6 +22,9 @@ class UserSession
 
     #[ORM\Column(name: 'token_hash', length: 64, unique: true)]
     private ?string $tokenHash = null;
+
+    #[ORM\Column(name: 'device_id', length: 64, nullable: true)]
+    private ?string $deviceId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $deviceName = null;
@@ -89,6 +93,17 @@ class UserSession
     public function setTokenHash(string $tokenHash): static
     {
         $this->tokenHash = $tokenHash;
+        return $this;
+    }
+
+    public function getDeviceId(): ?string
+    {
+        return $this->deviceId;
+    }
+
+    public function setDeviceId(?string $deviceId): static
+    {
+        $this->deviceId = $deviceId;
         return $this;
     }
 
@@ -184,12 +199,13 @@ class UserSession
         $this->revokedReason = $revokedReason;
         return $this;
     }
+
     public function isBlocked(): bool
     {
         return $this->isBlocked;
     }
 
-    public function setIsBlocked(bool $isBlocked): self
+    public function setIsBlocked(bool $isBlocked): static
     {
         $this->isBlocked = $isBlocked;
         return $this;
@@ -200,7 +216,7 @@ class UserSession
         return $this->blockedAt;
     }
 
-    public function setBlockedAt(?\DateTimeImmutable $blockedAt): self
+    public function setBlockedAt(?\DateTimeImmutable $blockedAt): static
     {
         $this->blockedAt = $blockedAt;
         return $this;
@@ -211,7 +227,7 @@ class UserSession
         return $this->blockedReason;
     }
 
-    public function setBlockedReason(?string $blockedReason): self
+    public function setBlockedReason(?string $blockedReason): static
     {
         $this->blockedReason = $blockedReason;
         return $this;

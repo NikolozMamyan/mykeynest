@@ -13,41 +13,43 @@ class SessionManager
     public function __construct(
         private EntityManagerInterface $em,
         private UserSessionRepository $userSessionRepository,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private DeviceIdentifier $deviceIdentifier
     ) {
     }
 
-    public function createSession(User $user, ?string $deviceName = null): array
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        $ipAddress = $request?->getClientIp();
-        $userAgent = $request?->headers->get('User-Agent');
+ public function createSession(User $user, ?string $deviceName = null): array
+{
+    $request = $this->requestStack->getCurrentRequest();
+    $ipAddress = $request?->getClientIp();
+    $userAgent = $request?->headers->get('User-Agent');
+    $deviceId = $this->deviceIdentifier->getOrCreateCurrentDeviceId();
 
-        // ✅ Vérifie si cet appareil/IP est bloqué
-        $blockedSession = $this->findBlockedSessionByFingerprint($user, $ipAddress, $userAgent);
-        if ($blockedSession) {
-            throw new \RuntimeException(
-                'Cette session a été bloquée. Raison : ' . ($blockedSession->getBlockedReason() ?? 'Non spécifiée')
-            );
-        }
-
-        $plainToken = bin2hex(random_bytes(32));
-        $tokenHash = hash('sha256', $plainToken);
-
-        $session = new UserSession();
-        $session->setUser($user);
-        $session->setTokenHash($tokenHash);
-        $session->setDeviceName($deviceName);
-        $session->setUserAgent($userAgent);
-        $session->setIpAddress($ipAddress);
-        $session->setExpiresAt(new \DateTimeImmutable('+30 days'));
-        $session->setLastActivityAt(new \DateTimeImmutable());
-
-        $this->em->persist($session);
-        $this->em->flush();
-
-        return [$session, $plainToken];
+    $blockedSession = $this->findBlockedSessionByDeviceId($user, $deviceId);
+    if ($blockedSession) {
+        throw new \RuntimeException(
+            'Cet appareil a été bloqué. Raison : ' . ($blockedSession->getBlockedReason() ?? 'Non spécifiée')
+        );
     }
+
+    $plainToken = bin2hex(random_bytes(32));
+    $tokenHash = hash('sha256', $plainToken);
+
+    $session = new UserSession();
+    $session->setUser($user);
+    $session->setTokenHash($tokenHash);
+    $session->setDeviceId($deviceId);
+    $session->setDeviceName($deviceName);
+    $session->setUserAgent($userAgent);
+    $session->setIpAddress($ipAddress);
+    $session->setExpiresAt(new \DateTimeImmutable('+30 days'));
+    $session->setLastActivityAt(new \DateTimeImmutable());
+
+    $this->em->persist($session);
+    $this->em->flush();
+
+    return [$session, $plainToken, $deviceId];
+}
 
     public function findActiveSessionByPlainToken(string $plainToken): ?UserSession
     {
@@ -61,7 +63,6 @@ class SessionManager
             return null;
         }
 
-        // ✅ Vérifie si la session est bloquée
         if ($session->isBlocked()) {
             return null;
         }
@@ -92,30 +93,85 @@ class SessionManager
         $this->em->flush();
     }
 
-    // ✅ NOUVELLE FONCTION : Bloquer une session (empêche les reconnexions)
-    public function block(UserSession $session, ?string $reason = null): void
+    public function revokeDeviceSessions(User $user, string $deviceId, ?int $exceptSessionId = null, ?string $reason = null): int
     {
-        // Révoque d'abord la session
-        $session->setIsRevoked(true);
-        $session->setRevokedAt(new \DateTimeImmutable());
-        $session->setRevokedReason($reason);
+        $sessions = $this->userSessionRepository->findBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+        ]);
 
-        // Puis bloque pour empêcher les nouvelles connexions
-        $session->setIsBlocked(true);
-        $session->setBlockedAt(new \DateTimeImmutable());
-        $session->setBlockedReason($reason);
+        $count = 0;
+
+        foreach ($sessions as $session) {
+            if ($exceptSessionId !== null && $session->getId() === $exceptSessionId) {
+                continue;
+            }
+
+            if ($session->isRevoked()) {
+                continue;
+            }
+
+            $session->setIsRevoked(true);
+            $session->setRevokedAt(new \DateTimeImmutable());
+            $session->setRevokedReason($reason ?? 'revoked_by_user');
+            $count++;
+        }
 
         $this->em->flush();
+
+        return $count;
     }
 
-    // ✅ NOUVELLE FONCTION : Débloquer une session
-    public function unblock(UserSession $session): void
+    public function blockDevice(User $user, string $deviceId, ?string $reason = null): int
     {
-        $session->setIsBlocked(false);
-        $session->setBlockedAt(null);
-        $session->setBlockedReason(null);
+        $sessions = $this->userSessionRepository->findBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+        ]);
+
+        $count = 0;
+        $now = new \DateTimeImmutable();
+
+        foreach ($sessions as $session) {
+            $session->setIsRevoked(true);
+            $session->setRevokedAt($now);
+            $session->setRevokedReason($reason ?? 'blocked_by_user');
+
+            $session->setIsBlocked(true);
+            $session->setBlockedAt($now);
+            $session->setBlockedReason($reason);
+
+            $count++;
+        }
 
         $this->em->flush();
+
+        return $count;
+    }
+
+    public function unblockDevice(User $user, string $deviceId): int
+    {
+        $sessions = $this->userSessionRepository->findBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+        ]);
+
+        $count = 0;
+
+        foreach ($sessions as $session) {
+            if (!$session->isBlocked()) {
+                continue;
+            }
+
+            $session->setIsBlocked(false);
+            $session->setBlockedAt(null);
+            $session->setBlockedReason(null);
+            $count++;
+        }
+
+        $this->em->flush();
+
+        return $count;
     }
 
     public function revokeAllForUser(User $user, ?int $exceptSessionId = null): int
@@ -147,18 +203,17 @@ class SessionManager
         return $count;
     }
 
-    // ✅ NOUVELLE FONCTION : Trouve une session bloquée par fingerprint (IP + UserAgent)
-    private function findBlockedSessionByFingerprint(User $user, ?string $ipAddress, ?string $userAgent): ?UserSession
+    public function findBlockedSessionByDeviceId(User $user, string $deviceId): ?UserSession
     {
-        if (!$ipAddress && !$userAgent) {
-            return null;
-        }
-
         return $this->userSessionRepository->findOneBy([
             'user' => $user,
-            'ipAddress' => $ipAddress,
-            'userAgent' => $userAgent,
+            'deviceId' => $deviceId,
             'isBlocked' => true,
         ]);
+    }
+
+    public function getCurrentDeviceId(): ?string
+    {
+        return $this->deviceIdentifier->getCurrentDeviceId();
     }
 }

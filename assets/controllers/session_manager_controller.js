@@ -4,7 +4,6 @@ export default class extends Controller {
   static targets = ['sessionsList', 'toast', 'toastMessage', 'logoutAllBtn']
 
   connect() {
-    console.log('Session Manager controller connected')
     this.toastTimeout = null
     this.loadSessions()
   }
@@ -21,36 +20,36 @@ export default class extends Controller {
         cache: 'no-store'
       })
 
+      const data = await response.json().catch(() => ({}))
+
       if (!response.ok) {
-        throw new Error(`Erreur lors du chargement des sessions (${response.status})`)
+        throw new Error(data.error || `Erreur lors du chargement des appareils (${response.status})`)
       }
 
-      const sessions = await response.json()
-      console.log('Sessions reçues:', sessions)
-      this.renderSessions(sessions)
+      this.renderSessions(data)
     } catch (error) {
       console.error('Erreur loadSessions:', error)
-      this.showToast('Erreur lors du chargement des sessions', 'error')
+      this.showToast(error.message || 'Erreur lors du chargement des appareils', 'error')
       this.sessionsListTarget.innerHTML = this.getEmptyState()
     }
   }
 
-  renderSessions(sessions) {
-    if (!Array.isArray(sessions) || sessions.length === 0) {
+  renderSessions(devices) {
+    if (!Array.isArray(devices) || devices.length === 0) {
       this.sessionsListTarget.innerHTML = this.getEmptyState()
       return
     }
 
-    this.sessionsListTarget.innerHTML = sessions
-      .map(session => this.getSessionCard(session))
+    this.sessionsListTarget.innerHTML = devices
+      .map(device => this.getSessionCard(device))
       .join('')
   }
 
-  getSessionCard(session) {
-    const deviceIcon = this.getDeviceIcon(session.userAgent)
-    const deviceName = session.deviceName || this.getDeviceName(session.userAgent)
-    const isBlocked = session.isBlocked
-    const isCurrent = session.isCurrent
+  getSessionCard(device) {
+    const deviceIcon = this.getDeviceIcon(device.userAgent)
+    const deviceName = device.deviceName || this.getDeviceName(device.userAgent)
+    const isBlocked = device.isBlocked
+    const isCurrent = device.isCurrent
     const cardClass = `session-card ${isCurrent ? 'current' : ''} ${isBlocked ? 'blocked' : ''}`
 
     return `
@@ -63,22 +62,26 @@ export default class extends Controller {
               </div>
               <div class="device-details">
                 <h3>${this.escapeHtml(deviceName)}</h3>
-                <p>${this.escapeHtml(session.ipAddress || 'IP inconnue')}</p>
+                <p>${this.escapeHtml(device.ipAddress || 'IP inconnue')}</p>
               </div>
             </div>
           </div>
-          ${isCurrent ? '<span class="session-badge badge-current">Session actuelle</span>' : ''}
+          ${isCurrent ? '<span class="session-badge badge-current">Appareil actuel</span>' : ''}
           ${isBlocked ? '<span class="session-badge badge-blocked">Bloqué</span>' : ''}
         </div>
 
         <div class="session-meta">
           <div class="meta-item">
             <i class="fas fa-clock"></i>
-            <span>Dernière activité: ${this.formatDate(session.lastActivityAt)}</span>
+            <span>Dernière activité: ${this.formatDate(device.lastActivityAt)}</span>
           </div>
           <div class="meta-item">
             <i class="fas fa-calendar-plus"></i>
-            <span>Créé: ${this.formatDate(session.createdAt)}</span>
+            <span>Première session: ${this.formatDate(device.createdAt)}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-layer-group"></i>
+            <span>${device.sessionCount || 0} session(s)</span>
           </div>
         </div>
 
@@ -86,29 +89,18 @@ export default class extends Controller {
           <div class="blocked-info">
             <i class="fas fa-shield-alt"></i>
             <div>
-              <strong>Session bloquée</strong>
-              <p>${this.escapeHtml(session.blockedReason || 'Raison non spécifiée')}</p>
+              <strong>Appareil bloqué</strong>
+              <p>${this.escapeHtml(device.blockedReason || 'Raison non spécifiée')}</p>
             </div>
           </div>
         ` : ''}
 
         <div class="session-actions">
-          ${!isCurrent && !session.isRevoked ? `
-            <button 
-              class="btn-session btn-revoke"
-              data-action="click->session-manager#revokeSession"
-              data-session-id="${session.id}"
-            >
-              <i class="fas fa-sign-out-alt"></i>
-              Déconnecter
-            </button>
-          ` : ''}
-          
           ${!isCurrent && !isBlocked ? `
-            <button 
+            <button
               class="btn-session btn-block"
-              data-action="click->session-manager#blockSession"
-              data-session-id="${session.id}"
+              data-action="click->session-manager#blockDevice"
+              data-device-id="${this.escapeHtml(device.deviceId)}"
             >
               <i class="fas fa-ban"></i>
               Bloquer cet appareil
@@ -116,13 +108,24 @@ export default class extends Controller {
           ` : ''}
 
           ${isBlocked ? `
-            <button 
+            <button
               class="btn-session btn-unblock"
-              data-action="click->session-manager#unblockSession"
-              data-session-id="${session.id}"
+              data-action="click->session-manager#unblockDevice"
+              data-device-id="${this.escapeHtml(device.deviceId)}"
             >
               <i class="fas fa-unlock"></i>
               Débloquer
+            </button>
+          ` : ''}
+
+          ${!isCurrent && !isBlocked && device.sessions?.length ? `
+            <button
+              class="btn-session btn-revoke"
+              data-action="click->session-manager#revokeLatestSession"
+              data-session-id="${device.sessions[0].id}"
+            >
+              <i class="fas fa-sign-out-alt"></i>
+              Déconnecter la dernière session
             </button>
           ` : ''}
         </div>
@@ -130,7 +133,7 @@ export default class extends Controller {
     `
   }
 
-  async revokeSession(event) {
+  async revokeLatestSession(event) {
     const sessionId = event.currentTarget.dataset.sessionId
 
     if (!confirm('Voulez-vous vraiment déconnecter cette session ?')) {
@@ -146,20 +149,22 @@ export default class extends Controller {
         }
       })
 
+      const data = await response.json().catch(() => ({}))
+
       if (!response.ok) {
-        throw new Error(`Erreur lors de la révocation (${response.status})`)
+        throw new Error(data.error || `Erreur lors de la révocation (${response.status})`)
       }
 
       await this.loadSessions()
-      this.showToast('Session déconnectée avec succès', 'success')
+      this.showToast(data.message || 'Session déconnectée avec succès', 'success')
     } catch (error) {
-      console.error('Erreur revokeSession:', error)
-      this.showToast('Erreur lors de la déconnexion', 'error')
+      console.error('Erreur revokeLatestSession:', error)
+      this.showToast(error.message || 'Erreur lors de la déconnexion', 'error')
     }
   }
 
-  async blockSession(event) {
-    const sessionId = event.currentTarget.dataset.sessionId
+  async blockDevice(event) {
+    const deviceId = event.currentTarget.dataset.deviceId
 
     const reason = prompt(
       'Pourquoi voulez-vous bloquer cet appareil ?\n(Cette action empêchera toute future connexion depuis cet appareil)',
@@ -169,7 +174,7 @@ export default class extends Controller {
     if (!reason) return
 
     try {
-      const response = await fetch(`/api/sessions/${sessionId}/block`, {
+      const response = await fetch(`/api/sessions/devices/${encodeURIComponent(deviceId)}/block`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -179,27 +184,29 @@ export default class extends Controller {
         body: JSON.stringify({ reason })
       })
 
+      const data = await response.json().catch(() => ({}))
+
       if (!response.ok) {
-        throw new Error(`Erreur lors du blocage (${response.status})`)
+        throw new Error(data.error || `Erreur lors du blocage (${response.status})`)
       }
 
       await this.loadSessions()
-      this.showToast('Appareil bloqué avec succès', 'success')
+      this.showToast(data.message || 'Appareil bloqué avec succès', 'success')
     } catch (error) {
-      console.error('Erreur blockSession:', error)
-      this.showToast('Erreur lors du blocage', 'error')
+      console.error('Erreur blockDevice:', error)
+      this.showToast(error.message || 'Erreur lors du blocage', 'error')
     }
   }
 
-  async unblockSession(event) {
-    const sessionId = event.currentTarget.dataset.sessionId
+  async unblockDevice(event) {
+    const deviceId = event.currentTarget.dataset.deviceId
 
     if (!confirm('Voulez-vous vraiment débloquer cet appareil ?')) {
       return
     }
 
     try {
-      const response = await fetch(`/api/sessions/${sessionId}/unblock`, {
+      const response = await fetch(`/api/sessions/devices/${encodeURIComponent(deviceId)}/unblock`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -207,15 +214,17 @@ export default class extends Controller {
         }
       })
 
+      const data = await response.json().catch(() => ({}))
+
       if (!response.ok) {
-        throw new Error(`Erreur lors du déblocage (${response.status})`)
+        throw new Error(data.error || `Erreur lors du déblocage (${response.status})`)
       }
 
       await this.loadSessions()
-      this.showToast('Appareil débloqué avec succès', 'success')
+      this.showToast(data.message || 'Appareil débloqué avec succès', 'success')
     } catch (error) {
-      console.error('Erreur unblockSession:', error)
-      this.showToast('Erreur lors du déblocage', 'error')
+      console.error('Erreur unblockDevice:', error)
+      this.showToast(error.message || 'Erreur lors du déblocage', 'error')
     }
   }
 
@@ -237,17 +246,17 @@ export default class extends Controller {
         }
       })
 
-      if (!response.ok) {
-        throw new Error(`Erreur lors de la déconnexion (${response.status})`)
-      }
+      const data = await response.json().catch(() => ({}))
 
-      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || `Erreur lors de la déconnexion (${response.status})`)
+      }
 
       await this.loadSessions()
       this.showToast(`${data.revokedCount ?? 0} session(s) déconnectée(s)`, 'success')
     } catch (error) {
       console.error('Erreur logoutAll:', error)
-      this.showToast('Erreur lors de la déconnexion', 'error')
+      this.showToast(error.message || 'Erreur lors de la déconnexion', 'error')
     } finally {
       if (this.hasLogoutAllBtnTarget) {
         this.logoutAllBtnTarget.disabled = false
@@ -283,7 +292,7 @@ export default class extends Controller {
     if (!dateString) return 'Date inconnue'
 
     const date = new Date(dateString)
-    if (isNaN(date.getTime())) return 'Date inconnue'
+    if (Number.isNaN(date.getTime())) return 'Date inconnue'
 
     const now = new Date()
     const diffMs = now - date
@@ -303,54 +312,47 @@ export default class extends Controller {
     })
   }
 
-showToast(message, type = 'success') {
+  showToast(message, type = 'success') {
+    if (!this.hasToastTarget) {
+      const toast = document.createElement('div')
+      toast.className = 'toast'
+      toast.innerHTML = `
+        <div class="toast-content">
+          <i class="toast-icon"></i>
+          <span class="toast-message"></span>
+        </div>
+      `
+      document.body.appendChild(toast)
+      this.toastElement = toast
+      this.toastMessageElement = toast.querySelector('.toast-message')
+    }
 
-  if (!this.hasToastTarget) {
-    console.warn('Toast target introuvable — création automatique')
+    const toast = this.toastElement || this.toastTarget
+    const messageEl = this.toastMessageElement || this.toastMessageTarget
 
-    const toast = document.createElement('div')
-    toast.className = 'toast'
+    messageEl.textContent = message
+    toast.className = `toast ${type}`
+    toast.classList.add('show')
 
-    toast.innerHTML = `
-      <div class="toast-content">
-        <i class="toast-icon"></i>
-        <span class="toast-message"></span>
-      </div>
-    `
+    clearTimeout(this.toastTimeout)
 
-    document.body.appendChild(toast)
-
-    this.toastElement = toast
-    this.toastMessageElement = toast.querySelector('.toast-message')
+    this.toastTimeout = setTimeout(() => {
+      toast.classList.remove('show')
+    }, 3000)
   }
-
-  const toast = this.toastElement || this.toastTarget
-  const messageEl = this.toastMessageElement || this.toastMessageTarget
-
-  messageEl.textContent = message
-
-  toast.className = `toast ${type}`
-  toast.classList.add('show')
-
-  clearTimeout(this.toastTimeout)
-
-  this.toastTimeout = setTimeout(() => {
-    toast.classList.remove('show')
-  }, 3000)
-}
 
   getEmptyState() {
     return `
       <div class="empty-state">
         <i class="fas fa-inbox"></i>
-        <p>Aucune session active</p>
+        <p>Aucun appareil connu</p>
       </div>
     `
   }
 
   escapeHtml(text) {
     const div = document.createElement('div')
-    div.textContent = text
+    div.textContent = text ?? ''
     return div.innerHTML
   }
 }

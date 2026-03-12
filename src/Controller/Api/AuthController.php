@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Entity\User;
 use App\Entity\Notification;
 use App\Repository\UserRepository;
+use App\Service\DeviceIdentifier;
 use App\Service\MailerService;
 use App\Service\SessionManager;
 use App\Service\NotificationService;
@@ -21,15 +22,27 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class AuthController extends AbstractController
 {
     private function buildAuthCookie(Request $request, string $plainToken, \DateTimeInterface $expiresAt): Cookie
-{
-    return Cookie::create('AUTH_TOKEN')
-        ->withValue($plainToken)
-        ->withHttpOnly(true)
-        ->withSecure($request->isSecure())
-        ->withSameSite('lax')
-        ->withPath('/')
-        ->withExpires($expiresAt);
-}
+    {
+        return Cookie::create('AUTH_TOKEN')
+            ->withValue($plainToken)
+            ->withHttpOnly(true)
+            ->withSecure($request->isSecure())
+            ->withSameSite('lax')
+            ->withPath('/')
+            ->withExpires($expiresAt);
+    }
+
+    private function buildDeviceCookie(Request $request, string $deviceId): Cookie
+    {
+        return Cookie::create(DeviceIdentifier::COOKIE_NAME)
+            ->withValue($deviceId)
+            ->withHttpOnly(true)
+            ->withSecure($request->isSecure())
+            ->withSameSite('lax')
+            ->withPath('/')
+            ->withExpires(new \DateTimeImmutable('+5 years'));
+    }
+
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(
         Request $request,
@@ -61,8 +74,8 @@ final class AuthController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        // Création d'une vraie session
-        [$session, $plainToken] = $sessionManager->createSession($user);
+        // Crée la session + deviceId stable
+        [$session, $plainToken, $deviceId] = $sessionManager->createSession($user);
 
         try {
             $notificationService->createEntityNotification(
@@ -127,64 +140,71 @@ final class AuthController extends AbstractController
             'session' => [
                 'id' => $session->getId(),
                 'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
-            ]
+            ],
         ], 201);
 
-       $response->headers->setCookie(
-    $this->buildAuthCookie($request, $plainToken, $session->getExpiresAt())
-);
+        $response->headers->setCookie(
+            $this->buildAuthCookie($request, $plainToken, $session->getExpiresAt())
+        );
+
+        $response->headers->setCookie(
+            $this->buildDeviceCookie($request, $deviceId)
+        );
 
         return $response;
     }
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
-   public function login(
-    Request $request,
-    UserRepository $userRepository,
-    UserPasswordHasherInterface $passwordHasher,
-    SessionManager $sessionManager
-): JsonResponse {
-    $data = json_decode($request->getContent(), true);
+    public function login(
+        Request $request,
+        UserRepository $userRepository,
+        UserPasswordHasherInterface $passwordHasher,
+        SessionManager $sessionManager
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
 
-    if (!is_array($data) || !isset($data['email'], $data['password'])) {
-        return new JsonResponse(['error' => 'Email and password are required'], 400);
+        if (!is_array($data) || !isset($data['email'], $data['password'])) {
+            return new JsonResponse(['error' => 'Email and password are required'], 400);
+        }
+
+        $user = $userRepository->findOneBy(['email' => $data['email']]);
+
+        if (!$user || !$passwordHasher->isPasswordValid($user, $data['password'])) {
+            return new JsonResponse(['error' => 'Invalid credentials'], 401);
+        }
+
+        try {
+            [$session, $plainToken, $deviceId] = $sessionManager->createSession($user);
+        } catch (\RuntimeException $e) {
+            return new JsonResponse([
+                'error' => 'Connexion bloquée',
+                'message' => $e->getMessage(),
+            ], 403);
+        }
+
+        $response = new JsonResponse([
+            'message' => 'Connexion réussie',
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'roles' => $user->getRoles(),
+            ],
+            'session' => [
+                'id' => $session->getId(),
+                'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
+            ],
+        ]);
+
+        $response->headers->setCookie(
+            $this->buildAuthCookie($request, $plainToken, $session->getExpiresAt())
+        );
+
+        $response->headers->setCookie(
+            $this->buildDeviceCookie($request, $deviceId)
+        );
+
+        return $response;
     }
-
-    $user = $userRepository->findOneBy(['email' => $data['email']]);
-
-    if (!$user || !$passwordHasher->isPasswordValid($user, $data['password'])) {
-        return new JsonResponse(['error' => 'Invalid credentials'], 401);
-    }
-
-    try {
-        [$session, $plainToken] = $sessionManager->createSession($user);
-    } catch (\RuntimeException $e) {
-        // ✅ Session bloquée
-        return new JsonResponse([
-            'error' => 'Connexion bloquée',
-            'message' => $e->getMessage(),
-        ], 403);
-    }
-
-    $response = new JsonResponse([
-        'message' => 'Connexion réussie',
-        'user' => [
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'roles' => $user->getRoles(),
-        ],
-        'session' => [
-            'id' => $session->getId(),
-            'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
-        ]
-    ]);
-
-    $response->headers->setCookie(
-        $this->buildAuthCookie($request, $plainToken, $session->getExpiresAt())
-    );
-
-    return $response;
-}
 
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]
     public function logout(
