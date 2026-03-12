@@ -110,9 +110,9 @@
       "title_highlight": "en un seul endroit",
       "subtitle": "Un gestionnaire de mots de passe simple, sécurisé et moderne. Chiffrement AES-256, architecture zero-knowledge et installation hashée & signée. Essayez gratuitement.",
       "cta_start": "Commencer gratuitement",
-      "cta_start_aria": "Créer un compte gratuit sur MykeyNest",
+      "cta_start_aria": "Créer un compte gratuit sur MYKEYNEST",
       "cta_discover": "En savoir plus",
-      "trust_aria": "Garanties de sécurité MykeyNest",
+      "trust_aria": "Garanties de sécurité MYKEYNEST",
       "trust": {
         "aes": "Chiffrement AES-256",
         "zeroknowledge": "Zero-knowledge",
@@ -162,7 +162,7 @@
     "security": {
       "label": "Sécurité inviolable",
       "title": "Vous seul êtes le maître de l'accès",
-      "intro": "Chaque installation de l'extension MykeyNest génère une empreinte cryptographique unique (hash). L'accès est strictement lié à votre instance — impossible à usurper, même avec vos identifiants.",
+      "intro": "Chaque installation de l'extension MYKEYNEST génère une empreinte cryptographique unique (hash). L'accès est strictement lié à votre instance — impossible à usurper, même avec vos identifiants.",
       "points": {
         "p1_title": "Signature Matérielle",
         "p1_text": "L'accès est lié à votre instance spécifique. Un malfaiteur sur un autre poste est bloqué même avec vos codes.",
@@ -176,7 +176,7 @@
     },
     "pricing": {
       "label": "Tarifs",
-      "aria": "Grilles tarifaires MykeyNest",
+      "aria": "Grilles tarifaires MYKEYNEST",
       "title": "Une offre simple et transparente",
       "subtitle": "Commencez gratuitement, passez au premium quand vous en ressentez le besoin.",
       "plan": {
@@ -240,30 +240,30 @@
     },
     "faq": {
       "label": "Questions fréquentes",
-      "title": "Vos questions sur MykeyNest",
+      "title": "Vos questions sur MYKEYNEST",
       "subtitle": "Tout ce que vous devez savoir avant de commencer.",
       "items": {
         "q1": "Qu'est-ce qu'un gestionnaire de mots de passe ?",
-        "a1": "C'est un outil qui stocke et chiffre tous vos identifiants dans un coffre-fort numérique sécurisé. MykeyNest utilise le chiffrement AES-256, le même standard utilisé par les banques.",
+        "a1": "C'est un outil qui stocke et chiffre tous vos identifiants dans un coffre-fort numérique sécurisé. MYKEYNEST utilise le chiffrement AES-256, le même standard utilisé par les banques.",
         "q2": "Mes données sont-elles vraiment sécurisées ?",
         "a2": "Oui. Vos données sont chiffrées localement sur votre appareil avant d'être synchronisées. Nous n'avons jamais accès à vos mots de passe en clair (architecture zero-knowledge).",
         "q3": "L'offre gratuite est-elle vraiment gratuite ?",
-        "a3": "Oui, aucune carte bancaire requise. Vous pouvez utiliser MykeyNest gratuitement avec les fonctionnalités de base. Le plan Pro débloque des fonctionnalités avancées.",
-        "q4": "Puis-je utiliser MykeyNest sur plusieurs appareils ?",
+        "a3": "Oui, aucune carte bancaire requise. Vous pouvez utiliser MYKEYNEST gratuitement avec les fonctionnalités de base. Le plan Pro débloque des fonctionnalités avancées.",
+        "q4": "Puis-je utiliser MYKEYNEST sur plusieurs appareils ?",
         "a4": "Oui, vos mots de passe sont automatiquement synchronisés sur tous vos appareils : ordinateur, smartphone et tablette.",
         "q5": "Qu'est-ce que l'installation hashée et en quoi me protège-t-elle ?",
-        "a5": "Chaque installation de l'extension MykeyNest génère une empreinte cryptographique unique liée à votre instance. Si un attaquant tente de réutiliser vos identifiants sur un autre appareil, le hash ne correspond pas et l'accès est refusé. Si l'extension est modifiée ou corrompue, l'intégrité est détectée et le coffre-fort se verrouille automatiquement.",
+        "a5": "Chaque installation de l'extension MYKEYNEST génère une empreinte cryptographique unique liée à votre instance. Si un attaquant tente de réutiliser vos identifiants sur un autre appareil, le hash ne correspond pas et l'accès est refusé. Si l'extension est modifiée ou corrompue, l'intégrité est détectée et le coffre-fort se verrouille automatiquement.",
         "q6": "Que se passe-t-il si j'oublie mon mot de passe maître ?",
         "a6": "Nous ne pouvons pas le récupérer pour vous (zero-knowledge). C'est pourquoi il est essentiel de le conserver en lieu sûr. Vous pouvez configurer une récupération d'urgence.",
-        "q7": "MykeyNest est-il conforme au RGPD ?",
-        "a7": "Oui. MykeyNest est une solution 100% européenne : vos données sont hébergées en Europe et ne transitent jamais vers des serveurs tiers hors UE. L'architecture zero-knowledge garantit que nous n'avons jamais accès à vos mots de passe en clair. La conformité RGPD est native.",
+        "q7": "MYKEYNEST est-il conforme au RGPD ?",
+        "a7": "Oui. MYKEYNEST est une solution 100% européenne : vos données sont hébergées en Europe et ne transitent jamais vers des serveurs tiers hors UE. L'architecture zero-knowledge garantit que nous n'avons jamais accès à vos mots de passe en clair. La conformité RGPD est native.",
         "q8": "Comment fonctionne la double authentification (2FA) ?",
         "a8": "Le 2FA ajoute une couche de sécurité supplémentaire : en plus de votre mot de passe maître, un code temporaire est requis à chaque connexion. Disponible avec une application d'authentification (TOTP) ou par email."
       }
     },
     "cta": {
       "title": "Prêt à sécuriser vos identifiants ?",
-      "subtitle": "Rejoignez MykeyNest dès aujourd'hui et protégez votre vie numérique simplement.",
+      "subtitle": "Rejoignez MYKEYNEST dès aujourd'hui et protégez votre vie numérique simplement.",
       "note": "Essai gratuit 14 jours · Sans carte bancaire · Résiliable à tout moment",
       "start": "Commencer gratuitement",
       "login": "Se connecter"
@@ -1126,7 +1126,7 @@
         "Utilisez un mot de passe différent pour chaque compte important",
         "Privilégiez les mots de passe d'au moins 16 caractères",
         "Activez l'authentification à deux facteurs quand c'est possible",
-        "Utilisez un gestionnaire de mots de passe sécurisé comme MykeyNest",
+        "Utilisez un gestionnaire de mots de passe sécurisé comme MYKEYNEST",
         "Changez régulièrement vos mots de passe sensibles",
         "Ne partagez jamais vos mots de passe par email ou SMS"
       ],
@@ -1135,7 +1135,7 @@
     },
     "cta": {
       "title": "Prêt à sécuriser vos comptes ?",
-      "description": "Rejoignez des milliers d'utilisateurs qui protègent leurs données avec MykeyNest",
+      "description": "Rejoignez des milliers d'utilisateurs qui protègent leurs données avec MYKEYNEST",
       "button": "Créer un compte gratuit"
     }
   },
@@ -1144,7 +1144,7 @@
       "eyebrow": "Centre d'aide",
       "title_line1": "Comment pouvons-nous",
       "title_highlight": "vous aider ?",
-      "subtitle": "Guides, tutoriels et réponses à toutes vos questions sur MykeyNest."
+      "subtitle": "Guides, tutoriels et réponses à toutes vos questions sur MYKEYNEST."
     },
     "search": {
       "placeholder": "Rechercher un article, une fonctionnalité…",
@@ -1194,15 +1194,15 @@
       "title": "Réponses en un coup d'œil",
       "sub": "Les questions que tout le monde se pose.",
       "items": {
-        "q1": "Mes mots de passe sont-ils vraiment sécurisés chez MykeyNest ?",
+        "q1": "Mes mots de passe sont-ils vraiment sécurisés chez MYKEYNEST ?",
         "a1": "Oui. Vos données sont chiffrées localement avec AES-256 avant d'être envoyées sur nos serveurs. Nous utilisons une architecture zero-knowledge : même nos équipes ne peuvent pas lire vos mots de passe. Seul votre mot de passe maître peut les déchiffrer.",
-        "q2": "Puis-je utiliser MykeyNest sur plusieurs appareils ?",
+        "q2": "Puis-je utiliser MYKEYNEST sur plusieurs appareils ?",
         "a2": "Absolument. La synchronisation multi-appareils est incluse dans tous les plans. Vos identifiants sont disponibles sur ordinateur, smartphone et tablette, toujours chiffrés de bout en bout.",
         "q3": "Le générateur de mots de passe stocke-t-il mes mots de passe ?",
         "a3": "Non. Le générateur fonctionne entièrement côté client grâce à l'API crypto.getRandomValues du navigateur. Aucune donnée n'est transmise à nos serveurs. Le mot de passe disparaît dès que vous fermez l'onglet.",
         "q4": "Comment passer au plan Pro ?",
         "a4": "Depuis votre espace personnel, rendez-vous dans Paramètres › Abonnement et cliquez sur « Passer au Pro ». Le paiement est sécurisé via Stripe. Votre compte est mis à niveau instantanément, sans interruption de service.",
-        "q5": "MykeyNest est-il open source ?",
+        "q5": "MYKEYNEST est-il open source ?",
         "a5": "Oui. Le code source est publiquement accessible sur GitHub, ce qui permet à la communauté d'auditer la sécurité et de contribuer. La transparence est l'un de nos principes fondamentaux."
       }
     },
@@ -1309,12 +1309,12 @@
   "business": {
     "solution": {
       "meta": {
-        "title": "Solution cybersécurité PME — Gestion mots de passe & accompagnement | MykeyNest",
+        "title": "Solution cybersécurité PME — Gestion mots de passe & accompagnement | MYKEYNEST",
         "description": "Solution de cybersécurité complète pour PME : logiciel de gestion des mots de passe AES-256, maintenance incluse, formation collaborateurs et audit de sécurité. Dès 2,99 €/utilisateur/mois.",
         "keywords": "solution cybersécurité PME, gestionnaire mots de passe entreprise, audit sécurité PME, formation cybersécurité, password manager entreprise"
       },
       "schema": {
-        "name": "MykeyNest — Solution cybersécurité PME",
+        "name": "MYKEYNEST — Solution cybersécurité PME",
         "description": "Logiciel de gestion des mots de passe pour PME avec maintenance, formation collaborateurs et audit de sécurité inclus."
       },
       "hero": {
@@ -1367,7 +1367,7 @@
         "subtitle": "Consultez notre comparatif ou découvrez notre offre d'audit et de formation dédiée aux PME.",
         "comparatif": {
           "label": "Comparatif",
-          "title": "MykeyNest vs Bitwarden vs 1Password"
+          "title": "MYKEYNEST vs Bitwarden vs 1Password"
         },
         "audit": {
           "label": "Services",
@@ -1390,19 +1390,19 @@
       },
       "cta": {
         "title": "Prêt à sécuriser votre PME ?",
-        "subtitle": "Rejoignez MykeyNest et protégez vos données d'entreprise dès aujourd'hui.",
+        "subtitle": "Rejoignez MYKEYNEST et protégez vos données d'entreprise dès aujourd'hui.",
         "primary": "Essai gratuit — sans carte bancaire",
         "secondary": "Contacter notre équipe"
       }
     },
     "comparatif": {
       "meta": {
-        "title": "MykeyNest vs Bitwarden vs 1Password : comparatif pour PME | MykeyNest",
-        "description": "Comparatif objectif et factuel entre MykeyNest, Bitwarden Teams et 1Password Business. Prix, fonctionnalités, maintenance et formation : quelle solution choisir pour votre PME ?",
-        "keywords": "comparatif password manager entreprise, MykeyNest vs Bitwarden, MykeyNest vs 1Password, meilleur gestionnaire mots de passe PME"
+        "title": "MYKEYNEST vs Bitwarden vs 1Password : comparatif pour PME | MYKEYNEST",
+        "description": "Comparatif objectif et factuel entre MYKEYNEST, Bitwarden Teams et 1Password Business. Prix, fonctionnalités, maintenance et formation : quelle solution choisir pour votre PME ?",
+        "keywords": "comparatif password manager entreprise, MYKEYNEST vs Bitwarden, MYKEYNEST vs 1Password, meilleur gestionnaire mots de passe PME"
       },
       "schema": {
-        "headline": "MykeyNest vs Bitwarden vs 1Password : quelle solution pour PME ?",
+        "headline": "MYKEYNEST vs Bitwarden vs 1Password : quelle solution pour PME ?",
         "description": "Comparatif factuel des solutions de gestion des mots de passe pour entreprises : prix, sécurité, services inclus."
       },
       "breadcrumb": {
@@ -1423,7 +1423,7 @@
         "eyebrow": "Tableau comparatif",
         "title": "Fonctionnalités & prix en un coup d'œil",
         "subtitle": "Comparaison basée sur les offres équivalentes destinées aux équipes et PME.",
-        "aria": "Comparatif MykeyNest, Bitwarden et 1Password",
+        "aria": "Comparatif MYKEYNEST, Bitwarden et 1Password",
         "badge_recommended": "Recommandé",
         "cat_pricing": "💰 Tarif",
         "cat_security": "🔐 Sécurité",
@@ -1448,12 +1448,12 @@
         }
       },
       "why": {
-        "eyebrow": "Pourquoi choisir MykeyNest",
+        "eyebrow": "Pourquoi choisir MYKEYNEST",
         "title": "4 raisons de nous choisir",
-        "subtitle": "Au-delà du prix, MykeyNest est la seule solution qui accompagne vraiment votre PME.",
+        "subtitle": "Au-delà du prix, MYKEYNEST est la seule solution qui accompagne vraiment votre PME.",
         "price": {
           "title": "3× moins cher",
-          "desc": "À 2,99 €/utilisateur/mois, MykeyNest est jusqu'à 4 fois moins cher que ses concurrents pour des fonctionnalités équivalentes ou supérieures."
+          "desc": "À 2,99 €/utilisateur/mois, MYKEYNEST est jusqu'à 4 fois moins cher que ses concurrents pour des fonctionnalités équivalentes ou supérieures."
         },
         "maintenance": {
           "title": "Maintenance incluse",
@@ -1476,7 +1476,7 @@
     },
     "audit": {
       "meta": {
-        "title": "Audit & Formation cybersécurité PME | MykeyNest",
+        "title": "Audit & Formation cybersécurité PME | MYKEYNEST",
         "description": "Audit cybersécurité à distance ou sur site pour PME + formation des collaborateurs à la sensibilisation phishing et aux bonnes pratiques. Rapport de vulnérabilité inclus.",
         "keywords": "audit cybersécurité PME, formation cybersécurité collaborateurs, sensibilisation phishing entreprise, rapport vulnérabilité PME"
       },
@@ -1554,8 +1554,8 @@
           "answer": "Un audit à distance dure généralement 2 à 3 jours ouvrés. Un audit sur site s'étend sur une demi-journée à une journée complète selon la taille de votre structure. Le rapport est livré dans les 5 jours suivant l'intervention."
         },
         "q2": {
-          "question": "Faut-il avoir MykeyNest pour bénéficier de l'audit ?",
-          "answer": "Non. L'audit et la formation sont proposés indépendamment de notre logiciel. Bien sûr, si l'audit révèle des problèmes de gestion des mots de passe, nous pouvons vous proposer MykeyNest comme solution adaptée."
+          "question": "Faut-il avoir MYKEYNEST pour bénéficier de l'audit ?",
+          "answer": "Non. L'audit et la formation sont proposés indépendamment de notre logiciel. Bien sûr, si l'audit révèle des problèmes de gestion des mots de passe, nous pouvons vous proposer MYKEYNEST comme solution adaptée."
         },
         "q3": {
           "question": "La formation est-elle adaptée à des collaborateurs non techniques ?",
@@ -1563,7 +1563,7 @@
         },
         "q4": {
           "question": "Quel est le tarif d'un audit ?",
-          "answer": "Le tarif varie selon le périmètre et la taille de votre entreprise. Contactez-nous pour recevoir un devis personnalisé gratuit. En tant que client MykeyNest Pro, vous bénéficiez d'un audit de sécurité logiciel intégré sans surcoût."
+          "answer": "Le tarif varie selon le périmètre et la taille de votre entreprise. Contactez-nous pour recevoir un devis personnalisé gratuit. En tant que client MYKEYNEST Pro, vous bénéficiez d'un audit de sécurité logiciel intégré sans surcoût."
         }
       },
       "cta": {

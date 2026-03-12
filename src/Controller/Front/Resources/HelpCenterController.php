@@ -69,8 +69,8 @@ final class HelpCenterController extends AbstractController
                 'slug' => 'demarrer',
                 'icon' => '🚀',
                 'title' => [
-                    'fr' => 'Démarrer avec MykeyNest',
-                    'en' => 'Getting started with MykeyNest',
+                    'fr' => 'Démarrer avec MYKEYNEST',
+                    'en' => 'Getting started with MYKEYNEST',
                 ],
                 'description' => [
                     'fr' => 'Création de compte, installation, premiers mots de passe et prise en main rapide.',
@@ -159,8 +159,8 @@ final class HelpCenterController extends AbstractController
                 'creer-son-compte' => [
                     'slug' => 'creer-son-compte',
                     'title' => [
-                        'fr' => 'Comment créer son compte MykeyNest ?',
-                        'en' => 'How to create your MykeyNest account?',
+                        'fr' => 'Comment créer son compte MYKEYNEST ?',
+                        'en' => 'How to create your MYKEYNEST account?',
                     ],
                     'excerpt' => [
                         'fr' => 'Guide étape par étape pour créer votre compte, choisir un mot de passe maître solide et commencer à stocker vos identifiants.',
@@ -169,8 +169,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['démarrer', 'compte', 'inscription'],
                     'updatedAt' => new \DateTime('2026-01-20'),
@@ -206,8 +206,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Add your first credential',
                             ],
                             'content' => [
-                                'fr' => '<p>Une fois connecté, cliquez sur <strong>+ Nouvel identifiant</strong>. Renseignez le site, l\'email et le mot de passe. MykeyNest chiffre tout localement avant la sauvegarde.</p>',
-                                'en' => '<p>Once logged in, click <strong>+ New credential</strong>. Enter the website, email/username, and password. MykeyNest encrypts everything locally before saving.</p>',
+                                'fr' => '<p>Une fois connecté, cliquez sur <strong>+ Nouvel identifiant</strong>. Renseignez le site, l\'email et le mot de passe. MYKEYNEST chiffre tout localement avant la sauvegarde.</p>',
+                                'en' => '<p>Once logged in, click <strong>+ New credential</strong>. Enter the website, email/username, and password. MYKEYNEST encrypts everything locally before saving.</p>',
                             ],
                         ],
                     ],
@@ -226,8 +226,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 4,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['import', 'migration', 'CSV'],
                     'updatedAt' => new \DateTime('2026-01-18'),
@@ -241,8 +241,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Supported formats',
                             ],
                             'content' => [
-                                'fr' => '<p>MykeyNest accepte les exports CSV de : Google Chrome, Mozilla Firefox, Bitwarden, 1Password, LastPass et Dashlane.</p>',
-                                'en' => '<p>MykeyNest supports CSV exports from: Google Chrome, Mozilla Firefox, Bitwarden, 1Password, LastPass, and Dashlane.</p>',
+                                'fr' => '<p>MYKEYNEST accepte les exports CSV de : Google Chrome, Mozilla Firefox, Bitwarden, 1Password, LastPass et Dashlane.</p>',
+                                'en' => '<p>MYKEYNEST supports CSV exports from: Google Chrome, Mozilla Firefox, Bitwarden, 1Password, LastPass, and Dashlane.</p>',
                             ],
                         ],
                         [
@@ -259,8 +259,8 @@ final class HelpCenterController extends AbstractController
                         [
                             'id' => 'importer',
                             'title' => [
-                                'fr' => 'Importer dans MykeyNest',
-                                'en' => 'Import into MykeyNest',
+                                'fr' => 'Importer dans MYKEYNEST',
+                                'en' => 'Import into MYKEYNEST',
                             ],
                             'content' => [
                                 'fr' => '<p>Depuis votre tableau de bord, allez dans <strong>Paramètres › Import</strong>. Sélectionnez votre source, choisissez le fichier CSV et validez. Tout sera chiffré et importé automatiquement.</p>',
@@ -283,8 +283,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['synchronisation', 'appareils', 'mobile'],
                     'updatedAt' => new \DateTime('2025-12-15'),
@@ -309,8 +309,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Add a new device',
                             ],
                             'content' => [
-                                'fr' => '<p>Installez l\'application MykeyNest ou ouvrez le site dans un navigateur, connectez-vous avec votre email et votre mot de passe maître. La synchronisation démarre automatiquement.</p>',
-                                'en' => '<p>Install the MykeyNest app or open the website in a browser, then sign in with your email and master password. Sync starts automatically.</p>',
+                                'fr' => '<p>Installez l\'application MYKEYNEST ou ouvrez le site dans un navigateur, connectez-vous avec votre email et votre mot de passe maître. La synchronisation démarre automatiquement.</p>',
+                                'en' => '<p>Install the MYKEYNEST app or open the website in a browser, then sign in with your email and master password. Sync starts automatically.</p>',
                             ],
                         ],
                     ],
@@ -319,18 +319,18 @@ final class HelpCenterController extends AbstractController
                 'application-mobile' => [
                     'slug' => 'application-mobile',
                     'title' => [
-                        'fr' => 'Utiliser MykeyNest sur mobile',
-                        'en' => 'Use MykeyNest on mobile',
+                        'fr' => 'Utiliser MYKEYNEST sur mobile',
+                        'en' => 'Use MYKEYNEST on mobile',
                     ],
                     'excerpt' => [
-                        'fr' => 'L\'application mobile MykeyNest est disponible sur iOS et Android. Découvrez comment l\'installer et activer la biométrie.',
-                        'en' => 'The MykeyNest mobile app is available on iOS and Android. Learn how to install it and enable biometrics.',
+                        'fr' => 'L\'application mobile MYKEYNEST est disponible sur iOS et Android. Découvrez comment l\'installer et activer la biométrie.',
+                        'en' => 'The MYKEYNEST mobile app is available on iOS and Android. Learn how to install it and enable biometrics.',
                     ],
                     'readTime' => 3,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['mobile', 'iOS', 'Android'],
                     'updatedAt' => new \DateTime('2026-01-05'),
@@ -344,8 +344,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Download the app',
                             ],
                             'content' => [
-                                'fr' => '<p>L\'application est disponible sur l\'<strong>App Store</strong> (iOS 15+) et le <strong>Google Play Store</strong> (Android 9+). Recherchez « MykeyNest ».</p>',
-                                'en' => '<p>The app is available on the <strong>App Store</strong> (iOS 15+) and the <strong>Google Play Store</strong> (Android 9+). Search for “MykeyNest”.</p>',
+                                'fr' => '<p>L\'application est disponible sur l\'<strong>App Store</strong> (iOS 15+) et le <strong>Google Play Store</strong> (Android 9+). Recherchez « MYKEYNEST ».</p>',
+                                'en' => '<p>The app is available on the <strong>App Store</strong> (iOS 15+) and the <strong>Google Play Store</strong> (Android 9+). Search for “MYKEYNEST”.</p>',
                             ],
                         ],
                         [
@@ -372,14 +372,14 @@ final class HelpCenterController extends AbstractController
                         'en' => 'What is zero-knowledge architecture?',
                     ],
                     'excerpt' => [
-                        'fr' => 'Découvrez comment MykeyNest garantit que personne, même nos équipes, ne peut accéder à vos mots de passe en clair.',
-                        'en' => 'Learn how MykeyNest ensures no one — not even our team — can access your passwords in plain text.',
+                        'fr' => 'Découvrez comment MYKEYNEST garantit que personne, même nos équipes, ne peut accéder à vos mots de passe en clair.',
+                        'en' => 'Learn how MYKEYNEST ensures no one — not even our team — can access your passwords in plain text.',
                     ],
                     'readTime' => 4,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['sécurité', 'architecture', 'chiffrement'],
                     'updatedAt' => new \DateTime('2026-01-15'),
@@ -393,8 +393,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'What does “zero-knowledge” mean?',
                             ],
                             'content' => [
-                                'fr' => '<p>L\'architecture <strong>zero-knowledge</strong> signifie que MykeyNest n\'a <em>jamais accès</em> à vos données en clair. Vos mots de passe sont chiffrés localement avant d\'être envoyés sur nos serveurs.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>En résumé :</strong> Même si nos serveurs étaient piratés, les attaquants ne verraient que du chiffré totalement inutilisable.</span></div>',
-                                'en' => '<p><strong>Zero-knowledge</strong> means MykeyNest <em>never has access</em> to your data in plain text. Your passwords are encrypted locally before being sent to our servers.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>In short:</strong> Even if our servers were hacked, attackers would only see unusable encrypted data.</span></div>',
+                                'fr' => '<p>L\'architecture <strong>zero-knowledge</strong> signifie que MYKEYNEST n\'a <em>jamais accès</em> à vos données en clair. Vos mots de passe sont chiffrés localement avant d\'être envoyés sur nos serveurs.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>En résumé :</strong> Même si nos serveurs étaient piratés, les attaquants ne verraient que du chiffré totalement inutilisable.</span></div>',
+                                'en' => '<p><strong>Zero-knowledge</strong> means MYKEYNEST <em>never has access</em> to your data in plain text. Your passwords are encrypted locally before being sent to our servers.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>In short:</strong> Even if our servers were hacked, attackers would only see unusable encrypted data.</span></div>',
                             ],
                         ],
                         [
@@ -429,14 +429,14 @@ final class HelpCenterController extends AbstractController
                         'en' => 'How does AES-256 encryption work?',
                     ],
                     'excerpt' => [
-                        'fr' => 'Plongez dans les détails du standard de chiffrement militaire utilisé par MykeyNest pour protéger vos données.',
-                        'en' => 'Dive into the details of the military-grade encryption standard used by MykeyNest to protect your data.',
+                        'fr' => 'Plongez dans les détails du standard de chiffrement militaire utilisé par MYKEYNEST pour protéger vos données.',
+                        'en' => 'Dive into the details of the military-grade encryption standard used by MYKEYNEST to protect your data.',
                     ],
                     'readTime' => 6,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['aes-256', 'chiffrement', 'technique'],
                     'updatedAt' => new \DateTime('2026-01-10'),
@@ -450,8 +450,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'What is AES-256?',
                             ],
                             'content' => [
-                                'fr' => '<p>AES-256 est le standard de chiffrement symétrique adopté par les gouvernements, militaires et banques. MykeyNest l\'utilise pour chiffrer toutes vos données.</p>',
-                                'en' => '<p>AES-256 is a symmetric encryption standard used by governments, militaries, and banks. MykeyNest uses it to encrypt all your data.</p>',
+                                'fr' => '<p>AES-256 est le standard de chiffrement symétrique adopté par les gouvernements, militaires et banques. MYKEYNEST l\'utilise pour chiffrer toutes vos données.</p>',
+                                'en' => '<p>AES-256 is a symmetric encryption standard used by governments, militaries, and banks. MYKEYNEST uses it to encrypt all your data.</p>',
                             ],
                         ],
                         [
@@ -481,8 +481,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 5,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['mot de passe maître', 'sécurité', 'récupération'],
                     'updatedAt' => new \DateTime('2026-01-20'),
@@ -527,8 +527,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 4,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['2FA', 'authentification', 'sécurité', 'pro'],
                     'updatedAt' => new \DateTime('2025-12-20'),
@@ -573,8 +573,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['audit', 'sécurité', 'pro'],
                     'updatedAt' => new \DateTime('2025-12-28'),
@@ -622,8 +622,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['générateur', 'guide', 'démarrer'],
                     'updatedAt' => new \DateTime('2026-02-01'),
@@ -679,8 +679,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 4,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['longueur', 'sécurité', 'conseils'],
                     'updatedAt' => new \DateTime('2026-01-05'),
@@ -725,8 +725,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['sécurité', 'générateur', 'technique'],
                     'updatedAt' => new \DateTime('2025-12-10'),
@@ -774,8 +774,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['partage', 'identifiant', 'collaboration'],
                     'updatedAt' => new \DateTime('2026-01-12'),
@@ -820,8 +820,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 2,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['partage', 'offre gratuite', 'limites'],
                     'updatedAt' => new \DateTime('2025-12-01'),
@@ -855,8 +855,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 2,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['partage', 'révocation', 'sécurité'],
                     'updatedAt' => new \DateTime('2025-11-20'),
@@ -883,8 +883,8 @@ final class HelpCenterController extends AbstractController
                 'installer-extension-chrome' => [
                     'slug' => 'installer-extension-chrome',
                     'title' => [
-                        'fr' => 'Installer l\'extension MykeyNest sur Chrome',
-                        'en' => 'Install the MykeyNest extension on Chrome',
+                        'fr' => 'Installer l\'extension MYKEYNEST sur Chrome',
+                        'en' => 'Install the MYKEYNEST extension on Chrome',
                     ],
                     'excerpt' => [
                         'fr' => 'L\'extension Chrome permet le remplissage automatique de vos identifiants sur tous les sites. Installation en 2 minutes.',
@@ -893,8 +893,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['extension', 'Chrome', 'installation'],
                     'updatedAt' => new \DateTime('2026-01-25'),
@@ -908,8 +908,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Install the extension',
                             ],
                             'content' => [
-                                'fr' => '<p>Rendez-vous sur le <strong>Chrome Web Store</strong> et recherchez « MykeyNest ». Cliquez sur <strong>Ajouter à Chrome</strong> et confirmez. L\'extension s\'installe instantanément.</p>',
-                                'en' => '<p>Go to the <strong>Chrome Web Store</strong> and search for “MykeyNest”. Click <strong>Add to Chrome</strong> and confirm. The extension installs instantly.</p>',
+                                'fr' => '<p>Rendez-vous sur le <strong>Chrome Web Store</strong> et recherchez « MYKEYNEST ». Cliquez sur <strong>Ajouter à Chrome</strong> et confirmez. L\'extension s\'installe instantanément.</p>',
+                                'en' => '<p>Go to the <strong>Chrome Web Store</strong> and search for “MYKEYNEST”. Click <strong>Add to Chrome</strong> and confirm. The extension installs instantly.</p>',
                             ],
                         ],
                         [
@@ -919,8 +919,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Sign in to the extension',
                             ],
                             'content' => [
-                                'fr' => '<p>Cliquez sur l\'icône MykeyNest dans la barre d\'outils Chrome et connectez-vous avec votre email et votre mot de passe maître.</p>',
-                                'en' => '<p>Click the MykeyNest icon in the Chrome toolbar and sign in with your email and master password.</p>',
+                                'fr' => '<p>Cliquez sur l\'icône MYKEYNEST dans la barre d\'outils Chrome et connectez-vous avec votre email et votre mot de passe maître.</p>',
+                                'en' => '<p>Click the MYKEYNEST icon in the Chrome toolbar and sign in with your email and master password.</p>',
                             ],
                         ],
                         [
@@ -930,8 +930,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Use autofill',
                             ],
                             'content' => [
-                                'fr' => '<p>Sur un formulaire de connexion, cliquez sur le champ. Un popup MykeyNest apparaît avec les identifiants correspondants. Cliquez pour remplir automatiquement.</p>',
-                                'en' => '<p>On a login form, click the field. A MykeyNest popup appears with matching credentials. Click to fill automatically.</p>',
+                                'fr' => '<p>Sur un formulaire de connexion, cliquez sur le champ. Un popup MYKEYNEST apparaît avec les identifiants correspondants. Cliquez pour remplir automatiquement.</p>',
+                                'en' => '<p>On a login form, click the field. A MYKEYNEST popup appears with matching credentials. Click to fill automatically.</p>',
                             ],
                         ],
                     ],
@@ -940,18 +940,18 @@ final class HelpCenterController extends AbstractController
                 'installer-extension-firefox' => [
                     'slug' => 'installer-extension-firefox',
                     'title' => [
-                        'fr' => 'Installer l\'extension MykeyNest sur Firefox',
-                        'en' => 'Install the MykeyNest extension on Firefox',
+                        'fr' => 'Installer l\'extension MYKEYNEST sur Firefox',
+                        'en' => 'Install the MYKEYNEST extension on Firefox',
                     ],
                     'excerpt' => [
-                        'fr' => 'Guide d\'installation de l\'extension MykeyNest pour Firefox avec remplissage automatique des mots de passe.',
-                        'en' => 'Installation guide for the MykeyNest Firefox extension with password autofill.',
+                        'fr' => 'Guide d\'installation de l\'extension MYKEYNEST pour Firefox avec remplissage automatique des mots de passe.',
+                        'en' => 'Installation guide for the MYKEYNEST Firefox extension with password autofill.',
                     ],
                     'readTime' => 3,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['extension', 'Firefox', 'installation'],
                     'updatedAt' => new \DateTime('2026-01-22'),
@@ -965,8 +965,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Install from Firefox Add-ons',
                             ],
                             'content' => [
-                                'fr' => '<p>Allez sur <strong>addons.mozilla.org</strong>, recherchez « MykeyNest » et cliquez sur <strong>Ajouter à Firefox</strong>. Acceptez les permissions et connectez-vous avec vos identifiants MykeyNest.</p>',
-                                'en' => '<p>Go to <strong>addons.mozilla.org</strong>, search for “MykeyNest”, and click <strong>Add to Firefox</strong>. Accept permissions and sign in with your MykeyNest credentials.</p>',
+                                'fr' => '<p>Allez sur <strong>addons.mozilla.org</strong>, recherchez « MYKEYNEST » et cliquez sur <strong>Ajouter à Firefox</strong>. Acceptez les permissions et connectez-vous avec vos identifiants MYKEYNEST.</p>',
+                                'en' => '<p>Go to <strong>addons.mozilla.org</strong>, search for “MYKEYNEST”, and click <strong>Add to Firefox</strong>. Accept permissions and sign in with your MYKEYNEST credentials.</p>',
                             ],
                         ],
                     ],
@@ -985,8 +985,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 4,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['auto-remplissage', 'dépannage', 'extension'],
                     'updatedAt' => new \DateTime('2026-01-08'),
@@ -1000,8 +1000,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Check that the extension is enabled',
                             ],
                             'content' => [
-                                'fr' => '<p>Assurez-vous que l\'extension est activée dans <code>chrome://extensions</code> et que vous êtes bien connecté à votre compte MykeyNest.</p>',
-                                'en' => '<p>Make sure the extension is enabled in <code>chrome://extensions</code> and that you are signed in to your MykeyNest account.</p>',
+                                'fr' => '<p>Assurez-vous que l\'extension est activée dans <code>chrome://extensions</code> et que vous êtes bien connecté à votre compte MYKEYNEST.</p>',
+                                'en' => '<p>Make sure the extension is enabled in <code>chrome://extensions</code> and that you are signed in to your MYKEYNEST account.</p>',
                             ],
                         ],
                         [
@@ -1045,8 +1045,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 3,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['offre', 'comparatif', 'pro', 'gratuit'],
                     'updatedAt' => new \DateTime('2026-02-01'),
@@ -1091,8 +1091,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 2,
                     'popular' => true,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['pro', 'upgrade', 'paiement'],
                     'updatedAt' => new \DateTime('2026-01-15'),
@@ -1126,8 +1126,8 @@ final class HelpCenterController extends AbstractController
                     'readTime' => 2,
                     'popular' => false,
                     'author' => [
-                        'fr' => 'Équipe MykeyNest',
-                        'en' => 'MykeyNest Team',
+                        'fr' => 'Équipe MYKEYNEST',
+                        'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['annulation', 'abonnement', 'pro'],
                     'updatedAt' => new \DateTime('2025-12-10'),
@@ -1169,12 +1169,12 @@ final class HelpCenterController extends AbstractController
                 'categorySlug' => 'demarrer',
                 'articleSlug' => 'creer-son-compte',
                 'title' => [
-                    'fr' => 'Comment créer son compte MykeyNest ?',
-                    'en' => 'How to create your MykeyNest account?',
+                    'fr' => 'Comment créer son compte MYKEYNEST ?',
+                    'en' => 'How to create your MYKEYNEST account?',
                 ],
                 'categoryTitle' => [
-                    'fr' => 'Démarrer avec MykeyNest',
-                    'en' => 'Getting started with MykeyNest',
+                    'fr' => 'Démarrer avec MYKEYNEST',
+                    'en' => 'Getting started with MYKEYNEST',
                 ],
             ],
             [

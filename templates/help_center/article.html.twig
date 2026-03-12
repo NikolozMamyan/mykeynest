@@ -1,10 +1,10 @@
 {% extends 'base_auth.html.twig' %}
 
-{% block title %}{{ article.title }} | Centre d'aide | MykeyNest{% endblock %}
+{% block title %}{{ article.title }} | Centre d'aide | MYKEYNEST{% endblock %}
 
 {% block meta_description %}
 <meta name="description" content="{{ article.excerpt }}">
-<meta property="og:title" content="{{ article.title }} | MykeyNest">
+<meta property="og:title" content="{{ article.title }} | MYKEYNEST">
 <meta property="og:description" content="{{ article.excerpt }}">
 <meta property="og:type" content="article">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,10 +19,10 @@ CONTROLLER — exemple de données à passer :
 $article = [
     'slug'        => 'zero-knowledge-explique',
     'title'       => "Qu'est-ce que l'architecture zero-knowledge ?",
-    'excerpt'     => "Découvrez comment MykeyNest garantit que personne, même nous, ne peut lire vos mots de passe.",
+    'excerpt'     => "Découvrez comment MYKEYNEST garantit que personne, même nous, ne peut lire vos mots de passe.",
     'readTime'    => 4,
     'updatedAt'   => new \DateTime('2026-01-15'),
-    'author'      => 'Équipe MykeyNest',
+    'author'      => 'Équipe MYKEYNEST',
     'popular'     => true,
     'tags'        => ['sécurité', 'chiffrement', 'architecture'],
     'helpfulYes'  => 142,   // compteur votes positifs
@@ -51,7 +51,7 @@ $relatedArticles = [
     [
         'slug'     => 'aes-256-explique',
         'title'    => 'Comment fonctionne le chiffrement AES-256 ?',
-        'excerpt'  => 'Plongez dans les détails du standard de chiffrement utilisé par MykeyNest.',
+        'excerpt'  => 'Plongez dans les détails du standard de chiffrement utilisé par MYKEYNEST.',
         'readTime' => 5,
     ],
     ...

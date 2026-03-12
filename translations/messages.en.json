@@ -110,9 +110,9 @@
       "title_highlight": "all in one place",
       "subtitle": "A simple, secure, and modern password manager. AES-256 encryption, zero-knowledge architecture, and hashed & signed installation. Try it for free.",
       "cta_start": "Get started for free",
-      "cta_start_aria": "Create a free account on MykeyNest",
+      "cta_start_aria": "Create a free account on MYKEYNEST",
       "cta_discover": "Learn more",
-      "trust_aria": "MykeyNest security guarantees",
+      "trust_aria": "MYKEYNEST security guarantees",
       "trust": {
         "aes": "AES-256 encryption",
         "zeroknowledge": "Zero-knowledge",
@@ -162,7 +162,7 @@
     "security": {
       "label": "Unbreakable security",
       "title": "You alone control access",
-      "intro": "Every MykeyNest extension installation generates a unique cryptographic fingerprint (hash). Access is strictly tied to your instance — impossible to impersonate, even with your credentials.",
+      "intro": "Every MYKEYNEST extension installation generates a unique cryptographic fingerprint (hash). Access is strictly tied to your instance — impossible to impersonate, even with your credentials.",
       "points": {
         "p1_title": "Hardware Signature",
         "p1_text": "Access is tied to your specific instance. An attacker on another device is blocked even with your credentials.",
@@ -176,7 +176,7 @@
     },
     "pricing": {
       "label": "Pricing",
-      "aria": "MykeyNest pricing plans",
+      "aria": "MYKEYNEST pricing plans",
       "title": "A simple and transparent plan",
       "subtitle": "Start for free, upgrade to premium when you need it.",
       "plan": {
@@ -240,30 +240,30 @@
     },
     "faq": {
       "label": "Frequently asked questions",
-      "title": "Your questions about MykeyNest",
+      "title": "Your questions about MYKEYNEST",
       "subtitle": "Everything you need to know before getting started.",
       "items": {
         "q1": "What is a password manager?",
-        "a1": "It is a tool that stores and encrypts all your credentials in a secure digital vault. MykeyNest uses AES-256 encryption, the same standard used by banks.",
+        "a1": "It is a tool that stores and encrypts all your credentials in a secure digital vault. MYKEYNEST uses AES-256 encryption, the same standard used by banks.",
         "q2": "Are my data really secure?",
         "a2": "Yes. Your data is encrypted locally on your device before being synchronized. We never have access to your passwords in plain text (zero-knowledge architecture).",
         "q3": "Is the free plan really free?",
-        "a3": "Yes, no credit card required. You can use MykeyNest for free with basic features. The Pro plan unlocks advanced features.",
-        "q4": "Can I use MykeyNest on multiple devices?",
+        "a3": "Yes, no credit card required. You can use MYKEYNEST for free with basic features. The Pro plan unlocks advanced features.",
+        "q4": "Can I use MYKEYNEST on multiple devices?",
         "a4": "Yes, your passwords are automatically synchronized across all your devices: computer, smartphone, and tablet.",
         "q5": "What is a hashed installation and how does it protect me?",
-        "a5": "Every MykeyNest extension installation generates a unique cryptographic fingerprint tied to your instance. If an attacker tries to reuse your credentials on another device, the hash won't match and access is denied. If the extension is modified or corrupted, the integrity check fails and the vault locks automatically.",
+        "a5": "Every MYKEYNEST extension installation generates a unique cryptographic fingerprint tied to your instance. If an attacker tries to reuse your credentials on another device, the hash won't match and access is denied. If the extension is modified or corrupted, the integrity check fails and the vault locks automatically.",
         "q6": "What happens if I forget my master password?",
         "a6": "We cannot recover it for you (zero-knowledge). That's why it's essential to keep it safe. You can set up emergency recovery.",
-        "q7": "Is MykeyNest GDPR compliant?",
-        "a7": "Yes. MykeyNest is a 100% European solution: your data is hosted in Europe and never transferred to third-party servers outside the EU. The zero-knowledge architecture ensures we never have access to your passwords in plain text. GDPR compliance is built-in, not an afterthought.",
+        "q7": "Is MYKEYNEST GDPR compliant?",
+        "a7": "Yes. MYKEYNEST is a 100% European solution: your data is hosted in Europe and never transferred to third-party servers outside the EU. The zero-knowledge architecture ensures we never have access to your passwords in plain text. GDPR compliance is built-in, not an afterthought.",
         "q8": "How does two-factor authentication (2FA) work?",
         "a8": "2FA adds an extra layer of security: in addition to your master password, a temporary code is required at each login. Available via an authenticator app (TOTP) or email."
       }
     },
     "cta": {
       "title": "Ready to secure your credentials?",
-      "subtitle": "Join MykeyNest today and protect your digital life with ease.",
+      "subtitle": "Join MYKEYNEST today and protect your digital life with ease.",
       "note": "14-day free trial · No credit card required · Cancel anytime",
       "start": "Get started for free",
       "login": "Log in"
@@ -1123,7 +1123,7 @@
         "Use a different password for each important account",
         "Prefer passwords of at least 16 characters",
         "Enable two-factor authentication whenever possible",
-        "Use a secure password manager like MykeyNest",
+        "Use a secure password manager like MYKEYNEST",
         "Regularly change sensitive passwords",
         "Never share your passwords via email or SMS"
       ],
@@ -1132,7 +1132,7 @@
     },
     "cta": {
       "title": "Ready to secure your accounts?",
-      "description": "Join thousands of users who protect their data with MykeyNest",
+      "description": "Join thousands of users who protect their data with MYKEYNEST",
       "button": "Create a free account"
     }
   },
@@ -1141,7 +1141,7 @@
       "eyebrow": "Help center",
       "title_line1": "How can we",
       "title_highlight": "help you?",
-      "subtitle": "Guides, tutorials, and answers to all your questions about MykeyNest."
+      "subtitle": "Guides, tutorials, and answers to all your questions about MYKEYNEST."
     },
     "search": {
       "placeholder": "Search for an article, a feature…",
@@ -1191,15 +1191,15 @@
       "title": "Answers at a glance",
       "sub": "Questions everyone asks.",
       "items": {
-        "q1": "Are my passwords really secure with MykeyNest?",
+        "q1": "Are my passwords really secure with MYKEYNEST?",
         "a1": "Yes. Your data is encrypted locally with AES-256 before being sent to our servers. We use a zero-knowledge architecture: even our teams cannot read your passwords. Only your master password can decrypt them.",
-        "q2": "Can I use MykeyNest on multiple devices?",
+        "q2": "Can I use MYKEYNEST on multiple devices?",
         "a2": "Absolutely. Multi-device sync is included in all plans. Your credentials are available on computer, smartphone, and tablet — always end-to-end encrypted.",
         "q3": "Does the password generator store my passwords?",
         "a3": "No. The generator runs entirely client-side using the browser's crypto.getRandomValues API. No data is sent to our servers. The password disappears as soon as you close the tab.",
         "q4": "How do I upgrade to Pro?",
         "a4": "From your personal space, go to Settings › Subscription and click “Upgrade to Pro”. Payment is securely handled by Stripe. Your account is upgraded instantly with no downtime.",
-        "q5": "Is MykeyNest open source?",
+        "q5": "Is MYKEYNEST open source?",
         "a5": "Yes. The source code is publicly available on GitHub, allowing the community to audit security and contribute. Transparency is one of our core principles."
       }
     },
@@ -1306,12 +1306,12 @@
   "business": {
     "solution": {
       "meta": {
-        "title": "SMB Cybersecurity Solution — Password Management & Support | MykeyNest",
+        "title": "SMB Cybersecurity Solution — Password Management & Support | MYKEYNEST",
         "description": "Complete cybersecurity solution for SMBs: AES-256 password management software, included maintenance, employee training and security audit. From €2.99/user/month.",
         "keywords": "SMB cybersecurity solution, enterprise password manager, SMB security audit, cybersecurity training, business password manager"
       },
       "schema": {
-        "name": "MykeyNest — SMB Cybersecurity Solution",
+        "name": "MYKEYNEST — SMB Cybersecurity Solution",
         "description": "Password management software for SMBs with maintenance, employee training and security audit included."
       },
       "hero": {
@@ -1364,7 +1364,7 @@
         "subtitle": "Check out our comparison or discover our dedicated audit and training offer for SMBs.",
         "comparatif": {
           "label": "Comparison",
-          "title": "MykeyNest vs Bitwarden vs 1Password"
+          "title": "MYKEYNEST vs Bitwarden vs 1Password"
         },
         "audit": {
           "label": "Services",
@@ -1387,19 +1387,19 @@
       },
       "cta": {
         "title": "Ready to secure your SMB?",
-        "subtitle": "Join MykeyNest and protect your business data today.",
+        "subtitle": "Join MYKEYNEST and protect your business data today.",
         "primary": "Free trial — no credit card",
         "secondary": "Contact our team"
       }
     },
     "comparatif": {
       "meta": {
-        "title": "MykeyNest vs Bitwarden vs 1Password: SMB comparison | MykeyNest",
-        "description": "Objective, factual comparison between MykeyNest, Bitwarden Teams and 1Password Business. Pricing, features, maintenance and training: which solution to choose for your SMB?",
-        "keywords": "enterprise password manager comparison, MykeyNest vs Bitwarden, MykeyNest vs 1Password, best SMB password manager"
+        "title": "MYKEYNEST vs Bitwarden vs 1Password: SMB comparison | MYKEYNEST",
+        "description": "Objective, factual comparison between MYKEYNEST, Bitwarden Teams and 1Password Business. Pricing, features, maintenance and training: which solution to choose for your SMB?",
+        "keywords": "enterprise password manager comparison, MYKEYNEST vs Bitwarden, MYKEYNEST vs 1Password, best SMB password manager"
       },
       "schema": {
-        "headline": "MykeyNest vs Bitwarden vs 1Password: which solution for SMBs?",
+        "headline": "MYKEYNEST vs Bitwarden vs 1Password: which solution for SMBs?",
         "description": "Factual comparison of enterprise password management solutions: pricing, security, included services."
       },
       "breadcrumb": {
@@ -1420,7 +1420,7 @@
         "eyebrow": "Comparison table",
         "title": "Features & pricing at a glance",
         "subtitle": "Comparison based on equivalent team and SMB offers.",
-        "aria": "Comparison of MykeyNest, Bitwarden and 1Password",
+        "aria": "Comparison of MYKEYNEST, Bitwarden and 1Password",
         "badge_recommended": "Recommended",
         "cat_pricing": "💰 Pricing",
         "cat_security": "🔐 Security",
@@ -1445,12 +1445,12 @@
         }
       },
       "why": {
-        "eyebrow": "Why choose MykeyNest",
+        "eyebrow": "Why choose MYKEYNEST",
         "title": "4 reasons to choose us",
-        "subtitle": "Beyond price, MykeyNest is the only solution that truly supports your SMB.",
+        "subtitle": "Beyond price, MYKEYNEST is the only solution that truly supports your SMB.",
         "price": {
           "title": "3× cheaper",
-          "desc": "At €2.99/user/month, MykeyNest is up to 4 times cheaper than competitors for equivalent or superior features."
+          "desc": "At €2.99/user/month, MYKEYNEST is up to 4 times cheaper than competitors for equivalent or superior features."
         },
         "maintenance": {
           "title": "Maintenance included",
@@ -1473,7 +1473,7 @@
     },
     "audit": {
       "meta": {
-        "title": "SMB Cybersecurity Audit & Training | MykeyNest",
+        "title": "SMB Cybersecurity Audit & Training | MYKEYNEST",
         "description": "Remote or on-site cybersecurity audit for SMBs + employee training on phishing awareness and best practices. Vulnerability report included.",
         "keywords": "SMB cybersecurity audit, employee cybersecurity training, business phishing awareness, SMB vulnerability report"
       },
@@ -1551,8 +1551,8 @@
           "answer": "A remote audit typically takes 2 to 3 business days. An on-site audit spans half a day to a full day depending on the size of your organisation. The report is delivered within 5 days of the engagement."
         },
         "q2": {
-          "question": "Do I need MykeyNest to benefit from the audit?",
-          "answer": "No. The audit and training are offered independently of our software. Of course, if the audit reveals password management issues, we can propose MykeyNest as a suitable solution."
+          "question": "Do I need MYKEYNEST to benefit from the audit?",
+          "answer": "No. The audit and training are offered independently of our software. Of course, if the audit reveals password management issues, we can propose MYKEYNEST as a suitable solution."
         },
         "q3": {
           "question": "Is the training suitable for non-technical employees?",
@@ -1560,7 +1560,7 @@
         },
         "q4": {
           "question": "What is the cost of an audit?",
-          "answer": "The price varies depending on the scope and size of your company. Contact us for a free personalised quote. As a MykeyNest Pro customer, you benefit from a built-in software security audit at no extra cost."
+          "answer": "The price varies depending on the scope and size of your company. Contact us for a free personalised quote. As a MYKEYNEST Pro customer, you benefit from a built-in software security audit at no extra cost."
         }
       },
       "cta": {
