@@ -1,0 +1,209 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Validation de connexion{% endblock %}
+
+{% block body %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+  .wrapper-layout {
+    margin:0px !important;
+  }
+
+  .pending-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .pending-card {
+    background: var(--color-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-xl);
+    max-width: 520px;
+    width: 100%;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  /* Accent vert en haut */
+  .pending-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+  }
+
+  /* Cercle décoratif flou en fond */
+  .pending-card::after {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--color-primary-hover);
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .pending-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Icône email animée */
+  .icon-wrapper {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: var(--shadow-green);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-5px); }
+  }
+
+  .icon-wrapper svg {
+    width: 30px;
+    height: 30px;
+    stroke: var(--color-primary);
+  }
+
+  /* Titre */
+  .pending-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.75rem;
+    color: var(--color-text-dark);
+    margin: 0 0 0.75rem;
+    line-height: 1.2;
+  }
+
+  /* Message */
+  .pending-message {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    line-height: 1.6;
+    margin: 0 0 2rem;
+  }
+
+  /* Bloc statut */
+  .status-block {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: 0.875rem 1.125rem;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-warning);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+    50%       { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.1); }
+  }
+
+  .status-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .status-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 2rem 0;
+  }
+
+  /* Footer hint */
+  .pending-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .pending-hint a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .pending-hint a:hover {
+    text-decoration: underline;
+  }
+
+  /* Entrée animée */
+  .pending-card {
+    animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="pending-wrapper">
+  <div class="pending-card" data-controller="pending-login">
+
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="3"/>
+        <path d="M2 7l10 7 10-7"/>
+      </svg>
+    </div>
+
+    <h1 class="pending-title">Validez cette connexion</h1>
+
+    <p class="pending-message" data-pending-login-target="message">
+      Vérifiez votre e-mail puis confirmez que cette connexion est bien la vôtre.
+    </p>
+
+    <div class="status-block">
+      <span class="status-dot"></span>
+      <span class="status-label">Statut</span>
+      <span class="status-value" data-pending-login-target="status">pending</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="pending-hint">
+      Vous n'avez pas reçu d'e-mail ?&nbsp;
+      <a href="#">Renvoyer le lien</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

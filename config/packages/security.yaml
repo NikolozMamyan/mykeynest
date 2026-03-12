@@ -29,11 +29,19 @@ security:
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/logout$, roles: PUBLIC_ACCESS }
 
+        # Login challenge public
+        - { path: ^/api/login-challenge/status$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login-challenge/complete$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login-challenge/[A-Fa-f0-9]+/approve$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login-challenge/[A-Fa-f0-9]+/reject$, roles: PUBLIC_ACCESS }
+
+        # Pages publiques web
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/register$, roles: PUBLIC_ACCESS }
         - { path: ^/forgot-password$, roles: PUBLIC_ACCESS }
         - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/app/security/pending-login$, roles: PUBLIC_ACCESS }
 
         - { path: ^/stripe/webhook$, roles: PUBLIC_ACCESS }
 

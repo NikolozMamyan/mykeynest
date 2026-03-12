@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validez cette connexion</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0fdf4;font-family:'Google Sans',Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+
+  <!-- Wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0fdf4;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
+
+          <!-- Logo / Header -->
+          <tr>
+            <td align="center" style="padding-bottom:24px;">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="background-color:#059669;border-radius:12px;padding:10px 14px;">
+                    <!-- Simple lock icon in SVG -->
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="5" y="11" width="14" height="10" rx="2" fill="white"/>
+                      <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                      <circle cx="12" cy="16" r="1.5" fill="#059669"/>
+                    </svg>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td style="background-color:#ffffff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 4px 6px -1px rgba(0,0,0,0.07),0 2px 4px -1px rgba(0,0,0,0.04);overflow:hidden;">
+
+              <!-- Top accent bar -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="height:4px;background:linear-gradient(90deg,#059669,#10b981);font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+              </table>
+
+              <!-- Body -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:36px 40px;">
+
+                <!-- Title -->
+                <tr>
+                  <td style="padding-bottom:8px;">
+                    <p style="margin:0;font-size:22px;font-weight:600;color:#1e293b;letter-spacing:-0.3px;">Nouvelle tentative de connexion</p>
+                  </td>
+                </tr>
+
+                <!-- Greeting -->
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <p style="margin:0;font-size:14px;color:#475569;">Bonjour <strong style="color:#1e293b;">{{ user.email }}</strong>,</p>
+                  </td>
+                </tr>
+
+                <!-- Intro text -->
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <p style="margin:0;font-size:14px;color:#475569;line-height:1.65;">
+                      Nous avons détecté une tentative de connexion depuis un nouvel appareil ou une nouvelle localisation. Vérifiez les informations ci-dessous.
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Info block -->
+                <tr>
+                  <td style="padding-bottom:28px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+                      <tr>
+                        <td style="padding:12px 16px;border-bottom:1px solid #e2e8f0;">
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;width:130px;">Adresse IP</td>
+                              <td style="font-size:13px;color:#1e293b;font-weight:500;">{{ ip ?: 'Inconnue' }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px 16px;border-bottom:1px solid #e2e8f0;">
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;width:130px;">Appareil</td>
+                              <td style="font-size:13px;color:#1e293b;font-weight:500;">{{ userAgent ?: 'Inconnu' }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:12px 16px;">
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;width:130px;">Date</td>
+                              <td style="font-size:13px;color:#1e293b;font-weight:500;">{{ requestedAt|date('d/m/Y à H:i') }}</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Question -->
+                <tr>
+                  <td style="padding-bottom:16px;">
+                    <p style="margin:0;font-size:14px;color:#475569;line-height:1.65;">Était-ce bien vous ?</p>
+                  </td>
+                </tr>
+
+                <!-- CTA Buttons -->
+                <tr>
+                  <td style="padding-bottom:28px;">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <!-- Approve -->
+                        <td style="padding-right:12px;">
+                          <a href="{{ approveUrl }}" style="display:inline-block;padding:11px 22px;background-color:#059669;color:#ffffff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;letter-spacing:0.01em;">
+                            ✓&nbsp; Oui, c'est moi
+                          </a>
+                        </td>
+                        <!-- Reject -->
+                        <td>
+                          <a href="{{ rejectUrl }}" style="display:inline-block;padding:11px 22px;background-color:#ffffff;color:#ef4444;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;border:1.5px solid #ef4444;letter-spacing:0.01em;">
+                            ✕&nbsp; Non, ce n'est pas moi
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Expiry notice -->
+                <tr>
+                  <td>
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0;">
+                      <tr>
+                        <td style="padding:10px 14px;">
+                          <p style="margin:0;font-size:12.5px;color:#92400e;">
+                            ⏱&nbsp; Ce lien expire dans <strong>15 minutes</strong>. Passé ce délai, vous devrez vous reconnecter.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">
+                Si vous n'êtes pas à l'origine de cette tentative, ignorez cet e-mail.<br>
+                Votre compte reste sécurisé tant que vous n'approuvez pas la connexion.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

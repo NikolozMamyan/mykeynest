@@ -136,5 +136,10 @@ public function guestRegister(
         'token' => $token,
     ]);
 }
+#[Route('/app/security/pending-login', name: 'app_pending_login', methods: ['GET'])]
+public function pendingLoginPage(): Response
+{
+    return $this->render('security/pending_login.html.twig');
+}
     
 }

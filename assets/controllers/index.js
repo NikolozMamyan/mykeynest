@@ -5,6 +5,7 @@ import PasswordStrengthController   from "./credention/password-strength_control
 import LayoutController   from "./components/layout_controller.js";
 import GeneratorController from './generator/generator_controller.js';
 import SessionManagerController from "./session_manager_controller.js";
+import PendingLoginController from "./pending_login_controller.js";
 
 
 
@@ -16,3 +17,4 @@ application.register('password-strength', PasswordStrengthController);
 application.register("layout", LayoutController);
 application.register('generator', GeneratorController)
 application.register('session-manager', SessionManagerController)
+application.register('pending-login', PendingLoginController)

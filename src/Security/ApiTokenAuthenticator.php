@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -25,6 +24,8 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
         '/api/forgot-password',
         '/api/reset-password',
         '/api/reset-password/verify',
+        '/api/login-challenge/status',
+        '/api/login-challenge/complete',
         '/stripe/webhook',
 
         '/',
@@ -32,12 +33,14 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
         '/register',
         '/forgot-password',
         '/reset-password',
+        '/app/security/pending-login',
     ];
 
     private const PUBLIC_PREFIXES = [
         '/reset-password/',
         '/verify-email/',
         '/public/',
+        '/api/login-challenge/',
     ];
 
     private const ASSET_PREFIXES = [
@@ -67,13 +70,6 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
     public function supports(Request $request): ?bool
     {
         $path = $this->normalizePath($request->getPathInfo());
-        // 🔍 DEBUG - À RETIRER APRÈS
-    error_log('=== AUTH DEBUG ===');
-    error_log('Path: ' . $path);
-    error_log('All cookies: ' . json_encode($request->cookies->all()));
-    error_log('AUTH_TOKEN cookie: ' . ($request->cookies->get('AUTH_TOKEN') ?? 'NOT FOUND'));
-    error_log('Headers Authorization: ' . ($request->headers->get('Authorization') ?? 'NOT FOUND'));
-    // 🔍 FIN DEBUG
 
         if ($this->isPublicPath($path)) {
             return false;
@@ -90,40 +86,36 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
         return $this->isProtectedPath($path);
     }
 
+    public function authenticate(Request $request): Passport
+    {
+        $plainToken = $this->extractToken($request);
 
+        if (!$plainToken) {
+            throw new CustomUserMessageAuthenticationException('No token provided');
+        }
 
-public function authenticate(Request $request): Passport
-{
-    error_log('🔥🔥🔥 ApiTokenAuthenticator::authenticate() APPELÉ pour ' . $request->getPathInfo());
-    error_log('🔥🔥🔥 Token extrait: ' . ($this->extractToken($request) ?? 'NULL'));
-    
-    $plainToken = $this->extractToken($request);
+        $session = $this->sessionManager->findActiveSessionByPlainToken($plainToken);
 
-    if (!$plainToken) {
-        throw new CustomUserMessageAuthenticationException('No token provided');
+        if (!$session) {
+            throw new CustomUserMessageAuthenticationException('Session invalide, expirée ou révoquée');
+        }
+
+        $user = $session->getUser();
+
+        if (!$user) {
+            throw new CustomUserMessageAuthenticationException('Utilisateur introuvable');
+        }
+
+        $this->sessionManager->touch($session);
+
+        return new SelfValidatingPassport(
+            new UserBadge(
+                $user->getUserIdentifier(),
+                fn () => $user
+            )
+        );
     }
 
-    $session = $this->sessionManager->findActiveSessionByPlainToken($plainToken);
-
-    if (!$session) {
-        throw new CustomUserMessageAuthenticationException('Session invalide, expirée ou révoquée');
-    }
-
-    $user = $session->getUser();
-
-    if (!$user) {
-        throw new CustomUserMessageAuthenticationException('Utilisateur introuvable');
-    }
-
-    $this->sessionManager->touch($session);
-
-    return new SelfValidatingPassport(
-        new UserBadge(
-            $user->getUserIdentifier(),
-            fn() => $user
-        )
-    );
-}
     public function onAuthenticationSuccess(
         Request $request,
         TokenInterface $token,

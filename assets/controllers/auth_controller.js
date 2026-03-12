@@ -19,23 +19,54 @@ export default class extends Controller {
     return next
   }
 
-  async login(event) {
-    event.preventDefault()
+ async login(event) {
+  event.preventDefault()
 
-    const email = this.emailTarget.value
-    const password = this.passwordTarget.value
+  const submitButton = event.currentTarget
+  submitButton.disabled = true
 
+  const email = this.emailTarget.value.trim()
+  const password = this.passwordTarget.value
+
+  this.resultTarget.innerHTML = `
+    <div style="color: var(--color-text-muted); font-weight: 500;">
+      Connexion en cours...
+      <span class="spinner"></span>
+    </div>
+  `
+
+  try {
     const response = await fetch('/api/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify({ email, password }),
       credentials: 'include'
     })
 
+    const data = await response.json().catch(() => ({}))
+
+    if (response.status === 202 && data.status === 'email_verification_required') {
+      this.resultTarget.innerHTML = `
+        <div style="color: var(--color-primary); font-weight: 500;">
+          ✔ Validation requise. Vérifiez votre e-mail puis confirmez la connexion.
+          <span class="spinner"></span>
+        </div>
+      `
+
+      setTimeout(() => {
+        window.location.href = '/app/security/pending-login'
+      }, 900)
+
+      return
+    }
+
     if (response.ok) {
       this.resultTarget.innerHTML = `
         <div style="color: var(--color-primary); font-weight: 500;">
-          ✔ Login successful... redirecting...
+          ✔ Connexion réussie... redirection...
           <span class="spinner"></span>
         </div>
       `
@@ -45,15 +76,27 @@ export default class extends Controller {
       setTimeout(() => {
         window.location.href = nextUrl
       }, 1200)
-    } else {
-      const error = await response.json()
-      this.resultTarget.innerHTML = `
-        <div style="color: var(--damage-color);">
-          ⚠ ${error.error || 'Login failed'}
-        </div>
-      `
+
+      return
     }
+
+    this.resultTarget.innerHTML = `
+      <div style="color: var(--damage-color);">
+        ⚠ ${data.message || data.error || 'Connexion impossible'}
+      </div>
+    `
+  } catch (error) {
+    console.error('Erreur login:', error)
+
+    this.resultTarget.innerHTML = `
+      <div style="color: var(--damage-color);">
+        ⚠ Erreur réseau. Veuillez réessayer.
+      </div>
+    `
+  } finally {
+    submitButton.disabled = false
   }
+}
 
   async register(event) {
     event.preventDefault()

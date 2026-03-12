@@ -216,4 +216,11 @@ class SessionManager
     {
         return $this->deviceIdentifier->getCurrentDeviceId();
     }
+    public function isKnownDevice(User $user, string $deviceId): bool
+{
+    return $this->userSessionRepository->findOneBy([
+        'user' => $user,
+        'deviceId' => $deviceId,
+    ]) !== null;
+}
 }
