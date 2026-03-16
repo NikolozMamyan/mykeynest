@@ -22,9 +22,73 @@
                 {{ 'teams.new.form.credentials_help'|trans }}
             </div>
 
-            <div class="credentials-list">
-                {{ form_widget(form.credentials) }}
+            <div class="credentials-dropdown-wrapper">
+                {# Bouton pour ouvrir le dropdown #}
+                <button type="button" class="credentials-trigger" id="credentialsTrigger">
+                    <div class="trigger-content">
+                        <svg class="trigger-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                        <span class="trigger-text">Sélectionner des credentials</span>
+                        <span class="trigger-count" id="selectedCount">0 sélectionné(s)</span>
+                    </div>
+                    <svg class="trigger-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                {# Dropdown Panel #}
+                <div class="credentials-dropdown" id="credentialsDropdown">
+                    {# Barre de recherche #}
+                    <div class="dropdown-search">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            id="credentialSearch" 
+                            placeholder="Rechercher un credential..."
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    {# Actions rapides #}
+                    <div class="dropdown-actions">
+                        <button type="button" class="action-btn" id="selectAllBtn">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Tout sélectionner
+                        </button>
+                        <button type="button" class="action-btn" id="deselectAllBtn">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Tout désélectionner
+                        </button>
+                    </div>
+
+                    {# Liste des credentials (cachée, remplacée par notre interface) #}
+                    <div class="credentials-list-hidden">
+                        {{ form_widget(form.credentials) }}
+                    </div>
+
+                    {# Liste des credentials affichée #}
+                    <div class="credentials-list" id="credentialsList">
+                        {# Cette liste sera générée par JavaScript à partir des checkboxes Symfony #}
+                    </div>
+
+                    {# Message si aucun résultat #}
+                    <div class="no-results" id="noResults" style="display: none;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p>Aucun credential trouvé</p>
+                    </div>
+                </div>
             </div>
+            
             {{ form_errors(form.credentials) }}
         </div>
     {% endif %}
@@ -100,38 +164,303 @@
     color: var(--color-primary);
 }
 
-.credentials-list {
+/* ===== CREDENTIALS DROPDOWN - SYSTÈME INTELLIGENT ===== */
+.credentials-dropdown-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Bouton déclencheur */
+.credentials-trigger {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-    padding: 1rem;
-    background: var(--color-bg-light);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    background: white;
+    border: 2px solid var(--color-border);
     border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
-.credentials-list > div {
+.credentials-trigger:hover {
+    border-color: var(--color-primary);
+    background: rgba(5, 150, 105, 0.02);
+}
+
+.credentials-trigger.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.trigger-content {
     display: flex;
-    gap: 0.5rem;
-}
-
-.credentials-list input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--color-primary);
-    margin-top: 0.125rem;
-}
-
-.credentials-list label {
-    cursor: pointer;
-    color: var(--color-text-dark);
-    font-size: 0.9375rem;
-    user-select: none;
+    align-items: center;
+    gap: 0.75rem;
     flex: 1;
 }
 
-.credentials-list label:hover {
+.trigger-icon {
+    width: 20px;
+    height: 20px;
     color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+.trigger-text {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-text-dark);
+}
+
+.trigger-count {
+    font-size: 0.875rem;
+    color: var(--color-text-medium);
+    background: var(--color-bg-light);
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.trigger-chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-medium);
+    transition: transform 0.2s ease;
+}
+
+.credentials-trigger.active .trigger-chevron {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Panel */
+.credentials-dropdown {
+    background: white;
+    border: 2px solid var(--color-primary);
+    border-radius: var(--border-radius-sm);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.credentials-dropdown.active {
+    max-height: 500px;
+    opacity: 1;
+    transform: translateY(0);
+    overflow-y: auto;
+}
+
+/* Barre de recherche */
+.dropdown-search {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 10;
+}
+
+.search-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-medium);
+    flex-shrink: 0;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9375rem;
+    color: var(--color-text-dark);
+    background: transparent;
+}
+
+.search-input::placeholder {
+    color: var(--color-text-light);
+}
+
+/* Actions rapides */
+.dropdown-actions {
+    position: sticky;
+    top: 57px;
+    background: var(--color-bg-light);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    gap: 0.5rem;
+    z-index: 9;
+}
+
+.action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.action-btn:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.action-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Cache les checkboxes Symfony originaux */
+.credentials-list-hidden {
+    display: none;
+}
+
+/* Liste des credentials */
+.credentials-list {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.credential-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.credential-item:hover {
+    border-color: var(--color-primary);
+    background: rgba(5, 150, 105, 0.03);
+    transform: translateX(4px);
+}
+
+.credential-item.selected {
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+}
+
+.credential-item.selected::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--color-primary);
+    border-radius: var(--border-radius-sm) 0 0 var(--border-radius-sm);
+}
+
+.credential-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.credential-label {
+    flex: 1;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-text-dark);
+    cursor: pointer;
+    user-select: none;
+}
+
+.credential-item.selected .credential-label {
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.credential-item.selected::after {
+    content: '✓';
+    position: absolute;
+    right: 1rem;
+    width: 22px;
+    height: 22px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 22px;
+    text-align: center;
+}
+
+/* Message aucun résultat */
+.no-results {
+    padding: 2rem;
+    text-align: center;
+    color: var(--color-text-medium);
+}
+
+.no-results svg {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    opacity: 0.5;
+}
+
+.no-results p {
+    margin: 0;
+    font-size: 0.9375rem;
+}
+
+/* Scrollbar personnalisée */
+.credentials-dropdown::-webkit-scrollbar,
+.credentials-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.credentials-dropdown::-webkit-scrollbar-track,
+.credentials-list::-webkit-scrollbar-track {
+    background: var(--color-bg-light);
+}
+
+.credentials-dropdown::-webkit-scrollbar-thumb,
+.credentials-list::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+}
+
+.credentials-dropdown::-webkit-scrollbar-thumb:hover,
+.credentials-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-medium);
 }
 
 .form-actions {
@@ -178,3 +507,288 @@
     margin-top: 0.25rem;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const trigger = document.getElementById('credentialsTrigger');
+    const dropdown = document.getElementById('credentialsDropdown');
+    const searchInput = document.getElementById('credentialSearch');
+    const credentialsList = document.getElementById('credentialsList');
+    const selectedCount = document.getElementById('selectedCount');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    const noResults = document.getElementById('noResults');
+
+    if (!trigger || !dropdown || !searchInput || !credentialsList || !selectedCount || !selectAllBtn || !deselectAllBtn || !noResults) {
+        return;
+    }
+
+    const originalCheckboxes = Array.from(
+        document.querySelectorAll('.credentials-list-hidden input[type="checkbox"]')
+    );
+
+    let credentialsData = [];
+    let isOpen = false;
+    let currentFilter = '';
+
+    init();
+
+    function init() {
+        buildCredentialsData();
+        renderCredentials();
+        updateUI();
+        bindEvents();
+    }
+
+    function buildCredentialsData() {
+        credentialsData = originalCheckboxes.map((checkbox, index) => {
+            const originalLabel = document.querySelector(`label[for="${checkbox.id}"]`);
+
+            return {
+                id: checkbox.id,
+                name: checkbox.name,
+                value: checkbox.value,
+                label: originalLabel ? originalLabel.textContent.trim() : `Credential ${index + 1}`,
+                checked: checkbox.checked
+            };
+        });
+    }
+
+    function bindEvents() {
+        trigger.addEventListener('click', handleTriggerClick);
+
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        searchInput.addEventListener('input', handleSearch);
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDropdown();
+                trigger.focus();
+            }
+        });
+
+        selectAllBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setAllVisible(true);
+        });
+
+        deselectAllBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setAllVisible(false);
+        });
+
+        document.addEventListener('click', handleOutsideClick);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                closeDropdown();
+                trigger.focus();
+            }
+        });
+    }
+
+    function handleTriggerClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isOpen) {
+            closeDropdown();
+        } else {
+            openDropdown();
+        }
+    }
+
+    function handleOutsideClick(e) {
+        if (!isOpen) return;
+
+        const clickedInsideTrigger = trigger.contains(e.target);
+        const clickedInsideDropdown = dropdown.contains(e.target);
+
+        if (!clickedInsideTrigger && !clickedInsideDropdown) {
+            closeDropdown();
+        }
+    }
+
+    function handleSearch(e) {
+        currentFilter = e.target.value.trim().toLowerCase();
+        renderCredentials();
+    }
+
+    function openDropdown() {
+        isOpen = true;
+        dropdown.classList.add('active');
+        trigger.classList.add('active');
+        trigger.setAttribute('aria-expanded', 'true');
+
+        requestAnimationFrame(() => {
+            searchInput.focus();
+        });
+    }
+
+    function closeDropdown() {
+        isOpen = false;
+        dropdown.classList.remove('active');
+        trigger.classList.remove('active');
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function renderCredentials() {
+        credentialsList.innerHTML = '';
+
+        const filteredCredentials = getFilteredCredentials();
+        const hasResults = filteredCredentials.length > 0;
+
+        noResults.style.display = hasResults ? 'none' : 'block';
+        credentialsList.style.display = hasResults ? 'flex' : 'none';
+
+        if (!hasResults) return;
+
+        const fragment = document.createDocumentFragment();
+
+        filteredCredentials.forEach((cred) => {
+            const item = createCredentialItem(cred);
+            fragment.appendChild(item);
+        });
+
+        credentialsList.appendChild(fragment);
+    }
+
+    function getFilteredCredentials() {
+        if (!currentFilter) return credentialsData;
+
+        return credentialsData.filter((cred) =>
+            cred.label.toLowerCase().includes(currentFilter)
+        );
+    }
+
+    function createCredentialItem(cred) {
+        const item = document.createElement('div');
+        item.className = `credential-item${cred.checked ? ' selected' : ''}`;
+        item.setAttribute('data-cred-id', cred.id);
+        item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', cred.checked ? 'true' : 'false');
+        item.tabIndex = 0;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'credential-checkbox';
+        checkbox.checked = cred.checked;
+        checkbox.dataset.credId = cred.id;
+        checkbox.setAttribute('aria-label', cred.label);
+
+        const label = document.createElement('span');
+        label.className = 'credential-label';
+        label.textContent = cred.label;
+
+        item.appendChild(checkbox);
+        item.appendChild(label);
+
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.target === checkbox) return;
+
+            toggleCredential(cred.id);
+        });
+
+        item.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleCredential(cred.id);
+            }
+        });
+
+        checkbox.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        checkbox.addEventListener('change', (e) => {
+            e.stopPropagation();
+            setCredentialState(cred.id, e.target.checked);
+        });
+
+        return item;
+    }
+
+    function toggleCredential(credId) {
+        const cred = credentialsData.find(c => c.id === credId);
+        if (!cred) return;
+
+        setCredentialState(credId, !cred.checked);
+    }
+
+    function setCredentialState(credId, checked) {
+        const cred = credentialsData.find(c => c.id === credId);
+        if (!cred) return;
+
+        cred.checked = checked;
+
+        const originalCheckbox = document.getElementById(credId);
+        if (originalCheckbox) {
+            originalCheckbox.checked = checked;
+            originalCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        syncRenderedItem(credId, checked);
+        updateUI();
+    }
+
+    function syncRenderedItem(credId, checked) {
+        const item = credentialsList.querySelector(`[data-cred-id="${CSS.escape(credId)}"]`);
+        if (!item) return;
+
+        const checkbox = item.querySelector('.credential-checkbox');
+        if (checkbox) {
+            checkbox.checked = checked;
+        }
+
+        item.classList.toggle('selected', checked);
+        item.setAttribute('aria-selected', checked ? 'true' : 'false');
+    }
+
+    function setAllVisible(checked) {
+        const visibleCredentials = getFilteredCredentials();
+
+        visibleCredentials.forEach((cred) => {
+            cred.checked = checked;
+
+            const originalCheckbox = document.getElementById(cred.id);
+            if (originalCheckbox) {
+                originalCheckbox.checked = checked;
+                originalCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+
+        renderCredentials();
+        updateUI();
+    }
+
+    function updateUI() {
+        const checkedCount = credentialsData.filter(c => c.checked).length;
+        selectedCount.textContent = `${checkedCount} sélectionné(s)`;
+
+        const triggerText = trigger.querySelector('.trigger-text');
+        if (triggerText) {
+            if (checkedCount === 0) {
+                triggerText.textContent = 'Sélectionner des credentials';
+            } else if (checkedCount === 1) {
+                const selected = credentialsData.find(c => c.checked);
+                triggerText.textContent = selected ? selected.label : '1 credential sélectionné';
+            } else {
+                triggerText.textContent = 'Credentials sélectionnés';
+            }
+        }
+
+        trigger.setAttribute('aria-haspopup', 'listbox');
+        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        credentialsList.setAttribute('role', 'listbox');
+        credentialsList.setAttribute('aria-multiselectable', 'true');
+    }
+});
+</script>

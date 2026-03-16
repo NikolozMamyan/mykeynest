@@ -42,24 +42,24 @@ class CredentialType extends AbstractType
                 ],
             ]);
 
-        if ($user) {
-            $builder->add('teams', EntityType::class, [
-                'class'        => Team::class,
-                'choice_label' => 'name',
-                'label'        => 'Équipes (optionnel)',
-                'multiple'     => true,
-                'expanded'     => true,
-                'required'     => false,
-                'by_reference' => false,
-                'query_builder' => function (TeamRepository $repo) use ($user) {
-                    return $repo->createQueryBuilder('t')
-                        ->join('t.members', 'm')
-                        ->andWhere('m.user = :user')
-                        ->setParameter('user', $user)
-                        ->orderBy('t.name', 'ASC');
-                },
-            ]);
-        }
+        // if ($user) {
+        //     $builder->add('teams', EntityType::class, [
+        //         'class'        => Team::class,
+        //         'choice_label' => 'name',
+        //         'label'        => 'Équipes (optionnel)',
+        //         'multiple'     => true,
+        //         'expanded'     => true,
+        //         'required'     => false,
+        //         'by_reference' => false,
+        //         'query_builder' => function (TeamRepository $repo) use ($user) {
+        //             return $repo->createQueryBuilder('t')
+        //                 ->join('t.members', 'm')
+        //                 ->andWhere('m.user = :user')
+        //                 ->setParameter('user', $user)
+        //                 ->orderBy('t.name', 'ASC');
+        //         },
+        //     ]);
+        // }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
