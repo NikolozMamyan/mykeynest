@@ -864,120 +864,19 @@ color:var(--color-text-dark);
     <h1>{{ 'extension.page.hero.title'|trans }}</h1>
     <p class="tagline">{{ 'extension.page.hero.tagline'|trans }}</p>
 
-    <a href="/uploads/chrome-extension-form-autofill-master.zip" class="download-btn" download>
+    <a href="https://chromewebstore.google.com/detail/mykeynest/llckfoodkfccmibgmpfiodjkpincnfid" target="_blank" class="download-btn" download>
       <i class="fa-solid fa-download"></i>
       {{ 'extension.page.hero.download'|trans }}
     </a>
   </section>
 
-    <!-- Step 1 -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-number">1</div>
-        <div class="card-icon"><i class="fa-solid fa-download"></i></div>
-        <div class="card-title">
-          <h2>{{ 'extension.page.cards.install.title'|trans }}</h2>
-          <div class="helper">{{ 'extension.page.cards.install.helper'|trans }}</div>
-        </div>
-      </div>
-
-      <div class="card-body">
-        <p style="color: var(--color-text-medium); margin-bottom: var(--spacing-lg); line-height: 1.6;">
-          {{ 'extension.page.cards.install.intro'|trans }}
-        </p>
-
-        <div class="browser-list">
-          <div class="browser-card">
-            <div class="browser-header">
-              <span class="browser-icon">🌐</span>
-              <strong>{{ 'extension.page.cards.install.browsers.chrome_edge'|trans }}</strong>
-            </div>
-            <div class="browser-steps">
-              {{ 'extension.page.cards.install.browsers.chrome_edge_steps'|trans|raw }}
-            </div>
-          </div>
-
-          <div class="browser-card">
-            <div class="browser-header">
-              <span class="browser-icon">🦊</span>
-              <strong>{{ 'extension.page.cards.install.browsers.firefox'|trans }}</strong>
-            </div>
-            <div class="browser-steps">
-              {{ 'extension.page.cards.install.browsers.firefox_steps'|trans|raw }}
-            </div>
-          </div>
-        </div>
-
-        <div class="alert alert-info">
-          <i class="fa-solid fa-lightbulb"></i>
-          <div>
-            <strong>{{ 'extension.page.cards.install.tip.title'|trans }}</strong>
-            {{ 'extension.page.cards.install.tip.text'|trans }}
-          </div>
-        </div>
-      </div>
-    </div>
-
-      <div class="demo-window">
-    <div class="window-header">
-      <div class="window-dot dot-red"></div>
-      <div class="window-dot dot-yellow"></div>
-      <div class="window-dot dot-green"></div>
-      <div class="window-title">
-        <i class="fa-solid fa-browser"></i>
-        {{ 'extension.page.demo.window_title'|trans }}
-      </div>
-    </div>
-
-    <div class="window-content">
-      <div class="screenshot-container">
-        <div class="screenshot active" data-step="1"
-             style="background-image: url('/uploads/steps/step1.png');">
-          <div class="screenshot-placeholder">
-            <div class="screenshot-placeholder-icon">
-              <i class="fa-solid fa-download"></i>
-            </div>
-            <h3>{{ 'extension.page.demo.step1_title'|trans }}</h3>
-            <p>{{ 'extension.page.demo.step1_text'|trans }}</p>
-          </div>
-        </div>
-
-        <div class="screenshot" data-step="2"
-             style="background-image: url('/uploads/steps/step2.png');">
-          <div class="screenshot-placeholder">
-            <div class="screenshot-placeholder-icon">
-              <i class="fa-solid fa-cog"></i>
-            </div>
-            <h3>{{ 'extension.page.demo.step2_title'|trans }}</h3>
-            <p>{{ 'extension.page.demo.step2_text'|trans }}</p>
-          </div>
-        </div>
-
-        <div class="screenshot" data-step="3"
-             style="background-image: url('/uploads/steps/step3.png');">
-          <div class="screenshot-placeholder">
-            <div class="screenshot-placeholder-icon">
-              <i class="fa-solid fa-key"></i>
-            </div>
-            <h3>{{ 'extension.page.demo.step3_title'|trans }}</h3>
-            <p>{{ 'extension.page.demo.step3_text'|trans }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="navigation-dots">
-        <div class="nav-dot active" data-step="1"></div>
-        <div class="nav-dot" data-step="2"></div>
-        <div class="nav-dot" data-step="3"></div>
-      </div>
-    </div>
-  </div>
+    
   <!-- ====== Steps Grid ====== -->
   <div class="steps-grid">
     <!-- Step 2 -->
     <div class="card">
       <div class="card-header">
-        <div class="step-number">2</div>
+        <div class="step-number">1</div>
         <div class="card-icon"><i class="fa-solid fa-key"></i></div>
         <div class="card-title">
           <h2>{{ 'extension.page.cards.api_key.title'|trans }}</h2>
@@ -1038,7 +937,7 @@ color:var(--color-text-dark);
     <!-- Step 3 -->
     <div class="card">
       <div class="card-header">
-        <div class="step-number">3</div>
+        <div class="step-number">2</div>
         <div class="card-icon"><i class="fa-solid fa-check-circle"></i></div>
         <div class="card-title">
           <h2>{{ 'extension.page.cards.configure.title'|trans }}</h2>
