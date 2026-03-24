@@ -106,12 +106,12 @@
       "language": "Langue"
     },
     "hero": {
-      "title_before": "Gérez vos mots de passe en toute sécurité,",
-      "title_highlight": "en un seul endroit",
-      "subtitle": "Un gestionnaire de mots de passe simple, sécurisé et moderne. Chiffrement AES-256, architecture zero-knowledge et installation hashée & signée. Essayez gratuitement.",
-      "cta_start": "Commencer gratuitement",
-      "cta_start_aria": "Créer un compte gratuit sur MYKEYNEST",
-      "cta_discover": "En savoir plus",
+      "title_before": "Gérez les mots de passe et accès de votre équipe,",
+  "title_highlight": "dans un seul espace sécurisé",
+  "subtitle": "MYKEYNEST est une solution de gestion des mots de passe et des accès pour PME, agences et équipes. Chiffrement AES-256, architecture zero-knowledge, partage sécurisé, audit de sécurité et auto-remplissage.",
+  "cta_start": "Commencer gratuitement",
+  "cta_start_aria": "Créer un compte gratuit sur MYKEYNEST",
+  "cta_discover": "En savoir plus",
       "trust_aria": "Garanties de sécurité MYKEYNEST",
       "trust": {
         "aes": "Chiffrement AES-256",
@@ -125,9 +125,9 @@
       }
     },
     "features": {
-      "label": "Fonctionnalités",
-      "title": "Sécurité et simplicité avant tout",
-      "subtitle": "Toutes les fonctionnalités essentielles pour protéger vos identifiants au quotidien.",
+ "label": "Fonctionnalités",
+  "title": "Gestion sécurisée des mots de passe et accès",
+  "subtitle": "Toutes les fonctionnalités essentielles pour protéger les identifiants, partager les accès et sécuriser les équipes au quotidien.",
       "cards": {
         "e2e_title": "Chiffrement de bout en bout",
         "e2e_text": "Vos données sont chiffrées localement avec AES-256 avant d'être synchronisées. Seul vous y avez accès.",
@@ -261,13 +261,13 @@
         "a8": "Le 2FA ajoute une couche de sécurité supplémentaire : en plus de votre mot de passe maître, un code temporaire est requis à chaque connexion. Disponible avec une application d'authentification (TOTP) ou par email."
       }
     },
-    "cta": {
-      "title": "Prêt à sécuriser vos identifiants ?",
-      "subtitle": "Rejoignez MYKEYNEST dès aujourd'hui et protégez votre vie numérique simplement.",
-      "note": "Essai gratuit 14 jours · Sans carte bancaire · Résiliable à tout moment",
-      "start": "Commencer gratuitement",
-      "login": "Se connecter"
-    },
+"cta": {
+  "title": "Prêt à sécuriser les accès de votre équipe ?",
+  "subtitle": "Centralisez vos mots de passe, partagez vos accès en toute sécurité et gardez le contrôle avec MYKEYNEST.",
+  "note": "Essai gratuit 14 jours · Sans carte bancaire · Résiliable à tout moment",
+  "start": "Commencer gratuitement",
+  "login": "Se connecter"
+},
     "footer": {
       "brand_text": "Un gestionnaire de mots de passe moderne qui allie sécurité, simplicité et confidentialité. Solution 100% européenne.",
       "product": "Produit",

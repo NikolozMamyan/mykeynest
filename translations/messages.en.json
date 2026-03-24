@@ -106,12 +106,12 @@
       "language": "Language"
     },
     "hero": {
-      "title_before": "Manage your passwords securely,",
-      "title_highlight": "all in one place",
-      "subtitle": "A simple, secure, and modern password manager. AES-256 encryption, zero-knowledge architecture, and hashed & signed installation. Try it for free.",
-      "cta_start": "Get started for free",
-      "cta_start_aria": "Create a free account on MYKEYNEST",
-      "cta_discover": "Learn more",
+      "title_before": "Manage your team's passwords and access,",
+  "title_highlight": "in one secure place",
+  "subtitle": "MYKEYNEST is a password and access management solution for SMBs, agencies, and teams. AES-256 encryption, zero-knowledge architecture, secure sharing, security audit, and auto-fill.",
+  "cta_start": "Get started for free",
+  "cta_start_aria": "Create a free account on MYKEYNEST",
+  "cta_discover": "Learn more",
       "trust_aria": "MYKEYNEST security guarantees",
       "trust": {
         "aes": "AES-256 encryption",
@@ -125,9 +125,9 @@
       }
     },
     "features": {
-      "label": "Features",
-      "title": "Security and simplicity first",
-      "subtitle": "All the essential features to protect your credentials every day.",
+"label": "Features",
+  "title": "Secure password and access management",
+  "subtitle": "Everything your team needs to protect credentials, share access securely, and stay in control every day.",
       "cards": {
         "e2e_title": "End-to-end encryption",
         "e2e_text": "Your data is encrypted locally with AES-256 before being synchronized. Only you can access it.",
@@ -146,19 +146,19 @@
         "twofactor_text": "Manage and secure your account's active sessions."
       }
     },
-    "how": {
-      "label": "Simple and efficient",
-      "title": "How does it work?",
-      "subtitle": "Secure your passwords in three simple steps.",
-      "steps": {
-        "s1_title": "Create your account",
-        "s1_text": "Sign up for free and create your master password. It's the only one you need to remember.",
-        "s2_title": "Add your credentials",
-        "s2_text": "Import or manually enter your passwords. Everything is encrypted automatically.",
-        "s3_title": "Access everywhere",
-        "s3_text": "Log in securely on all your devices thanks to synchronization."
-      }
-    },
+"how": {
+  "label": "Simple et efficace",
+  "title": "Comment MYKEYNEST aide votre équipe",
+  "subtitle": "Centralisez vos mots de passe, partagez les accès et gardez le contrôle en trois étapes.",
+  "steps": {
+    "s1_title": "Créez votre espace sécurisé",
+    "s1_text": "Inscrivez votre équipe et créez votre mot de passe maître pour accéder à votre coffre-fort sécurisé.",
+    "s2_title": "Ajoutez et organisez vos accès",
+    "s2_text": "Importez vos identifiants, classez-les et partagez les accès en toute sécurité selon vos besoins.",
+    "s3_title": "Accédez partout, en toute sécurité",
+    "s3_text": "Retrouvez vos mots de passe et accès sur tous vos appareils grâce à la synchronisation sécurisée."
+  }
+},
     "security": {
       "label": "Unbreakable security",
       "title": "You alone control access",
@@ -261,13 +261,13 @@
         "a8": "2FA adds an extra layer of security: in addition to your master password, a temporary code is required at each login. Available via an authenticator app (TOTP) or email."
       }
     },
-    "cta": {
-      "title": "Ready to secure your credentials?",
-      "subtitle": "Join MYKEYNEST today and protect your digital life with ease.",
-      "note": "14-day free trial · No credit card required · Cancel anytime",
-      "start": "Get started for free",
-      "login": "Log in"
-    },
+"cta": {
+  "title": "Ready to secure your team's access?",
+  "subtitle": "Centralize passwords, share access securely, and stay in control with MYKEYNEST.",
+  "note": "14-day free trial · No credit card required · Cancel anytime",
+  "start": "Get started for free",
+  "login": "Log in"
+},
     "footer": {
       "brand_text": "A modern password manager that combines security, simplicity, and privacy. 100% European solution.",
       "product": "Product",
