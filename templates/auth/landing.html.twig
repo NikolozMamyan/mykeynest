@@ -402,82 +402,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--color-text-dark);
   </div>
 </div>
 
-{# ======================== FEATURES ======================== #}
-<section class="feat-section" id="features">
-  <div class="wrap">
-    <div class="sh">
-      <span class="sh-label"><i class="fas fa-bolt"></i> {{ 'landing.features.label'|trans }}</span>
-      <h2>{{ 'landing.features.title'|trans }}</h2>
-      <p>{{ 'landing.features.subtitle'|trans }}</p>
-    </div>
-    <div class="feat-layout">
-      <div class="fhero">
-        <div class="fhero-icon"><i class="fas fa-fingerprint"></i></div>
-        <span class="fhero-tag"><i class="fas fa-star"></i> {{ 'landing.features.cards.hashed_tag'|trans }}</span>
-        <h3>{{ 'landing.features.cards.hashed_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.hashed_text'|trans }}</p>
-        <div class="fhero-term" aria-hidden="true">
-          <div class="ftl"><span class="ftp">›</span><span class="ftv">HASH_STATUS : SIGNED & VERIFIED ✓</span></div>
-          <div class="ftl"><span class="ftp">›</span><span class="fte">attack → HASH_MISMATCH — denied</span></div>
-          <div class="ftl"><span class="ftp"> </span><span class="ftw">VAULT : LOCKED</span></div>
-        </div>
-      </div>
-      <div class="feat-grid">
-        <div class="fc accent">
-          <div class="fci"><i class="fas fa-shield-halved"></i></div>
-          <div><h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3><p>{{ 'landing.features.cards.e2e_text'|trans }}</p></div>
-        </div>
-        <div class="fc dark">
-          <div class="fci"><i class="fas fa-mobile-screen-button"></i></div>
-          <div><h3>{{ 'landing.features.cards.twofactor_title'|trans }}</h3><p>{{ 'landing.features.cards.twofactor_text'|trans }}</p></div>
-        </div>
-        <div class="fc">
-          <div class="fci"><i class="fas fa-wand-magic-sparkles"></i></div>
-          <div><h3>{{ 'landing.features.cards.generator_title'|trans }}</h3><p>{{ 'landing.features.cards.generator_text'|trans }}</p></div>
-        </div>
-        <div class="fc">
-          <div class="fci"><i class="fas fa-shield-heart"></i></div>
-          <div><h3>{{ 'landing.features.cards.audit_title'|trans }}</h3><p>{{ 'landing.features.cards.audit_text'|trans }}</p></div>
-        </div>
-        <div class="fc wide">
-          <div class="fci"><i class="fas fa-bolt"></i></div>
-          <div class="fc-bdy"><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n">2s</span><span class="fc-stat-l">connexion</span></div>
-        </div>
-        <div class="fc wide accent">
-          <div class="fci"><i class="fas fa-share-nodes"></i></div>
-          <div class="fc-bdy"><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n">E2E</span><span class="fc-stat-l">chiffré</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-{# ======================== HOW IT WORKS ======================== #}
-<section class="how" id="how-it-works">
-  <div class="wrap">
-    <div class="sh">
-      <span class="sh-label"><i class="fas fa-map"></i> {{ 'landing.how.label'|trans }}</span>
-      <h2>{{ 'landing.how.title'|trans }}</h2>
-      <p>{{ 'landing.how.subtitle'|trans }}</p>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">1</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s1_title'|trans }}</h3><p>{{ 'landing.how.steps.s1_text'|trans }}</p></div>
-      </div>
-      <div class="step">
-        <div class="step-n">2</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s2_title'|trans }}</h3><p>{{ 'landing.how.steps.s2_text'|trans }}</p></div>
-      </div>
-      <div class="step">
-        <div class="step-n">3</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s3_title'|trans }}</h3><p>{{ 'landing.how.steps.s3_text'|trans }}</p></div>
-      </div>
-    </div>
-  </div>
-</section>
 
 {# ======================== SECURITY ======================== #}
 <section class="sec-section" id="security" aria-labelledby="sec-h2">
@@ -584,7 +509,81 @@ body { font-family:'Plus Jakarta Sans',sans-serif; color:var(--color-text-dark);
     </div>
   </div>
 </section>
-
+{# ======================== HOW IT WORKS ======================== #}
+<section class="how" id="how-it-works">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-map"></i> {{ 'landing.how.label'|trans }}</span>
+      <h2>{{ 'landing.how.title'|trans }}</h2>
+      <p>{{ 'landing.how.subtitle'|trans }}</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s1_title'|trans }}</h3><p>{{ 'landing.how.steps.s1_text'|trans }}</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s2_title'|trans }}</h3><p>{{ 'landing.how.steps.s2_text'|trans }}</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s3_title'|trans }}</h3><p>{{ 'landing.how.steps.s3_text'|trans }}</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+{# ======================== FEATURES ======================== #}
+<section class="feat-section" id="features">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-bolt"></i> {{ 'landing.features.label'|trans }}</span>
+      <h2>{{ 'landing.features.title'|trans }}</h2>
+      <p>{{ 'landing.features.subtitle'|trans }}</p>
+    </div>
+    <div class="feat-layout">
+      <div class="fhero">
+        <div class="fhero-icon"><i class="fas fa-fingerprint"></i></div>
+        <span class="fhero-tag"><i class="fas fa-star"></i> {{ 'landing.features.cards.hashed_tag'|trans }}</span>
+        <h3>{{ 'landing.features.cards.hashed_title'|trans }}</h3>
+        <p>{{ 'landing.features.cards.hashed_text'|trans }}</p>
+        <div class="fhero-term" aria-hidden="true">
+          <div class="ftl"><span class="ftp">›</span><span class="ftv">HASH_STATUS : SIGNED & VERIFIED ✓</span></div>
+          <div class="ftl"><span class="ftp">›</span><span class="fte">attack → HASH_MISMATCH — denied</span></div>
+          <div class="ftl"><span class="ftp"> </span><span class="ftw">VAULT : LOCKED</span></div>
+        </div>
+      </div>
+      <div class="feat-grid">
+        <div class="fc accent">
+          <div class="fci"><i class="fas fa-shield-halved"></i></div>
+          <div><h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3><p>{{ 'landing.features.cards.e2e_text'|trans }}</p></div>
+        </div>
+        <div class="fc dark">
+          <div class="fci"><i class="fas fa-mobile-screen-button"></i></div>
+          <div><h3>{{ 'landing.features.cards.twofactor_title'|trans }}</h3><p>{{ 'landing.features.cards.twofactor_text'|trans }}</p></div>
+        </div>
+        <div class="fc">
+          <div class="fci"><i class="fas fa-wand-magic-sparkles"></i></div>
+          <div><h3>{{ 'landing.features.cards.generator_title'|trans }}</h3><p>{{ 'landing.features.cards.generator_text'|trans }}</p></div>
+        </div>
+        <div class="fc">
+          <div class="fci"><i class="fas fa-shield-heart"></i></div>
+          <div><h3>{{ 'landing.features.cards.audit_title'|trans }}</h3><p>{{ 'landing.features.cards.audit_text'|trans }}</p></div>
+        </div>
+        <div class="fc wide">
+          <div class="fci"><i class="fas fa-bolt"></i></div>
+          <div class="fc-bdy"><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
+          <div class="fc-stat"><span class="fc-stat-n">2s</span><span class="fc-stat-l">connexion</span></div>
+        </div>
+        <div class="fc wide accent">
+          <div class="fci"><i class="fas fa-share-nodes"></i></div>
+          <div class="fc-bdy"><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
+          <div class="fc-stat"><span class="fc-stat-n">E2E</span><span class="fc-stat-l">chiffré</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> 
 {# ======================== FAQ ======================== #}
 <section class="faq">
   <div class="wrap">
