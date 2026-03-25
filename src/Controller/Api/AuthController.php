@@ -85,6 +85,11 @@ final class AuthController extends AbstractController
         $user->setEmail($data['email']);
         $user->setRoles(['ROLE_USER']);
         $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        // $token = bin2hex(random_bytes(32));
+        // $expiresAt = (new \DateTime())->modify('+1 hour');
+        // $user->setApiToken($token);
+        // $user->setTokenExpiresAt($expiresAt);
+        $user->regenerateApiExtensionToken();
 
         $em->persist($user);
         $em->flush();
@@ -155,6 +160,7 @@ final class AuthController extends AbstractController
         SessionManager $sessionManager,
         LoginChallengeManager $loginChallengeManager,
         MailerService $mailerService,
+        EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
@@ -168,7 +174,11 @@ final class AuthController extends AbstractController
         if (!$user || !$passwordHasher->isPasswordValid($user, $data['password'])) {
             return new JsonResponse(['error' => 'Invalid credentials'], 401);
         }
-
+        // $token = bin2hex(random_bytes(32));
+        // $expiresAt = (new \DateTime())->modify('+1 hour');
+        // $user->setApiToken($token);
+        // $user->setTokenExpiresAt($expiresAt);
+        // $em->flush();
         $deviceId = $sessionManager->getCurrentDeviceId() ?? bin2hex(random_bytes(32));
 
         // Appareil connu => login direct
