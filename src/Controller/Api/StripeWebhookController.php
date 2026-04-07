@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\User;
 use App\Entity\UserSubscription;
+use App\Repository\UserRepository;
 use App\Repository\UserSubscriptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,7 @@ final class StripeWebhookController extends AbstractController
     #[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
     public function handle(
         Request $request,
+        UserRepository $users,
         UserSubscriptionRepository $subscriptions,
         EntityManagerInterface $em,
         LoggerInterface $logger
@@ -28,6 +30,12 @@ final class StripeWebhookController extends AbstractController
         $payload = $request->getContent();
         $sigHeader = $request->headers->get('Stripe-Signature');
 
+        if (!$sigHeader) {
+            $logger->warning('Stripe webhook: missing Stripe-Signature header');
+
+            return new Response('Missing signature', 400);
+        }
+
         try {
             $event = Webhook::constructEvent(
                 $payload,
@@ -35,262 +43,321 @@ final class StripeWebhookController extends AbstractController
                 $_ENV['STRIPE_WEBHOOK_SECRET']
             );
         } catch (\Throwable $e) {
-            $logger->error('Stripe webhook signature validation failed.', [
+            $logger->error('Stripe webhook: invalid signature or payload', [
                 'message' => $e->getMessage(),
-                'path' => $request->getPathInfo(),
-                'has_signature_header' => $sigHeader !== null,
-                'payload_length' => strlen($payload),
             ]);
 
             return new Response('Invalid signature', 400);
         }
 
-        $logger->info('Stripe webhook received.', [
-            'event_type' => $event->type,
+        $logger->info('Stripe webhook received', [
+            'type' => $event->type,
             'event_id' => $event->id ?? null,
         ]);
 
-        switch ($event->type) {
-            case 'checkout.session.completed': {
-                /** @var \Stripe\Checkout\Session $session */
-                $session = $event->data->object;
+        try {
+            switch ($event->type) {
+                case 'checkout.session.completed': {
+                    /** @var \Stripe\Checkout\Session $session */
+                    $session = $event->data->object;
 
-                $user = $this->resolveUserFromCheckoutSession($session, $em);
-                if (!$user) {
-                    $logger->warning('Stripe checkout.session.completed skipped: user not found.', [
-                        'event_id' => $event->id ?? null,
-                        'session_id' => $session->id ?? null,
-                        'client_reference_id' => $session->client_reference_id ?? null,
-                        'metadata_user_id' => $session->metadata->user_id ?? null,
-                        'customer_email' => $session->customer_email ?? ($session->customer_details->email ?? null),
+                    $userId = $session->client_reference_id ?? null;
+                    $customerId = is_string($session->customer) ? $session->customer : ($session->customer->id ?? null);
+                    $subscriptionId = is_string($session->subscription) ? $session->subscription : ($session->subscription->id ?? null);
+                    $email = $session->customer_email ?? ($session->customer_details->email ?? null);
+
+                    $logger->info('checkout.session.completed payload', [
+                        'client_reference_id' => $userId,
+                        'customer_id' => $customerId,
+                        'subscription_id' => $subscriptionId,
+                        'email' => $email,
+                    ]);
+
+                    $user = null;
+
+                    if ($userId) {
+                        $user = $users->find((int) $userId);
+                    }
+
+                    if (!$user && is_string($email) && $email !== '') {
+                        $user = $users->findOneBy(['email' => $email]);
+                    }
+
+                    if (!$user) {
+                        $logger->warning('Stripe webhook: user not found for checkout.session.completed', [
+                            'client_reference_id' => $userId,
+                            'email' => $email,
+                        ]);
+                        break;
+                    }
+
+                    $this->syncSubscriptionRecord(
+                        user: $user,
+                        subscriptions: $subscriptions,
+                        em: $em,
+                        customerId: $customerId,
+                        subscriptionId: $subscriptionId,
+                        status: 'pending',
+                        isActive: false,
+                        planCode: (string) ($session->metadata->plan ?? 'pro')
+                    );
+
+                    $em->flush();
+
+                    $logger->info('Stripe webhook: subscription record created/updated after checkout.session.completed', [
+                        'user_id' => $user->getId(),
+                        'customer_id' => $customerId,
+                        'subscription_id' => $subscriptionId,
+                    ]);
+
+                    break;
+                }
+
+                case 'invoice.payment_succeeded': {
+                    /** @var \Stripe\Invoice $invoice */
+                    $invoice = $event->data->object;
+
+                    $subscriptionId = is_string($invoice->subscription) ? $invoice->subscription : ($invoice->subscription->id ?? null);
+                    $customerId = is_string($invoice->customer) ? $invoice->customer : ($invoice->customer->id ?? null);
+                    $email = $invoice->customer_email ?? ($invoice->customer_details->email ?? null);
+
+                    $logger->info('invoice.payment_succeeded payload', [
+                        'subscription_id' => $subscriptionId,
+                        'customer_id' => $customerId,
+                        'email' => $email,
+                    ]);
+
+                    $user = $this->findUserFromStripeData(
+                        users: $users,
+                        subscriptions: $subscriptions,
+                        subscriptionId: $subscriptionId,
+                        customerId: $customerId,
+                        email: is_string($email) ? $email : null
+                    );
+
+                    if (!$user) {
+                        $logger->warning('Stripe webhook: user not found for invoice.payment_succeeded', [
+                            'subscription_id' => $subscriptionId,
+                            'customer_id' => $customerId,
+                            'email' => $email,
+                        ]);
+                        break;
+                    }
+
+                    $this->syncSubscriptionRecord(
+                        user: $user,
+                        subscriptions: $subscriptions,
+                        em: $em,
+                        customerId: $customerId,
+                        subscriptionId: $subscriptionId,
+                        status: 'active',
+                        isActive: true,
+                        planCode: 'pro'
+                    );
+
+                    $em->flush();
+
+                    $logger->info('Stripe webhook: subscription activated', [
+                        'user_id' => $user->getId(),
+                        'customer_id' => $customerId,
+                        'subscription_id' => $subscriptionId,
+                    ]);
+
+                    break;
+                }
+
+                case 'invoice.payment_failed': {
+                    /** @var \Stripe\Invoice $invoice */
+                    $invoice = $event->data->object;
+
+                    $subscriptionId = is_string($invoice->subscription) ? $invoice->subscription : ($invoice->subscription->id ?? null);
+                    $customerId = is_string($invoice->customer) ? $invoice->customer : ($invoice->customer->id ?? null);
+                    $email = $invoice->customer_email ?? ($invoice->customer_details->email ?? null);
+
+                    $user = $this->findUserFromStripeData(
+                        users: $users,
+                        subscriptions: $subscriptions,
+                        subscriptionId: $subscriptionId,
+                        customerId: $customerId,
+                        email: is_string($email) ? $email : null
+                    );
+
+                    if (!$user) {
+                        $logger->warning('Stripe webhook: user not found for invoice.payment_failed', [
+                            'subscription_id' => $subscriptionId,
+                            'customer_id' => $customerId,
+                            'email' => $email,
+                        ]);
+                        break;
+                    }
+
+                    $this->syncSubscriptionRecord(
+                        user: $user,
+                        subscriptions: $subscriptions,
+                        em: $em,
+                        customerId: $customerId,
+                        subscriptionId: $subscriptionId,
+                        status: 'past_due',
+                        isActive: false
+                    );
+
+                    $em->flush();
+
+                    $logger->info('Stripe webhook: subscription marked past_due', [
+                        'user_id' => $user->getId(),
+                        'subscription_id' => $subscriptionId,
+                    ]);
+
+                    break;
+                }
+
+                case 'customer.subscription.updated': {
+                    /** @var \Stripe\Subscription $sub */
+                    $sub = $event->data->object;
+
+                    $subscriptionId = $sub->id ?? null;
+                    $customerId = is_string($sub->customer) ? $sub->customer : ($sub->customer->id ?? null);
+                    $status = $sub->status ?? null;
+
+                    if (!$subscriptionId || !is_string($status)) {
+                        $logger->warning('Stripe webhook: invalid customer.subscription.updated payload', [
+                            'subscription_id' => $subscriptionId,
+                            'status' => $status,
+                        ]);
+                        break;
+                    }
+
+                    $user = $this->findUserFromStripeData(
+                        users: $users,
+                        subscriptions: $subscriptions,
+                        subscriptionId: $subscriptionId,
+                        customerId: $customerId
+                    );
+
+                    if (!$user) {
+                        $logger->warning('Stripe webhook: user not found for customer.subscription.updated', [
+                            'subscription_id' => $subscriptionId,
+                            'customer_id' => $customerId,
+                            'status' => $status,
+                        ]);
+                        break;
+                    }
+
+                    $isActive = \in_array($status, ['active', 'trialing'], true);
+
+                    $this->syncSubscriptionRecord(
+                        user: $user,
+                        subscriptions: $subscriptions,
+                        em: $em,
+                        customerId: $customerId,
+                        subscriptionId: $subscriptionId,
+                        status: $status,
+                        isActive: $isActive
+                    );
+
+                    $em->flush();
+
+                    $logger->info('Stripe webhook: subscription updated', [
+                        'user_id' => $user->getId(),
+                        'subscription_id' => $subscriptionId,
+                        'status' => $status,
+                        'is_active' => $isActive,
+                    ]);
+
+                    break;
+                }
+
+                case 'customer.subscription.deleted': {
+                    /** @var \Stripe\Subscription $sub */
+                    $sub = $event->data->object;
+
+                    $subscriptionId = $sub->id ?? null;
+                    $customerId = is_string($sub->customer) ? $sub->customer : ($sub->customer->id ?? null);
+
+                    if (!$subscriptionId) {
+                        $logger->warning('Stripe webhook: missing subscription id for customer.subscription.deleted');
+                        break;
+                    }
+
+                    $user = $this->findUserFromStripeData(
+                        users: $users,
+                        subscriptions: $subscriptions,
+                        subscriptionId: $subscriptionId,
+                        customerId: $customerId
+                    );
+
+                    if (!$user) {
+                        $logger->warning('Stripe webhook: user not found for customer.subscription.deleted', [
+                            'subscription_id' => $subscriptionId,
+                            'customer_id' => $customerId,
+                        ]);
+                        break;
+                    }
+
+                    $this->syncSubscriptionRecord(
+                        user: $user,
+                        subscriptions: $subscriptions,
+                        em: $em,
+                        customerId: $customerId,
+                        subscriptionId: null,
+                        status: 'canceled',
+                        isActive: false,
+                        clearSubscriptionId: true
+                    );
+
+                    $em->flush();
+
+                    $logger->info('Stripe webhook: subscription canceled', [
+                        'user_id' => $user->getId(),
+                        'old_subscription_id' => $subscriptionId,
+                    ]);
+
+                    break;
+                }
+
+                default:
+                    $logger->info('Stripe webhook: event ignored', [
+                        'type' => $event->type,
                     ]);
                     break;
-                }
-
-                $this->syncSubscriptionRecord(
-                    $user,
-                    $em,
-                    customerId: $this->extractStripeId($session->customer),
-                    subscriptionId: $this->extractStripeId($session->subscription),
-                    status: $session->payment_status === 'paid' ? 'active' : null,
-                    isActive: $session->payment_status === 'paid',
-                    planCode: (string) ($session->metadata->plan ?? 'pro')
-                );
-
-                $em->flush();
-
-                $logger->info('User subscription synced from checkout.session.completed.', [
-                    'event_id' => $event->id ?? null,
-                    'user_id' => $user->getId(),
-                    'session_id' => $session->id ?? null,
-                    'customer_id' => $this->extractStripeId($session->customer),
-                    'subscription_id' => $this->extractStripeId($session->subscription),
-                ]);
-                break;
             }
+        } catch (\Throwable $e) {
+            $logger->error('Stripe webhook processing failed', [
+                'type' => $event->type ?? null,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
 
-            case 'invoice.payment_succeeded':
-            case 'invoice.paid': {
-                /** @var \Stripe\Invoice $invoice */
-                $invoice = $event->data->object;
-
-                $this->handlePaidInvoice($invoice, $event->id ?? null, $subscriptions, $em, $logger);
-                break;
-            }
-
-            case 'customer.subscription.deleted': {
-                /** @var \Stripe\Subscription $sub */
-                $sub = $event->data->object;
-
-                $subId = $sub->id ?? null;
-                if (!$subId) {
-                    break;
-                }
-
-                $user = $subscriptions->findOneBy(['stripeSubscriptionId' => $subId])?->getUser();
-                if (!$user) {
-                    $logger->warning('Stripe customer.subscription.deleted skipped: subscription owner not found.', [
-                        'event_id' => $event->id ?? null,
-                        'subscription_id' => $subId,
-                    ]);
-                    break;
-                }
-
-                $this->syncSubscriptionRecord(
-                    $user,
-                    $em,
-                    status: 'canceled',
-                    isActive: false,
-                    clearSubscriptionId: true
-                );
-
-                $em->flush();
-
-                $logger->info('User subscription marked inactive from customer.subscription.deleted.', [
-                    'event_id' => $event->id ?? null,
-                    'user_id' => $user->getId(),
-                    'subscription_id' => $subId,
-                ]);
-                break;
-            }
-
-            case 'customer.subscription.updated': {
-                /** @var \Stripe\Subscription $sub */
-                $sub = $event->data->object;
-
-                $subId = $sub->id ?? null;
-                if (!$subId) {
-                    break;
-                }
-
-                $user = $subscriptions->findOneBy(['stripeSubscriptionId' => $subId])?->getUser();
-                if (!$user) {
-                    $logger->warning('Stripe customer.subscription.updated skipped: subscription owner not found.', [
-                        'event_id' => $event->id ?? null,
-                        'subscription_id' => $subId,
-                    ]);
-                    break;
-                }
-
-                $status = $sub->status ?? null;
-                if (!is_string($status)) {
-                    break;
-                }
-
-                $this->syncSubscriptionRecord(
-                    $user,
-                    $em,
-                    customerId: $this->extractStripeId($sub->customer),
-                    subscriptionId: $subId,
-                    status: $status,
-                    isActive: in_array($status, ['active', 'trialing'], true)
-                );
-
-                $em->flush();
-
-                $logger->info('User subscription updated from customer.subscription.updated.', [
-                    'event_id' => $event->id ?? null,
-                    'user_id' => $user->getId(),
-                    'subscription_id' => $subId,
-                    'status' => $status,
-                ]);
-                break;
-            }
-
-            default:
-                $logger->info('Stripe webhook event ignored.', [
-                    'event_type' => $event->type,
-                    'event_id' => $event->id ?? null,
-                ]);
-                break;
+            return new Response('Webhook error: ' . $e->getMessage(), 500);
         }
 
         return new Response('ok', 200);
     }
 
-    private function handlePaidInvoice(
-        \Stripe\Invoice $invoice,
-        ?string $eventId,
+    private function findUserFromStripeData(
+        UserRepository $users,
         UserSubscriptionRepository $subscriptions,
-        EntityManagerInterface $em,
-        LoggerInterface $logger
-    ): void {
-        $subId = $this->extractInvoiceSubscriptionId($invoice);
-        $customerId = $this->extractStripeId($invoice->customer);
-        $email = $invoice->customer_email ?? ($invoice->customer_details->email ?? null);
-
-        $user = null;
-
-        if ($subId) {
-            $user = $subscriptions->findOneBy(['stripeSubscriptionId' => $subId])?->getUser();
-        }
-
-        if (!$user && $customerId) {
-            $user = $subscriptions->findOneBy(['stripeCustomerId' => $customerId])?->getUser();
-        }
-
-        if (!$user && is_string($email) && $email !== '') {
-            /** @var User|null $user */
-            $user = $em->getRepository(User::class)->findOneBy(['email' => $email]);
-        }
-
-        if (!$user) {
-            $logger->warning('Stripe paid invoice skipped: user not found.', [
-                'event_id' => $eventId,
-                'customer_id' => $customerId,
-                'subscription_id' => $subId,
-                'customer_email' => $email,
-            ]);
-
-            return;
-        }
-
-        $this->syncSubscriptionRecord(
-            $user,
-            $em,
-            customerId: $customerId,
-            subscriptionId: $subId,
-            status: 'active',
-            isActive: true,
-            planCode: 'pro'
-        );
-
-        $em->flush();
-
-        $logger->info('User subscription activated from paid invoice event.', [
-            'event_id' => $eventId,
-            'user_id' => $user->getId(),
-            'customer_id' => $customerId,
-            'subscription_id' => $subId,
-        ]);
-    }
-
-    private function resolveUserFromCheckoutSession(
-        \Stripe\Checkout\Session $session,
-        EntityManagerInterface $em
+        ?string $subscriptionId = null,
+        ?string $customerId = null,
+        ?string $email = null
     ): ?User {
-        $userId = $session->client_reference_id ?? ($session->metadata->user_id ?? null);
-
-        if (is_string($userId) && ctype_digit($userId)) {
-            $user = $em->getRepository(User::class)->find((int) $userId);
-            if ($user instanceof User) {
-                return $user;
+        if ($subscriptionId) {
+            $subscription = $subscriptions->findOneBy(['stripeSubscriptionId' => $subscriptionId]);
+            if ($subscription?->getUser()) {
+                return $subscription->getUser();
             }
         }
 
-        $email = $session->customer_email ?? ($session->customer_details->email ?? null);
-        if (is_string($email) && $email !== '') {
-            $user = $em->getRepository(User::class)->findOneBy(['email' => $email]);
-            if ($user instanceof User) {
-                return $user;
+        if ($customerId) {
+            $subscription = $subscriptions->findOneBy(['stripeCustomerId' => $customerId]);
+            if ($subscription?->getUser()) {
+                return $subscription->getUser();
             }
         }
 
-        return null;
-    }
-
-    private function extractInvoiceSubscriptionId(\Stripe\Invoice $invoice): ?string
-    {
-        $directSubscriptionId = $this->extractStripeId($invoice->subscription ?? null);
-        if ($directSubscriptionId !== null) {
-            return $directSubscriptionId;
-        }
-
-        $parentSubscriptionId = $invoice->parent->subscription_details->subscription ?? null;
-
-        return is_string($parentSubscriptionId) && $parentSubscriptionId !== ''
-            ? $parentSubscriptionId
-            : null;
-    }
-
-    private function extractStripeId(mixed $value): ?string
-    {
-        if (is_string($value) && $value !== '') {
-            return $value;
-        }
-
-        if (is_object($value) && isset($value->id) && is_string($value->id) && $value->id !== '') {
-            return $value->id;
+        if ($email) {
+            return $users->findOneBy(['email' => $email]);
         }
 
         return null;
@@ -298,6 +365,7 @@ final class StripeWebhookController extends AbstractController
 
     private function syncSubscriptionRecord(
         User $user,
+        UserSubscriptionRepository $subscriptions,
         EntityManagerInterface $em,
         ?string $customerId = null,
         ?string $subscriptionId = null,
@@ -307,6 +375,10 @@ final class StripeWebhookController extends AbstractController
         bool $clearSubscriptionId = false
     ): UserSubscription {
         $subscription = $user->getUserSubscription();
+
+        if (!$subscription) {
+            $subscription = $subscriptions->findOneBy(['user' => $user]);
+        }
 
         if (!$subscription) {
             $subscription = new UserSubscription();
