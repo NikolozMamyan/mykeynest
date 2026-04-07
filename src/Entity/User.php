@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use App\Entity\UserSubscription;
 use App\Repository\UserRepository;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\ExtensionClient;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -30,9 +28,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
 
@@ -54,25 +49,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $apiExtensionToken = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private bool $isSubscribed = false;
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $stripeCustomerId = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $stripeSubscriptionId = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
-#[ORM\Column(type: 'string', length: 20, nullable: true)]
-#[Assert\Regex(
-    pattern: '/^\+?[0-9\s\-]{6,20}$/',
-    message: 'Phone number'
-)]
-private ?string $phone = null;
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^\+?[0-9\s\-]{6,20}$/',
+        message: 'Phone number'
+    )]
+    private ?string $phone = null;
 
-#[ORM\Column(type: 'string', length: 5, options: ['default' => 'fr'])]
+    #[ORM\Column(type: 'string', length: 5, options: ['default' => 'fr'])]
     private string $locale = 'fr';
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
@@ -85,19 +72,18 @@ private ?string $phone = null;
     private bool $receiveSecurityEmails = false;
 
     /**
- * @var Collection<int, ExtensionClient>
- */
-#[ORM\OneToMany(mappedBy: 'user', targetEntity: ExtensionClient::class, orphanRemoval: true)]
-private Collection $extensionClients;
+     * @var Collection<int, ExtensionClient>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ExtensionClient::class, orphanRemoval: true)]
+    private Collection $extensionClients;
 
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: UserSubscription::class, cascade: ['persist', 'remove'])]
     private ?UserSubscription $userSubscription = null;
 
-
-public function __construct()
-{
-      $this->extensionClients = new ArrayCollection();
-}
+    public function __construct()
+    {
+        $this->extensionClients = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -116,25 +102,17 @@ public function __construct()
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
     /**
-     * @see UserInterface
-     *
      * @return list<string>
      */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -150,9 +128,6 @@ public function __construct()
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -165,163 +140,148 @@ public function __construct()
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
+
     public function getApiToken(): ?string
-{
-    return $this->apiToken;
-}
+    {
+        return $this->apiToken;
+    }
 
-public function setApiToken(?string $apiToken): static
-{
-    $this->apiToken = $apiToken;
-
-    return $this;
-}
-public function getTokenExpiresAt(): ?\DateTimeInterface
-{
-    return $this->tokenExpiresAt;
-}
-
-public function setTokenExpiresAt(?\DateTimeInterface $expiresAt): static
-{
-    $this->tokenExpiresAt = $expiresAt;
-    return $this;
-}
-
-public function getCompany(): ?string
-{
-    return $this->company;
-}
-
-public function setCompany(string $company): static
-{
-    $this->company = $company;
-
-    return $this;
-}
-
-public function getNom(): ?string
-{
-    return $this->nom;
-}
-
-public function setNom(?string $nom): static
-{
-    $this->nom = $nom;
-
-    return $this;
-}
-
-public function getPrenom(): ?string
-{
-    return $this->prenom;
-}
-
-public function setPrenom(?string $prenom): static
-{
-    $this->prenom = $prenom;
-
-    return $this;
-}
-
-public function getApiExtensionToken(): ?string
-{
-    return $this->apiExtensionToken;
-}
-
-
-public function regenerateApiExtensionToken(): static
-{
-    $this->apiExtensionToken = bin2hex(random_bytes(32)); // 64 caractères hexadécimaux
-    return $this;
-}
-public function isSubscribed(): bool
-{
-    return $this->isSubscribed;
-}
-
-public function setIsSubscribed(bool $isSubscribed): static
-{
-    $this->isSubscribed = $isSubscribed;
-    return $this;
-}
-public function getStripeCustomerId(): ?string
-{
-    return $this->userSubscription?->getStripeCustomerId() ?? $this->stripeCustomerId;
-}
-
-public function setStripeCustomerId(?string $stripeCustomerId): static
-{
-    $this->stripeCustomerId = $stripeCustomerId;
-    return $this;
-}
-
-public function getStripeSubscriptionId(): ?string
-{
-    return $this->userSubscription?->getStripeSubscriptionId() ?? $this->stripeSubscriptionId;
-}
-
-public function setStripeSubscriptionId(?string $stripeSubscriptionId): static
-{
-    $this->stripeSubscriptionId = $stripeSubscriptionId;
-    return $this;
-}
-public function getUserSubscription(): ?UserSubscription
-{
-    return $this->userSubscription;
-}
-
-public function setUserSubscription(?UserSubscription $userSubscription): static
-{
-    if ($userSubscription === null) {
-        if ($this->userSubscription !== null) {
-            $this->userSubscription->setUser(null);
-        }
-
-        $this->userSubscription = null;
+    public function setApiToken(?string $apiToken): static
+    {
+        $this->apiToken = $apiToken;
 
         return $this;
     }
 
-    $this->userSubscription = $userSubscription;
-
-    if ($userSubscription->getUser() !== $this) {
-        $userSubscription->setUser($this);
+    public function getTokenExpiresAt(): ?\DateTimeInterface
+    {
+        return $this->tokenExpiresAt;
     }
 
-    return $this;
-}
-public function getAvatar(): ?string
-{
-    return $this->avatar;
-}
+    public function setTokenExpiresAt(?\DateTimeInterface $expiresAt): static
+    {
+        $this->tokenExpiresAt = $expiresAt;
 
-public function setAvatar(?string $avatar): self
-{
-    $this->avatar = $avatar;
+        return $this;
+    }
 
-    return $this;
-}
-public function getPhone(): ?string
-{
-    return $this->phone;
-}
+    public function getCompany(): ?string
+    {
+        return $this->company;
+    }
 
-public function setPhone(?string $phone): self
-{
-    $this->phone = $phone;
+    public function setCompany(string $company): static
+    {
+        $this->company = $company;
 
-    return $this;
-}
+        return $this;
+    }
 
-  public function getLocale(): string
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(?string $prenom): static
+    {
+        $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getApiExtensionToken(): ?string
+    {
+        return $this->apiExtensionToken;
+    }
+
+    public function regenerateApiExtensionToken(): static
+    {
+        $this->apiExtensionToken = bin2hex(random_bytes(32));
+
+        return $this;
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->userSubscription?->isActive() ?? false;
+    }
+
+    public function getStripeCustomerId(): ?string
+    {
+        return $this->userSubscription?->getStripeCustomerId();
+    }
+
+    public function getStripeSubscriptionId(): ?string
+    {
+        return $this->userSubscription?->getStripeSubscriptionId();
+    }
+
+    public function getUserSubscription(): ?UserSubscription
+    {
+        return $this->userSubscription;
+    }
+
+    public function setUserSubscription(?UserSubscription $userSubscription): static
+    {
+        if ($userSubscription === null) {
+            if ($this->userSubscription !== null) {
+                $this->userSubscription->setUser(null);
+            }
+
+            $this->userSubscription = null;
+
+            return $this;
+        }
+
+        $this->userSubscription = $userSubscription;
+
+        if ($userSubscription->getUser() !== $this) {
+            $userSubscription->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): self
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getLocale(): string
     {
         return $this->locale;
     }
@@ -329,6 +289,7 @@ public function setPhone(?string $phone): self
     public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -340,6 +301,7 @@ public function setPhone(?string $phone): self
     public function setAllowFeedback(bool $allowFeedback): self
     {
         $this->allowFeedback = $allowFeedback;
+
         return $this;
     }
 
@@ -351,6 +313,7 @@ public function setPhone(?string $phone): self
     public function setInterestedInCyberSecurity(bool $interestedInCyberSecurity): self
     {
         $this->interestedInCyberSecurity = $interestedInCyberSecurity;
+
         return $this;
     }
 
@@ -362,34 +325,36 @@ public function setPhone(?string $phone): self
     public function setReceiveSecurityEmails(bool $receiveSecurityEmails): self
     {
         $this->receiveSecurityEmails = $receiveSecurityEmails;
+
         return $this;
     }
+
     /**
- * @return Collection<int, ExtensionClient>
- */
-public function getExtensionClients(): Collection
-{
-    return $this->extensionClients;
-}
-
-public function addExtensionClient(ExtensionClient $extensionClient): static
-{
-    if (!$this->extensionClients->contains($extensionClient)) {
-        $this->extensionClients->add($extensionClient);
-        $extensionClient->setUser($this);
+     * @return Collection<int, ExtensionClient>
+     */
+    public function getExtensionClients(): Collection
+    {
+        return $this->extensionClients;
     }
 
-    return $this;
-}
-
-public function removeExtensionClient(ExtensionClient $extensionClient): static
-{
-    if ($this->extensionClients->removeElement($extensionClient)) {
-        if ($extensionClient->getUser() === $this) {
-            $extensionClient->setUser(null);
+    public function addExtensionClient(ExtensionClient $extensionClient): static
+    {
+        if (!$this->extensionClients->contains($extensionClient)) {
+            $this->extensionClients->add($extensionClient);
+            $extensionClient->setUser($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeExtensionClient(ExtensionClient $extensionClient): static
+    {
+        if ($this->extensionClients->removeElement($extensionClient)) {
+            if ($extensionClient->getUser() === $this) {
+                $extensionClient->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 }

@@ -588,8 +588,7 @@
 {% endblock %}
 
 {% block body %}
-  {# bool safe: supporte isSubscribed OU is_subscribed #}
-  {% set isSubscribed = app.user and (app.user.isSubscribed is defined ? app.user.isSubscribed : (app.user.is_subscribed is defined ? app.user.is_subscribed : false)) %}
+  {% set hasActiveSubscription = app.user and app.user.hasActiveSubscription %}
 
   <!-- ===== HERO ===== -->
   <section class="pricing-hero">
@@ -618,7 +617,7 @@
   </section>
 
   {# ===== SUBSCRIBED CARD ===== #}
-  {% if isSubscribed %}
+  {% if hasActiveSubscription %}
     <section class="pricing-container" style="margin-bottom: 40px;">
       <div class="pricing-card featured" style="max-width: 920px; margin: 0 auto;">
         <div class="card-header" style="padding: 40px 40px 25px;">
@@ -721,7 +720,7 @@
             <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> {{ 'subscription.plans.pro.features.f4'|trans }}</li>
           </ul>
 
-          {% if not isSubscribed %}
+          {% if not hasActiveSubscription %}
             <a class="cta-button" href="{{ path('app_subscription_checkout_pro') }}">
               {{ 'subscription.plans.pro.cta_upgrade'|trans }}
             </a>

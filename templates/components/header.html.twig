@@ -1119,7 +1119,7 @@
   <!-- Partie droite -->
   <div class="header_right">
   <!-- PRO Upgrade Badge (visible uniquement si non abonné) -->
-{% if not app.user.isSubscribed %}
+{% if not app.user.hasActiveSubscription %}
   <a href="{{ path('app_subscription') }}" class="header-upgrade-badge">
     <div class="upgrade-badge-icon">
       <i class="fas fa-crown"></i>

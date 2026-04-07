@@ -54,7 +54,7 @@ public function new(Request $request): Response
 
     // 1) Vérifier la limite si pas d'abonnement
     // Adapte ces 2 lignes à ton projet (repo / relation / méthode)
-    $hasSubscription = (bool) $user->isSubscribed(); // ou $user->isSubscribed(), etc.
+    $hasSubscription = $user->hasActiveSubscription();
 
     if (!$hasSubscription) {
         // Méthode A: via repository
@@ -168,7 +168,7 @@ public function importCredentials(Request $request): Response
     }
 
     // ✅ Tu veux interdire l’import si pas abonné
-    if (!$user->isSubscribed()) {
+    if (!$user->hasActiveSubscription()) {
         $this->addFlash('warning', 'Fonction réservée aux abonnés.');
         return $this->redirectToRoute('app_credential');
     }

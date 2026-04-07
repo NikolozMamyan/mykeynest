@@ -12,7 +12,7 @@
         <p class="hero-subtitle">{{ 'shared_access.index.hero.subtitle'|trans }}</p>
       </div>
 
-{% if app.user.isSubscribed or sharedByMe|length < 3 %}
+{% if app.user.hasActiveSubscription or sharedByMe|length < 3 %}
   <a href="{{ path('shared_access_new') }}" class="btn-primary">
     <i class="fas fa-share-alt"></i>
     <span>{{ 'shared_access.index.hero.new'|trans }}</span>
@@ -26,7 +26,7 @@
     </div>
   </div>
 {# PRO Upgrade Banner - Affiché seulement si non abonné et a déjà 3 partages #}
-{% if not app.user.isSubscribed and sharedByMe|length >= 3 %}
+{% if not app.user.hasActiveSubscription and sharedByMe|length >= 3 %}
   <div class="pro-upgrade-banner">
     <div class="pro-banner-content">
       <div class="pro-banner-icon">

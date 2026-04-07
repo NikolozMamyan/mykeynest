@@ -133,7 +133,7 @@ public function preferences(Request $request, EntityManagerInterface $em): Respo
         throw $this->createAccessDeniedException();
     }
 
-    if ($user->isSubscribed()) {
+    if ($user->hasActiveSubscription()) {
         return $this->redirectToRoute('app_subscription_portal');
     }
 

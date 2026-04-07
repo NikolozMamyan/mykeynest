@@ -53,7 +53,7 @@ class SharedAccessController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $hasSubscription = (bool) $owner->isSubscribed();
+        $hasSubscription = $owner->hasActiveSubscription();
         $limit = 3;
 
         if ($request->isMethod('POST')) {

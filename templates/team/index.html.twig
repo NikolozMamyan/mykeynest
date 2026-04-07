@@ -18,7 +18,7 @@
             </p>
         </div>
 
-        {% if app.user.isSubscribed or teams|length < 1 %}
+        {% if app.user.hasActiveSubscription or teams|length < 1 %}
             <a href="{{ path('app_team_new') }}" class="btn-primary-action">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -38,7 +38,7 @@
     </div>
 
     {# PRO Upgrade Banner - Affiché seulement si non abonné et a déjà 1 équipe #}
-    {% if not app.user.isSubscribed and teams|length >= 1 %}
+    {% if not app.user.hasActiveSubscription and teams|length >= 1 %}
         <div class="pro-upgrade-banner">
             <div class="pro-banner-content">
                 <div class="pro-banner-icon">

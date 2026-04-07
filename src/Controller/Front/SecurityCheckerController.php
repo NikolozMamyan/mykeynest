@@ -2,6 +2,7 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\User;
 use App\Entity\Notification;
 use App\Service\NotificationService;
 use App\Service\SecurityCheckerService;
@@ -33,6 +34,9 @@ final class SecurityCheckerController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        \assert($user instanceof User);
+        $this->denyUnlessSubscribed($user);
+
         $report = $this->checker->buildReport($user, SecurityCheckerService::ROTATION_DAYS_DEFAULT);
 
         $score = $report['overallScore'] ?? 0;
@@ -58,6 +62,9 @@ if ($score < 40) {
             throw $this->createAccessDeniedException();
         }
 
+        \assert($user instanceof User);
+        $this->denyUnlessSubscribed($user);
+
         $token = (string) $request->request->get('_token');
         if (!$this->isCsrfTokenValid('rotate'.$id, $token)) {
             throw $this->createAccessDeniedException('CSRF token invalide.');
@@ -79,5 +86,14 @@ if ($score < 40) {
         $this->addFlash('success', 'Mot de passe marqué comme changé.');
 
         return $this->redirectToRoute('app_security_checker');
+    }
+
+    private function denyUnlessSubscribed(User $user): void
+    {
+        if ($user->hasActiveSubscription()) {
+            return;
+        }
+
+        throw $this->createAccessDeniedException('Active subscription required.');
     }
 }

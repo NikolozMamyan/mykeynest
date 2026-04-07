@@ -48,7 +48,7 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
     }
 
     // ✅ 1) Bloquer si pas d'abonnement et limite atteinte
-    $hasSubscription = (bool) $user->isSubscribed(); // adapte: isSubscribed(), getSubscriptionActive(), etc.
+    $hasSubscription = $user->hasActiveSubscription();
 
     if (!$hasSubscription) {
         // Méthode A: via repository (recommandé)

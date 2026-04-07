@@ -32,6 +32,7 @@ final class NoteController extends AbstractController
     ): Response {
         $user = $this->getUser();
         \assert($user instanceof User);
+        $this->denyUnlessSubscribed($user);
 
         // Teams list
         $myTeams = $teams->createQueryBuilder('t')
@@ -128,6 +129,7 @@ public function updateStatus(
 ): Response {
     $user = $this->getUser();
     \assert($user instanceof User);
+    $this->denyUnlessSubscribed($user);
 
     if (!$this->isCsrfTokenValid('status_note_' . $note->getId(), (string) $request->request->get('_token'))) {
         $this->addFlash('danger', 'ERROR: Le jeton CSRF est invalide. Veuillez renvoyer le formulaire.');
@@ -208,6 +210,7 @@ public function assign(
 ): Response {
     $currentUser = $this->getUser();
     \assert($currentUser instanceof User);
+    $this->denyUnlessSubscribed($currentUser);
 
     if (!$this->isCsrfTokenValid('assign_note_' . $note->getId(), (string) $request->request->get('_token'))) {
         $this->addFlash('danger', 'ERROR: Le jeton CSRF est invalide.');
@@ -260,6 +263,10 @@ public function assign(
     ): Response {
         $this->denyAccessUnlessGranted('NOTE_ASSIGN', $note);
 
+        $user = $this->getUser();
+        \assert($user instanceof User);
+        $this->denyUnlessSubscribed($user);
+
         if (!$this->isCsrfTokenValid('unassign_note_'.$note->getId(), (string)$request->request->get('_token'))) {
             throw $this->createAccessDeniedException();
         }
@@ -288,6 +295,10 @@ public function assign(
         EntityManagerInterface $em
     ): Response {
         $this->denyAccessUnlessGranted('NOTE_EDIT', $note);
+
+        $user = $this->getUser();
+        \assert($user instanceof User);
+        $this->denyUnlessSubscribed($user);
 
         if (!$this->isCsrfTokenValid('update_note_'.$note->getId(), (string)$request->request->get('_token'))) {
             throw $this->createAccessDeniedException();
@@ -322,6 +333,7 @@ public function assign(
     ): Response {
         $user = $this->getUser();
         \assert($user instanceof User);
+        $this->denyUnlessSubscribed($user);
 
         if (!$this->isCsrfTokenValid('delete_note_' . $note->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('danger', 'ERROR: Le jeton CSRF est invalide. Veuillez renvoyer le formulaire.');
@@ -383,6 +395,15 @@ public function assign(
         }
 
         return $users;
+    }
+
+    private function denyUnlessSubscribed(User $user): void
+    {
+        if ($user->hasActiveSubscription()) {
+            return;
+        }
+
+        throw $this->createAccessDeniedException('Active subscription required.');
     }
 
 }
