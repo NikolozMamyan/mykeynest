@@ -1,0 +1,80 @@
+.theme-btn {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  font-size: 18px;
+  color: var(--color-text-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 10px;
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: var(--color-primary);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.theme-btn:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.theme-btn:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-green);
+}
+
+.theme-btn:hover i {
+  color: var(--color-white);
+  position: relative;
+  z-index: 1;
+}
+
+.theme-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.theme-btn.switching {
+  animation: themeSwitch 0.5s ease;
+}
+
+@keyframes themeSwitch {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg); }
+}
+
+.theme-btn .fa-sun { color: #f59e0b; }
+.theme-btn .fa-moon { color: #6366f1; }
+
+@media (max-width: 768px) {
+  .theme-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+}

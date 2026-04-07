@@ -1,23 +1,61 @@
-
-
-    <div class="lang-switch">
-        {% if app.request.locale == 'fr' %}
-            <a href="{{ vm.url_fr }}" class="lang-option active" lang="fr" aria-current="true">
-                <span class="lang-flag">🇫🇷</span>
-
-            </a>
-            <a href="{{ vm.url_en }}" class="lang-option" lang="en" hreflang="en">
-                <span class="lang-flag">🇬🇧</span>
-
-            </a>
-        {% else %}
-            <a href="{{ vm.url_en }}" class="lang-option active" lang="en" aria-current="true">
-                <span class="lang-flag">🇬🇧</span>
-
-            </a>
-            <a href="{{ vm.url_fr }}" class="lang-option" lang="fr" hreflang="fr">
-                <span class="lang-flag">🇫🇷</span>
-
-            </a>
-        {% endif %}
-    </div>
+<div class="lang-switch" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
+  {% if app.request.locale == 'fr' %}
+    <a href="{{ vm.url_fr }}"
+       class="lang-switch__btn is-active"
+       lang="fr"
+       aria-current="true"
+       title="Français">
+      <img
+        src="{{ asset('images/flags/fr.svg') }}"
+        alt="Français"
+        class="lang-switch__flag"
+        loading="lazy"
+        width="22"
+        height="16"
+      >
+    </a>
+    <a href="{{ vm.url_en }}"
+       class="lang-switch__btn"
+       lang="en"
+       hreflang="en"
+       title="English">
+      <img
+        src="{{ asset('images/flags/gb.svg') }}"
+        alt="English"
+        class="lang-switch__flag"
+        loading="lazy"
+        width="22"
+        height="16"
+      >
+    </a>
+  {% else %}
+    <a href="{{ vm.url_en }}"
+       class="lang-switch__btn is-active"
+       lang="en"
+       aria-current="true"
+       title="English">
+      <img
+        src="{{ asset('images/flags/gb.svg') }}"
+        alt="English"
+        class="lang-switch__flag"
+        loading="lazy"
+        width="22"
+        height="16"
+      >
+    </a>
+    <a href="{{ vm.url_fr }}"
+       class="lang-switch__btn"
+       lang="fr"
+       hreflang="fr"
+       title="Français">
+      <img
+        src="{{ asset('images/flags/fr.svg') }}"
+        alt="Français"
+        class="lang-switch__flag"
+        loading="lazy"
+        width="22"
+        height="16"
+      >
+    </a>
+  {% endif %}
+</div>

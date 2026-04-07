@@ -1,4 +1,4 @@
-{% extends 'base_auth.html.twig' %}
+﻿{% extends 'base_auth.html.twig' %}
 
 {% block title %}{{ 'business.solution.meta.title'|trans }}{% endblock %}
 
@@ -24,351 +24,11 @@
 </script>
 {% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/pages/business-solution.css') }}">
+{% endblock %}
+
 {% block body %}
-<style>
-/* ===== FONTS & RESET ===== */
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0 }
-html { -webkit-text-size-adjust:100% }
-body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-light); color:var(--color-text-dark); overflow-x:hidden }
-
-/* ===== KEYFRAMES ===== */
-@keyframes fadeUp   { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
-@keyframes slideDown{ from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
-@keyframes shimmer  { 0%{background-position:-200% center} 100%{background-position:200% center} }
-@keyframes float    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-@keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.6} }
-@keyframes countUp  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-/* ===== LAYOUT ===== */
-.wrap { width:100%; max-width:1200px; margin:0 auto; padding:0 1.25rem }
-@media(min-width:640px)  { .wrap { padding:0 1.75rem } }
-@media(min-width:1024px) { .wrap { padding:0 2.5rem } }
-
-/* ===== BUTTONS ===== */
-.btn { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; padding:.75rem 1.5rem; border-radius:var(--border-radius-sm); font-weight:700; font-size:.9rem; text-decoration:none; transition:all .22s ease; border:none; cursor:pointer; font-family:inherit; min-height:44px; white-space:nowrap }
-.btn-green { background:var(--color-primary); color:#fff; border:1.5px solid var(--color-primary) }
-.btn-green:hover { background:#047857; box-shadow:var(--shadow-green); transform:translateY(-2px) }
-.btn-outline { color:var(--color-primary); background:#fff; border:2px solid var(--color-primary) }
-.btn-outline:hover { background:rgba(5,150,105,.06); transform:translateY(-2px) }
-.btn-white { background:#fff; color:var(--color-primary); border:2px solid rgba(255,255,255,.3) }
-.btn-white:hover { background:rgba(255,255,255,.92); transform:translateY(-2px); box-shadow:var(--shadow-lg) }
-.btn-ghost { background:rgba(255,255,255,.12); color:#fff; border:2px solid rgba(255,255,255,.3) }
-.btn-ghost:hover { background:rgba(255,255,255,.22) }
-.btn-lg { padding:.875rem 2rem; font-size:1rem }
-.btn-w { width:100% }
-@media(min-width:480px) { .btn-w { width:auto } }
-
-/* ===== SECTION HEADER ===== */
-.shead { margin-bottom:2.5rem }
-@media(min-width:768px) { .shead { margin-bottom:3rem } }
-.shead-eye { display:inline-flex; align-items:center; gap:.4rem; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--color-primary); margin-bottom:.625rem }
-.shead h2 { font-size:1.6rem; font-weight:800; color:var(--color-text-dark); line-height:1.2; margin-bottom:.625rem; letter-spacing:-.022em }
-@media(min-width:768px)  { .shead h2 { font-size:2rem } }
-@media(min-width:1024px) { .shead h2 { font-size:2.25rem } }
-.shead p { font-size:.925rem; color:var(--color-text-medium); line-height:1.65 }
-@media(min-width:768px) { .shead p { font-size:1rem } }
-
-/* ===========================
-   HERO
-   =========================== */
-.hero {
-    background:linear-gradient(150deg, #f0fdf4 0%, #ecfdf5 50%, #f8fafc 100%);
-    border-bottom:1px solid var(--color-border);
-    padding:4rem 1.25rem 3rem;
-    position:relative; overflow:hidden;
-}
-@media(min-width:640px)  { .hero { padding:5rem 1.75rem 4rem } }
-@media(min-width:1024px) { .hero { padding:6rem 2.5rem 5rem } }
-
-/* Orbes de fond */
-.hero::before {
-    content:''; position:absolute; inset:0; pointer-events:none;
-    background:
-        radial-gradient(circle at 12% 45%, rgba(5,150,105,.1) 0%, transparent 52%),
-        radial-gradient(circle at 88% 15%, rgba(16,185,129,.07) 0%, transparent 48%);
-}
-.hero::after {
-    content:''; position:absolute; bottom:-1px; left:0; right:0; height:48px;
-    background:linear-gradient(to bottom, transparent, var(--color-bg-light));
-    pointer-events:none;
-}
-
-.hero-inner { max-width:860px; margin:0 auto; text-align:center; position:relative; z-index:1 }
-
-.hero-eyebrow {
-    display:inline-flex; align-items:center; gap:.5rem;
-    background:#fff; border:1px solid rgba(5,150,105,.25);
-    border-radius:2rem; padding:.42rem 1.125rem;
-    font-size:.75rem; font-weight:700; color:var(--color-primary);
-    text-transform:uppercase; letter-spacing:.06em;
-    box-shadow:0 2px 8px rgba(5,150,105,.1); margin-bottom:1.375rem;
-    animation:slideDown .5s ease-out both;
-}
-.hero h1 {
-    font-size:1.875rem; font-weight:800; color:var(--color-text-dark);
-    line-height:1.15; margin-bottom:1.125rem; letter-spacing:-.025em;
-    animation:fadeUp .6s ease-out .12s both;
-}
-@media(min-width:480px)  { .hero h1 { font-size:2.25rem } }
-@media(min-width:768px)  { .hero h1 { font-size:2.75rem } }
-@media(min-width:1024px) { .hero h1 { font-size:3.1rem } }
-
-.hero-grad {
-    background:linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-}
-.hero-sub {
-    font-size:.95rem; color:var(--color-text-medium); line-height:1.7;
-    max-width:640px; margin:0 auto 2rem;
-    animation:fadeUp .6s ease-out .25s both;
-}
-@media(min-width:768px) { .hero-sub { font-size:1.1rem; margin-bottom:2.5rem } }
-
-/* Stat strip dans le hero */
-.hero-stats {
-    display:flex; justify-content:center; gap:0; flex-wrap:wrap;
-    background:#fff; border:1px solid var(--color-border); border-radius:var(--border-radius);
-    box-shadow:var(--shadow-md); overflow:hidden; margin-bottom:2rem;
-    animation:fadeUp .6s ease-out .38s both;
-}
-@media(min-width:768px) { .hero-stats { flex-wrap:nowrap } }
-.hero-stat {
-    flex:1; min-width:120px; padding:.875rem 1.25rem; text-align:center;
-    border-right:1px solid var(--color-border); position:relative;
-}
-.hero-stat:last-child { border-right:none }
-@media(max-width:480px) { .hero-stat:nth-child(even) { border-right:none } .hero-stat:nth-child(n+3) { border-top:1px solid var(--color-border) } }
-.hero-stat-num { font-size:1.375rem; font-weight:800; color:var(--color-primary); line-height:1; margin-bottom:.2rem; font-variant-numeric:tabular-nums }
-@media(min-width:768px) { .hero-stat-num { font-size:1.625rem } }
-.hero-stat-label { font-size:.72rem; color:var(--color-text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.05em }
-
-.hero-actions {
-    display:flex; flex-direction:column; gap:.75rem; justify-content:center;
-    animation:fadeUp .6s ease-out .48s both;
-}
-@media(min-width:480px) { .hero-actions { flex-direction:row; gap:1rem; flex-wrap:wrap } }
-
-.hero-trust {
-    display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap;
-    margin-top:2rem; animation:fadeUp .6s ease-out .58s both;
-}
-@media(min-width:640px) { .hero-trust { gap:2.5rem } }
-.trust-item { display:flex; align-items:center; gap:.4rem; font-size:.8rem; font-weight:600; color:var(--color-text-muted) }
-.trust-check { width:1.125rem; height:1.125rem; background:var(--color-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.56rem; font-weight:800; flex-shrink:0 }
-
-/* ===========================
-   STATS BAND (sous hero)
-   =========================== */
-.stats-band { background:var(--color-text-dark); padding:1.375rem 1.25rem }
-@media(min-width:640px) { .stats-band { padding:1.375rem 1.75rem } }
-.stats-band-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-around; gap:1.25rem; flex-wrap:wrap }
-.sb-item { display:flex; align-items:center; gap:.6rem; color:rgba(255,255,255,.82); font-size:.8rem; font-weight:500; white-space:nowrap }
-.sb-item i { color:var(--color-primary); font-size:.9rem }
-.sb-div { width:1px; height:20px; background:rgba(255,255,255,.14); flex-shrink:0 }
-@media(max-width:600px) { .sb-div { display:none } .stats-band {  display:none;} }
-
-/* ===========================
-   PILLARS SECTION
-   =========================== */
-.pillars-section { padding:4rem 1.25rem; background:var(--color-bg-light) }
-@media(min-width:640px)  { .pillars-section { padding:5rem 1.75rem } }
-@media(min-width:1024px) { .pillars-section { padding:6rem 2.5rem } }
-
-.pillars-grid { display:grid; grid-template-columns:1fr; gap:1.25rem }
-@media(min-width:600px)  { .pillars-grid { grid-template-columns:1fr 1fr } }
-@media(min-width:1024px) { .pillars-grid { grid-template-columns:repeat(4,1fr) } }
-
-.pillar {
-    background:#fff; border:1.5px solid var(--color-border); border-radius:var(--border-radius);
-    padding:1.75rem; transition:all .25s ease; position:relative; overflow:hidden;
-}
-.pillar::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:3px;
-    background:linear-gradient(90deg, var(--color-primary), #10b981);
-    transform:scaleX(0); transform-origin:left; transition:transform .28s ease;
-}
-.pillar:hover { border-color:rgba(5,150,105,.3); transform:translateY(-5px); box-shadow:var(--shadow-lg) }
-.pillar:hover::before { transform:scaleX(1) }
-
-.pillar-icon {
-    width:48px; height:48px;
-    background:linear-gradient(135deg, #f0fdf4, #ecfdf5);
-    border:1px solid rgba(5,150,105,.18); border-radius:var(--border-radius-sm);
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.375rem; margin-bottom:1.125rem;
-    transition:transform .25s ease;
-}
-.pillar:hover .pillar-icon { transform:scale(1.08) rotate(-4deg) }
-.pillar-title { font-size:.95rem; font-weight:800; color:var(--color-text-dark); margin-bottom:.875rem; letter-spacing:-.012em }
-.pillar-list { list-style:none; display:flex; flex-direction:column; gap:.475rem }
-.pillar-list li {
-    font-size:.85rem; color:var(--color-text-medium);
-    display:flex; align-items:flex-start; gap:.5rem; line-height:1.5;
-}
-.pillar-list li i { color:var(--color-primary); font-size:.7rem; margin-top:.28rem; flex-shrink:0 }
-
-/* Pillar "featured" (dark) — le premier */
-.pillar.featured { background:var(--color-text-dark); border-color:transparent }
-.pillar.featured::before { transform:scaleX(1) }
-.pillar.featured .pillar-title { color:#f8fafc }
-.pillar.featured .pillar-list li { color:#94a3b8 }
-.pillar.featured .pillar-list li i { color:#34d399 }
-.pillar.featured .pillar-icon { background:rgba(5,150,105,.18); border-color:rgba(5,150,105,.3) }
-
-/* ===========================
-   SPLIT FEATURE (hash highlight)
-   =========================== */
-.split-section { padding:4rem 1.25rem; background:#fff }
-@media(min-width:640px)  { .split-section { padding:5rem 1.75rem } }
-@media(min-width:1024px) { .split-section { padding:6rem 2.5rem } }
-
-.split-inner { max-width:1200px; margin:0 auto; display:flex; flex-direction:column; gap:2.5rem }
-@media(min-width:1024px) { .split-inner { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center } }
-
-.split-text .shead { margin-bottom:1.75rem }
-.split-pts { display:flex; flex-direction:column; gap:1rem }
-.split-pt { display:flex; gap:.875rem; align-items:flex-start }
-.split-pt-ico { width:40px; height:40px; min-width:40px; background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid rgba(5,150,105,.2); border-radius:var(--border-radius-sm); display:flex; align-items:center; justify-content:center; color:var(--color-primary); font-size:.95rem }
-.split-pt-body b { display:block; font-size:.9rem; font-weight:700; color:var(--color-text-dark); margin-bottom:.18rem }
-.split-pt-body p { font-size:.82rem; color:var(--color-text-medium); line-height:1.55; margin:0 }
-
-/* Terminal card dans le split */
-.split-visual { position:relative }
-.split-card {
-    background:var(--color-text-dark); border-radius:var(--border-radius);
-    overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.18); border:1px solid #1e293b;
-    position:relative;
-}
-.split-card-header { display:flex; align-items:center; gap:.5rem; padding:.75rem 1.25rem; background:#1e293b; border-bottom:1px solid #334155 }
-.sc-dots { display:flex; gap:.3rem }
-.sc-dot { width:9px; height:9px; border-radius:50% }
-.sc-dot:nth-child(1){background:#ef4444} .sc-dot:nth-child(2){background:#f59e0b} .sc-dot:nth-child(3){background:#22c55e}
-.sc-title { flex:1; text-align:center; font-size:.68rem; font-weight:600; color:#64748b; font-family:'JetBrains Mono',monospace }
-.sc-body { padding:1.5rem 1.5rem 1.25rem; font-family:'JetBrains Mono',monospace; font-size:.75rem; line-height:1.8 }
-.tl { display:flex; gap:.6rem; margin-bottom:.15rem }
-.tp{color:#334155;flex-shrink:0} .tc{color:#94a3b8} .tv{color:#34d399} .tw{color:#fbbf24} .te{color:#f87171} .tok{color:#34d399;font-weight:700}
-
-/* Score sécurité dans le card */
-.sc-score { margin:1.25rem 1.5rem 1.5rem; padding:1rem 1.25rem; background:rgba(5,150,105,.1); border:1px solid rgba(5,150,105,.25); border-radius:8px }
-.sc-score-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:.625rem }
-.sc-score-label { font-size:.7rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.06em }
-.sc-score-val { font-size:1.5rem; font-weight:800; color:#34d399; font-family:'JetBrains Mono',monospace; line-height:1 }
-.sc-score-bar { height:6px; background:#1e293b; border-radius:3px; overflow:hidden }
-.sc-score-fill { height:100%; background:linear-gradient(90deg, var(--color-primary), #34d399); border-radius:3px; width:94%; transition:width .8s ease }
-
-/* Badge flottant */
-.split-badge {
-    position:absolute; top:-14px; right:1.5rem;
-    background:var(--color-primary); color:#fff;
-    border-radius:50px; padding:.35rem .9rem;
-    z-index:10;
-    font-size:.72rem; font-weight:700;
-    display:flex; align-items:center; gap:.35rem;
-    box-shadow:var(--shadow-green); white-space:nowrap;
-    animation:float 3s ease-in-out infinite;
-}
-
-/* ===========================
-   EXPLORE NAV CARDS
-   =========================== */
-.explore-section { padding:4rem 1.25rem; background:var(--color-bg-light) }
-@media(min-width:640px)  { .explore-section { padding:5rem 1.75rem } }
-@media(min-width:1024px) { .explore-section { padding:6rem 2.5rem } }
-
-.explore-grid { display:grid; grid-template-columns:1fr; gap:1.25rem }
-@media(min-width:600px) { .explore-grid { grid-template-columns:1fr 1fr } }
-
-.explore-card {
-    background:#fff; border:1.5px solid var(--color-border); border-radius:var(--border-radius);
-    padding:1.75rem; text-decoration:none;
-    display:flex; flex-direction:column; gap:1.125rem;
-    transition:all .25s ease; position:relative; overflow:hidden;
-}
-.explore-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--color-primary),#10b981); transform:scaleX(0); transform-origin:left; transition:transform .25s ease }
-.explore-card:hover { border-color:rgba(5,150,105,.3); transform:translateY(-4px); box-shadow:var(--shadow-lg) }
-.explore-card:hover::after { transform:scaleX(1) }
-
-.explore-card-top { display:flex; align-items:center; gap:1rem }
-.explore-icon { width:48px; height:48px; background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid rgba(5,150,105,.18); border-radius:var(--border-radius-sm); display:flex; align-items:center; justify-content:center; font-size:1.375rem; flex-shrink:0; transition:transform .25s }
-.explore-card:hover .explore-icon { transform:scale(1.08) rotate(-3deg) }
-.explore-badge { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--color-primary); display:block; margin-bottom:.2rem }
-.explore-card-title { font-size:1rem; font-weight:800; color:var(--color-text-dark); letter-spacing:-.012em }
-.explore-desc { font-size:.85rem; color:var(--color-text-medium); line-height:1.6 }
-.explore-arrow { display:flex; align-items:center; gap:.4rem; font-size:.8rem; font-weight:700; color:var(--color-primary); margin-top:.25rem }
-
-/* ===========================
-   PRICING SECTION
-   =========================== */
-.pricing-section { padding:4rem 1.25rem; background:#fff }
-@media(min-width:640px)  { .pricing-section { padding:5rem 1.75rem } }
-@media(min-width:1024px) { .pricing-section { padding:6rem 2.5rem } }
-
-.pricing-card {
-    max-width:960px; margin:0 auto;
-    background:#fff; border:1.5px solid var(--color-border); border-radius:var(--border-radius);
-    overflow:hidden; position:relative;
-    box-shadow:0 0 0 1px var(--color-primary), var(--shadow-green);
-    border-color:var(--color-primary);
-}
-.pricing-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:4px;
-    background:linear-gradient(90deg,var(--color-primary),#10b981,var(--color-primary));
-    background-size:200%; animation:shimmer 3s linear infinite;
-}
-.pricing-inner { display:flex; flex-direction:column }
-@media(min-width:768px) { .pricing-inner { flex-direction:row } }
-
-.pricing-left { padding:2rem 1.75rem; border-bottom:1px solid var(--color-border); flex-shrink:0 }
-@media(min-width:768px) { .pricing-left { padding:2.5rem; border-bottom:none; border-right:1px solid var(--color-border); min-width:300px } }
-
-.pricing-amount { font-family:'JetBrains Mono',monospace; font-size:3rem; font-weight:700; color:var(--color-primary); line-height:1; margin-bottom:.2rem }
-@media(min-width:768px) { .pricing-amount { font-size:3.5rem } }
-.pricing-unit { font-size:.875rem; color:var(--color-text-muted); margin-bottom:1rem; font-weight:500 }
-.pricing-pill { display:inline-flex; align-items:center; gap:.35rem; background:#f0fdf4; border:1px solid rgba(5,150,105,.28); color:var(--color-primary); padding:.3rem .8rem; border-radius:50px; font-size:.75rem; font-weight:700; margin-bottom:1.25rem }
-.pricing-desc { font-size:.875rem; color:var(--color-text-medium); line-height:1.65; margin-bottom:1.5rem }
-.pricing-cta { display:flex; flex-direction:column; gap:.625rem }
-
-.pricing-right { padding:2rem 1.75rem; flex:1 }
-@media(min-width:768px) { .pricing-right { padding:2.5rem } }
-.pricing-features { list-style:none; display:flex; flex-direction:column; gap:.75rem }
-.pricing-features li { display:flex; align-items:flex-start; gap:.75rem; padding:.625rem 0; border-bottom:1px solid var(--color-border); font-size:.9rem; color:var(--color-text-medium); line-height:1.45 }
-.pricing-features li:last-child { border-bottom:none }
-.feat-check { width:22px; height:22px; min-width:22px; background:linear-gradient(135deg,var(--color-primary),#10b981); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.6rem; flex-shrink:0; margin-top:.1rem }
-
-/* ===========================
-   CTA FINAL
-   =========================== */
-.cta-section {  background:var(--color-bg-light) }
-@media(min-width:640px)  { .cta-section { padding:5rem 1.75rem } }
-@media(min-width:1024px) { .cta-section { padding:6rem 2.5rem } }
-
-.cta-box {
-    max-width:900px; margin:0 auto;
-    background:linear-gradient(135deg, var(--color-text-dark) 0%, #1e3a2f 100%);
-    border-radius:var(--border-radius); padding:3rem 1.75rem;
-    text-align:center; position:relative; overflow:hidden;
-}
-@media(min-width:640px) { .cta-box { padding:4rem 3rem } }
-/* Orbes déco */
-.cta-box::before { content:''; position:absolute; top:-60px; right:-60px; width:240px; height:240px; background:radial-gradient(circle,rgba(5,150,105,.2) 0%,transparent 70%); pointer-events:none }
-.cta-box::after  { content:''; position:absolute; bottom:-40px; left:-40px; width:180px; height:180px; background:radial-gradient(circle,rgba(16,185,129,.15) 0%,transparent 70%); pointer-events:none }
-.cta-box-inner { position:relative; z-index:1 }
-.cta-label { display:inline-flex; align-items:center; gap:.4rem; background:rgba(5,150,105,.2); border:1px solid rgba(5,150,105,.3); color:#34d399; border-radius:50px; padding:.3rem .875rem; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:1.25rem }
-.cta-box h2 { font-size:1.5rem; font-weight:800; color:#f8fafc; margin-bottom:.875rem; letter-spacing:-.022em; line-height:1.2 }
-@media(min-width:640px) { .cta-box h2 { font-size:2rem } }
-@media(min-width:1024px){ .cta-box h2 { font-size:2.4rem } }
-.cta-box p { font-size:.9rem; color:#94a3b8; margin-bottom:2rem; line-height:1.65; max-width:560px; margin-left:auto; margin-right:auto }
-@media(min-width:640px) { .cta-box p { font-size:1rem } }
-.cta-btns { display:flex; flex-direction:column; gap:.75rem; justify-content:center }
-@media(min-width:480px) { .cta-btns { flex-direction:row; flex-wrap:wrap } }
-.cta-note { margin-top:1.5rem; font-size:.75rem; color:#64748b; display:flex; align-items:center; justify-content:center; gap:.35rem; flex-wrap:wrap }
-.cta-note i { color:#34d399 }
-
-/* ===== ACCESSIBILITY ===== */
-*:focus-visible { outline:3px solid var(--color-primary); outline-offset:2px }
-@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important } }
-</style>
-
 <main>
 
 {# ======================== HERO ======================== #}
@@ -386,22 +46,22 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
     <p class="hero-sub">{{ 'business.solution.hero.subtitle'|trans }}</p>
 
     {# Stat strip #}
-    <div class="hero-stats" aria-label="Chiffres clés">
+    <div class="hero-stats" aria-label="Chiffres cles">
       <div class="hero-stat">
-        <div class="hero-stat-num">AES‑256</div>
+        <div class="hero-stat-num">AESâ€‘256</div>
         <div class="hero-stat-label">Chiffrement</div>
       </div>
       <div class="hero-stat">
         <div class="hero-stat-num">0</div>
-        <div class="hero-stat-label">Données lisibles</div>
+        <div class="hero-stat-label">Donnees lisibles</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-num">2,99€</div>
+        <div class="hero-stat-num">2,99â‚¬</div>
         <div class="hero-stat-label">/ utilisateur / mois</div>
       </div>
       <div class="hero-stat">
         <div class="hero-stat-num">100%</div>
-        <div class="hero-stat-label">Européen</div>
+        <div class="hero-stat-label">Europeen</div>
       </div>
     </div>
 
@@ -416,9 +76,9 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
     </div>
 
     <div class="hero-trust">
-      <div class="trust-item"><span class="trust-check">✓</span>{{ 'business.solution.hero.trust.no_commitment'|trans }}</div>
-      <div class="trust-item"><span class="trust-check">✓</span>{{ 'business.solution.hero.trust.setup'|trans }}</div>
-      <div class="trust-item"><span class="trust-check">✓</span>{{ 'business.solution.hero.trust.support'|trans }}</div>
+      <div class="trust-item"><span class="trust-check">&#10003;</span>{{ 'business.solution.hero.trust.no_commitment'|trans }}</div>
+      <div class="trust-item"><span class="trust-check">&#10003;</span>{{ 'business.solution.hero.trust.setup'|trans }}</div>
+      <div class="trust-item"><span class="trust-check">&#10003;</span>{{ 'business.solution.hero.trust.support'|trans }}</div>
     </div>
   </div>
 </section>
@@ -428,13 +88,13 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
   <div class="stats-band-inner">
     <div class="sb-item"><i class="fas fa-certificate"></i> AES-256</div>
     <div class="sb-div"></div>
-    <div class="sb-item"><i class="fas fa-fingerprint"></i> Installation Hashée</div>
+    <div class="sb-item"><i class="fas fa-fingerprint"></i> Installation Hashee</div>
     <div class="sb-div"></div>
-    <div class="sb-item"><i class="fas fa-euro-sign"></i> Données en Europe</div>
+    <div class="sb-item"><i class="fas fa-euro-sign"></i> Donnees en Europe</div>
     <div class="sb-div"></div>
     <div class="sb-item"><i class="fas fa-user-secret"></i> Zero-Knowledge</div>
     <div class="sb-div"></div>
-    <div class="sb-item"><i class="fas fa-check-double"></i> Conformité RGPD</div>
+    <div class="sb-item"><i class="fas fa-check-double"></i> Conformite RGPD</div>
   </div>
 </div>
 
@@ -448,7 +108,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
     </div>
 
     <div class="pillars-grid">
-      {# Logiciel — featured dark #}
+      {# Logiciel ? featured dark #}
       <div class="pillar featured">
         <div class="pillar-icon" aria-hidden="true"><i class="fas fa-lock" style="color:#34d399"></i></div>
         <div class="pillar-title">{{ 'business.solution.pillars.software.title'|trans }}</div>
@@ -493,69 +153,69 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
   </div>
 </section>
 
-{# ======================== SPLIT — INSTALLATION HASHÉE ======================== #}
+{# ======================== SPLIT ? INSTALLATION HASHÃ‰E ======================== #}
 <section class="split-section">
   <div class="split-inner">
     <div class="split-text">
       <div class="shead">
-        <div class="shead-eye"><i class="fas fa-fingerprint"></i> Sécurité inviolable</div>
-        <h2>Vous seul contrôlez l'accès</h2>
-        <p>Chaque déploiement MykeyNest génère une empreinte cryptographique unique. L'accès est verrouillé à votre instance — impossible à usurper, même avec les bons identifiants.</p>
+        <div class="shead-eye"><i class="fas fa-fingerprint"></i> Securite inviolable</div>
+        <h2>Vous seul controlez l'acces</h2>
+        <p>Chaque deploiement MykeyNest genere une empreinte cryptographique unique. L'acces est verrouille a votre instance, impossible a usurper, meme avec les bons identifiants.</p>
       </div>
       <div class="split-pts">
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-fingerprint"></i></div>
           <div class="split-pt-body">
-            <b>Signature Matérielle</b>
-            <p>Accès strictement lié à votre instance. Un attaquant sur un autre poste est bloqué même avec vos codes.</p>
+            <b>Signature Materielle</b>
+            <p>Acces strictement lie a votre instance. Un attaquant sur un autre poste est bloque meme avec vos codes.</p>
           </div>
         </div>
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-link-slash"></i></div>
           <div class="split-pt-body">
-            <b>Preuve d'Intégrité</b>
-            <p>Si l'extension est modifiée ou falsifiée, le hash change instantanément et l'accès est révoqué.</p>
+            <b>Preuve d'Integrite</b>
+            <p>Si l'extension est modifiee ou falsifiee, le hash change instantanement et l'acces est revoque.</p>
           </div>
         </div>
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-file-shield"></i></div>
           <div class="split-pt-body">
             <b>Logs d'Audit Complets</b>
-            <p>Chaque tentative d'accès est tracée avec horodatage cryptographique pour vos audits de conformité.</p>
+            <p>Chaque tentative d'acces est tracee avec horodatage cryptographique pour vos audits de conformite.</p>
           </div>
         </div>
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-check-double"></i></div>
           <div class="split-pt-body">
-            <b>Conformité RGPD native</b>
-            <p>Données hébergées en Europe, architecture zero-knowledge. Conformité intégrée dès la conception.</p>
+            <b>Conformite RGPD native</b>
+            <p>Donnees hebergees en Europe, architecture zero-knowledge. Conformite integree des la conception.</p>
           </div>
         </div>
       </div>
     </div>
 
     <div class="split-visual">
-      <div class="split-badge"><i class="fas fa-shield-check"></i> Installation vérifiée</div>
+      <div class="split-badge"><i class="fas fa-shield-check"></i> Installation verifiee</div>
       <div class="split-card">
         <div class="split-card-header">
           <div class="sc-dots"><div class="sc-dot"></div><div class="sc-dot"></div><div class="sc-dot"></div></div>
-          <span class="sc-title">mykeynest — audit de sécurité</span>
+          <span class="sc-title">mykeynest - audit de securite</span>
         </div>
         <div class="sc-body">
-          <div class="tl"><span class="tp">›</span><span class="tc">verify_install --id 0x8f2a</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">HASH_STATUS&nbsp;&nbsp;: SIGNED ✓</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tc">verify_install --id 0x8f2a</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">HASH_STATUS&nbsp;&nbsp;: SIGNED âœ“</span></div>
           <div class="tl"><span class="tp"> </span><span class="tv">OWNER_KEY&nbsp;&nbsp;&nbsp;&nbsp;: USER_STRICT</span></div>
           <div class="tl"><span class="tp"> </span><span class="tv">INTEGRITY&nbsp;&nbsp;&nbsp;&nbsp;: PASS</span></div>
           <br>
-          <div class="tl"><span class="tp">›</span><span class="tc">simulate_attack</span></div>
-          <div class="tl"><span class="tp"> </span><span class="te">HASH_MISMATCH — denied</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tc">simulate_attack</span></div>
+          <div class="tl"><span class="tp"> </span><span class="te">HASH_MISMATCH - denied</span></div>
           <div class="tl"><span class="tp"> </span><span class="tw">VAULT : LOCKED</span></div>
           <br>
-          <div class="tl"><span class="tp">›</span><span class="tok">✓ Zero data exposed.</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tok">âœ“ Zero data exposed.</span></div>
         </div>
         <div class="sc-score">
           <div class="sc-score-top">
-            <span class="sc-score-label">Score de sécurité</span>
+            <span class="sc-score-label">Score de securite</span>
             <span class="sc-score-val">A+</span>
           </div>
           <div class="sc-score-bar"><div class="sc-score-fill"></div></div>
@@ -577,24 +237,24 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
     <div class="explore-grid">
       <a href="{{ path('business_comparatif') }}" class="explore-card">
         <div class="explore-card-top">
-          <div class="explore-icon" aria-hidden="true">⚖️</div>
+          <div class="explore-icon" aria-hidden="true">âš–ï¸</div>
           <div>
             <span class="explore-badge">{{ 'business.solution.explore.comparatif.label'|trans }}</span>
             <div class="explore-card-title">{{ 'business.solution.explore.comparatif.title'|trans }}</div>
           </div>
         </div>
-        <div class="explore-desc">Comparez MykeyNest aux solutions concurrentes sur les critères qui comptent pour votre PME : sécurité, prix, conformité RGPD.</div>
+        <div class="explore-desc">Comparez MykeyNest aux solutions concurrentes sur les criteres qui comptent pour votre PME : securite, prix, conformite RGPD.</div>
         <div class="explore-arrow"><i class="fas fa-arrow-right"></i> Voir le comparatif</div>
       </a>
       <a href="{{ path('business_audit') }}" class="explore-card">
         <div class="explore-card-top">
-          <div class="explore-icon" aria-hidden="true">🧪</div>
+          <div class="explore-icon" aria-hidden="true">ðŸ§ª</div>
           <div>
             <span class="explore-badge">{{ 'business.solution.explore.audit.label'|trans }}</span>
             <div class="explore-card-title">{{ 'business.solution.explore.audit.title'|trans }}</div>
           </div>
         </div>
-        <div class="explore-desc">Évaluez gratuitement le niveau de sécurité des mots de passe de votre organisation en quelques minutes.</div>
+        <div class="explore-desc">Evaluez gratuitement le niveau de securite des mots de passe de votre organisation en quelques minutes.</div>
         <div class="explore-arrow"><i class="fas fa-arrow-right"></i> Lancer l'audit</div>
       </a>
     </div>
@@ -612,7 +272,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
     <div class="pricing-card">
       <div class="pricing-inner">
         <div class="pricing-left">
-          <div class="pricing-amount">2,99€</div>
+          <div class="pricing-amount">2,99â‚¬</div>
           <div class="pricing-unit">{{ 'business.solution.pricing.unit'|trans }}</div>
           <div class="pricing-pill"><i class="fas fa-tags"></i> {{ 'business.solution.pricing.badge'|trans }}</div>
           <p class="pricing-desc">{{ 'business.solution.pricing.description'|trans }}</p>
@@ -621,7 +281,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
               <i class="fas fa-rocket"></i> {{ 'business.solution.pricing.cta'|trans }}
             </a>
             <a href="mailto:contact@key-nest.com" class="btn btn-outline">
-              <i class="fas fa-envelope"></i> Contacter l'équipe
+              <i class="fas fa-envelope"></i> Contacter l'equipe
             </a>
           </div>
         </div>
@@ -656,7 +316,7 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
             <i class="fas fa-envelope"></i> {{ 'business.solution.cta.secondary'|trans }}
           </a>
         </div>
-        <p class="cta-note"><i class="fas fa-circle-check"></i> Essai gratuit 14 jours · Sans carte bancaire · RGPD compliant</p>
+        <p class="cta-note"><i class="fas fa-circle-check"></i> Essai gratuit 14 jours - Sans carte bancaire - RGPD compliant</p>
       </div>
     </div>
   </div>
@@ -664,3 +324,4 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--color-bg-lig
 
 </main>
 {% endblock %}
+
