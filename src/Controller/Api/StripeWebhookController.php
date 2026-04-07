@@ -2,9 +2,11 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\UserSubscription;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use App\Entity\User;
+use App\Repository\UserSubscriptionRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +20,7 @@ final class StripeWebhookController extends AbstractController
     public function handle(
         Request $request,
         UserRepository $users,
+        UserSubscriptionRepository $subscriptions,
         EntityManagerInterface $em
     ): Response {
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
@@ -52,6 +55,14 @@ final class StripeWebhookController extends AbstractController
                 $customerId = is_string($session->customer) ? $session->customer : ($session->customer->id ?? null);
                 $subId      = is_string($session->subscription) ? $session->subscription : ($session->subscription->id ?? null);
 
+                $this->syncSubscriptionRecord(
+                    $user,
+                    $em,
+                    customerId: $customerId,
+                    subscriptionId: $subId,
+                    planCode: 'pro'
+                );
+
                 if ($customerId) $user->setStripeCustomerId($customerId);
                 if ($subId) $user->setStripeSubscriptionId($subId);
 
@@ -72,10 +83,22 @@ final class StripeWebhookController extends AbstractController
 
     // 1) by subscription id
     if ($subId) {
+        $subscription = $subscriptions->findOneBy(['stripeSubscriptionId' => $subId]);
+        $user = $subscription?->getUser();
+    }
+
+    // 1bis) compatibilite ancienne structure user
+    if (!$user && $subId) {
         $user = $users->findOneBy(['stripeSubscriptionId' => $subId]);
     }
 
     // 2) by customer id
+    if (!$user && $customerId) {
+        $subscription = $subscriptions->findOneBy(['stripeCustomerId' => $customerId]);
+        $user = $subscription?->getUser();
+    }
+
+    // 2bis) compatibilite ancienne structure user
     if (!$user && $customerId) {
         $user = $users->findOneBy(['stripeCustomerId' => $customerId]);
     }
@@ -96,6 +119,16 @@ final class StripeWebhookController extends AbstractController
     }
 
     // rattachement Stripe -> user + activation
+    $this->syncSubscriptionRecord(
+        $user,
+        $em,
+        customerId: $customerId,
+        subscriptionId: $subId,
+        status: 'active',
+        isActive: true,
+        planCode: 'pro'
+    );
+
     if ($customerId) $user->setStripeCustomerId($customerId);
     if ($subId) $user->setStripeSubscriptionId($subId);
 
@@ -113,9 +146,19 @@ final class StripeWebhookController extends AbstractController
                 $subId = $sub->id ?? null;
                 if (!$subId) break;
 
-                /** @var User|null $user */
-                $user = $users->findOneBy(['stripeSubscriptionId' => $subId]);
+                $subscription = $subscriptions->findOneBy(['stripeSubscriptionId' => $subId]);
+                $user = $subscription?->getUser();
+                $user ??= $users->findOneBy(['stripeSubscriptionId' => $subId]);
                 if (!$user) break;
+
+                $this->syncSubscriptionRecord(
+                    $user,
+                    $em,
+                    subscriptionId: $subId,
+                    status: 'canceled',
+                    isActive: false,
+                    clearSubscriptionId: true
+                );
 
                 $user->setIsSubscribed(false);
                 $user->setStripeSubscriptionId(null);
@@ -132,13 +175,25 @@ final class StripeWebhookController extends AbstractController
                 $subId = $sub->id ?? null;
                 if (!$subId) break;
 
-                /** @var User|null $user */
-                $user = $users->findOneBy(['stripeSubscriptionId' => $subId]);
+                $subscription = $subscriptions->findOneBy(['stripeSubscriptionId' => $subId]);
+                $user = $subscription?->getUser();
+                $user ??= $users->findOneBy(['stripeSubscriptionId' => $subId]);
                 if (!$user) break;
 
                 $status = $sub->status ?? null;
                 if (is_string($status)) {
-                    $user->setIsSubscribed(in_array($status, ['active', 'trialing'], true));
+                    $isActive = in_array($status, ['active', 'trialing'], true);
+
+                    $this->syncSubscriptionRecord(
+                        $user,
+                        $em,
+                        customerId: is_string($sub->customer) ? $sub->customer : ($sub->customer->id ?? null),
+                        subscriptionId: $subId,
+                        status: $status,
+                        isActive: $isActive
+                    );
+
+                    $user->setIsSubscribed($isActive);
                     $em->flush();
                 }
                 break;
@@ -146,5 +201,51 @@ final class StripeWebhookController extends AbstractController
         }
 
         return new Response('ok', 200);
+    }
+
+    private function syncSubscriptionRecord(
+        User $user,
+        EntityManagerInterface $em,
+        ?string $customerId = null,
+        ?string $subscriptionId = null,
+        ?string $status = null,
+        ?bool $isActive = null,
+        ?string $planCode = null,
+        bool $clearSubscriptionId = false
+    ): UserSubscription {
+        $subscription = $user->getUserSubscription();
+
+        if (!$subscription) {
+            $subscription = new UserSubscription();
+            $subscription->setUser($user);
+            $user->setUserSubscription($subscription);
+            $em->persist($subscription);
+        }
+
+        if ($customerId !== null) {
+            $subscription->setStripeCustomerId($customerId);
+        }
+
+        if ($clearSubscriptionId) {
+            $subscription->setStripeSubscriptionId(null);
+        } elseif ($subscriptionId !== null) {
+            $subscription->setStripeSubscriptionId($subscriptionId);
+        }
+
+        if ($status !== null) {
+            $subscription->setStatus($status);
+        }
+
+        if ($isActive !== null) {
+            $subscription->setIsActive($isActive);
+        }
+
+        if ($planCode !== null) {
+            $subscription->setPlanCode($planCode);
+        }
+
+        $subscription->touch();
+
+        return $subscription;
     }
 }

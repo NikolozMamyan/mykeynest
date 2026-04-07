@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\UserSubscription;
 use App\Repository\UserRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -88,6 +89,9 @@ private ?string $phone = null;
  */
 #[ORM\OneToMany(mappedBy: 'user', targetEntity: ExtensionClient::class, orphanRemoval: true)]
 private Collection $extensionClients;
+
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: UserSubscription::class, cascade: ['persist', 'remove'])]
+    private ?UserSubscription $userSubscription = null;
 
 
 public function __construct()
@@ -250,7 +254,7 @@ public function setIsSubscribed(bool $isSubscribed): static
 }
 public function getStripeCustomerId(): ?string
 {
-    return $this->stripeCustomerId;
+    return $this->userSubscription?->getStripeCustomerId() ?? $this->stripeCustomerId;
 }
 
 public function setStripeCustomerId(?string $stripeCustomerId): static
@@ -261,12 +265,37 @@ public function setStripeCustomerId(?string $stripeCustomerId): static
 
 public function getStripeSubscriptionId(): ?string
 {
-    return $this->stripeSubscriptionId;
+    return $this->userSubscription?->getStripeSubscriptionId() ?? $this->stripeSubscriptionId;
 }
 
 public function setStripeSubscriptionId(?string $stripeSubscriptionId): static
 {
     $this->stripeSubscriptionId = $stripeSubscriptionId;
+    return $this;
+}
+public function getUserSubscription(): ?UserSubscription
+{
+    return $this->userSubscription;
+}
+
+public function setUserSubscription(?UserSubscription $userSubscription): static
+{
+    if ($userSubscription === null) {
+        if ($this->userSubscription !== null) {
+            $this->userSubscription->setUser(null);
+        }
+
+        $this->userSubscription = null;
+
+        return $this;
+    }
+
+    $this->userSubscription = $userSubscription;
+
+    if ($userSubscription->getUser() !== $this) {
+        $userSubscription->setUser($this);
+    }
+
     return $this;
 }
 public function getAvatar(): ?string
