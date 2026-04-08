@@ -4,9 +4,10 @@
 
 {% block body %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+  
   .wrapper-layout {
-    margin:0px !important;
+    margin: 0px !important;
   }
 
   .pending-wrapper {
@@ -16,13 +17,14 @@
     justify-content: center;
     padding: 2rem;
     font-family: 'DM Sans', sans-serif;
+
   }
 
   .pending-card {
     background: var(--color-white);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-xl);
-    max-width: 520px;
+    max-width: 580px;
     width: 100%;
     padding: 3rem 2.5rem;
     position: relative;
@@ -59,44 +61,199 @@
 
   /* Icône email animée */
   .icon-wrapper {
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 72px;
     background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-    border-radius: 16px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.5rem;
+    margin: 0 auto 1.5rem;
     animation: float 3s ease-in-out infinite;
     box-shadow: var(--shadow-green);
+    position: relative;
   }
 
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50%       { transform: translateY(-5px); }
+    50%       { transform: translateY(-8px); }
   }
 
   .icon-wrapper svg {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     stroke: var(--color-primary);
+  }
+
+  /* Badge "1" animé sur l'icône */
+  .email-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--color-primary);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    animation: badge-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+  }
+
+  @keyframes badge-pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
   }
 
   /* Titre */
   .pending-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 1.75rem;
+    font-size: 1.85rem;
     color: var(--color-text-dark);
-    margin: 0 0 0.75rem;
+    margin: 0 0 0.5rem;
     line-height: 1.2;
+    text-align: center;
   }
 
-  /* Message */
-  .pending-message {
-    font-size: 0.95rem;
+  /* Sous-titre */
+  .pending-subtitle {
+    font-size: 1rem;
     color: var(--color-text-medium);
-    line-height: 1.6;
+    text-align: center;
     margin: 0 0 2rem;
+    font-weight: 400;
+  }
+
+  /* Étapes */
+  .steps-container {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .steps-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .steps-title::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: var(--color-primary);
+    border-radius: 2px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    animation: fadeInStep 0.5s ease-out both;
+  }
+
+  .step-item:nth-child(2) { animation-delay: 0.1s; }
+  .step-item:nth-child(3) { animation-delay: 0.2s; }
+  .step-item:nth-child(4) { animation-delay: 0.3s; }
+  .step-item:last-child { margin-bottom: 0; }
+
+  @keyframes fadeInStep {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    flex: 1;
+    padding-top: 2px;
+  }
+
+  .step-text {
+    font-size: 0.9rem;
+    color: var(--color-text-dark);
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .step-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-medium);
+    margin: 0.25rem 0 0;
+    line-height: 1.4;
+  }
+
+  /* Alert spam - très visible */
+  .spam-alert {
+    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    border: 1.5px solid #fb923c;
+    border-radius: var(--border-radius-sm);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .spam-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    color: #ea580c;
+    margin-top: 1px;
+  }
+
+  .spam-content {
+    flex: 1;
+  }
+
+  .spam-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #ea580c;
+    margin: 0 0 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .spam-text {
+    font-size: 0.85rem;
+    color: #9a3412;
+    margin: 0;
+    line-height: 1.5;
   }
 
   /* Bloc statut */
@@ -104,15 +261,16 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: var(--color-bg-light);
-    border: 1px solid var(--color-border);
+    background: white;
+    border: 1.5px solid var(--color-border);
     border-radius: var(--border-radius-sm);
-    padding: 0.875rem 1.125rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
   }
 
   .status-dot {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: var(--color-warning);
     flex-shrink: 0;
@@ -125,25 +283,97 @@
     50%       { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.1); }
   }
 
+  .status-content {
+    flex: 1;
+  }
+
   .status-label {
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 0.125rem;
   }
 
   .status-value {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--color-text-dark);
+  }
+
+  /* Email affiché */
+  .email-display {
+    background: var(--color-bg-light);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: 0.875rem 1.125rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .email-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 0.375rem;
+  }
+
+  .email-value {
+    font-size: 1rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    word-break: break-all;
   }
 
   /* Divider */
   .divider {
     height: 1px;
     background: var(--color-border);
-    margin: 2rem 0;
+    margin: 1.5rem 0;
+  }
+
+  /* Bouton resend */
+  .resend-section {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  .resend-text {
+    font-size: 0.875rem;
+    color: var(--color-text-medium);
+    margin-bottom: 0.75rem;
+  }
+
+  .resend-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    padding: 0.675rem 1.5rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .resend-button:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .resend-button svg {
+    width: 16px;
+    height: 16px;
   }
 
   /* Footer hint */
@@ -152,6 +382,7 @@
     color: var(--color-text-light);
     text-align: center;
     line-height: 1.5;
+    margin-top: 1.5rem;
   }
 
   .pending-hint a {
@@ -166,12 +397,31 @@
 
   /* Entrée animée */
   .pending-card {
-    animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(24px); }
+    from { opacity: 0; transform: translateY(30px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .pending-wrapper {
+      padding: 1rem;
+    }
+
+    .pending-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .pending-title {
+      font-size: 1.5rem;
+    }
+
+    .steps-container {
+      padding: 1.25rem;
+    }
   }
 </style>
 
@@ -183,25 +433,93 @@
         <rect x="2" y="4" width="20" height="16" rx="3"/>
         <path d="M2 7l10 7 10-7"/>
       </svg>
+      <div class="email-badge">1</div>
     </div>
 
-    <h1 class="pending-title">Validez cette connexion</h1>
+    <h1 class="pending-title">Consultez votre boîte mail</h1>
+    <p class="pending-subtitle">Un e-mail de confirmation vient d'être envoyé</p>
 
-    <p class="pending-message" data-pending-login-target="message">
-      Vérifiez votre e-mail puis confirmez que cette connexion est bien la vôtre.
-    </p>
+    <!-- Email de l'utilisateur -->
+    {# <div class="email-display">
+      <div class="email-label">E-mail envoyé à</div>
+      <div class="email-value" data-pending-login-target="email">votre-email@exemple.com</div>
+    </div> #}
+<p style="display: none;" data-pending-login-target="message">
+  Vérifiez votre e-mail puis confirmez que cette connexion est bien la vôtre.
+</p>
+    <!-- Alerte spam - très visible -->
+    <div class="spam-alert">
+      <svg class="spam-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <div class="spam-content">
+        <div class="spam-title">⚠️ Vérifiez vos spams</div>
+        <p class="spam-text">L'e-mail peut arriver dans vos courriers indésirables ou spam. Pensez à vérifier ces dossiers si vous ne le voyez pas.</p>
+      </div>
+    </div>
 
+    <!-- Étapes à suivre -->
+    <div class="steps-container">
+      <div class="steps-title">Que faire maintenant ?</div>
+      
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <p class="step-text">Ouvrez votre boîte mail</p>
+          <p class="step-hint">Cherchez un e-mail de notre part dans votre boîte de réception</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <p class="step-text">Vérifiez aussi les spams / courriers indésirables</p>
+          <p class="step-hint">Notre e-mail peut parfois être filtré par erreur</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <p class="step-text">Cliquez sur le lien de validation</p>
+          <p class="step-hint">Le lien est valide pendant 15 minutes</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <p class="step-text">Vous serez automatiquement connecté</p>
+          <p class="step-hint">Cette page se mettra à jour toute seule</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statut actuel -->
     <div class="status-block">
       <span class="status-dot"></span>
-      <span class="status-label">Statut</span>
-      <span class="status-value" data-pending-login-target="status">pending</span>
+      <div class="status-content">
+        <span class="status-label">Statut de connexion</span>
+        <span class="status-value" data-pending-login-target="status">En attente de validation</span>
+      </div>
     </div>
 
     <div class="divider"></div>
 
+    <!-- Section resend -->
+    <div class="resend-section">
+      <p class="resend-text">Vous n'avez rien reçu après 2-3 minutes ?</p>
+      <a href="#" class="resend-button">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Renvoyer l'e-mail
+      </a>
+    </div>
+
     <p class="pending-hint">
-      Vous n'avez pas reçu d'e-mail ?&nbsp;
-      <a href="#">Renvoyer le lien</a>
+      Besoin d'aide ?&nbsp;
+      <a href="#">Contactez le support</a>
     </p>
 
   </div>

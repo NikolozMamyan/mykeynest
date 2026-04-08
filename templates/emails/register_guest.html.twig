@@ -5,112 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Invitation MYKEYNEST</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
-
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc;">
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:Arial,sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f8fafc;">
     <tr>
-      <td align="center" style="padding: 48px 16px;">
-
-        <table role="presentation" width="100%" style="max-width: 540px;">
-
-          <!-- Logo -->
+      <td align="center" style="padding:48px 16px;">
+        <table role="presentation" width="100%" style="max-width:540px;">
           <tr>
-            <td align="center" style="padding-bottom: 28px;">
-              {% include 'components/parts/logo.html.twig' %}
+            <td align="center" style="padding-bottom:28px;">
+              {% include 'emails/_brand_header.html.twig' %}
             </td>
           </tr>
-
-          <!-- Card -->
           <tr>
-            <td style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(0,0,0,0.05); overflow: hidden;">
-
-              <!-- Top accent bar -->
+            <td style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,0.05);overflow:hidden;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td style="background: #059669; height: 3px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  <td style="background:#059669;height:3px;font-size:0;line-height:0;">&nbsp;</td>
                 </tr>
               </table>
-
-              <!-- Body -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td style="padding: 40px 40px 36px;">
-
-                    <!-- Eyebrow label -->
-                    <p style="margin: 0 0 18px; font-size: 11px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.08em;">
-                      Invitation
-                    </p>
-
-                    <!-- Title -->
-                    <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #1e293b; line-height: 1.3; letter-spacing: -0.3px;">
-                      Accédez à des identifiants partagés
+                  <td style="padding:40px 40px 36px;">
+                    <p style="margin:0 0 18px;font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:0.08em;">Invitation</p>
+                    <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#1e293b;line-height:1.3;letter-spacing:-0.3px;">
+                      Accedez a des identifiants partages
                     </h1>
-
-                    <!-- Intro -->
-                    <p style="margin: 0 0 28px; font-size: 15px; color: #64748b; line-height: 1.6;">
-                      Vous avez été invité à rejoindre un espace de gestion d'identifiants sécurisé sur <strong style="color: #1e293b;">MYKEYNEST</strong>.
+                    <p style="margin:0 0 28px;font-size:15px;color:#64748b;line-height:1.6;">
+                      Vous avez ete invite a rejoindre un espace de gestion d'identifiants securise sur <strong style="color:#1e293b;">MYKEYNEST</strong>.
                     </p>
-
-                    <!-- Divider -->
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 28px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:28px;">
                       <tr>
-                        <td style="border-top: 1px solid #f1f5f9; font-size: 0; line-height: 0;">&nbsp;</td>
+                        <td style="border-top:1px solid #f1f5f9;font-size:0;line-height:0;">&nbsp;</td>
                       </tr>
                     </table>
-
-                    <!-- Message -->
-                    <p style="margin: 0 0 28px; font-size: 15px; color: #475569; line-height: 1.7;">
-                      Pour finaliser l'accès, créez votre mot de passe en cliquant sur le bouton ci-dessous.
-                      Votre compte sera activé immédiatement après.
+                    <p style="margin:0 0 28px;font-size:15px;color:#475569;line-height:1.7;">
+                      Pour finaliser l'acces, creez votre mot de passe en cliquant sur le bouton ci-dessous.
+                      Votre compte sera active immediatement apres.
                     </p>
-
-                    <!-- CTA Button -->
-                    <table role="presentation" cellspacing="0" cellpadding="0" style="margin-bottom: 32px;">
+                    <table role="presentation" cellspacing="0" cellpadding="0" style="margin-bottom:32px;">
                       <tr>
-                        <td style="border-radius: 8px; background: #059669;">
-                          <a href="{{ guest_register }}"
-                             style="display: inline-block; padding: 13px 28px; font-size: 14px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 8px; letter-spacing: 0.1px;">
-                            Créer mon compte
+                        <td style="border-radius:8px;background:#059669;">
+                          <a href="{{ guest_register }}" style="display:inline-block;padding:13px 28px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
+                            Creer mon compte
                           </a>
                         </td>
                       </tr>
                     </table>
-
-                    <!-- Expiry notice -->
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                       <tr>
-                        <td style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #f59e0b; border-radius: 8px; padding: 12px 16px;">
-                          <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.6;">
-                            Ce lien expire le <strong style="color: #1e293b;">{{ expiresAt|date('d/m/Y à H:i') }}</strong>.
-                            Passé ce délai, une nouvelle invitation sera nécessaire.
+                        <td style="background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #f59e0b;border-radius:8px;padding:12px 16px;">
+                          <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
+                            Ce lien expire le <strong style="color:#1e293b;">{{ expiresAt|date('d/m/Y a H:i') }}</strong>.
+                            Passe ce delai, une nouvelle invitation sera necessaire.
                           </p>
                         </td>
                       </tr>
                     </table>
-
                   </td>
                 </tr>
               </table>
-
             </td>
           </tr>
-
-          <!-- Footer -->
           <tr>
-            <td align="center" style="padding: 28px 16px 0;">
-              <p style="margin: 0 0 6px; font-size: 12px; color: #94a3b8; line-height: 1.6;">
-                Vous recevez cet email suite à une invitation sur MYKEYNEST.
+            <td align="center" style="padding:28px 16px 0;">
+              <p style="margin:0 0 6px;font-size:12px;color:#94a3b8;line-height:1.6;">
+                Vous recevez cet email suite a une invitation sur MYKEYNEST.
               </p>
-              <p style="margin: 0; font-size: 12px; color: #cbd5e1;">
-                Si vous n'êtes pas concerné, ignorez simplement ce message.
+              <p style="margin:0;font-size:12px;color:#cbd5e1;">
+                Si vous n'etes pas concerne, ignorez simplement ce message.
               </p>
             </td>
           </tr>
-
         </table>
       </td>
     </tr>
   </table>
-
 </body>
 </html>

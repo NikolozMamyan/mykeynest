@@ -40,7 +40,7 @@ public function send(Request $request, MailerService $mailer): Response
 
     $mailer->send(
         'contact@key-nest.com',
-        'Contact - ' . $reasonLabel,
+        'Nouveau message de contact - ' . $reasonLabel,
         'emails/contact.html.twig',
         [
             'name' => $name,
@@ -48,7 +48,8 @@ public function send(Request $request, MailerService $mailer): Response
             'reason' => $reason,
             'reasonLabel' => $reasonLabel,
             'message' => $message,
-        ]
+        ],
+        $email
     );
 
     $this->addFlash('success', 'Thanks! Your message has been sent.');
