@@ -79,7 +79,7 @@
     </script>
   </head>
 
-  <body style="padding-top:50px;">
+  <body class="auth-layout">
   {% set route = app.request.attributes.get('_route') %}
 
 {% if route not in ['show_login', 'show_register'] %}
