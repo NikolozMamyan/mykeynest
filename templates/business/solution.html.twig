@@ -35,7 +35,7 @@
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-eyebrow">
-      <i class="fas fa-building-shield" aria-hidden="true"></i>
+      <i class="fas fa-building-lock" aria-hidden="true"></i>
       {{ 'business.solution.hero.eyebrow'|trans }}
     </div>
     <h1>
@@ -48,7 +48,7 @@
     {# Stat strip #}
     <div class="hero-stats" aria-label="Chiffres cles">
       <div class="hero-stat">
-        <div class="hero-stat-num">AESâ€‘256</div>
+        <div class="hero-stat-num">AES-256</div>
         <div class="hero-stat-label">Chiffrement</div>
       </div>
       <div class="hero-stat">
@@ -56,7 +56,7 @@
         <div class="hero-stat-label">Donnees lisibles</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-num">2,99â‚¬</div>
+        <div class="hero-stat-num">6,99€</div>
         <div class="hero-stat-label">/ utilisateur / mois</div>
       </div>
       <div class="hero-stat">
@@ -76,9 +76,9 @@
     </div>
 
     <div class="hero-trust">
-      <div class="trust-item"><span class="trust-check">&#10003;</span>{{ 'business.solution.hero.trust.no_commitment'|trans }}</div>
-      <div class="trust-item"><span class="trust-check">&#10003;</span>{{ 'business.solution.hero.trust.setup'|trans }}</div>
-      <div class="trust-item"><span class="trust-check">&#10003;</span>{{ 'business.solution.hero.trust.support'|trans }}</div>
+      <div class="trust-item"><span class="trust-check"><i class="fas fa-check"></i></span>{{ 'business.solution.hero.trust.no_commitment'|trans }}</div>
+      <div class="trust-item"><span class="trust-check"><i class="fas fa-check"></i></span>{{ 'business.solution.hero.trust.setup'|trans }}</div>
+      <div class="trust-item"><span class="trust-check"><i class="fas fa-check"></i></span>{{ 'business.solution.hero.trust.support'|trans }}</div>
     </div>
   </div>
 </section>
@@ -119,6 +119,7 @@
           <li><i class="fas fa-chevron-right"></i>{{ 'business.solution.pillars.software.item4'|trans }}</li>
         </ul>
       </div>
+
       {# Maintenance #}
       <div class="pillar">
         <div class="pillar-icon" aria-hidden="true"><i class="fas fa-screwdriver-wrench" style="color:var(--color-primary)"></i></div>
@@ -129,6 +130,7 @@
           <li><i class="fas fa-chevron-right"></i>{{ 'business.solution.pillars.maintenance.item3'|trans }}</li>
         </ul>
       </div>
+
       {# Formation #}
       <div class="pillar">
         <div class="pillar-icon" aria-hidden="true"><i class="fas fa-chalkboard-user" style="color:var(--color-primary)"></i></div>
@@ -139,6 +141,7 @@
           <li><i class="fas fa-chevron-right"></i>{{ 'business.solution.pillars.training.item3'|trans }}</li>
         </ul>
       </div>
+
       {# Audit #}
       <div class="pillar">
         <div class="pillar-icon" aria-hidden="true"><i class="fas fa-flask" style="color:var(--color-primary)"></i></div>
@@ -153,7 +156,7 @@
   </div>
 </section>
 
-{# ======================== SPLIT ? INSTALLATION HASHÃ‰E ======================== #}
+{# ======================== SPLIT ? INSTALLATION HASHEE ======================== #}
 <section class="split-section">
   <div class="split-inner">
     <div class="split-text">
@@ -162,6 +165,7 @@
         <h2>Vous seul controlez l'acces</h2>
         <p>Chaque deploiement MykeyNest genere une empreinte cryptographique unique. L'acces est verrouille a votre instance, impossible a usurper, meme avec les bons identifiants.</p>
       </div>
+
       <div class="split-pts">
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-fingerprint"></i></div>
@@ -170,6 +174,7 @@
             <p>Acces strictement lie a votre instance. Un attaquant sur un autre poste est bloque meme avec vos codes.</p>
           </div>
         </div>
+
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-link-slash"></i></div>
           <div class="split-pt-body">
@@ -177,13 +182,15 @@
             <p>Si l'extension est modifiee ou falsifiee, le hash change instantanement et l'acces est revoque.</p>
           </div>
         </div>
+
         <div class="split-pt">
-          <div class="split-pt-ico"><i class="fas fa-file-shield"></i></div>
+          <div class="split-pt-ico"><i class="fas fa-shield-halved"></i></div>
           <div class="split-pt-body">
             <b>Logs d'Audit Complets</b>
             <p>Chaque tentative d'acces est tracee avec horodatage cryptographique pour vos audits de conformite.</p>
           </div>
         </div>
+
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-check-double"></i></div>
           <div class="split-pt-body">
@@ -195,15 +202,16 @@
     </div>
 
     <div class="split-visual">
-      <div class="split-badge"><i class="fas fa-shield-check"></i> Installation verifiee</div>
+      <div class="split-badge"><i class="fas fa-shield-halved"></i> Installation verifiee</div>
       <div class="split-card">
         <div class="split-card-header">
           <div class="sc-dots"><div class="sc-dot"></div><div class="sc-dot"></div><div class="sc-dot"></div></div>
           <span class="sc-title">mykeynest - audit de securite</span>
         </div>
+
         <div class="sc-body">
           <div class="tl"><span class="tp">$</span><span class="tc">verify_install --id 0x8f2a</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">HASH_STATUS&nbsp;&nbsp;: SIGNED âœ“</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">HASH_STATUS&nbsp;&nbsp;: SIGNED <i class="fas fa-check"></i></span></div>
           <div class="tl"><span class="tp"> </span><span class="tv">OWNER_KEY&nbsp;&nbsp;&nbsp;&nbsp;: USER_STRICT</span></div>
           <div class="tl"><span class="tp"> </span><span class="tv">INTEGRITY&nbsp;&nbsp;&nbsp;&nbsp;: PASS</span></div>
           <br>
@@ -211,8 +219,9 @@
           <div class="tl"><span class="tp"> </span><span class="te">HASH_MISMATCH - denied</span></div>
           <div class="tl"><span class="tp"> </span><span class="tw">VAULT : LOCKED</span></div>
           <br>
-          <div class="tl"><span class="tp">$</span><span class="tok">âœ“ Zero data exposed.</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tok"><i class="fas fa-check"></i> Zero data exposed.</span></div>
         </div>
+
         <div class="sc-score">
           <div class="sc-score-top">
             <span class="sc-score-label">Score de securite</span>
@@ -237,7 +246,7 @@
     <div class="explore-grid">
       <a href="{{ path('business_comparatif') }}" class="explore-card">
         <div class="explore-card-top">
-          <div class="explore-icon" aria-hidden="true">âš–ï¸</div>
+          <div class="explore-icon" aria-hidden="true"><i class="fas fa-scale-balanced"></i></div>
           <div>
             <span class="explore-badge">{{ 'business.solution.explore.comparatif.label'|trans }}</span>
             <div class="explore-card-title">{{ 'business.solution.explore.comparatif.title'|trans }}</div>
@@ -246,9 +255,10 @@
         <div class="explore-desc">Comparez MykeyNest aux solutions concurrentes sur les criteres qui comptent pour votre PME : securite, prix, conformite RGPD.</div>
         <div class="explore-arrow"><i class="fas fa-arrow-right"></i> Voir le comparatif</div>
       </a>
+
       <a href="{{ path('business_audit') }}" class="explore-card">
         <div class="explore-card-top">
-          <div class="explore-icon" aria-hidden="true">ðŸ§ª</div>
+          <div class="explore-icon" aria-hidden="true"><i class="fas fa-vial"></i></div>
           <div>
             <span class="explore-badge">{{ 'business.solution.explore.audit.label'|trans }}</span>
             <div class="explore-card-title">{{ 'business.solution.explore.audit.title'|trans }}</div>
@@ -272,7 +282,7 @@
     <div class="pricing-card">
       <div class="pricing-inner">
         <div class="pricing-left">
-          <div class="pricing-amount">2,99â‚¬</div>
+          <div class="pricing-amount">6,99€</div>
           <div class="pricing-unit">{{ 'business.solution.pricing.unit'|trans }}</div>
           <div class="pricing-pill"><i class="fas fa-tags"></i> {{ 'business.solution.pricing.badge'|trans }}</div>
           <p class="pricing-desc">{{ 'business.solution.pricing.description'|trans }}</p>
@@ -285,7 +295,8 @@
             </a>
           </div>
         </div>
-        <div class="pricing-right">
+
+        {# <div class="pricing-right">
           <ul class="pricing-features">
             <li><span class="feat-check"><i class="fas fa-check"></i></span>{{ 'business.solution.pricing.feature1'|trans }}</li>
             <li><span class="feat-check"><i class="fas fa-check"></i></span>{{ 'business.solution.pricing.feature2'|trans }}</li>
@@ -293,7 +304,7 @@
             <li><span class="feat-check"><i class="fas fa-check"></i></span>{{ 'business.solution.pricing.feature4'|trans }}</li>
             <li><span class="feat-check"><i class="fas fa-check"></i></span>{{ 'business.solution.pricing.feature5'|trans }}</li>
             <li><span class="feat-check"><i class="fas fa-check"></i></span>{{ 'business.solution.pricing.feature6'|trans }}</li>
-          </ul>
+          </ul> #}
         </div>
       </div>
     </div>
@@ -305,7 +316,7 @@
   <div class="wrap">
     <div class="cta-box">
       <div class="cta-box-inner">
-        <div class="cta-label"><i class="fas fa-shield-check"></i> Solution PME</div>
+        <div class="cta-label"><i class="fas fa-shield-halved"></i> Solution PME</div>
         <h2>{{ 'business.solution.cta.title'|trans }}</h2>
         <p>{{ 'business.solution.cta.subtitle'|trans }}</p>
         <div class="cta-btns">
@@ -324,4 +335,3 @@
 
 </main>
 {% endblock %}
-

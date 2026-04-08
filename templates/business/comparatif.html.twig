@@ -29,7 +29,7 @@
 
 {% block body %}
 <main>
-    {# ?? Breadcrumb ?? #}
+    {# Breadcrumb #}
     <nav class="cmp-breadcrumb" aria-label="{{ 'business.comparatif.breadcrumb.aria'|trans }}">
         <div class="cmp-breadcrumb-inner">
             <a href="{{ path('app_landing') }}">{{ 'business.comparatif.breadcrumb.home'|trans }}</a>
@@ -40,7 +40,7 @@
         </div>
     </nav>
 
-    {# ?? Hero ?? #}
+    {# Hero #}
     <section class="cmp-hero">
         <div class="cmp-hero-inner">
             <div class="cmp-eyebrow">
@@ -63,7 +63,7 @@
 
     <div class="cmp-layout">
 
-        {# ?? Tableau comparatif ?? #}
+        {# Tableau comparatif #}
         <div class="cmp-section-eyebrow">{{ 'business.comparatif.table.eyebrow'|trans }}</div>
         <h2 class="cmp-section-title">{{ 'business.comparatif.table.title'|trans }}</h2>
         <p class="cmp-section-sub">{{ 'business.comparatif.table.subtitle'|trans }}</p>
@@ -77,137 +77,137 @@
                             <div class="cmp-th-logo">
                                 <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> MYKEYNEST
                                 <span class="cmp-badge-winner">{{ 'business.comparatif.table.badge_recommended'|trans }}</span>
-                                <span class="cmp-th-price">2,99â‚¬</span>
+                                <span class="cmp-th-price">6,99€</span>
                             </div>
                         </th>
                         <th class="cmp-th" scope="col">
                             <div class="cmp-th-logo">
                                 Bitwarden<br>
-                                <span class="cmp-th-price cmp-th-price-other">~10â‚¬+</span>
+                                <span class="cmp-th-price cmp-th-price-other">~10€+</span>
                             </div>
                         </th>
                         <th class="cmp-th" scope="col">
                             <div class="cmp-th-logo">
                                 1Password<br>
-                                <span class="cmp-th-price cmp-th-price-other">~12â‚¬+</span>
+                                <span class="cmp-th-price cmp-th-price-other">~12€+</span>
                             </div>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {# ?? Tarif ?? #}
+                    {# Tarif #}
                     <tr class="cmp-row-category">
                         <td class="cmp-td-category-label" colspan="4">{{ 'business.comparatif.table.cat_pricing'|trans }}</td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.price_per_user'|trans }}<small>{{ 'business.comparatif.table.row.price_per_user_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-th-price">2,99â‚¬</span></td>
-                        <td class="cmp-td-val"><span class="cmp-val-text">~10â‚¬+</span></td>
-                        <td class="cmp-td-val"><span class="cmp-val-text">~12â‚¬+</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-th-price">6,99€</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">~10€+</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">~12€+</span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.free_trial'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
                     </tr>
 
-                    {# ?? Securite ?? #}
+                    {# Securite #}
                     <tr class="cmp-row-category">
                         <td class="cmp-td-category-label" colspan="4">{{ 'business.comparatif.table.cat_security'|trans }}</td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.aes256'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes">âœ“</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.zero_knowledge'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes">âœ“</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.2fa'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes">âœ“</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.audit'|trans }}<small>{{ 'business.comparatif.table.row.audit_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
                     </tr>
 
-                    {# ?? Services inclus ?? #}
+                    {# Services inclus #}
                     <tr class="cmp-row-category">
                         <td class="cmp-td-category-label" colspan="4">{{ 'business.comparatif.table.cat_services'|trans }}</td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.maintenance'|trans }}<small>{{ 'business.comparatif.table.row.maintenance_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.training'|trans }}<small>{{ 'business.comparatif.table.row.training_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.security_audit'|trans }}<small>{{ 'business.comparatif.table.row.security_audit_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.support'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial">~</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.french_support'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes">âœ“</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
-                        <td class="cmp-td-val"><span class="cmp-no">&times;</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        {# ?? Pourquoi choisir MYKEYNEST ?? #}
+        {# Pourquoi choisir MYKEYNEST #}
         <div class="cmp-section-eyebrow">{{ 'business.comparatif.why.eyebrow'|trans }}</div>
         <h2 class="cmp-section-title">{{ 'business.comparatif.why.title'|trans }}</h2>
         <p class="cmp-section-sub">{{ 'business.comparatif.why.subtitle'|trans }}</p>
 
         <div class="cmp-why-grid">
             <div class="cmp-why-card">
-                <div class="cmp-why-icon">ðŸ’°</div>
+                <div class="cmp-why-icon"><i class="fa-solid fa-sack-dollar"></i></div>
                 <div class="cmp-why-title">{{ 'business.comparatif.why.price.title'|trans }}</div>
                 <p class="cmp-why-desc">{{ 'business.comparatif.why.price.desc'|trans }}</p>
             </div>
             <div class="cmp-why-card">
-                <div class="cmp-why-icon">ðŸ› </div>
+                <div class="cmp-why-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
                 <div class="cmp-why-title">{{ 'business.comparatif.why.maintenance.title'|trans }}</div>
                 <p class="cmp-why-desc">{{ 'business.comparatif.why.maintenance.desc'|trans }}</p>
             </div>
             <div class="cmp-why-card">
-                <div class="cmp-why-icon">&#10003;??</div>
+                <div class="cmp-why-icon"><i class="fa-solid fa-user-check"></i></div>
                 <div class="cmp-why-title">{{ 'business.comparatif.why.training.title'|trans }}</div>
                 <p class="cmp-why-desc">{{ 'business.comparatif.why.training.desc'|trans }}</p>
             </div>
             <div class="cmp-why-card">
-                <div class="cmp-why-icon">ðŸ‡«ðŸ‡·</div>
+                <div class="cmp-why-icon"><i class="fa-solid fa-flag"></i></div>
                 <div class="cmp-why-title">{{ 'business.comparatif.why.french.title'|trans }}</div>
                 <p class="cmp-why-desc">{{ 'business.comparatif.why.french.desc'|trans }}</p>
             </div>
         </div>
 
-        {# ?? CTA ?? #}
+        {# CTA #}
         <div class="cmp-cta">
             <h2 class="cmp-cta-title">{{ 'business.comparatif.cta.title'|trans }}</h2>
             <p class="cmp-cta-sub">{{ 'business.comparatif.cta.subtitle'|trans }}</p>
@@ -220,4 +220,3 @@
     </div>
 </main>
 {% endblock %}
-
