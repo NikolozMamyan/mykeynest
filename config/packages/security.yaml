@@ -34,6 +34,8 @@ security:
         - { path: ^/api/login-challenge/complete$, roles: PUBLIC_ACCESS }
         - { path: ^/api/login-challenge/[A-Fa-f0-9]+/approve$, roles: PUBLIC_ACCESS }
         - { path: ^/api/login-challenge/[A-Fa-f0-9]+/reject$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/extension-installation-challenge/[A-Fa-f0-9]+/approve$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/extension-installation-challenge/[A-Fa-f0-9]+/reject$, roles: PUBLIC_ACCESS }
 
         # Pages publiques web
         - { path: ^/$, roles: PUBLIC_ACCESS }
