@@ -41,6 +41,7 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
         '/verify-email/',
         '/public/',
         '/api/login-challenge/',
+        '/api/extension-installation-challenge',
     ];
 
     private const ASSET_PREFIXES = [

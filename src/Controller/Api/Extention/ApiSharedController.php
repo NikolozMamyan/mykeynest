@@ -38,16 +38,8 @@ final class ApiSharedController extends AbstractController
             $response->headers->set('Vary', 'Origin');
         }
 
-        $response->headers->set(
-            'Access-Control-Allow-Headers',
-            'Authorization, Content-Type, X-Extension-Client-Id, X-Extension-Installation-Token, X-Extension-Version, X-Extension-Manifest-Version, X-Device-Label, X-Browser-Name, X-Browser-Version, X-OS-Name, X-OS-Version, X-Extension-Origin'
-        );
-
-        $response->headers->set(
-            'Access-Control-Expose-Headers',
-            'X-Extension-Installation-Token'
-        );
-
+        $response->headers->set('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-Extension-Client-Id, X-Extension-Installation-Token, X-Extension-Version, X-Extension-Manifest-Version, X-Device-Label, X-Browser-Name, X-Browser-Version, X-OS-Name, X-OS-Version, X-Extension-Origin');
+        $response->headers->set('Access-Control-Expose-Headers', 'X-Extension-Installation-Token');
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         $response->headers->set('Access-Control-Max-Age', '600');
 
@@ -65,23 +57,17 @@ final class ApiSharedController extends AbstractController
 
     private function unauthorized(string $message = 'Unauthorized'): JsonResponse
     {
-        return $this->cors(
-            $this->json(['error' => $message], Response::HTTP_UNAUTHORIZED)
-        );
+        return $this->cors($this->json(['error' => $message], Response::HTTP_UNAUTHORIZED));
     }
 
     private function badRequest(string $message): JsonResponse
     {
-        return $this->cors(
-            $this->json(['error' => $message], Response::HTTP_BAD_REQUEST)
-        );
+        return $this->cors($this->json(['error' => $message], Response::HTTP_BAD_REQUEST));
     }
 
     private function forbidden(string $message): JsonResponse
     {
-        return $this->cors(
-            $this->json(['error' => $message], Response::HTTP_FORBIDDEN)
-        );
+        return $this->cors($this->json(['error' => $message], Response::HTTP_FORBIDDEN));
     }
 
     private function withInstallationToken(JsonResponse $response, ?string $installationToken): JsonResponse
@@ -100,10 +86,7 @@ final class ApiSharedController extends AbstractController
         $limit = $limiter->consume(1);
 
         if (!$limit->isAccepted()) {
-            $response = $this->json(
-                ['error' => 'Too many requests'],
-                Response::HTTP_TOO_MANY_REQUESTS
-            );
+            $response = $this->json(['error' => 'Too many requests'], Response::HTTP_TOO_MANY_REQUESTS);
 
             $retryAfter = $limit->getRetryAfter();
             if ($retryAfter instanceof \DateTimeInterface) {
@@ -121,22 +104,13 @@ final class ApiSharedController extends AbstractController
     {
         $authHeader = $request->headers->get('Authorization');
 
-        if (!$authHeader) {
-            return null;
-        }
-
-        if (!preg_match('/Bearer\s+(\S+)/', $authHeader, $matches)) {
+        if (!$authHeader || !preg_match('/Bearer\s+(\S+)/', $authHeader, $matches)) {
             return null;
         }
 
         return $matches[1] ?? null;
     }
 
-    /**
-     * Compat V1 -> V2:
-     * Si le client existe mais n'a pas encore de clientSecretHash,
-     * on lui émet un installation token une seule fois sans le bloquer.
-     */
     private function migrateLegacyClientIfNeeded(ExtensionClient $client, Request $request): ?string
     {
         if ($client->getClientSecretHash()) {
@@ -144,7 +118,6 @@ final class ApiSharedController extends AbstractController
         }
 
         $issuedInstallationToken = $this->extensionClientManager->rotateInstallationToken($client);
-
         $client->setDeviceLabel($this->cleanNullable($request->headers->get('X-Device-Label')));
         $client->setBrowserName($this->cleanNullable($request->headers->get('X-Browser-Name')));
         $client->setBrowserVersion($this->cleanNullable($request->headers->get('X-Browser-Version')));
@@ -172,11 +145,7 @@ final class ApiSharedController extends AbstractController
     }
 
     /**
-     * @return array{
-     *     user: User,
-     *     client: ExtensionClient,
-     *     issuedInstallationToken: ?string
-     * }|array{rate_limited: JsonResponse}|null
+     * @return array{user: User, client: ExtensionClient, issuedInstallationToken: ?string}|array{rate_limited: JsonResponse}|array{response: JsonResponse}|null
      */
     private function authenticate(Request $request): ?array
     {
@@ -219,13 +188,26 @@ final class ApiSharedController extends AbstractController
                 $client = $existingClient;
             } else {
                 $resolved = $this->extensionClientManager->resolveFromRequest($user, $request);
+
+                if ($resolved['status'] === 'approval_required') {
+                    return [
+                        'response' => $this->cors($this->json([
+                            'status' => 'email_verification_required',
+                            'message' => $resolved['message'],
+                            'challenge' => [
+                                'publicId' => $resolved['challenge']->getPublicId(),
+                                'expiresAt' => $resolved['challenge']->getExpiresAt()?->format(DATE_ATOM),
+                            ],
+                        ], Response::HTTP_ACCEPTED)),
+                    ];
+                }
+
                 $client = $resolved['client'];
                 $issuedInstallationToken = $resolved['installationToken'];
-
                 $this->extensionClientManager->assertAllowed($client);
             }
         } catch (\RuntimeException $e) {
-            return ['rate_limited' => $this->forbidden($e->getMessage())];
+            return ['response' => $this->forbidden($e->getMessage())];
         }
 
         return [
@@ -236,10 +218,8 @@ final class ApiSharedController extends AbstractController
     }
 
     #[Route('/extention/api/search', name: 'api_credential_search', methods: ['POST', 'OPTIONS'])]
-    public function apiSearch(
-        Request $request,
-        CredentialRepository $credentialRepository
-    ): JsonResponse {
+    public function apiSearch(Request $request, CredentialRepository $credentialRepository): JsonResponse
+    {
         if ($pf = $this->preflight($request)) {
             return $pf;
         }
@@ -251,17 +231,11 @@ final class ApiSharedController extends AbstractController
         if (isset($auth['rate_limited'])) {
             return $auth['rate_limited'];
         }
-
-        /** @var User $user */
-        $user = $auth['user'];
-        $issuedInstallationToken = $auth['issuedInstallationToken'];
-
-        try {
-            $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            return $this->badRequest('Corps JSON invalide');
+        if (isset($auth['response'])) {
+            return $auth['response'];
         }
 
+        $payload = json_decode($request->getContent(), true);
         $domain = $payload['domain'] ?? null;
         if (!is_string($domain) || trim($domain) === '') {
             return $this->badRequest('Domaine non spécifié');
@@ -271,8 +245,7 @@ final class ApiSharedController extends AbstractController
         $domain = preg_replace('#^www\.#', '', $domain);
         $domain = strtolower(trim($domain));
 
-        $credentials = $credentialRepository->findByDomainAndUser($domain, $user);
-
+        $credentials = $credentialRepository->findByDomainAndUser($domain, $auth['user']);
         $result = array_map(
             static fn(Credential $credential) => [
                 'id' => $credential->getId(),
@@ -283,19 +256,12 @@ final class ApiSharedController extends AbstractController
             $credentials
         );
 
-        return $this->withInstallationToken(
-            $this->json(['credentials' => $result]),
-            $issuedInstallationToken
-        );
+        return $this->withInstallationToken($this->json(['credentials' => $result]), $auth['issuedInstallationToken']);
     }
 
     #[Route('/extention/api/credentials/list', name: 'api_credential_list', methods: ['GET', 'OPTIONS'])]
-    public function apiCredentials(
-        Request $request,
-        CredentialRepository $credentialRepository,
-        SharedAccessRepository $sharedAccessRepo,
-        TeamRepository $teamRepo
-    ): JsonResponse {
+    public function apiCredentials(Request $request, CredentialRepository $credentialRepository, SharedAccessRepository $sharedAccessRepo, TeamRepository $teamRepo): JsonResponse
+    {
         if ($pf = $this->preflight($request)) {
             return $pf;
         }
@@ -307,32 +273,19 @@ final class ApiSharedController extends AbstractController
         if (isset($auth['rate_limited'])) {
             return $auth['rate_limited'];
         }
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
 
-        /** @var User $user */
         $user = $auth['user'];
-        $issuedInstallationToken = $auth['issuedInstallationToken'];
-
         $credentials = $credentialRepository->findCredentialsByUser($user);
         $sharedAccess = $sharedAccessRepo->findSharedWith($user);
         $teams = $teamRepo->findTeamWithCredentialsByUser($user);
 
-        $userPayload = static fn(User $u) => [
-            'id' => $u->getId(),
-            'email' => $u->getEmail(),
-        ];
+        $userPayload = static fn(User $u) => ['id' => $u->getId(), 'email' => $u->getEmail()];
+        $credentialPayload = static fn(Credential $c) => ['id' => $c->getId(), 'domain' => $c->getDomain(), 'username' => $c->getUsername(), 'name' => $c->getName()];
 
-        $credentialPayload = static fn(Credential $c) => [
-            'id' => $c->getId(),
-            'domain' => $c->getDomain(),
-            'username' => $c->getUsername(),
-            'name' => $c->getName(),
-        ];
-
-        $resultCredentials = array_map(
-            static fn(Credential $credential) => $credentialPayload($credential),
-            $credentials
-        );
-
+        $resultCredentials = array_map(static fn(Credential $credential) => $credentialPayload($credential), $credentials);
         $resultSharedAccess = array_map(
             static function ($sharedAccess) use ($userPayload, $credentialPayload) {
                 return [
@@ -372,24 +325,16 @@ final class ApiSharedController extends AbstractController
             $teams
         );
 
-        return $this->withInstallationToken(
-            $this->json([
-                'credentials' => $resultCredentials,
-                'sharedAccess' => $resultSharedAccess,
-                'teamSharedAccess' => $resultTeamSharedAccess,
-            ]),
-            $issuedInstallationToken
-        );
+        return $this->withInstallationToken($this->json([
+            'credentials' => $resultCredentials,
+            'sharedAccess' => $resultSharedAccess,
+            'teamSharedAccess' => $resultTeamSharedAccess,
+        ]), $auth['issuedInstallationToken']);
     }
 
     #[Route('/extention/api/credentials/{id}/reveal', name: 'api_credential_reveal', methods: ['POST', 'OPTIONS'])]
-    public function reveal(
-        Request $request,
-        int $id,
-        CredentialRepository $credentialRepository,
-        SharedAccessRepository $sharedAccessRepo,
-        TeamRepository $teamRepo
-    ): JsonResponse {
+    public function reveal(Request $request, int $id, CredentialRepository $credentialRepository, SharedAccessRepository $sharedAccessRepo, TeamRepository $teamRepo): JsonResponse
+    {
         if ($pf = $this->preflight($request)) {
             return $pf;
         }
@@ -401,63 +346,42 @@ final class ApiSharedController extends AbstractController
         if (isset($auth['rate_limited'])) {
             return $auth['rate_limited'];
         }
-
-        /** @var User $user */
-        $user = $auth['user'];
-        $issuedInstallationToken = $auth['issuedInstallationToken'];
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
 
         $cred = $credentialRepository->find($id);
         if (!$cred instanceof Credential) {
-            return $this->withInstallationToken(
-                $this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND),
-                $issuedInstallationToken
-            );
+            return $this->withInstallationToken($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
         }
 
+        $user = $auth['user'];
         $isOwner = ($cred->getUser()?->getId() === $user->getId());
         $hasDirectShare = $sharedAccessRepo->userHasAccessToCredential($user, $cred);
         $hasTeamShare = $teamRepo->userHasTeamAccessToCredential($user, $cred);
 
         if (!$isOwner && !$hasDirectShare && !$hasTeamShare) {
-            return $this->withInstallationToken(
-                $this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND),
-                $issuedInstallationToken
-            );
+            return $this->withInstallationToken($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
         }
 
         $owner = $cred->getUser();
         if (!$owner || !$owner->getApiExtensionToken()) {
-            return $this->withInstallationToken(
-                $this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT),
-                $issuedInstallationToken
-            );
+            return $this->withInstallationToken($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 
         $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
         $password = $this->encryptionService->decrypt((string) $cred->getPassword());
 
         if ($password === '') {
-            return $this->withInstallationToken(
-                $this->json(['error' => 'Unable to decrypt credential'], Response::HTTP_CONFLICT),
-                $issuedInstallationToken
-            );
+            return $this->withInstallationToken($this->json(['error' => 'Unable to decrypt credential'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 
-        return $this->withInstallationToken(
-            $this->json([
-                'id' => $cred->getId(),
-                'password' => $password,
-            ]),
-            $issuedInstallationToken
-        );
+        return $this->withInstallationToken($this->json(['id' => $cred->getId(), 'password' => $password]), $auth['issuedInstallationToken']);
     }
 
     #[Route('/extention/api/credentials/create', name: 'api_credential_create', methods: ['POST', 'OPTIONS'])]
-    public function createCredential(
-        Request $request,
-        CredentialRepository $credentialRepository,
-        EntityManagerInterface $entityManager
-    ): JsonResponse {
+    public function createCredential(Request $request, CredentialRepository $credentialRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
         if ($pf = $this->preflight($request)) {
             return $pf;
         }
@@ -469,10 +393,9 @@ final class ApiSharedController extends AbstractController
         if (isset($auth['rate_limited'])) {
             return $auth['rate_limited'];
         }
-
-        /** @var User $user */
-        $user = $auth['user'];
-        $issuedInstallationToken = $auth['issuedInstallationToken'];
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
 
         try {
             $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -488,11 +411,9 @@ final class ApiSharedController extends AbstractController
         if (!is_string($domain) || trim($domain) === '') {
             return $this->badRequest('Domaine manquant ou invalide');
         }
-
         if (!is_string($username) || trim($username) === '') {
             return $this->badRequest('Nom d\'utilisateur manquant ou invalide');
         }
-
         if (!is_string($password) || trim($password) === '') {
             return $this->badRequest('Mot de passe manquant ou invalide');
         }
@@ -506,22 +427,19 @@ final class ApiSharedController extends AbstractController
         }
 
         $existingCredential = $credentialRepository->findOneBy([
-            'user' => $user,
+            'user' => $auth['user'],
             'domain' => $domain,
             'username' => $username,
         ]);
 
         if ($existingCredential instanceof Credential) {
-            return $this->withInstallationToken(
-                $this->json([
-                    'error' => 'Un credential existe déjà pour ce domaine et cet utilisateur',
-                    'credentialId' => $existingCredential->getId(),
-                ], Response::HTTP_CONFLICT),
-                $issuedInstallationToken
-            );
+            return $this->withInstallationToken($this->json([
+                'error' => 'Un credential existe déjà pour ce domaine et cet utilisateur',
+                'credentialId' => $existingCredential->getId(),
+            ], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 
-        $this->encryptionService->setKeyFromUserToken((string) $user->getApiExtensionToken());
+        $this->encryptionService->setKeyFromUserToken((string) $auth['user']->getApiExtensionToken());
         $encryptedPassword = $this->encryptionService->encrypt($password);
 
         $credential = new Credential();
@@ -529,23 +447,20 @@ final class ApiSharedController extends AbstractController
         $credential->setDomain($domain);
         $credential->setUsername($username);
         $credential->setPassword($encryptedPassword);
-        $credential->setUser($user);
+        $credential->setUser($auth['user']);
 
         $entityManager->persist($credential);
         $entityManager->flush();
 
-        return $this->withInstallationToken(
-            $this->json([
-                'success' => true,
-                'credential' => [
-                    'id' => $credential->getId(),
-                    'name' => $credential->getName(),
-                    'domain' => $credential->getDomain(),
-                    'username' => $credential->getUsername(),
-                    'createdAt' => $credential->getCreatedAt()?->format(DATE_ATOM),
-                ],
-            ], Response::HTTP_CREATED),
-            $issuedInstallationToken
-        );
+        return $this->withInstallationToken($this->json([
+            'success' => true,
+            'credential' => [
+                'id' => $credential->getId(),
+                'name' => $credential->getName(),
+                'domain' => $credential->getDomain(),
+                'username' => $credential->getUsername(),
+                'createdAt' => $credential->getCreatedAt()?->format(DATE_ATOM),
+            ],
+        ], Response::HTTP_CREATED), $auth['issuedInstallationToken']);
     }
 }
