@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <title>Accès partagé sécurisé</title>
+
+  <style>
+    :root {
+      /* Couleurs principales */
+      --color-primary: #059669;
+      --color-primary-hover: rgba(16, 185, 129, 0.3);
+      --background-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+
+      /* Couleurs de base */
+      --color-white: #ffffff;
+      --color-bg-light: #f8fafc;
+      --color-bg-hover: #f1f5f9;
+
+      /* Couleurs du texte */
+      --color-text-dark: #1e293b;
+      --color-text-medium: #475569;
+      --color-text-muted: #64748b;
+      --color-text-light: #94a3b8;
+
+      /* Bordures */
+      --color-border: #e2e8f0;
+
+      /* Couleurs d’alerte / notification */
+      --color-danger-start: #ef4444;
+      --color-danger-end: #dc2626;
+      --color-warning: #f59e0b;
+      --color-success: #10b981;
+
+      /* Ombres et effets */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-green: 0 4px 12px var(--color-primary-hover);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+      /* Divers */
+      --blur-background: blur(10px);
+      --border-radius: 12px;
+      --border-radius-sm: 8px;
+
+      /* UI complémentaires */
+      --container-width: 1120px;
+      --radius-xl: 24px;
+      --radius-2xl: 28px;
+      --transition: 180ms ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--color-text-dark);
+      background:
+        radial-gradient(circle at top left, rgba(5, 150, 105, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(16, 185, 129, 0.10), transparent 24%),
+        linear-gradient(180deg, #f8fffb 0%, #f8fafc 42%, #f1f5f9 100%);
+      min-height: 100vh;
+    }
+
+    a,
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      padding: 0;
+    }
+
+    .page-shell {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-shell::before,
+    .page-shell::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 999px;
+      filter: blur(80px);
+      opacity: 0.55;
+    }
+
+    .page-shell::before {
+      width: 320px;
+      height: 320px;
+      top: 80px;
+      left: -80px;
+      background: rgba(5, 150, 105, 0.10);
+    }
+
+    .page-shell::after {
+      width: 260px;
+      height: 260px;
+      right: -60px;
+      top: 220px;
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(var(--container-width), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--color-text-dark);
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--color-primary), #10b981);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: var(--shadow-green);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.05;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: var(--blur-background);
+      -webkit-backdrop-filter: var(--blur-background);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-xl);
+      padding: 34px;
+      margin-bottom: 22px;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(5, 150, 105, 0.06), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 55%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 16px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(5, 150, 105, 0.08);
+      color: var(--color-primary);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      width: fit-content;
+    }
+
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      max-width: 760px;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--color-text-medium);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      transition:
+        transform var(--transition),
+        box-shadow var(--transition),
+        background var(--transition),
+        border-color var(--transition),
+        color var(--transition);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
+      box-shadow:
+        0 10px 20px rgba(5, 150, 105, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary:hover {
+      box-shadow:
+        0 14px 28px rgba(5, 150, 105, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-secondary {
+      color: var(--color-text-dark);
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-bg-hover);
+    }
+
+    .hero-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 20px;
+      border-radius: 22px;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .hero-side-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-light);
+      margin-bottom: 8px;
+    }
+
+    .hero-side-value {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--color-text-dark);
+      word-break: break-word;
+    }
+
+    .hero-side-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(5, 150, 105, 0.06);
+      border: 1px solid rgba(5, 150, 105, 0.12);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--color-text-medium);
+    }
+
+    .hero-side-note strong {
+      color: var(--color-text-dark);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 28px 0 16px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--color-text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(5, 150, 105, 0.08);
+      color: var(--color-primary);
+      font-weight: 800;
+      font-size: 14px;
+      border: 1px solid rgba(5, 150, 105, 0.12);
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 24px;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+      transition:
+        transform var(--transition),
+        box-shadow var(--transition),
+        border-color var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 45px rgba(15, 23, 42, 0.08);
+      border-color: rgba(5, 150, 105, 0.16);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--color-primary), #10b981);
+    }
+
+    .card-head {
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card-topline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .vault-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-primary);
+      background: rgba(5, 150, 105, 0.08);
+      border: 1px solid rgba(5, 150, 105, 0.12);
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: clamp(20px, 2vw, 24px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      word-break: break-word;
+    }
+
+    .card-subtitle {
+      margin: 8px 0 0;
+      color: var(--color-text-muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .domain-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: var(--color-bg-light);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-medium);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      max-width: 100%;
+      word-break: break-all;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+    }
+
+    .row {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+      border-right: 1px solid rgba(226, 232, 240, 0.75);
+      min-width: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.86) 0%, rgba(248,250,252,0.64) 100%);
+    }
+
+    .row:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .row:nth-last-child(-n + 2) {
+      border-bottom: 0;
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--color-text-light);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .value {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-width: 0;
+      color: var(--color-text-dark);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .secret-value {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--color-border);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    .actions-inline {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 42px;
+      height: 42px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      background: rgba(255,255,255,0.9);
+      color: var(--color-text-dark);
+      cursor: pointer;
+      transition:
+        transform var(--transition),
+        border-color var(--transition),
+        background var(--transition),
+        box-shadow var(--transition),
+        color var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(5, 150, 105, 0.22);
+      background: #ffffff;
+      box-shadow: var(--shadow-md);
+      color: var(--color-primary);
+    }
+
+    .icon-btn:focus-visible,
+    .btn:focus-visible {
+      outline: 3px solid rgba(16, 185, 129, 0.20);
+      outline-offset: 2px;
+    }
+
+    .icon-btn-label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .empty {
+      position: relative;
+      overflow: hidden;
+      padding: 42px 24px;
+      text-align: center;
+      color: var(--color-text-muted);
+      line-height: 1.8;
+      border-radius: 24px;
+      border: 1px solid var(--color-border);
+      background: rgba(255,255,255,0.82);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--color-text-dark);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--color-text-light);
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 60;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.96);
+      color: white;
+      box-shadow: var(--shadow-xl);
+      font-size: 14px;
+      font-weight: 600;
+      transform: translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-success-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--color-success);
+      box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.15);
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        border-right: 0;
+      }
+
+      .row:not(:last-child) {
+        border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+      }
+
+      .row:nth-last-child(-n + 2) {
+        border-bottom: 1px solid rgba(226, 232, 240, 0.75);
+      }
+
+      .row:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100%, calc(100% - 18px));
+        padding-top: 18px;
+        padding-bottom: 48px;
+      }
+
+      .topbar {
+        margin-bottom: 14px;
+      }
+
+      .hero,
+      .card-head,
+      .row,
+      .empty {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero {
+        border-radius: 22px;
+        padding-top: 24px;
+        padding-bottom: 24px;
+      }
+
+      .card {
+        border-radius: 20px;
+      }
+
+      .card-head {
+        padding-top: 18px;
+        padding-bottom: 16px;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .value {
+        align-items: stretch;
+      }
+
+      .secret-value {
+        width: 100%;
+      }
+
+      .actions-inline {
+        width: 100%;
+      }
+
+      .icon-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+
+      .toast {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <main class="page">
+      <div class="topbar">
+        <div class="brand" aria-label="MYKEYNEST">
+          <div class="brand-mark">M</div>
+          <div class="brand-text">
+            <span class="brand-title">MYKEYNEST</span>
+            <span class="brand-subtitle">Partage sécurisé d’identifiants</span>
+          </div>
+        </div>
+      </div>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow">Accès sécurisé</p>
+      <h1>Identifiants partagés</h1>
+      <p>
+        Consultez vos accès. Créez votre compte pour les conserver.
+      </p>
+
+      <div class="hero-actions">
+        <a
+          class="btn btn-primary"
+          href="{{ path('app_guest_register', { token: token, email: user.email }) }}"
+        >
+          <i class="fa-solid fa-user-plus"></i>
+          Créer un compte
+        </a>
+      </div>
+    </div>
+
+    <aside class="hero-side">
+      <div>
+        <div class="hero-side-label">Compte invité</div>
+        <div class="hero-side-value">{{ user.email }}</div>
+      </div>
+
+      <div class="hero-side-note">
+        <i class="fa-solid fa-lock"></i>
+        <div>
+          Accès temporaire.<br>
+          <strong>Créer un compte pour sauvegarder.</strong>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+      {% if sharedCredentials is empty %}
+        <section class="empty">
+          <strong>Aucun identifiant partagé</strong>
+          Cette invitation ne contient actuellement aucun accès disponible.
+        </section>
+      {% else %}
+<div class="section-head">
+  <div>
+    <h2>Identifiants</h2>
+    <p>Copiez les accès nécessaires.</p>
+  </div>
+  <div class="section-badge">{{ sharedCredentials|length }}</div>
+</div>
+
+        <section class="stack">
+          {% for item in sharedCredentials %}
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <div class="card-topline">
+                    <span class="vault-badge">Coffre partagé</span>
+                  </div>
+
+                  <h2 class="card-title">{{ item.credential.name }}</h2>
+
+                  <p class="card-subtitle">
+                    Partagé par
+                    <strong>{{ item.owner.company ?: item.owner.email }}</strong>
+                    {% if item.owner.company %}
+                      <span class="muted">({{ item.owner.email }})</span>
+                    {% endif %}
+                  </p>
+                </div>
+
+                {% if item.credential.domain %}
+                  <div class="domain-pill">{{ item.credential.domain }}</div>
+                {% endif %}
+              </div>
+
+              <div class="grid">
+                <div class="row">
+                    <i class="fa-solid fa-globe"></i> Domaine
+                  <div class="value">
+                    {{ item.credential.domain ?: '-' }}
+                  </div>
+                </div>
+
+                <div class="row">
+                    <i class="fa-solid fa-user"></i> Identifiant
+                  <div class="value">
+                    <span class="secret-value">{{ item.credential.username ?: '-' }}</span>
+
+                    {% if item.credential.username %}
+                      <div class="actions-inline">
+<button
+  class="icon-btn"
+  type="button"
+  data-copy="{{ item.decryptedPassword }}"
+>
+  <i class="fa-regular fa-copy"></i>
+  <span class="icon-btn-label">Copier</span>
+</button>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row">
+                   <i class="fa-solid fa-key"></i> Mot de passe
+                  <div class="value">
+                    <span class="secret-value" data-password-hidden>••••••••••••</span>
+                    <span class="secret-value" data-password-visible style="display:none;">{{ item.decryptedPassword }}</span>
+
+                    <div class="actions-inline">
+<button
+  class="icon-btn"
+  type="button"
+  data-toggle-password
+>
+  <i class="fa-solid fa-eye"></i>
+  <span class="icon-btn-label">Voir</span>
+</button>
+
+<button
+  class="icon-btn"
+  type="button"
+  data-copy="{{ item.decryptedPassword }}"
+>
+  <i class="fa-regular fa-copy"></i>
+  <span class="icon-btn-label">Copier</span>
+</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <i class="fa-solid fa-clock"></i> Partagé le
+                  <div class="value">
+                    {{ item.sharedAccess.createdAt ? item.sharedAccess.createdAt|date('d/m/Y à H:i') : '-' }}
+                  </div>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </section>
+      {% endif %}
+
+      <p class="footer-note">
+        Vos accès sont affichés dans un environnement protégé. Évitez de partager ce lien avec un tiers.
+      </p>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite" aria-atomic="true">
+    <span class="toast-success-dot"></span>
+    <span id="toast-text">Copié dans le presse-papiers</span>
+  </div>
+
+  <script>
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    let toastTimeout = null;
+
+    function showToast(message) {
+      toastText.textContent = message;
+      toast.classList.add('is-visible');
+
+      window.clearTimeout(toastTimeout);
+      toastTimeout = window.setTimeout(() => {
+        toast.classList.remove('is-visible');
+      }, 1600);
+    }
+
+    document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const container = button.closest('.value');
+        const hidden = container.querySelector('[data-password-hidden]');
+        const visible = container.querySelector('[data-password-visible]');
+        const label = button.querySelector('.icon-btn-label');
+        const icon = button.querySelector('span');
+
+        const isVisible = visible.style.display !== 'none';
+
+        visible.style.display = isVisible ? 'none' : '';
+        hidden.style.display = isVisible ? '' : 'none';
+
+        if (label) {
+          label.textContent = isVisible ? 'Voir' : 'Masquer';
+        }
+
+
+      });
+    });
+
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const value = button.getAttribute('data-copy') || '';
+        const label = button.querySelector('.icon-btn-label');
+        const icon = button.querySelector('span');
+
+        try {
+          await navigator.clipboard.writeText(value);
+
+          const previousLabel = label ? label.textContent : '';
+          const previousIcon = icon ? icon.textContent : '';
+
+          if (label) label.textContent = 'Copié';
+          if (icon) icon.textContent = '✓';
+
+          showToast('Copié dans le presse-papiers');
+
+          window.setTimeout(() => {
+            if (label) label.textContent = previousLabel;
+            if (icon) icon.textContent = previousIcon;
+          }, 1200);
+        } catch (error) {
+          console.error(error);
+          showToast('Impossible de copier');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

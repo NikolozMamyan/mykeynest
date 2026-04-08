@@ -17,21 +17,51 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-
 class SharedAccessController extends AbstractController
 {
+    private function sendGuestInvitationEmail(
+        MailerService $mailer,
+        UrlGeneratorInterface $urlGenerator,
+        User $guest,
+        \DateTimeImmutable $expiresAt
+    ): void {
+        $guestRegisterUrl = $urlGenerator->generate(
+            'app_guest_register',
+            ['token' => $guest->getApiToken(), 'email' => $guest->getEmail()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $guestPreviewUrl = $urlGenerator->generate(
+            'app_guest_shared_preview',
+            ['token' => $guest->getApiToken(), 'email' => $guest->getEmail()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $mailer->send(
+            $guest->getEmail(),
+            'Vous avez ete invite sur MYKEYNEST',
+            'emails/register_guest.html.twig',
+            [
+                'user' => $guest,
+                'guest_register' => $guestRegisterUrl,
+                'guest_preview' => $guestPreviewUrl,
+                'expiresAt' => $expiresAt,
+            ]
+        );
+    }
+
     #[Route('/app/shared-access', name: 'shared_access_index', methods: ['GET'])]
     public function index(SharedAccessRepository $sharedAccessRepository): Response
     {
         $user = $this->getUser();
 
-        $sharedByMe   = $sharedAccessRepository->findBy(['owner' => $user]);
+        $sharedByMe = $sharedAccessRepository->findBy(['owner' => $user]);
         $sharedWithMe = $sharedAccessRepository->findBy(['guest' => $user]);
 
         return $this->render('shared_access/index.html.twig', [
-            'sharedByMe'   => $sharedByMe,
+            'sharedByMe' => $sharedByMe,
             'sharedWithMe' => $sharedWithMe,
-            'heading'      => 'Partages',
+            'heading' => 'Partages',
         ]);
     }
 
@@ -57,14 +87,13 @@ class SharedAccessController extends AbstractController
         $limit = 3;
 
         if ($request->isMethod('POST')) {
-            $email         = strtolower(trim((string) $request->request->get('email')));
+            $email = strtolower(trim((string) $request->request->get('email')));
             $credentialIds = $request->request->all('credentials') ?? [];
 
             $guest = $userRepository->findOneBy(['email' => $email]);
 
-            // ─── Cas 1 : utilisateur inexistant → créer un compte guest + envoyer l'invitation ───
             if (!$guest) {
-                $token     = bin2hex(random_bytes(32));
+                $token = bin2hex(random_bytes(32));
                 $expiresAt = new \DateTimeImmutable('+6 hours');
 
                 $guest = new User();
@@ -77,70 +106,31 @@ class SharedAccessController extends AbstractController
                 $guest->regenerateApiExtensionToken();
 
                 $entityManager->persist($guest);
-                $entityManager->flush(); // flush pour avoir l'ID avant de créer les SharedAccess
+                $entityManager->flush();
 
-                $guestRegisterUrl = $urlGenerator->generate(
-                    'app_guest_register',
-                    ['token' => $token, 'email' => $email],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                );
-
-                $mailer->send(
-                    $guest->getEmail(),
-                    'Vous avez été invité sur MYKEYNEST',
-                    'emails/register_guest.html.twig',
-                    [
-                        'user'           => $guest,
-                        'guest_register' => $guestRegisterUrl,
-                        'expiresAt'      => $expiresAt,
-                    ]
-                );
-
-                $this->addFlash('success', 'Une invitation a été envoyée à ' . $email . '.');
-            }
-
-            // ─── Cas 2 : compte guest existant mais non activé → regénérer le token et renvoyer l'invitation ───
-            elseif (in_array('ROLE_GUEST', $guest->getRoles(), true) && $guest->getApiToken() !== null) {
-                $token     = bin2hex(random_bytes(32));
-                $expiresAt = new \DateTimeImmutable('+6 hours');
+                $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
+                $this->addFlash('success', 'Une invitation a ete envoyee a ' . $email . '.');
+            } elseif (in_array('ROLE_GUEST', $guest->getRoles(), true) && $guest->getApiToken() !== null) {
+                $token = bin2hex(random_bytes(32));
+                $expiresAt = new \DateTimeImmutable('+24 hours');
 
                 $guest->setApiToken($token);
                 $guest->setTokenExpiresAt($expiresAt);
                 $entityManager->flush();
 
-                $guestRegisterUrl = $urlGenerator->generate(
-                    'app_guest_register',
-                    ['token' => $token, 'email' => $email],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                );
-
-                $mailer->send(
-                    $guest->getEmail(),
-                    'Vous avez été invité sur MYKEYNEST',
-                    'emails/register_guest.html.twig',
-                    [
-                        'user'           => $guest,
-                        'guest_register' => $guestRegisterUrl,
-                        'expiresAt'      => $expiresAt,
-                    ]
-                );
-
-                $this->addFlash('success', 'Une nouvelle invitation a été envoyée à ' . $email . '.');
+                $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
+                $this->addFlash('success', 'Une nouvelle invitation a ete envoyee a ' . $email . '.');
             }
 
-            // ─── Cas 3 : compte actif (ROLE_USER) → on notifie après création des partages ───
-            // (la notification est envoyée plus bas, après $entityManager->flush())
-
-            // ─── Garde : on ne peut pas partager avec soi-même ───
             if ($guest === $owner) {
-                $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-même.');
+                $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-meme.');
+
                 return $this->redirectToRoute('shared_access_new');
             }
 
-            // ─── Vérification de la limite d'abonnement ───
             if (!$hasSubscription) {
                 $existingCount = $entityManager->getRepository(SharedAccess::class)->count(['owner' => $owner]);
-                $newToCreate   = 0;
+                $newToCreate = 0;
 
                 foreach ($credentialIds as $credentialId) {
                     $credential = $credentialRepository->find($credentialId);
@@ -150,8 +140,8 @@ class SharedAccessController extends AbstractController
                     }
 
                     $exists = $entityManager->getRepository(SharedAccess::class)->findOneBy([
-                        'owner'      => $owner,
-                        'guest'      => $guest,
+                        'owner' => $owner,
+                        'guest' => $guest,
                         'credential' => $credential,
                     ]);
 
@@ -170,11 +160,11 @@ class SharedAccessController extends AbstractController
                             $remaining
                         )
                     );
+
                     return $this->redirectToRoute('shared_access_new');
                 }
             }
 
-            // ─── Création des SharedAccess ───
             $createdCount = 0;
 
             foreach ($credentialIds as $credentialId) {
@@ -185,8 +175,8 @@ class SharedAccessController extends AbstractController
                 }
 
                 $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
-                    'owner'      => $owner,
-                    'guest'      => $guest,
+                    'owner' => $owner,
+                    'guest' => $guest,
                     'credential' => $credential,
                 ]);
 
@@ -204,15 +194,14 @@ class SharedAccessController extends AbstractController
 
             if ($createdCount > 0) {
                 $entityManager->flush();
-                $this->addFlash('success', $createdCount . ' identifiant(s) partagé(s) avec succès.');
+                $this->addFlash('success', $createdCount . ' identifiant(s) partage(s) avec succes.');
 
-                // ─── Notification mail pour un compte actif (ROLE_USER) ───
                 $isActiveUser = in_array('ROLE_USER', $guest->getRoles(), true)
                     && !in_array('ROLE_GUEST', $guest->getRoles(), true);
 
                 if ($isActiveUser) {
-                    // Récupérer uniquement les credentials nouvellement partagés pour le mail
                     $sharedCredentials = [];
+
                     foreach ($credentialIds as $credentialId) {
                         $credential = $credentialRepository->find($credentialId);
                         if ($credential && $credential->getUser() === $owner) {
@@ -222,13 +211,13 @@ class SharedAccessController extends AbstractController
 
                     $mailer->send(
                         $guest->getEmail(),
-                        $owner->getEmail() . ' a partagé des identifiants avec vous',
+                        $owner->getEmail() . ' a partage des identifiants avec vous',
                         'emails/share_notification.html.twig',
                         [
-                            'owner'       => $owner,
-                            'guest'       => $guest,
+                            'owner' => $owner,
+                            'guest' => $guest,
                             'credentials' => $sharedCredentials,
-                            'app_url'     => $urlGenerator->generate(
+                            'app_url' => $urlGenerator->generate(
                                 'shared_access_index',
                                 [],
                                 UrlGeneratorInterface::ABSOLUTE_URL
@@ -237,18 +226,17 @@ class SharedAccessController extends AbstractController
                     );
                 }
             } else {
-                $this->addFlash('info', 'Aucun nouvel identifiant n\'a été partagé.');
+                $this->addFlash('info', 'Aucun nouvel identifiant n\'a ete partage.');
             }
 
             return $this->redirectToRoute('shared_access_index');
         }
 
-        // GET
         $credentials = $credentialRepository->findBy(['user' => $owner]);
 
         return $this->render('shared_access/new.html.twig', [
             'credentials' => $credentials,
-            'heading'     => 'Partages',
+            'heading' => 'Partages',
         ]);
     }
 
@@ -259,13 +247,13 @@ class SharedAccessController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         if ($sharedAccess->getOwner() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à révoquer cet accès partagé.');
+            throw $this->createAccessDeniedException('Vous n\'etes pas autorise a revoquer cet acces partage.');
         }
 
         if ($this->isCsrfTokenValid('revoke' . $sharedAccess->getId(), $request->request->get('_token'))) {
             $entityManager->remove($sharedAccess);
             $entityManager->flush();
-            $this->addFlash('success', 'Accès partagé révoqué avec succès.');
+            $this->addFlash('success', 'Acces partage revoque avec succes.');
         }
 
         return $this->redirectToRoute('shared_access_index');
@@ -279,17 +267,23 @@ class SharedAccessController extends AbstractController
         $user = $this->getUser();
 
         if ($sharedAccess->getGuest() !== $user) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à voir cet identifiant.');
+            throw $this->createAccessDeniedException('Vous n\'etes pas autorise a voir cet identifiant.');
         }
 
-        $credential        = $sharedAccess->getCredential();
-        $decryptedPassword = $encryptionService->decrypt($credential->getPassword());
+        $credential = $sharedAccess->getCredential();
+        $owner = $sharedAccess->getOwner();
+
+        if ($owner?->getApiExtensionToken()) {
+            $encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+        }
+
+        $decryptedPassword = $encryptionService->decrypt((string) $credential?->getPassword());
 
         return $this->render('shared_access/view_credential.html.twig', [
-            'credential'        => $credential,
+            'credential' => $credential,
             'decryptedPassword' => $decryptedPassword,
-            'owner'             => $sharedAccess->getOwner(),
-            'heading'           => 'Partages',
+            'owner' => $owner,
+            'heading' => 'Partages',
         ]);
     }
 }

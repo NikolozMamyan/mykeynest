@@ -3,7 +3,9 @@
 namespace App\Controller\Front;
 
 use App\Repository\UserRepository;
+use App\Repository\SharedAccessRepository;
 use App\Service\DeviceIdentifier;
+use App\Service\EncryptionService;
 use App\Service\SessionManager;
 use App\Service\TokenCleaner;
 use Doctrine\ORM\EntityManagerInterface;
@@ -170,5 +172,68 @@ class AuthPageController extends AbstractController
     public function pendingLoginPage(): Response
     {
         return $this->render('security/pending_login.html.twig');
+    }
+
+    #[Route('/guest/shared-preview', name: 'app_guest_shared_preview', methods: ['GET'])]
+    public function guestSharedPreview(
+        Request $request,
+        UserRepository $userRepository,
+        SharedAccessRepository $sharedAccessRepository,
+        EncryptionService $encryptionService
+    ): Response {
+        $token = $request->query->get('token');
+        $email = $request->query->get('email');
+
+        if (!$token) {
+            throw $this->createNotFoundException('Token manquant');
+        }
+
+        $user = $userRepository->findOneBy(['apiToken' => $token]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Token invalide');
+        }
+
+        if (!in_array('ROLE_GUEST', $user->getRoles(), true)) {
+            $this->addFlash('error', 'Invitation deja utilisee.');
+
+            return $this->redirectToRoute('show_login');
+        }
+
+        if ($user->getTokenExpiresAt() && $user->getTokenExpiresAt() < new \DateTimeImmutable()) {
+            $this->addFlash('error', 'Lien expire. Demandez une nouvelle invitation.');
+
+            return $this->redirectToRoute('show_login');
+        }
+
+        if ($email && strtolower($user->getEmail()) !== strtolower($email)) {
+            throw $this->createAccessDeniedException('Email mismatch');
+        }
+
+        $sharedAccesses = $sharedAccessRepository->findBy(['guest' => $user], ['createdAt' => 'DESC']);
+        $sharedCredentials = [];
+
+        foreach ($sharedAccesses as $sharedAccess) {
+            $credential = $sharedAccess->getCredential();
+            $owner = $sharedAccess->getOwner();
+
+            if (!$credential || !$owner || !$owner->getApiExtensionToken()) {
+                continue;
+            }
+
+            $encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+            $sharedCredentials[] = [
+                'sharedAccess' => $sharedAccess,
+                'credential' => $credential,
+                'owner' => $owner,
+                'decryptedPassword' => $encryptionService->decrypt((string) $credential->getPassword()),
+            ];
+        }
+
+        return $this->render('guest/shared_preview.html.twig', [
+            'user' => $user,
+            'token' => $token,
+            'sharedCredentials' => $sharedCredentials,
+        ]);
     }
 }
