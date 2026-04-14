@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserSubscription;
 use App\Repository\UserRepository;
 use App\Repository\UserSubscriptionRepository;
+use App\Service\AdminNotificationService;
 use App\Service\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -27,7 +28,8 @@ final class StripeWebhookController extends AbstractController
         EntityManagerInterface $em,
         LoggerInterface $logger,
         MailerService $mailer,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        AdminNotificationService $adminNotificationService
     ): Response {
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 
@@ -174,6 +176,7 @@ final class StripeWebhookController extends AbstractController
 
                     if (!$wasActive) {
                         $this->sendPostPaymentEmail($user, $mailer, $urlGenerator, $logger);
+                        $adminNotificationService->notifySubscriptionActivated($user, 'stripe_webhook');
                         $em->flush();
                     }
 

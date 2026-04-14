@@ -3,7 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Article;
+use App\Entity\User;
+use App\Entity\UserSubscription;
 use App\Form\Admin\ArticleType;
+use App\Repository\UserRepository;
+use App\Repository\UserSubscriptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
@@ -36,34 +40,89 @@ final class AdminController extends AbstractController
     ) {}
 
     #[Route('', name: 'app_admin', methods: ['GET'])]
-    public function index(EntityManagerInterface $em, Request $request): Response
+    public function index(
+        EntityManagerInterface $em,
+        Request $request,
+        UserRepository $userRepository
+    ): Response
     {
+        return $this->render('admin/index.html.twig', [
+            'recentArticles' => array_slice($this->getArticles($em), 0, 5),
+            'recentUsers' => array_slice($this->getUsers($userRepository), 0, 5),
+            'articlesCount' => $this->countArticles($em),
+            'usersCount' => $this->countUsers($userRepository),
+            'activeSubscriptionsCount' => $this->countActiveSubscriptions($userRepository),
+        ]);
+    }
+
+    #[Route('/blog', name: 'admin_blog', methods: ['GET'])]
+    public function blog(
+        EntityManagerInterface $em,
+        Request $request
+    ): Response {
         $q = $this->sanitizeSearchQuery($request->query->get('q', ''));
 
-        $repo = $em->getRepository(Article::class);
-        /** @var QueryBuilder $qb */
-        $qb = $repo->createQueryBuilder('a')
-            ->orderBy('a.publishedAt', 'DESC');
-
-        if ($q !== '') {
-            $qb->andWhere(
-                $qb->expr()->orX(
-                    'a.slugFr LIKE :q',
-                    'a.slugEn LIKE :q',
-                    'a.h1Fr LIKE :q',
-                    'a.h1En LIKE :q',
-                    'a.seoTitleFr LIKE :q',
-                    'a.seoTitleEn LIKE :q'
-                )
-            )->setParameter('q', '%' . $q . '%');
-        }
-
-        $articles = $qb->getQuery()->getResult();
-
-        return $this->render('admin/index.html.twig', [
-            'articles' => $articles,
+        return $this->render('admin/blog.html.twig', [
+            'articles' => $this->getArticles($em, $q),
             'q' => $q,
         ]);
+    }
+
+    #[Route('/subscriptions', name: 'admin_subscriptions', methods: ['GET'])]
+    public function subscriptions(UserRepository $userRepository): Response
+    {
+        return $this->render('admin/subscriptions.html.twig', [
+            'users' => $this->getUsers($userRepository),
+        ]);
+    }
+
+    #[Route('/users/{id}/subscription/assign-pro', name: 'admin_user_subscription_assign_pro', methods: ['POST'])]
+    public function assignProToUser(
+        User $user,
+        Request $request,
+        EntityManagerInterface $em,
+        UserSubscriptionRepository $subscriptionRepository
+    ): Response {
+        if (!$this->isCsrfTokenValid('assign_pro_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_subscriptions');
+        }
+
+        $subscription = $this->getOrCreateSubscription($user, $subscriptionRepository, $em);
+        $subscription->setPlanCode('pro');
+        $subscription->setStatus('admin_active');
+        $subscription->setIsActive(true);
+        $subscription->touch();
+        $em->flush();
+
+        $this->addFlash('success', 'Abonnement Pro attribue a ' . $user->getEmail() . '.');
+
+        return $this->redirectToRoute('admin_subscriptions');
+    }
+
+    #[Route('/users/{id}/subscription/deactivate', name: 'admin_user_subscription_deactivate', methods: ['POST'])]
+    public function deactivateUserSubscription(
+        User $user,
+        Request $request,
+        EntityManagerInterface $em,
+        UserSubscriptionRepository $subscriptionRepository
+    ): Response {
+        if (!$this->isCsrfTokenValid('deactivate_subscription_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_subscriptions');
+        }
+
+        $subscription = $this->getOrCreateSubscription($user, $subscriptionRepository, $em);
+        $subscription->setIsActive(false);
+        $subscription->setStatus('admin_disabled');
+        $subscription->touch();
+        $em->flush();
+
+        $this->addFlash('warning', 'Abonnement desactive pour ' . $user->getEmail() . '.');
+
+        return $this->redirectToRoute('admin_subscriptions');
     }
 
     #[Route('/articles/new', name: 'admin_article_new', methods: ['GET', 'POST'])]
@@ -91,7 +150,7 @@ final class AdminController extends AbstractController
                 $em->flush();
 
                 $this->addFlash('success', 'Article créé avec succès ✅');
-                return $this->redirectToRoute('app_admin');
+                return $this->redirectToRoute('admin_blog');
             } catch (\Exception $e) {
                 $this->logger->error('Erreur lors de la création de l\'article', [
                     'error' => $e->getMessage(),
@@ -137,7 +196,7 @@ final class AdminController extends AbstractController
                 $em->flush();
 
                 $this->addFlash('success', 'Article mis à jour avec succès ✅');
-                return $this->redirectToRoute('app_admin');
+                return $this->redirectToRoute('admin_blog');
             } catch (\Exception $e) {
                 $this->logger->error('Erreur lors de la modification de l\'article', [
                     'article_id' => $article->getId(),
@@ -164,7 +223,7 @@ final class AdminController extends AbstractController
         
         if (!$this->isCsrfTokenValid('delete_article_' . $article->getId(), $token)) {
             $this->addFlash('error', 'Token CSRF invalide.');
-            return $this->redirectToRoute('app_admin');
+            return $this->redirectToRoute('admin_blog');
         }
 
         try {
@@ -186,7 +245,7 @@ final class AdminController extends AbstractController
             $this->addFlash('error', 'Une erreur est survenue lors de la suppression de l\'article.');
         }
 
-        return $this->redirectToRoute('app_admin');
+        return $this->redirectToRoute('admin_blog');
     }
 
     #[Route('/articles/upload-image', name: 'admin_article_upload_image', methods: ['POST'])]
@@ -335,5 +394,95 @@ final class AdminController extends AbstractController
 
         // Limite la longueur
         return mb_substr($query, 0, 255);
+    }
+
+    private function getOrCreateSubscription(
+        User $user,
+        UserSubscriptionRepository $subscriptionRepository,
+        EntityManagerInterface $em
+    ): UserSubscription {
+        $subscription = $user->getUserSubscription() ?? $subscriptionRepository->findOneBy(['user' => $user]);
+
+        if (!$subscription) {
+            $subscription = new UserSubscription();
+            $subscription->setUser($user);
+            $user->setUserSubscription($subscription);
+            $em->persist($subscription);
+        }
+
+        return $subscription;
+    }
+
+    /**
+     * @return list<Article>
+     */
+    private function getArticles(EntityManagerInterface $em, string $q = ''): array
+    {
+        $repo = $em->getRepository(Article::class);
+        /** @var QueryBuilder $qb */
+        $qb = $repo->createQueryBuilder('a')
+            ->orderBy('a.publishedAt', 'DESC');
+
+        if ($q !== '') {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    'a.slugFr LIKE :q',
+                    'a.slugEn LIKE :q',
+                    'a.h1Fr LIKE :q',
+                    'a.h1En LIKE :q',
+                    'a.seoTitleFr LIKE :q',
+                    'a.seoTitleEn LIKE :q'
+                )
+            )->setParameter('q', '%' . $q . '%');
+        }
+
+        /** @var list<Article> $articles */
+        $articles = $qb->getQuery()->getResult();
+
+        return $articles;
+    }
+
+    /**
+     * @return list<User>
+     */
+    private function getUsers(UserRepository $userRepository): array
+    {
+        /** @var list<User> $users */
+        $users = $userRepository->createQueryBuilder('u')
+            ->leftJoin('u.userSubscription', 's')
+            ->addSelect('s')
+            ->orderBy('u.id', 'DESC')
+            ->setMaxResults(100)
+            ->getQuery()
+            ->getResult();
+
+        return $users;
+    }
+
+    private function countArticles(EntityManagerInterface $em): int
+    {
+        return (int) $em->getRepository(Article::class)->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    private function countUsers(UserRepository $userRepository): int
+    {
+        return (int) $userRepository->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    private function countActiveSubscriptions(UserRepository $userRepository): int
+    {
+        return (int) $userRepository->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->innerJoin('u.userSubscription', 's')
+            ->andWhere('s.isActive = :active')
+            ->setParameter('active', true)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

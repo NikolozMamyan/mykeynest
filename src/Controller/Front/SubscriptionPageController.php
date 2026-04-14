@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserSubscription;
 use App\Repository\UserRepository;
 use App\Repository\UserSubscriptionRepository;
+use App\Service\AdminNotificationService;
 use App\Service\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -128,7 +129,8 @@ final class SubscriptionPageController extends AbstractController
         EntityManagerInterface $em,
         MailerService $mailer,
         UrlGeneratorInterface $urlGenerator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        AdminNotificationService $adminNotificationService
     ): Response
     {
         $sessionId = (string) $request->query->get('session_id', '');
@@ -164,6 +166,7 @@ final class SubscriptionPageController extends AbstractController
 
                         if (!$wasActive && $session->payment_status === 'paid') {
                             $this->sendPostPaymentEmail($user, $mailer, $urlGenerator, $logger);
+                            $adminNotificationService->notifySubscriptionActivated($user, 'public_success_fallback');
                             $em->flush();
                         }
                     }

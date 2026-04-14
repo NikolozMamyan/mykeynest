@@ -7,6 +7,7 @@ use App\Entity\Notification;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\DeviceIdentifier;
+use App\Service\AdminNotificationService;
 use App\Service\LoginChallengeManager;
 use App\Service\MailerService;
 use App\Service\NotificationService;
@@ -25,8 +26,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class AuthController extends AbstractController
 {
-    private function getPostAuthRedirectUrl(UrlGeneratorInterface $urlGenerator, bool $isFirstLogin): string
+    private function getPostAuthRedirectUrl(UrlGeneratorInterface $urlGenerator, User $user, bool $isFirstLogin): string
     {
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            return $urlGenerator->generate('app_admin');
+        }
+
         if ($isFirstLogin) {
             return $urlGenerator->generate('app_extention', [
                 'onboarding' => 1,
@@ -80,7 +85,8 @@ final class AuthController extends AbstractController
         EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator,
         MailerService $mailerService,
-        SessionManager $sessionManager
+        SessionManager $sessionManager,
+        AdminNotificationService $adminNotificationService
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -146,6 +152,19 @@ final class AuthController extends AbstractController
             ]);
         }
 
+        try {
+            $adminNotificationService->notifyNewRegistration(
+                $user,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent')
+            );
+        } catch (\Exception $e) {
+            $logger->error('Failed to send admin registration notification', [
+                'userId' => $user->getId(),
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         $response = new JsonResponse([
             'message' => 'Inscription réussie',
             'user' => [
@@ -157,7 +176,7 @@ final class AuthController extends AbstractController
                 'id' => $session->getId(),
                 'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
             ],
-            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $isFirstLogin),
+            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user, $isFirstLogin),
         ], 201);
 
         $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
@@ -218,7 +237,7 @@ final class AuthController extends AbstractController
                     'id' => $session->getId(),
                     'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
                 ],
-                'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $isFirstLogin),
+                'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user, $isFirstLogin),
             ]);
 
             $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
@@ -359,7 +378,7 @@ final class AuthController extends AbstractController
                 'id' => $session->getId(),
                 'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
             ],
-            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $isFirstLogin),
+            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $challenge->getUser(), $isFirstLogin),
         ]);
 
         $response->headers->setCookie($this->buildAuthCookie($request, $plainAuthToken, $session->getExpiresAt()));

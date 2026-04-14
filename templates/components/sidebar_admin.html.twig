@@ -9,32 +9,36 @@
   <nav class="sidebar-nav">
     <div class="nav-section">
       <div class="nav-section-title">
-        {{ 'sidebar.sections.main'|trans }}
+        Admin
       </div>
 
       <a href="{{ path('app_admin') }}"
          class="nav-item {{ app.request.attributes.get('_route') == 'app_admin' ? 'active' : '' }}">
         <i class="fas fa-house"></i>
-        <span>{{ 'sidebar.items.dashboard'|trans }}</span>
+        <span>Dashboard</span>
       </a>
-    </div>
 
-    <div class="nav-divider"></div>
+      <a href="{{ path('admin_blog') }}"
+         class="nav-item {{ app.request.attributes.get('_route') in ['admin_blog', 'admin_article_new', 'admin_article_edit'] ? 'active' : '' }}">
+        <i class="fas fa-newspaper"></i>
+        <span>Blog</span>
+      </a>
 
-    <div class="nav-section">
-      <div class="nav-section-title">
-        {{ 'sidebar.sections.settings'|trans }}
-      </div>
+      <a href="{{ path('admin_subscriptions') }}"
+         class="nav-item {{ app.request.attributes.get('_route') in ['admin_subscriptions', 'admin_user_subscription_assign_pro', 'admin_user_subscription_deactivate'] ? 'active' : '' }}">
+        <i class="fas fa-credit-card"></i>
+        <span>Subscriptions</span>
+      </a>
     </div>
   </nav>
 
   <div class="sidebar-footer">
     <a href="#"
-       class="logout-btn"
-       data-controller="auth"
-       data-action="click->auth#logout">
+      class="logout-btn"
+      data-controller="auth"
+      data-action="click->auth#logout">
       <i class="fas fa-sign-out-alt"></i>
-      <span>{{ 'sidebar.items.logout'|trans }}</span>
+      <span>Logout</span>
     </a>
   </div>
 </aside>

@@ -219,6 +219,8 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
     {
         return $path === '/app'
             || str_starts_with($path, '/app/')
+            || $path === '/admin'
+            || str_starts_with($path, '/admin/')
             || str_starts_with($path, '/api/');
     }
 }
