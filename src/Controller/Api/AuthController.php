@@ -322,7 +322,8 @@ final class AuthController extends AbstractController
     public function completeLoginChallenge(
         Request $request,
         LoginChallengeManager $loginChallengeManager,
-        SessionManager $sessionManager
+        SessionManager $sessionManager,
+        UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
         $plainToken = $request->cookies->get(LoginChallengeManager::COOKIE_NAME);
 
