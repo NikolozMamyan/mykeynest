@@ -223,4 +223,11 @@ class SessionManager
         'deviceId' => $deviceId,
     ]) !== null;
 }
+
+    public function isFirstSessionForUser(User $user): bool
+    {
+        return $this->userSessionRepository->count([
+            'user' => $user,
+        ]) === 0;
+    }
 }

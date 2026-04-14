@@ -82,6 +82,6 @@ export default class extends Controller {
     }
 
     clearInterval(this.interval)
-    window.location.href = '/app/credential'
+    window.location.href = data.redirectUrl || '/app/credential'
   }
 }

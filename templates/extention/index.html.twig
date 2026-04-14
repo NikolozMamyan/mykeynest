@@ -50,6 +50,28 @@
   position: relative;
 }
 
+.onboarding-banner {
+  max-width: 840px;
+  margin: 0 auto 28px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(5, 150, 105, 0.18);
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.96) 0%, rgba(236, 253, 245, 0.96) 100%);
+  box-shadow: 0 12px 30px rgba(5, 150, 105, 0.08);
+}
+
+.onboarding-banner h2 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+  color: var(--color-text-dark);
+}
+
+.onboarding-banner p {
+  margin: 0;
+  color: var(--color-text-medium);
+  line-height: 1.7;
+}
+
 .hero-icon-wrapper {
   position: relative;
   display: inline-block;
@@ -142,6 +164,33 @@ color:var(--color-text-dark);
 .download-btn i {
   font-size: 1.3rem;
   animation: bounce 2s infinite;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 28px;
+  border-radius: 50px;
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: var(--color-text-dark);
+  background: rgba(255,255,255,0.92);
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+
+.secondary-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* ——— Cards ——— */
@@ -862,12 +911,28 @@ color:var(--color-text-dark);
     </div>
 
     <h1>{{ 'extension.page.hero.title'|trans }}</h1>
+    {% if isOnboarding %}
+      <div class="onboarding-banner">
+        <h2><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> Installation recommandee</h2>
+        <p>Votre compte est pret. Installez maintenant l extension Chrome MYKEYNEST puis revenez ici: votre token est deja disponible et peut etre copie automatiquement.</p>
+      </div>
+    {% endif %}
+
     <p class="tagline">{{ 'extension.page.hero.tagline'|trans }}</p>
 
-    <a href="https://chromewebstore.google.com/detail/mykeynest/llckfoodkfccmibgmpfiodjkpincnfid" target="_blank" class="download-btn" download>
-      <i class="fa-solid fa-download"></i>
-      {{ 'extension.page.hero.download'|trans }}
-    </a>
+    <div class="hero-actions">
+      <a href="{{ chromeWebStoreUrl }}" target="_blank" rel="noopener" class="download-btn">
+        <i class="fa-solid fa-download"></i>
+        {{ 'extension.page.hero.download'|trans }}
+      </a>
+
+      {% if isOnboarding %}
+        <a href="{{ path('app_credential') }}" class="secondary-btn">
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          Passer a l application
+        </a>
+      {% endif %}
+    </div>
   </section>
 
     
@@ -903,7 +968,7 @@ color:var(--color-text-dark);
             <span class="token-label">{{ 'extension.page.cards.api_key.label'|trans }}</span>
           </div>
 
-          <div class="token-display">
+          <div class="token-display" {% if autoCopyToken %}data-autocopy="1"{% endif %}>
             <div class="token-value masked" id="tokenValue" data-token="{{ extentiotoken }}">
               ••••••••••••••••••••••••••••••••
             </div>
@@ -1096,6 +1161,13 @@ document.addEventListener('DOMContentLoaded', () => {
     copyBtn.addEventListener('click', function () {
       copyToken(this);
     });
+  }
+
+  const autoCopyEnabled = document.querySelector('.token-display')?.dataset.autocopy === '1';
+  if (autoCopyEnabled && copyBtn) {
+    setTimeout(() => {
+      copyToken(copyBtn);
+    }, 700);
   }
 
   // =========================================================

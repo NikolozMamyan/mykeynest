@@ -155,7 +155,10 @@ class AuthPageController extends AbstractController
                 return $this->redirectToRoute('show_login');
             }
 
-            $response = $this->redirectToRoute('app_credential');
+            $response = $this->redirectToRoute('app_extention', [
+                'onboarding' => 1,
+                'autocopy' => 1,
+            ]);
             $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
             $response->headers->setCookie($this->buildDeviceCookie($request, $deviceId));
 
