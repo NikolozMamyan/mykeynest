@@ -15,10 +15,27 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Product",
-  "name": "{{ 'business.solution.schema.name'|trans }}",
-  "description": "{{ 'business.solution.schema.description'|trans }}",
-  "offers": { "@type": "Offer", "price": "2.99", "priceCurrency": "EUR", "priceSpecification": { "price": "2.99", "unitCode": "MON" } }
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "MYKEYNEST", "item": "{{ absolute_url(path('app_landing')) }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ 'business.solution.hero.eyebrow'|trans }}", "item": "{{ absolute_url(path('business_solution')) }}" }
+      ]
+    },
+    {
+      "@type": "Service",
+      "name": "{{ 'business.solution.schema.name'|trans }}",
+      "description": "{{ 'business.solution.schema.description'|trans }}",
+      "provider": { "@type": "Organization", "name": "MYKEYNEST" },
+      "areaServed": "Europe",
+      "offers": {
+        "@type": "Offer",
+        "price": "6.99",
+        "priceCurrency": "EUR"
+      }
+    }
+  ]
 }
 </script>
 {% endblock %}
@@ -78,6 +95,27 @@
       <div class="trust-item"><span class="trust-check"><i class="fas fa-check"></i></span>{{ 'business.solution.hero.trust.no_commitment'|trans }}</div>
       <div class="trust-item"><span class="trust-check"><i class="fas fa-check"></i></span>{{ 'business.solution.hero.trust.setup'|trans }}</div>
       <div class="trust-item"><span class="trust-check"><i class="fas fa-check"></i></span>{{ 'business.solution.hero.trust.support'|trans }}</div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" aria-labelledby="solution-summary-title" style="padding: 2rem 0 0;">
+  {% set isEn = app.request.locale == 'en' %}
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
+    <div class="shead-eye" style="margin-bottom:0.75rem;"><i class="fas fa-bolt"></i> {{ isEn ? 'Quick summary' : 'Resume rapide' }}</div>
+    <h2 id="solution-summary-title" style="margin-bottom:0.75rem;">{{ isEn ? 'What this page answers' : 'Ce que cette page explique' }}</h2>
+    <p style="margin-bottom:1rem;color:#475569;">
+      {{ isEn ? 'This page is designed for SMBs evaluating a password manager plus operational support, employee onboarding, and security guidance.' : 'Cette page s adresse aux PME qui cherchent un gestionnaire de mots de passe avec accompagnement, formation des equipes et cadre de securite.' }}
+    </p>
+    <ul style="margin:0 0 1rem 1.25rem;color:#334155;line-height:1.7;">
+      <li>{{ isEn ? 'MYKEYNEST combines password management, maintenance, training, and audit support in one offer.' : 'MYKEYNEST combine gestion des mots de passe, maintenance, formation et accompagnement audit dans une seule offre.' }}</li>
+      <li>{{ isEn ? 'The offer targets SMBs, agencies, and teams that need a practical cybersecurity baseline without building it in-house.' : 'L offre vise les PME, agences et equipes qui veulent un socle cyber operationnel sans recruter une equipe interne.' }}</li>
+      <li>{{ isEn ? 'Use the comparison and audit pages below if you need vendor evaluation or a services-first entry point.' : 'Utilisez ensuite le comparatif et la page audit si vous avez besoin d une aide au choix ou d une entree orientee services.' }}</li>
+    </ul>
+    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+      <a href="{{ path('business_comparatif') }}" class="btn btn-outline">{{ isEn ? 'See the comparison' : 'Voir le comparatif' }}</a>
+      <a href="{{ path('business_audit') }}" class="btn btn-outline">{{ isEn ? 'See audit services' : 'Voir les services d audit' }}</a>
+      <a href="{{ path('app_help_center') }}" class="btn btn-outline">{{ isEn ? 'Visit the help center' : 'Consulter le centre d aide' }}</a>
     </div>
   </div>
 </section>
@@ -251,8 +289,8 @@
             <div class="explore-card-title">{{ 'business.solution.explore.comparatif.title'|trans }}</div>
           </div>
         </div>
-        <div class="explore-desc">Comparez MykeyNest aux solutions concurrentes sur les criteres qui comptent pour votre PME : securite, prix, conformite RGPD.</div>
-        <div class="explore-arrow"><i class="fas fa-arrow-right"></i> Voir le comparatif</div>
+        <div class="explore-desc">{{ app.request.locale == 'en' ? 'Compare MYKEYNEST with other solutions on the criteria that matter for SMBs: security, pricing, support, and GDPR positioning.' : 'Comparez MYKEYNEST aux autres solutions sur les criteres qui comptent pour une PME : securite, prix, accompagnement et positionnement RGPD.' }}</div>
+        <div class="explore-arrow"><i class="fas fa-arrow-right"></i> {{ app.request.locale == 'en' ? 'Open the comparison' : 'Voir le comparatif' }}</div>
       </a>
 
       <a href="{{ path('business_audit') }}" class="explore-card">
@@ -263,8 +301,8 @@
             <div class="explore-card-title">{{ 'business.solution.explore.audit.title'|trans }}</div>
           </div>
         </div>
-        <div class="explore-desc">Evaluez gratuitement le niveau de securite des mots de passe de votre organisation en quelques minutes.</div>
-        <div class="explore-arrow"><i class="fas fa-arrow-right"></i> Lancer l'audit</div>
+        <div class="explore-desc">{{ app.request.locale == 'en' ? 'Discover the audit and awareness offer if your main need is to reduce human risk, weak password hygiene, and phishing exposure.' : 'Decouvrez l offre audit et sensibilisation si votre besoin principal est de reduire le risque humain, les mots de passe faibles et l exposition au phishing.' }}</div>
+        <div class="explore-arrow"><i class="fas fa-arrow-right"></i> {{ app.request.locale == 'en' ? 'View the audit offer' : 'Lancer l audit' }}</div>
       </a>
     </div>
   </div>

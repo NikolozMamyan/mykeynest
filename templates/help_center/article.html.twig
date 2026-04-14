@@ -82,13 +82,13 @@ $relatedArticles = [
                     {{ 'help_article.breadcrumb.help_center'|trans }}
                 </a>
 
-                <span class="art-breadcrumb-sep">?</span>
+                <span class="art-breadcrumb-sep">&rsaquo;</span>
 
                 <a href="{{ path('app_help_category', { slug: category.slug }) }}">
-                    {{ category.icon }} {{ category.title }}
+                    <i class="{{ category.iconClass }}" aria-hidden="true"></i> {{ category.title }}
                 </a>
 
-                <span class="art-breadcrumb-sep">?</span>
+                <span class="art-breadcrumb-sep">&rsaquo;</span>
                 <span class="art-breadcrumb-current">{{ article.title }}</span>
             </div>
 
@@ -133,7 +133,7 @@ $relatedArticles = [
             <header class="art-header">
                 <div class="art-header-tags">
                     {% if article.popular %}
-                        <span class="art-tag art-tag-popular">{{ 'help_article.tags.popular'|trans }}</span>
+                        <span class="art-tag art-tag-popular"><i class="fa-solid fa-fire" aria-hidden="true"></i> {{ 'help_article.tags.popular'|trans }}</span>
                     {% endif %}
                     {% for tag in article.tags %}
                         <span class="art-tag">{{ tag }}</span>

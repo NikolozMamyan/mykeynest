@@ -1223,7 +1223,7 @@
     "filters": {
       "aria": "Filter articles",
       "all": "All",
-      "popular": "⭐ Popular",
+      "popular": "Popular",
       "recent": "Recent"
     },
     "sort": {
@@ -1233,7 +1233,7 @@
       "read": "Quick read"
     },
     "article": {
-      "popular_tag": "⭐ Popular",
+      "popular_tag": "Popular",
       "read_time": "%minutes% min read"
     },
     "empty": {
@@ -1267,7 +1267,7 @@
       "to_category": "Back to %category%"
     },
     "tags": {
-      "popular": "⭐ Popular"
+      "popular": "Popular"
     },
     "meta": {
       "updated_on": "Updated on %date%",
@@ -1307,7 +1307,7 @@
     "solution": {
       "meta": {
         "title": "SMB Cybersecurity Solution — Password Management & Support | MYKEYNEST",
-        "description": "Complete cybersecurity solution for SMBs: AES-256 password management software, included maintenance, employee training and security audit. From €2.99/user/month.",
+        "description": "Complete cybersecurity solution for SMBs: AES-256 password management software, included maintenance, employee training and security audit. From €6.99/user/month.",
         "keywords": "SMB cybersecurity solution, enterprise password manager, SMB security audit, cybersecurity training, business password manager"
       },
       "schema": {
@@ -1450,7 +1450,7 @@
         "subtitle": "Beyond price, MYKEYNEST is the only solution that truly supports your SMB.",
         "price": {
           "title": "3× cheaper",
-          "desc": "At €2.99/user/month, MYKEYNEST is up to 4 times cheaper than competitors for equivalent or superior features."
+          "desc": "At €6.99/user/month, MYKEYNEST remains competitive for SMBs that want software, support, and guidance in one offer."
         },
         "maintenance": {
           "title": "Maintenance included",

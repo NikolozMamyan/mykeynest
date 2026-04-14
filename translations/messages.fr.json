@@ -1226,7 +1226,7 @@
     "filters": {
       "aria": "Filtrer les articles",
       "all": "Tous",
-      "popular": "⭐ Populaires",
+      "popular": "Populaires",
       "recent": "Récents"
     },
     "sort": {
@@ -1236,7 +1236,7 @@
       "read": "Lecture rapide"
     },
     "article": {
-      "popular_tag": "⭐ Populaire",
+      "popular_tag": "Populaire",
       "read_time": "%minutes% min de lecture"
     },
     "empty": {
@@ -1270,7 +1270,7 @@
       "to_category": "Retour à %category%"
     },
     "tags": {
-      "popular": "⭐ Populaire"
+      "popular": "Populaire"
     },
     "meta": {
       "updated_on": "Mis à jour le %date%",
@@ -1310,7 +1310,7 @@
     "solution": {
       "meta": {
         "title": "Solution cybersécurité PME — Gestion mots de passe & accompagnement | MYKEYNEST",
-        "description": "Solution de cybersécurité complète pour PME : logiciel de gestion des mots de passe AES-256, maintenance incluse, formation collaborateurs et audit de sécurité. Dès 2,99 €/utilisateur/mois.",
+        "description": "Solution de cybersécurité complète pour PME : logiciel de gestion des mots de passe AES-256, maintenance incluse, formation collaborateurs et audit de sécurité. Dès 6,99 €/utilisateur/mois.",
         "keywords": "solution cybersécurité PME, gestionnaire mots de passe entreprise, audit sécurité PME, formation cybersécurité, password manager entreprise"
       },
       "schema": {
@@ -1453,7 +1453,7 @@
         "subtitle": "Au-delà du prix, MYKEYNEST est la seule solution qui accompagne vraiment votre PME.",
         "price": {
           "title": "3× moins cher",
-          "desc": "À 2,99 €/utilisateur/mois, MYKEYNEST est jusqu'à 4 fois moins cher que ses concurrents pour des fonctionnalités équivalentes ou supérieures."
+          "desc": "À 6,99 €/utilisateur/mois, MYKEYNEST reste compétitif pour les PME qui veulent le logiciel, le support et l'accompagnement dans une offre unique."
         },
         "maintenance": {
           "title": "Maintenance incluse",

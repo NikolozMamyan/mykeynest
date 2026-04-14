@@ -67,7 +67,7 @@ final class HelpCenterController extends AbstractController
         return [
             [
                 'slug' => 'demarrer',
-                'icon' => '🚀',
+                'iconClass' => 'fa-solid fa-rocket',
                 'title' => [
                     'fr' => 'Démarrer avec MYKEYNEST',
                     'en' => 'Getting started with MYKEYNEST',
@@ -81,7 +81,7 @@ final class HelpCenterController extends AbstractController
             ],
             [
                 'slug' => 'securite',
-                'icon' => '🔐',
+                'iconClass' => 'fa-solid fa-lock',
                 'title' => [
                     'fr' => 'Sécurité & Chiffrement',
                     'en' => 'Security & Encryption',
@@ -95,7 +95,7 @@ final class HelpCenterController extends AbstractController
             ],
             [
                 'slug' => 'generateur',
-                'icon' => '🔑',
+                'iconClass' => 'fa-solid fa-key',
                 'title' => [
                     'fr' => 'Générateur de mots de passe',
                     'en' => 'Password generator',
@@ -109,7 +109,7 @@ final class HelpCenterController extends AbstractController
             ],
             [
                 'slug' => 'partage',
-                'icon' => '🤝',
+                'iconClass' => 'fa-solid fa-share-nodes',
                 'title' => [
                     'fr' => 'Partage & Collaboration',
                     'en' => 'Sharing & Collaboration',
@@ -123,7 +123,7 @@ final class HelpCenterController extends AbstractController
             ],
             [
                 'slug' => 'extension',
-                'icon' => '🌐',
+                'iconClass' => 'fa-solid fa-puzzle-piece',
                 'title' => [
                     'fr' => 'Extension Navigateur',
                     'en' => 'Browser extension',
@@ -137,7 +137,7 @@ final class HelpCenterController extends AbstractController
             ],
             [
                 'slug' => 'abonnement',
-                'icon' => '💳',
+                'iconClass' => 'fa-solid fa-credit-card',
                 'title' => [
                     'fr' => 'Abonnement & Facturation',
                     'en' => 'Subscription & Billing',
@@ -184,8 +184,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Create your account',
                             ],
                             'content' => [
-                                'fr' => '<p>Rendez-vous sur <strong>key-nest.com</strong> et cliquez sur <strong>Essai gratuit</strong>. Renseignez votre adresse email et choisissez un mot de passe maître robuste. Ce mot de passe est la <em>seule clé</em> qui déchiffre votre coffre — il ne sera jamais transmis à nos serveurs.</p><div class="art-callout"><span class="art-callout-icon">💡</span><span class="art-callout-text"><strong>Astuce :</strong> Utilisez notre générateur intégré pour créer un mot de passe maître de 20+ caractères, puis notez-le dans un endroit physique sûr.</span></div>',
-                                'en' => '<p>Go to <strong>key-nest.com</strong> and click <strong>Free trial</strong>. Enter your email address and choose a strong master password. This password is the <em>only key</em> that decrypts your vault — it is never sent to our servers.</p><div class="art-callout"><span class="art-callout-icon">💡</span><span class="art-callout-text"><strong>Tip:</strong> Use our built-in generator to create a 20+ character master password, then write it down in a safe physical place.</span></div>',
+                                'fr' => '<p>Rendez-vous sur <strong>key-nest.com</strong> et cliquez sur <strong>Essai gratuit</strong>. Renseignez votre adresse email et choisissez un mot de passe maître robuste. Ce mot de passe est la <em>seule clé</em> qui déchiffre votre coffre — il ne sera jamais transmis à nos serveurs.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text"><strong>Astuce :</strong> Utilisez notre générateur intégré pour créer un mot de passe maître de 20+ caractères, puis notez-le dans un endroit physique sûr.</span></div>',
+                                'en' => '<p>Go to <strong>key-nest.com</strong> and click <strong>Free trial</strong>. Enter your email address and choose a strong master password. This password is the <em>only key</em> that decrypts your vault — it is never sent to our servers.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text"><strong>Tip:</strong> Use our built-in generator to create a 20+ character master password, then write it down in a safe physical place.</span></div>',
                             ],
                         ],
                         [
@@ -252,8 +252,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Export from Chrome',
                             ],
                             'content' => [
-                                'fr' => '<p>Dans Chrome, allez dans <code>chrome://password-manager/passwords</code>, cliquez sur ⚙️ puis <strong>Exporter les mots de passe</strong>.<div class="art-callout art-callout-warn"><span class="art-callout-icon">⚠️</span><span class="art-callout-text">Le fichier CSV contient vos mots de passe <strong>en clair</strong>. Supprimez-le immédiatement après l\'import.</span></div>',
-                                'en' => '<p>In Chrome, go to <code>chrome://password-manager/passwords</code>, click ⚙️ then <strong>Export passwords</strong>.<div class="art-callout art-callout-warn"><span class="art-callout-icon">⚠️</span><span class="art-callout-text">The CSV file contains your passwords in <strong>plain text</strong>. Delete it immediately after importing.</span></div>',
+                                'fr' => '<p>Dans Chrome, allez dans <code>chrome://password-manager/passwords</code>, cliquez sur les paramètres puis <strong>Exporter les mots de passe</strong>.<div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Le fichier CSV contient vos mots de passe <strong>en clair</strong>. Supprimez-le immédiatement après l\'import.</span></div>',
+                                'en' => '<p>In Chrome, go to <code>chrome://password-manager/passwords</code>, open settings, then click <strong>Export passwords</strong>.<div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">The CSV file contains your passwords in <strong>plain text</strong>. Delete it immediately after importing.</span></div>',
                             ],
                         ],
                         [
@@ -415,8 +415,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'What this implies',
                             ],
                             'content' => [
-                                'fr' => '<p>Nous <strong>ne pouvons pas récupérer</strong> votre mot de passe maître si vous le perdez. Configurez une récupération d\'urgence depuis vos Paramètres.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon">⚠️</span><span class="art-callout-text">Conservez votre mot de passe maître dans un lieu physique sûr.</span></div>',
-                                'en' => '<p>We <strong>cannot recover</strong> your master password if you lose it. Set up emergency recovery in your Settings.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon">⚠️</span><span class="art-callout-text">Keep your master password in a safe physical place.</span></div>',
+                                'fr' => '<p>Nous <strong>ne pouvons pas récupérer</strong> votre mot de passe maître si vous le perdez. Configurez une récupération d\'urgence depuis vos Paramètres.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Conservez votre mot de passe maître dans un lieu physique sûr.</span></div>',
+                                'en' => '<p>We <strong>cannot recover</strong> your master password if you lose it. Set up emergency recovery in your Settings.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Keep your master password in a safe physical place.</span></div>',
                             ],
                         ],
                     ],
@@ -507,8 +507,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'I forgot my master password',
                             ],
                             'content' => [
-                                'fr' => '<p>En raison du zero-knowledge, nous ne pouvons pas le récupérer. Si vous avez configuré une <strong>récupération d\'urgence</strong>, allez sur <em>Connexion › Mot de passe oublié</em>.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon">⚠️</span><span class="art-callout-text">Sans récupération d\'urgence configurée au préalable, vos données seront inaccessibles.</span></div>',
-                                'en' => '<p>Because of zero-knowledge, we can’t recover it. If you enabled <strong>emergency recovery</strong>, go to <em>Login › Forgot password</em>.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon">⚠️</span><span class="art-callout-text">Without emergency recovery set up beforehand, your data will be inaccessible.</span></div>',
+                                'fr' => '<p>En raison du zero-knowledge, nous ne pouvons pas le récupérer. Si vous avez configuré une <strong>récupération d\'urgence</strong>, allez sur <em>Connexion › Mot de passe oublié</em>.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Sans récupération d\'urgence configurée au préalable, vos données seront inaccessibles.</span></div>',
+                                'en' => '<p>Because of zero-knowledge, we can’t recover it. If you enabled <strong>emergency recovery</strong>, go to <em>Login › Forgot password</em>.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Without emergency recovery set up beforehand, your data will be inaccessible.</span></div>',
                             ],
                         ],
                     ],
@@ -553,8 +553,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Enable 2FA step by step',
                             ],
                             'content' => [
-                                'fr' => '<p>Allez dans <strong>Paramètres › Sécurité › 2FA</strong>. Scannez le QR code avec Google Authenticator ou Authy, et saisissez le code à 6 chiffres pour confirmer.</p><div class="art-callout"><span class="art-callout-icon">💡</span><span class="art-callout-text">Sauvegardez les <strong>codes de secours</strong> affichés lors de l\'activation.</span></div>',
-                                'en' => '<p>Go to <strong>Settings › Security › 2FA</strong>. Scan the QR code with Google Authenticator or Authy, then enter the 6-digit code to confirm.</p><div class="art-callout"><span class="art-callout-icon">💡</span><span class="art-callout-text">Save the <strong>backup codes</strong> shown during setup.</span></div>',
+                                'fr' => '<p>Allez dans <strong>Paramètres › Sécurité › 2FA</strong>. Scannez le QR code avec Google Authenticator ou Authy, et saisissez le code à 6 chiffres pour confirmer.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text">Sauvegardez les <strong>codes de secours</strong> affichés lors de l\'activation.</span></div>',
+                                'en' => '<p>Go to <strong>Settings › Security › 2FA</strong>. Scan the QR code with Google Authenticator or Authy, then enter the 6-digit code to confirm.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text">Save the <strong>backup codes</strong> shown during setup.</span></div>',
                             ],
                         ],
                     ],
@@ -1071,8 +1071,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Pro plan pricing',
                             ],
                             'content' => [
-                                'fr' => '<p>Le plan Pro est disponible à <strong>2,99 € / mois</strong>, sans engagement. Aucune carte bancaire requise pour l\'offre gratuite.</p>',
-                                'en' => '<p>The Pro plan is available for <strong>€2.99 / month</strong>, no commitment. No credit card is required for the Free plan.</p>',
+                                'fr' => '<p>Le plan Pro est disponible à <strong>6,99 € / mois</strong>, sans engagement. Aucune carte bancaire requise pour l\'offre gratuite.</p>',
+                                'en' => '<p>The Pro plan is available for <strong>€6.99 / month</strong>, no commitment. No credit card is required for the Free plan.</p>',
                             ],
                         ],
                     ],
@@ -1106,8 +1106,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Upgrade in 3 clicks',
                             ],
                             'content' => [
-                                'fr' => '<p>Allez dans <strong>Paramètres › Abonnement</strong> et cliquez sur <strong>Passer au Pro</strong>. Choisissez votre moyen de paiement (carte ou SEPA via Stripe). Votre compte est mis à niveau immédiatement.</p><div class="art-callout"><span class="art-callout-icon">💳</span><span class="art-callout-text">Le paiement est sécurisé via <strong>Stripe</strong>. Vos données bancaires ne sont jamais stockées sur nos serveurs.</span></div>',
-                                'en' => '<p>Go to <strong>Settings › Subscription</strong> and click <strong>Upgrade to Pro</strong>. Choose your payment method (card or SEPA via Stripe). Your account is upgraded instantly.</p><div class="art-callout"><span class="art-callout-icon">💳</span><span class="art-callout-text">Payment is secured by <strong>Stripe</strong>. Your banking details are never stored on our servers.</span></div>',
+                                'fr' => '<p>Allez dans <strong>Paramètres › Abonnement</strong> et cliquez sur <strong>Passer au Pro</strong>. Choisissez votre moyen de paiement (carte ou SEPA via Stripe). Votre compte est mis à niveau immédiatement.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-credit-card"></i></span><span class="art-callout-text">Le paiement est sécurisé via <strong>Stripe</strong>. Vos données bancaires ne sont jamais stockées sur nos serveurs.</span></div>',
+                                'en' => '<p>Go to <strong>Settings › Subscription</strong> and click <strong>Upgrade to Pro</strong>. Choose your payment method (card or SEPA via Stripe). Your account is upgraded instantly.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-credit-card"></i></span><span class="art-callout-text">Payment is secured by <strong>Stripe</strong>. Your banking details are never stored on our servers.</span></div>',
                             ],
                         ],
                     ],

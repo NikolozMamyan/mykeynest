@@ -54,6 +54,26 @@
 
                 <button class="hc-search-clear" id="hcSearchClear" aria-label="{{ 'help_center.search.clear_aria'|trans }}" hidden data-help-center-target="clearButton" data-action="click->help-center#clear">&times;</button>
             </div>
+
+            {% set isEn = app.request.locale == 'en' %}
+            <div class="hc-quick-links" aria-label="{{ isEn ? 'Help center shortcuts' : 'Raccourcis centre d aide' }}">
+                <a href="{{ path('app_help_category', { slug: 'demarrer' }) }}" class="hc-quick-link">
+                    <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+                    <span>{{ isEn ? 'Getting started' : 'Demarrer' }}</span>
+                </a>
+                <a href="{{ path('app_help_category', { slug: 'securite' }) }}" class="hc-quick-link">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                    <span>{{ isEn ? 'Security' : 'Securite' }}</span>
+                </a>
+                <a href="{{ path('app_help_category', { slug: 'extension' }) }}" class="hc-quick-link">
+                    <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
+                    <span>{{ isEn ? 'Extension' : 'Extension' }}</span>
+                </a>
+                <a href="{{ path('app_public_generator') }}" class="hc-quick-link">
+                    <i class="fa-solid fa-key" aria-hidden="true"></i>
+                    <span>{{ isEn ? 'Generator' : 'Generateur' }}</span>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -78,6 +98,36 @@
     </div>
 
     <div class="hc-layout">
+        <section class="hc-summary" aria-labelledby="hc-summary-title">
+            <div class="hc-summary-copy">
+                <div class="hc-section-label">{{ isEn ? 'Product support' : 'Support produit' }}</div>
+                <h2 class="hc-section-title" id="hc-summary-title">{{ isEn ? 'Clear answers, practical guides, faster paths' : 'Reponses claires, guides concrets, parcours plus direct' }}</h2>
+                <p class="hc-section-sub">{{ isEn ? 'The MYKEYNEST help center is organized to resolve account, security, sharing, browser extension, and billing questions quickly.' : 'Le centre d aide MYKEYNEST est organise pour resoudre rapidement les questions de compte, securite, partage, extension navigateur et abonnement.' }}</p>
+            </div>
+            <div class="hc-summary-points">
+                <div class="hc-summary-point">
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    <div>
+                        <strong>{{ isEn ? 'Reliable documentation' : 'Base documentaire fiable' }}</strong>
+                        <p>{{ isEn ? 'Short, connected articles organized by category and built for quick resolution.' : 'Des articles courts, relies entre eux et mis a jour par categorie.' }}</p>
+                    </div>
+                </div>
+                <div class="hc-summary-point">
+                    <i class="fa-solid fa-compass" aria-hidden="true"></i>
+                    <div>
+                        <strong>{{ isEn ? 'More useful navigation' : 'Navigation plus utile' }}</strong>
+                        <p>{{ isEn ? 'Direct access to critical topics without a demo-style browsing experience.' : 'Acces direct aux sujets critiques sans passer par un parcours de demo.' }}</p>
+                    </div>
+                </div>
+                <div class="hc-summary-point">
+                    <i class="fa-solid fa-life-ring" aria-hidden="true"></i>
+                    <div>
+                        <strong>{{ isEn ? 'Support handoff' : 'Passerelle vers le support' }}</strong>
+                        <p>{{ isEn ? 'Support remains reachable when documentation alone is not enough.' : 'Le support reste accessible quand la documentation ne suffit pas.' }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         {# ?? Categories ?? #}
         <div class="hc-section-label">{{ 'help_center.sections.explore_label'|trans }}</div>
@@ -90,7 +140,7 @@
                    class="hc-cat-card"
                    data-tags="{{ cat.tags }}"
                    data-help-center-target="category">
-                    <div class="hc-cat-icon" aria-hidden="true">{{ cat.icon }}</div>
+                    <div class="hc-cat-icon" aria-hidden="true"><i class="{{ cat.iconClass }}"></i></div>
                     <div class="hc-cat-title">{{ cat.title }}</div>
                     <p class="hc-cat-desc">{{ cat.description }}</p>
                     <div class="hc-cat-meta">
@@ -133,7 +183,7 @@
                         <a href="{{ path('app_help_article', { categorySlug: article.categorySlug, articleSlug: article.articleSlug }) }}"
                            class="hc-article-row">
                             <div class="hc-article-num" aria-hidden="true">
-                                {{ loop.index < 10 ? '0' ~ loop.index : loop.index }}
+                                <i class="fa-solid fa-file-lines"></i>
                             </div>
                             <div class="hc-article-info">
                                 <div class="hc-article-title">{{ article.title }}</div>

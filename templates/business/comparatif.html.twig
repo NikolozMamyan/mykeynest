@@ -14,10 +14,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "{{ 'business.comparatif.schema.headline'|trans }}",
-  "description": "{{ 'business.comparatif.schema.description'|trans }}",
-  "dateModified": "{{ "now"|date("Y-m-d") }}"
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "{{ 'business.comparatif.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing')) }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ 'business.comparatif.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution')) }}" },
+        { "@type": "ListItem", "position": 3, "name": "{{ 'business.comparatif.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_comparatif')) }}" }
+      ]
+    },
+    {
+      "@type": "Article",
+      "headline": "{{ 'business.comparatif.schema.headline'|trans }}",
+      "description": "{{ 'business.comparatif.schema.description'|trans }}",
+      "dateModified": "{{ "now"|date("Y-m-d") }}"
+    }
+  ]
 }
 </script>
 {% endblock %}
@@ -56,6 +68,24 @@
             <div class="cmp-disclaimer">
                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                 {{ 'business.comparatif.hero.disclaimer'|trans }}
+            </div>
+        </div>
+    </section>
+
+    <section class="cmp-layout" aria-labelledby="cmp-summary-title" style="padding-top: 2rem;">
+        {% set isEn = app.request.locale == 'en' %}
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
+            <div class="cmp-section-eyebrow">{{ isEn ? 'Quick verdict' : 'Verdict rapide' }}</div>
+            <h2 class="cmp-section-title" id="cmp-summary-title">{{ isEn ? 'What this comparison says' : 'Ce que dit ce comparatif' }}</h2>
+            <p class="cmp-section-sub">{{ isEn ? 'This page helps SMB buyers compare software capabilities and included services before choosing a password management vendor.' : 'Cette page aide les PME a comparer les capacites logicielles et les services inclus avant de choisir un fournisseur de gestion des mots de passe.' }}</p>
+            <ul style="margin:0 0 1rem 1.25rem;color:#334155;line-height:1.7;">
+                <li>{{ isEn ? 'MYKEYNEST is positioned on value for SMBs that want software plus support and training.' : 'MYKEYNEST se positionne sur la valeur pour les PME qui veulent un logiciel avec support et formation.' }}</li>
+                <li>{{ isEn ? 'The comparison emphasizes operational support, training, and French-language service in addition to core security features.' : 'Le comparatif met en avant l accompagnement operationnel, la formation et le support francophone en plus des fonctions de securite.' }}</li>
+                <li>{{ isEn ? 'For implementation details, continue to the solution page; for awareness and remediation services, continue to the audit page.' : 'Pour les details de mise en place, poursuivez sur la page solution ; pour les services de sensibilisation et remediation, poursuivez sur la page audit.' }}</li>
+            </ul>
+            <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                <a href="{{ path('business_solution') }}" class="cmp-cta-btn">{{ isEn ? 'See the full solution' : 'Voir la solution complete' }}</a>
+                <a href="{{ path('business_audit') }}" class="cmp-cta-btn" style="background:#fff;color:#0f172a;border:1px solid #cbd5e1;">{{ isEn ? 'See audit services' : 'Voir les services audit' }}</a>
             </div>
         </div>
     </section>

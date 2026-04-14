@@ -14,11 +14,48 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Service",
-  "name": "{{ 'business.audit.schema.name'|trans }}",
-  "description": "{{ 'business.audit.schema.description'|trans }}",
-  "provider": { "@type": "Organization", "name": "MYKEYNEST" },
-  "serviceType": ["Audit cybersecurite PME", "Formation cybersecurite collaborateurs"]
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "{{ 'business.audit.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing')) }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ 'business.audit.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution')) }}" },
+        { "@type": "ListItem", "position": 3, "name": "{{ 'business.audit.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_audit')) }}" }
+      ]
+    },
+    {
+      "@type": "Service",
+      "name": "{{ 'business.audit.schema.name'|trans }}",
+      "description": "{{ 'business.audit.schema.description'|trans }}",
+      "provider": { "@type": "Organization", "name": "MYKEYNEST" },
+      "serviceType": ["Audit cybersecurite PME", "Formation cybersecurite collaborateurs"]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "{{ 'business.audit.faq.q1.question'|trans|e('js') }}",
+          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q1.answer'|trans|e('js') }}" }
+        },
+        {
+          "@type": "Question",
+          "name": "{{ 'business.audit.faq.q2.question'|trans|e('js') }}",
+          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q2.answer'|trans|e('js') }}" }
+        },
+        {
+          "@type": "Question",
+          "name": "{{ 'business.audit.faq.q3.question'|trans|e('js') }}",
+          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q3.answer'|trans|e('js') }}" }
+        },
+        {
+          "@type": "Question",
+          "name": "{{ 'business.audit.faq.q4.question'|trans|e('js') }}",
+          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q4.answer'|trans|e('js') }}" }
+        }
+      ]
+    }
+  ]
 }
 </script>
 {% endblock %}
@@ -56,6 +93,24 @@
                 <span class="aud-pill"><span class="aud-pill-dot"></span>{{ 'business.audit.hero.pill1'|trans }}</span>
                 <span class="aud-pill"><span class="aud-pill-dot"></span>{{ 'business.audit.hero.pill2'|trans }}</span>
                 <span class="aud-pill"><span class="aud-pill-dot"></span>{{ 'business.audit.hero.pill3'|trans }}</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="aud-layout" aria-labelledby="aud-summary-title" style="padding-top: 2rem;">
+        {% set isEn = app.request.locale == 'en' %}
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
+            <div class="aud-section-eyebrow">{{ isEn ? 'Quick summary' : 'Resume rapide' }}</div>
+            <h2 class="aud-section-title" id="aud-summary-title">{{ isEn ? 'When this page is relevant' : 'Quand cette page est pertinente' }}</h2>
+            <p class="aud-section-sub">{{ isEn ? 'This page is for SMBs that need a cybersecurity audit, employee awareness, or phishing-risk reduction alongside password hygiene improvements.' : 'Cette page est utile aux PME qui ont besoin d un audit cyber, de sensibilisation collaborateurs ou d une reduction du risque phishing en plus de l hygiene des mots de passe.' }}</p>
+            <ul style="margin:0 0 1rem 1.25rem;color:#334155;line-height:1.7;">
+                <li>{{ isEn ? 'The offer combines audit, awareness, and a remediation roadmap.' : 'L offre combine audit, sensibilisation et feuille de route de remediation.' }}</li>
+                <li>{{ isEn ? 'It can be used independently of the software, or as a complement to MYKEYNEST adoption.' : 'Elle peut etre utilisee independamment du logiciel ou en complement d un deploiement MYKEYNEST.' }}</li>
+                <li>{{ isEn ? 'If you are still comparing vendors, the comparison and solution pages provide the broader product context.' : 'Si vous etes encore en phase de comparaison, les pages comparatif et solution donnent le contexte produit plus large.' }}</li>
+            </ul>
+            <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                <a href="{{ path('business_solution') }}" class="aud-cta-btn-white" style="text-decoration:none;">{{ isEn ? 'View the full solution' : 'Voir la solution complete' }}</a>
+                <a href="{{ path('business_comparatif') }}" class="aud-cta-btn-ghost" style="text-decoration:none;">{{ isEn ? 'Open the comparison' : 'Ouvrir le comparatif' }}</a>
             </div>
         </div>
     </section>
