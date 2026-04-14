@@ -1,0 +1,20 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}Paiement confirme | MYKEYNEST{% endblock %}
+
+{% block body %}
+<section style="min-height:70vh;display:flex;align-items:center;justify-content:center;padding:3rem 1rem;background:linear-gradient(180deg,#f8fcfa 0%,#ffffff 100%);">
+  <div style="max-width:640px;width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:24px;box-shadow:0 18px 48px rgba(15,23,42,.08);padding:2rem;text-align:center;">
+    <div style="width:72px;height:72px;margin:0 auto 1rem;border-radius:20px;background:#ecfdf5;color:#059669;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+    </div>
+    <h1 style="margin:0 0 .75rem;font-size:2rem;color:#0f172a;">Paiement confirme</h1>
+    <p style="margin:0 0 1rem;color:#475569;line-height:1.7;">Votre abonnement Pro est en cours d activation. Si vous venez de payer sans compte existant, un email vient de vous etre envoye pour definir votre mot de passe.</p>
+    <p style="margin:0 0 2rem;color:#64748b;line-height:1.7;">Si vous aviez deja un compte, vous recevrez un email de confirmation et vous pouvez vous reconnecter normalement.</p>
+    <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+      <a href="{{ path('show_login') }}" class="btn btn-primary">Se connecter</a>
+      <a href="{{ path('app_landing') }}" class="btn btn-outline">Retour au site</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

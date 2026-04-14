@@ -13,6 +13,40 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class SubscriptionPageController extends AbstractController
 {
+    private function createCheckoutRedirect(?User $user, string $successUrl, string $cancelUrl): RedirectResponse
+    {
+        Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+
+        $checkoutParams = [
+            'mode' => 'subscription',
+            'line_items' => [[
+                'price' => $_ENV['STRIPE_PRICE_PRO'],
+                'quantity' => 1,
+            ]],
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'metadata' => [
+                'plan' => 'pro',
+                'checkout_origin' => 'landing_public',
+            ],
+        ];
+
+        if ($user) {
+            $checkoutParams['client_reference_id'] = (string) $user->getId();
+            $checkoutParams['metadata']['user_id'] = (string) $user->getId();
+
+            if ($user->getStripeCustomerId()) {
+                $checkoutParams['customer'] = $user->getStripeCustomerId();
+            } else {
+                $checkoutParams['customer_email'] = $user->getEmail();
+            }
+        }
+
+        $session = CheckoutSession::create($checkoutParams);
+
+        return new RedirectResponse($session->url);
+    }
+
     #[Route('/app/subscription', name: 'app_subscription')]
     public function index(): Response
     {
@@ -46,32 +80,24 @@ final class SubscriptionPageController extends AbstractController
             return $this->redirectToRoute('show_login');
         }
 
-        Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+        return $this->createCheckoutRedirect(
+            $user,
+            rtrim($_ENV['APP_URL'], '/') . '/app/subscription/success?session_id={CHECKOUT_SESSION_ID}',
+            rtrim($_ENV['APP_URL'], '/') . '/app/subscription/cancel'
+        );
+    }
 
-        $checkoutParams = [
-            'mode' => 'subscription',
-            'line_items' => [[
-                'price' => $_ENV['STRIPE_PRICE_PRO'],
-                'quantity' => 1,
-            ]],
-            'success_url' => rtrim($_ENV['APP_URL'], '/') . '/app/subscription/success?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => rtrim($_ENV['APP_URL'], '/') . '/app/subscription/cancel',
-            'client_reference_id' => (string) $user->getId(),
-            'metadata' => [
-                'user_id' => (string) $user->getId(),
-                'plan' => 'pro',
-            ],
-        ];
+    #[Route('/pricing/pro/checkout', name: 'app_public_subscription_checkout_pro', methods: ['GET'])]
+    public function publicCheckoutPro(): RedirectResponse
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
 
-        if ($user->getStripeCustomerId()) {
-            $checkoutParams['customer'] = $user->getStripeCustomerId();
-        } else {
-            $checkoutParams['customer_email'] = $user->getEmail();
-        }
-
-        $session = CheckoutSession::create($checkoutParams);
-
-        return new RedirectResponse($session->url);
+        return $this->createCheckoutRedirect(
+            $user,
+            rtrim($_ENV['APP_URL'], '/') . '/pricing/pro/success?session_id={CHECKOUT_SESSION_ID}',
+            rtrim($_ENV['APP_URL'], '/') . '/pricing/pro/cancel'
+        );
     }
 
     #[Route('/app/subscription/success', name: 'app_subscription_success')]
@@ -84,6 +110,18 @@ final class SubscriptionPageController extends AbstractController
     public function cancel(): Response
     {
         return $this->render('subscription/cancel.html.twig');
+    }
+
+    #[Route('/pricing/pro/success', name: 'app_public_subscription_success', methods: ['GET'])]
+    public function publicSuccess(): Response
+    {
+        return $this->render('subscription/public_success.html.twig');
+    }
+
+    #[Route('/pricing/pro/cancel', name: 'app_public_subscription_cancel', methods: ['GET'])]
+    public function publicCancel(): Response
+    {
+        return $this->render('subscription/public_cancel.html.twig');
     }
 
     #[Route('/app/subscription/portal', name: 'app_subscription_portal')]

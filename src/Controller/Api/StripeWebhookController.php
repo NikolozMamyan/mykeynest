@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserSubscription;
 use App\Repository\UserRepository;
 use App\Repository\UserSubscriptionRepository;
+use App\Service\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Stripe\Stripe;
@@ -14,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class StripeWebhookController extends AbstractController
 {
@@ -23,7 +25,9 @@ final class StripeWebhookController extends AbstractController
         UserRepository $users,
         UserSubscriptionRepository $subscriptions,
         EntityManagerInterface $em,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        MailerService $mailer,
+        UrlGeneratorInterface $urlGenerator
     ): Response {
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 
@@ -84,7 +88,15 @@ final class StripeWebhookController extends AbstractController
                     }
 
                     if (!$user) {
-                        $logger->warning('Stripe webhook: user not found for checkout.session.completed', [
+                        $user = $this->createPendingCheckoutUser(
+                            email: is_string($email) ? $email : null,
+                            em: $em,
+                            logger: $logger
+                        );
+                    }
+
+                    if (!$user) {
+                        $logger->warning('Stripe webhook: unable to resolve user for checkout.session.completed', [
                             'client_reference_id' => $userId,
                             'email' => $email,
                         ]);
@@ -144,6 +156,9 @@ final class StripeWebhookController extends AbstractController
                         break;
                     }
 
+                    $existingSubscription = $user->getUserSubscription() ?? $subscriptions->findOneBy(['user' => $user]);
+                    $wasActive = $existingSubscription?->isActive() ?? false;
+
                     $this->syncSubscriptionRecord(
                         user: $user,
                         subscriptions: $subscriptions,
@@ -156,6 +171,11 @@ final class StripeWebhookController extends AbstractController
                     );
 
                     $em->flush();
+
+                    if (!$wasActive) {
+                        $this->sendPostPaymentEmail($user, $mailer, $urlGenerator, $logger);
+                        $em->flush();
+                    }
 
                     $logger->info('Stripe webhook: subscription activated', [
                         'user_id' => $user->getId(),
@@ -412,5 +432,85 @@ final class StripeWebhookController extends AbstractController
         $subscription->touch();
 
         return $subscription;
+    }
+
+    private function createPendingCheckoutUser(
+        ?string $email,
+        EntityManagerInterface $em,
+        LoggerInterface $logger
+    ): ?User {
+        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $logger->warning('Stripe webhook: cannot create pending user without valid email', [
+                'email' => $email,
+            ]);
+
+            return null;
+        }
+
+        $user = new User();
+        $user->setEmail(strtolower(trim($email)));
+        $user->setCompany('');
+        $user->setPassword('');
+        $user->setRoles(['ROLE_GUEST']);
+        $user->setApiToken(bin2hex(random_bytes(32)));
+        $user->setTokenExpiresAt(new \DateTimeImmutable('+7 days'));
+        $user->regenerateApiExtensionToken();
+
+        $em->persist($user);
+
+        return $user;
+    }
+
+    private function sendPostPaymentEmail(
+        User $user,
+        MailerService $mailer,
+        UrlGeneratorInterface $urlGenerator,
+        LoggerInterface $logger
+    ): void {
+        try {
+            if (in_array('ROLE_GUEST', $user->getRoles(), true) && $user->getApiToken()) {
+                $expiresAt = new \DateTimeImmutable('+7 days');
+                $user->setApiToken(bin2hex(random_bytes(32)));
+                $user->setTokenExpiresAt($expiresAt);
+
+                $setupUrl = $urlGenerator->generate('app_guest_register', [
+                    'token' => $user->getApiToken(),
+                    'email' => $user->getEmail(),
+                ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+                $mailer->send(
+                    (string) $user->getEmail(),
+                    'Votre abonnement Pro est actif',
+                    'emails/pro_checkout_activation.html.twig',
+                    [
+                        'user' => $user,
+                        'setup_url' => $setupUrl,
+                        'expiresAt' => $expiresAt,
+                    ]
+                );
+
+                return;
+            }
+
+            $loginUrl = $urlGenerator->generate('show_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
+            $forgotPasswordUrl = $urlGenerator->generate('app_forgot_password_request', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+            $mailer->send(
+                (string) $user->getEmail(),
+                'Votre abonnement Pro est actif',
+                'emails/pro_checkout_existing_user.html.twig',
+                [
+                    'user' => $user,
+                    'login_url' => $loginUrl,
+                    'forgot_password_url' => $forgotPasswordUrl,
+                ]
+            );
+        } catch (\Throwable $e) {
+            $logger->error('Stripe webhook: failed to send post-payment email', [
+                'user_id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }
