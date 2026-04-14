@@ -1,0 +1,13 @@
+{% set href = href|default(null) %}
+{% if href %}
+  <a href="{{ href }}" class="ds-surface ds-metric">
+{% else %}
+  <div class="ds-surface ds-metric">
+{% endif %}
+  <span class="ds-metric-label">{{ label }}</span>
+  <strong class="ds-metric-value">{{ value }}</strong>
+{% if href %}
+  </a>
+{% else %}
+  </div>
+{% endif %}

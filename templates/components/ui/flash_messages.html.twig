@@ -1,0 +1,11 @@
+{% for label, messages in app.flashes %}
+  <div class="ds-flashes">
+    {% for message in messages %}
+      {% set tone = label in ['success', 'warning', 'error'] ? label : 'info' %}
+      <div class="ds-flash ds-flash--{{ tone }}">
+        <strong>{{ label|capitalize }}</strong>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endfor %}

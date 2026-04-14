@@ -563,50 +563,41 @@
    Stats Cards (cliquables)
 ------------------------------ #}
 <div class="stats-grid">
+  {% include 'components/app_ui/stat_card.html.twig' with {
+    href: path('app_credential'),
+    gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+    icon: 'fas fa-key',
+    label: 'dashboard.stats.credentials'|trans,
+    value: stats.credentials|default(0),
+    deltaHtml: ui.delta_badge(deltaCreds, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month')
+  } only %}
 
-  <a class="stat-card" href="{{ path('app_credential') }}" style="text-decoration:none; color:inherit;">
-    <div class="stat-icon" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
-      <i class="fas fa-key"></i>
-    </div>
-    <div class="stat-content">
-      <div class="stat-label">{{ 'dashboard.stats.credentials'|trans }}</div>
-      <div class="stat-value js-count" data-count="{{ stats.credentials|default(0) }}">0</div>
-      {{ ui.delta_badge(deltaCreds, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month') }}
-    </div>
-  </a>
+  {% include 'components/app_ui/stat_card.html.twig' with {
+    href: path('app_team_index'),
+    gradient: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+    icon: 'fas fa-users',
+    label: 'dashboard.stats.teams'|trans,
+    value: stats.teams|default(0),
+    deltaHtml: ui.delta_badge(deltaTeams, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month')
+  } only %}
 
-  <a class="stat-card" href="{{ path('app_team_index') }}" style="text-decoration:none; color:inherit;">
-    <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);">
-      <i class="fas fa-users"></i>
-    </div>
-    <div class="stat-content">
-      <div class="stat-label">{{ 'dashboard.stats.teams'|trans }}</div>
-      <div class="stat-value js-count" data-count="{{ stats.teams|default(0) }}">0</div>
-      {{ ui.delta_badge(deltaTeams, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month') }}
-    </div>
-  </a>
+  {% include 'components/app_ui/stat_card.html.twig' with {
+    href: path('shared_access_index'),
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+    icon: 'fas fa-share-alt',
+    label: 'dashboard.stats.active_shares'|trans,
+    value: stats.shares|default(0),
+    deltaHtml: ui.delta_badge(deltaShares, 'dashboard.stats.change.plus_n_this_week', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_week')
+  } only %}
 
-  <a class="stat-card" href="{{ path('shared_access_index') }}" style="text-decoration:none; color:inherit;">
-    <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
-      <i class="fas fa-share-alt"></i>
-    </div>
-    <div class="stat-content">
-      <div class="stat-label">{{ 'dashboard.stats.active_shares'|trans }}</div>
-      <div class="stat-value js-count" data-count="{{ stats.shares|default(0) }}">0</div>
-      {{ ui.delta_badge(deltaShares, 'dashboard.stats.change.plus_n_this_week', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_week') }}
-    </div>
-  </a>
-
-  <a class="stat-card" href="{{ path('app_generator') }}" style="text-decoration:none; color:inherit;">
-    <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);">
-      <i class="fas fa-file-alt"></i>
-    </div>
-    <div class="stat-content">
-      <div class="stat-label">{{ 'dashboard.stats.drafts'|trans }}</div>
-      <div class="stat-value js-count" data-count="{{ stats.drafts|default(0) }}">0</div>
-      {{ ui.delta_badge(deltaDrafts, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month') }}
-    </div>
-  </a>
+  {% include 'components/app_ui/stat_card.html.twig' with {
+    href: path('app_generator'),
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+    icon: 'fas fa-file-alt',
+    label: 'dashboard.stats.drafts'|trans,
+    value: stats.drafts|default(0),
+    deltaHtml: ui.delta_badge(deltaDrafts, 'dashboard.stats.change.plus_n_this_month', 'dashboard.stats.change.stable', 'dashboard.stats.change.minus_n_this_month')
+  } only %}
 
 </div>
 
@@ -624,10 +615,11 @@
     <div class="card-content">
       <div class="activity-list">
         {% if activity is empty %}
-          <div class="empty-state">
-            <div class="empty-title">{{ 'dashboard.recent_activity.empty.title'|trans }}</div>
-            <div class="empty-desc">{{ 'dashboard.recent_activity.empty.desc'|trans }}</div>
-          </div>
+          {% include 'components/app_ui/empty_state.html.twig' with {
+            icon: 'fas fa-clock',
+            title: 'dashboard.recent_activity.empty.title'|trans,
+            text: 'dashboard.recent_activity.empty.desc'|trans
+          } only %}
         {% else %}
           {% for a in activity %}
             <div class="activity-item">
@@ -668,10 +660,11 @@
     <div class="card-content">
       <div class="teams-list">
         {% if teams is empty %}
-          <div class="empty-state">
-            <div class="empty-title">{{ 'dashboard.teams.empty.title'|trans }}</div>
-            <div class="empty-desc">{{ 'dashboard.teams.empty.desc'|trans }}</div>
-          </div>
+          {% include 'components/app_ui/empty_state.html.twig' with {
+            icon: 'fas fa-users',
+            title: 'dashboard.teams.empty.title'|trans,
+            text: 'dashboard.teams.empty.desc'|trans
+          } only %}
         {% else %}
           {% for t in teams %}
             <a class="team-item" href="{{ path('app_team_show', {id: t.id}) }}">
@@ -737,10 +730,11 @@
     <div class="card-content">
       <div class="drafts-list">
         {% if drafts is empty %}
-          <div class="empty-state">
-            <div class="empty-title">{{ 'dashboard.drafts.empty.title'|trans }}</div>
-            <div class="empty-desc">{{ 'dashboard.drafts.empty.desc'|trans }}</div>
-          </div>
+          {% include 'components/app_ui/empty_state.html.twig' with {
+            icon: 'fas fa-file-alt',
+            title: 'dashboard.drafts.empty.title'|trans,
+            text: 'dashboard.drafts.empty.desc'|trans
+          } only %}
         {% else %}
           {% for d in drafts %}
             <div class="draft-item">

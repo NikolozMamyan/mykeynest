@@ -1,0 +1,11 @@
+<div class="app-ui-empty">
+  {% if icon is defined and icon %}
+    <div class="app-ui-empty__icon">
+      <i class="{{ icon }}"></i>
+    </div>
+  {% endif %}
+  <div class="app-ui-empty__title">{{ title }}</div>
+  {% if text is defined and text %}
+    <div class="app-ui-empty__text">{{ text }}</div>
+  {% endif %}
+</div>

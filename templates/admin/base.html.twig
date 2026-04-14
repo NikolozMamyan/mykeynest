@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+  {% set adminPageClass = block('admin_page_class')|trim %}
+  {% set adminTitle = block('admin_page_title')|trim %}
+  {% set adminIntro = block('admin_page_intro')|trim %}
+  {% set adminToolbar = block('admin_toolbar')|trim %}
+
+  <div class="ds-page {{ adminPageClass }}">
+    <div class="ds-stack-lg">
+      {% if adminTitle %}
+        {% include 'components/ui/page_header.html.twig' with {
+          title: adminTitle,
+          text: adminIntro
+        } only %}
+      {% endif %}
+
+      {% include 'components/ui/flash_messages.html.twig' %}
+
+      {% if adminToolbar %}
+        <div class="ds-toolbar">
+          {{ adminToolbar|raw }}
+        </div>
+      {% endif %}
+
+      {% block admin_content %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block admin_page_class %}{% endblock %}
+{% block admin_page_title %}{% endblock %}
+{% block admin_page_intro %}{% endblock %}
+{% block admin_toolbar %}{% endblock %}

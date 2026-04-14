@@ -444,61 +444,59 @@
   <section class="settings-section">
     <ul class="settings-list" role="list">
       <li class="settings-item">
-        <a class="settings-link" href="{{path('app_user_profile')}}">
-          <span class="settings-icon"><i class="fa-regular fa-id-card"></i></span>
-          <span class="settings-text">{{ 'settings.menu.personal_data'|trans }}</span>
-          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-        </a>
+        {% include 'components/app_ui/settings_link.html.twig' with {
+          href: path('app_user_profile'),
+          icon: 'fa-regular fa-id-card',
+          label: 'settings.menu.personal_data'|trans
+        } only %}
       </li>
 
       <li class="settings-item">
-        <a class="settings-link" href="{{path('app_user_preferences')}}">
-          <span class="settings-icon"><i class="fa-solid fa-sliders"></i></span>
-          <span class="settings-text">{{ 'settings.menu.preferences'|trans }}</span>
-          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-        </a>
+        {% include 'components/app_ui/settings_link.html.twig' with {
+          href: path('app_user_preferences'),
+          icon: 'fa-solid fa-sliders',
+          label: 'settings.menu.preferences'|trans
+        } only %}
       </li>
-<li class="settings-item">
-  <a class="settings-link" href="{{ path('app_sessions_manager') }}">
-    <span class="settings-icon">
-       <i class="fas fa-display"></i>
-    </span>
-    <span class="settings-text">Sessions Manager</span>
-    <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-  </a>
-</li>
+      <li class="settings-item">
+        {% include 'components/app_ui/settings_link.html.twig' with {
+          href: path('app_sessions_manager'),
+          icon: 'fas fa-display',
+          label: 'Sessions Manager'
+        } only %}
+      </li>
 
 
       <li class="settings-item">
-        <a class="settings-link" href="{{path('app_user_subscription_manage')}}">
-          <span class="settings-icon"><i class="fa-regular fa-credit-card"></i></span>
-          <span class="settings-text">{{ 'settings.menu.subscription'|trans }}</span>
-          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-        </a>
+        {% include 'components/app_ui/settings_link.html.twig' with {
+          href: path('app_user_subscription_manage'),
+          icon: 'fa-regular fa-credit-card',
+          label: 'settings.menu.subscription'|trans
+        } only %}
       </li>
 
       <li class="settings-item">
-        <a class="settings-link" href="subscription#subscription_contact">
-          <span class="settings-icon"><i class="fa-regular fa-envelope"></i></span>
-          <span class="settings-text">{{ 'settings.menu.contact'|trans }}</span>
-          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-        </a>
+        {% include 'components/app_ui/settings_link.html.twig' with {
+          href: 'subscription#subscription_contact',
+          icon: 'fa-regular fa-envelope',
+          label: 'settings.menu.contact'|trans
+        } only %}
       </li>
 
       <li class="settings-item">
-        <a class="settings-link" href="{{ path('legal_cgu') }}">
-          <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
-          <span class="settings-text">{{ 'settings.menu.terms_cgu'|trans }}</span>
-          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-        </a>
+        {% include 'components/app_ui/settings_link.html.twig' with {
+          href: path('legal_cgu'),
+          icon: 'fa-regular fa-file-lines',
+          label: 'settings.menu.terms_cgu'|trans
+        } only %}
       </li>
 
       <li class="settings-item">
-        <a class="settings-link" href="{{ path('legal_cgv') }}">
-          <span class="settings-icon"><i class="fa-regular fa-file-lines"></i></span>
-          <span class="settings-text">{{ 'settings.menu.terms_cgv'|trans }}</span>
-          <i class="fa-solid fa-chevron-right settings-chevron" aria-hidden="true"></i>
-        </a>
+        {% include 'components/app_ui/settings_link.html.twig' with {
+          href: path('legal_cgv'),
+          icon: 'fa-regular fa-file-lines',
+          label: 'settings.menu.terms_cgv'|trans
+        } only %}
       </li>
     </ul>
   </section>

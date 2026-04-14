@@ -1,158 +1,12 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
 {% block title %}Admin Subscriptions{% endblock %}
+{% block admin_page_title %}Subscriptions{% endblock %}
+{% block admin_page_intro %}Vue rapide des 100 derniers comptes avec leur statut d abonnement.{% endblock %}
 
-{% block body %}
-<style>
-.admin-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.admin-header,
-.flash-box,
-.table-wrap {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-}
-
-.admin-header,
-.flash-box {
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.admin-header h1 {
-  margin: 0;
-  color: #0f172a;
-}
-
-.admin-header p,
-.table-note {
-  color: #64748b;
-}
-
-.table-wrap {
-  overflow: hidden;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-  vertical-align: top;
-}
-
-th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #475569;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-.user-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.mono {
-  font-family: Consolas, Monaco, monospace;
-  font-size: 0.8rem;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.status-badge.success {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.status-badge.warning {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status-badge.muted {
-  background: #e2e8f0;
-  color: #475569;
-}
-
-.stack-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.inline-form {
-  margin: 0;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.btn-primary {
-  background: #059669;
-}
-
-.btn-warning {
-  background: #d97706;
-}
-
-@media (max-width: 768px) {
-  .table-wrap {
-    overflow-x: auto;
-  }
-}
-</style>
-
-<div class="admin-page">
-  <div class="admin-header">
-    <h1>Subscriptions</h1>
-    <p>Vue rapide des 100 derniers comptes avec leur statut d abonnement.</p>
-  </div>
-
-  {% for label, messages in app.flashes %}
-    {% for message in messages %}
-      <div class="flash-box">
-        <strong>{{ label|capitalize }}</strong>
-        <span>{{ message }}</span>
-      </div>
-    {% endfor %}
-  {% endfor %}
-
-  <div class="table-wrap">
-    <table>
+{% block admin_content %}
+  <div class="ds-surface ds-table-wrap">
+    <table class="ds-table">
       <thead>
         <tr>
           <th>Utilisateur</th>
@@ -170,45 +24,45 @@ tr:last-child td {
           {% set subscription = user.userSubscription %}
           <tr>
             <td>
-              <div class="user-meta">
-                <strong>#{{ user.id }} {{ user.email }}</strong>
-                <span class="table-note">
+              <div class="ds-cell-stack">
+                <span class="ds-title-strong">#{{ user.id }} {{ user.email }}</span>
+                <span class="ds-muted">
                   {{ subscription ? 'Abonnement cree le ' ~ subscription.createdAt|date('d/m/Y H:i') : 'Date utilisateur indisponible' }}
                 </span>
               </div>
             </td>
             <td>{{ user.company ?: '-' }}</td>
-            <td><span class="table-note">{{ user.roles ? user.roles|join(', ') : 'ROLE_USER' }}</span></td>
-            <td><strong>{{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</strong></td>
+            <td class="ds-text-break">{{ user.roles ? user.roles|join(', ') : 'ROLE_USER' }}</td>
+            <td class="ds-title-strong">{{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</td>
             <td>
               {% if subscription and subscription.isActive %}
-                <span class="status-badge success">{{ subscription.status ?: 'active' }}</span>
+                {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'active', tone: 'success' } only %}
               {% elseif subscription %}
-                <span class="status-badge warning">{{ subscription.status ?: 'inactive' }}</span>
+                {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'inactive', tone: 'warning' } only %}
               {% else %}
-                <span class="status-badge muted">aucun</span>
+                {% include 'components/ui/status_badge.html.twig' with { label: 'aucun', tone: 'muted' } only %}
               {% endif %}
             </td>
             <td>
-              <div class="user-meta">
-                <span class="mono">{{ subscription and subscription.stripeCustomerId ? subscription.stripeCustomerId : 'customer: -' }}</span>
-                <span class="mono">{{ subscription and subscription.stripeSubscriptionId ? subscription.stripeSubscriptionId : 'subscription: -' }}</span>
+              <div class="ds-cell-stack">
+                <span class="ds-mono">{{ subscription and subscription.stripeCustomerId ? subscription.stripeCustomerId : 'customer: -' }}</span>
+                <span class="ds-mono">{{ subscription and subscription.stripeSubscriptionId ? subscription.stripeSubscriptionId : 'subscription: -' }}</span>
               </div>
             </td>
             <td>{{ subscription ? subscription.updatedAt|date('d/m/Y H:i') : '-' }}</td>
             <td>
-              <div class="stack-actions">
+              <div class="ds-actions-stack">
                 {% if not subscription or not subscription.isActive %}
-                  <form method="post" action="{{ path('admin_user_subscription_assign_pro', {id: user.id}) }}" class="inline-form">
+                  <form method="post" action="{{ path('admin_user_subscription_assign_pro', {id: user.id}) }}" class="ds-inline-form">
                     <input type="hidden" name="_token" value="{{ csrf_token('assign_pro_' ~ user.id) }}">
-                    <button type="submit" class="btn btn-primary">Activer Pro</button>
+                    <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Activer Pro</button>
                   </form>
                 {% endif %}
 
                 {% if subscription %}
-                  <form method="post" action="{{ path('admin_user_subscription_deactivate', {id: user.id}) }}" class="inline-form" onsubmit="return confirm('Desactiver cet abonnement ?');">
+                  <form method="post" action="{{ path('admin_user_subscription_deactivate', {id: user.id}) }}" class="ds-inline-form" onsubmit="return confirm('Desactiver cet abonnement ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('deactivate_subscription_' ~ user.id) }}">
-                    <button type="submit" class="btn btn-warning">Desactiver</button>
+                    <button type="submit" class="ds-btn ds-btn--warning ds-btn--block">Desactiver</button>
                   </form>
                 {% endif %}
               </div>
@@ -216,11 +70,10 @@ tr:last-child td {
           </tr>
         {% else %}
           <tr>
-            <td colspan="8">Aucun utilisateur recent a afficher.</td>
+            <td colspan="8" class="ds-empty">Aucun utilisateur recent a afficher.</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-</div>
 {% endblock %}

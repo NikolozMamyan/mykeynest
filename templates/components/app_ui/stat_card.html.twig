@@ -1,0 +1,12 @@
+<a class="stat-card app-ui-stat-card" href="{{ href }}">
+  <div class="stat-icon app-ui-stat-card__icon" style="background: {{ gradient }};">
+    <i class="{{ icon }}"></i>
+  </div>
+  <div class="stat-content app-ui-stat-card__content">
+    <div class="stat-label app-ui-stat-card__label">{{ label }}</div>
+    <div class="stat-value app-ui-stat-card__value js-count" data-count="{{ value }}">0</div>
+    {% if deltaHtml is defined and deltaHtml %}
+      {{ deltaHtml|raw }}
+    {% endif %}
+  </div>
+</a>

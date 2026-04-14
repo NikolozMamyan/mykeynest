@@ -216,7 +216,7 @@
   display: inline-block;
   width: 22px;
   height: 22px;
-  border: 3px solid var(--color-primary-hover); /* cercle plus pâle */
+  border: 3px solid var(--color-primary-hover); /* cercle plus pale */
   border-top: 3px solid var(--color-primary);   /* accent vert */
   border-radius: 50%;
   animation: spin 0.8s linear infinite;

@@ -1,196 +1,27 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
 {% block title %}Admin Blog{% endblock %}
+{% block admin_page_title %}Blog{% endblock %}
+{% block admin_page_intro %}Gestion des articles, recherche et edition.{% endblock %}
 
-{% block body %}
-<style>
-.admin-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
+{% block admin_toolbar %}
+  <form method="get" action="{{ path('admin_blog') }}" class="ds-search-form ds-toolbar-grow">
+    <input
+      type="text"
+      name="q"
+      value="{{ q }}"
+      placeholder="Rechercher un article"
+      class="ds-input"
+    >
+    <button type="submit" class="ds-btn ds-btn--secondary">Rechercher</button>
+  </form>
 
-.admin-header,
-.toolbar,
-.table-wrap {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-}
+  <a href="{{ path('admin_article_new') }}" class="ds-btn ds-btn--primary">Nouvel article</a>
+{% endblock %}
 
-.admin-header,
-.toolbar {
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.admin-header h1 {
-  margin: 0;
-  color: #0f172a;
-}
-
-.admin-header p {
-  margin: 0.5rem 0 0;
-  color: #64748b;
-}
-
-.toolbar {
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.search-form {
-  display: flex;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 280px;
-}
-
-.search-input,
-.btn {
-  border-radius: 12px;
-  font: inherit;
-}
-
-.search-input {
-  flex: 1;
-  padding: 0.9rem 1rem;
-  border: 1px solid #cbd5e1;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.9rem 1.2rem;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.btn-primary {
-  background: #059669;
-  color: #fff;
-}
-
-.btn-secondary {
-  background: #e2e8f0;
-  color: #0f172a;
-}
-
-.btn-danger {
-  background: #dc2626;
-  color: #fff;
-}
-
-.btn-edit {
-  color: #059669;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.table-wrap {
-  overflow: hidden;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #475569;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-.article-cover {
-  width: 80px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.published-badge {
-  display: inline-flex;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  background: #d1fae5;
-  color: #065f46;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.article-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-@media (max-width: 768px) {
-  .toolbar,
-  .search-form,
-  .article-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .table-wrap {
-    overflow-x: auto;
-  }
-}
-</style>
-
-<div class="admin-page">
-  <div class="admin-header">
-    <h1>Blog</h1>
-    <p>Gestion des articles, recherche et edition.</p>
-  </div>
-
-  {% for label, messages in app.flashes %}
-    {% for message in messages %}
-      <div class="toolbar" style="margin-bottom:1rem;">
-        <strong>{{ label|capitalize }}</strong>
-        <span>{{ message }}</span>
-      </div>
-    {% endfor %}
-  {% endfor %}
-
-  <div class="toolbar">
-    <form method="get" action="{{ path('admin_blog') }}" class="search-form">
-      <input
-        type="text"
-        name="q"
-        value="{{ q }}"
-        placeholder="Rechercher un article"
-        class="search-input"
-      >
-      <button type="submit" class="btn btn-secondary">Rechercher</button>
-    </form>
-
-    <a href="{{ path('admin_article_new') }}" class="btn btn-primary">Nouvel article</a>
-  </div>
-
-  <div class="table-wrap">
-    <table>
+{% block admin_content %}
+  <div class="ds-surface ds-table-wrap">
+    <table class="ds-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -204,36 +35,38 @@ tr:last-child td {
       <tbody>
         {% for a in articles %}
           <tr>
-            <td><strong>#{{ a.id }}</strong></td>
+            <td class="ds-title-strong">#{{ a.id }}</td>
             <td>
               {% if a.coverImage %}
-                <img src="{{ asset('uploads/blog/' ~ a.coverImage) }}" alt="Cover" class="article-cover">
+                <img src="{{ asset('uploads/blog/' ~ a.coverImage) }}" alt="Cover" class="ds-media-thumb">
               {% else %}
-                -
+                <span class="ds-muted">-</span>
               {% endif %}
             </td>
-            <td>{{ a.slugFr }}</td>
-            <td>{{ a.slugEn ?: '-' }}</td>
+            <td class="ds-text-break">{{ a.slugFr }}</td>
+            <td class="ds-text-break">{{ a.slugEn ?: '-' }}</td>
             <td>
-              <span class="published-badge">{{ a.publishedAt ? a.publishedAt|date('d/m/Y H:i') : '-' }}</span>
+              {% include 'components/ui/status_badge.html.twig' with {
+                label: a.publishedAt ? a.publishedAt|date('d/m/Y H:i') : '-',
+                tone: 'success'
+              } only %}
             </td>
             <td>
-              <div class="article-actions">
-                <a href="{{ path('admin_article_edit', {id: a.id}) }}" class="btn-edit">Editer</a>
-                <form method="post" action="{{ path('admin_article_delete', {id: a.id}) }}" onsubmit="return confirm('Supprimer cet article ?');">
+              <div class="ds-actions-stack">
+                <a href="{{ path('admin_article_edit', {id: a.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Editer</a>
+                <form method="post" action="{{ path('admin_article_delete', {id: a.id}) }}" class="ds-inline-form" onsubmit="return confirm('Supprimer cet article ?');">
                   <input type="hidden" name="_token" value="{{ csrf_token('delete_article_' ~ a.id) }}">
-                  <button type="submit" class="btn btn-danger">Supprimer</button>
+                  <button type="submit" class="ds-btn ds-btn--danger ds-btn--block">Supprimer</button>
                 </form>
               </div>
             </td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="6">Aucun article trouve.</td>
+            <td colspan="6" class="ds-empty">Aucun article trouve.</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-</div>
 {% endblock %}

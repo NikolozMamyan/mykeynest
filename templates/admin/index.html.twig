@@ -1,171 +1,28 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base.html.twig' %}
 
 {% block title %}Dashboard Admin{% endblock %}
+{% block admin_page_title %}Dashboard Admin{% endblock %}
+{% block admin_page_intro %}Administration structuree par domaine pour eviter le melange entre blog, subscriptions, sessions et extension.{% endblock %}
 
-{% block body %}
-<style>
-.admin-dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.admin-header,
-.admin-card,
-.admin-list {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-}
-
-.admin-header {
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-}
-
-.admin-header h1,
-.panel-header h2 {
-  margin: 0;
-  color: #0f172a;
-}
-
-.admin-header p,
-.panel-header p,
-.muted {
-  color: #64748b;
-}
-
-.admin-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.admin-card {
-  padding: 1.25rem;
-}
-
-.admin-card strong {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 2rem;
-  color: #059669;
-}
-
-.admin-panels {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
-}
-
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.panel-link {
-  color: #059669;
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.admin-list {
-  padding: 1rem;
-}
-
-.admin-list table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-list th,
-.admin-list td {
-  padding: 0.85rem 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
-  text-align: left;
-}
-
-.admin-list th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #475569;
-}
-
-.admin-list tr:last-child td {
-  border-bottom: none;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.status-badge.success {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.status-badge.warning {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status-badge.muted {
-  background: #e2e8f0;
-  color: #475569;
-}
-
-@media (max-width: 900px) {
-  .admin-stats,
-  .admin-panels {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
-
-<div class="admin-dashboard">
-  <div class="admin-header">
-    <h1>Dashboard Admin</h1>
-    <p>Administration separee par domaine pour eviter le melange blog, abonnements et actions globales.</p>
-  </div>
-
-  <section class="admin-stats">
-    <article class="admin-card">
-      <span class="muted">Articles blog</span>
-      <strong>{{ articlesCount }}</strong>
-    </article>
-    <article class="admin-card">
-      <span class="muted">Utilisateurs</span>
-      <strong>{{ usersCount }}</strong>
-    </article>
-    <article class="admin-card">
-      <span class="muted">Subscriptions actives</span>
-      <strong>{{ activeSubscriptionsCount }}</strong>
-    </article>
+{% block admin_content %}
+  <section class="ds-grid-3">
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Articles blog', value: articlesCount } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Utilisateurs', value: usersCount } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Subscriptions actives', value: activeSubscriptionsCount } only %}
   </section>
 
-  <section class="admin-panels">
-    <div>
-      <div class="panel-header">
+  <section class="ds-grid-2">
+    <div class="ds-surface">
+      <div class="ds-section-head">
         <div>
-          <h2>Blog</h2>
-          <p>Derniers articles publies.</p>
+          <h2 class="ds-section-title">Blog</h2>
+          <p class="ds-section-text">Derniers articles publies.</p>
         </div>
-        <a class="panel-link" href="{{ path('admin_blog') }}">Ouvrir</a>
+        <a class="ds-section-link" href="{{ path('admin_blog') }}">Ouvrir</a>
       </div>
-      <div class="admin-list">
-        <table>
+
+      <div class="ds-table-wrap">
+        <table class="ds-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -177,12 +34,12 @@
             {% for article in recentArticles %}
               <tr>
                 <td>#{{ article.id }}</td>
-                <td>{{ article.h1Fr ?: article.slugFr }}</td>
+                <td class="ds-title-strong">{{ article.h1Fr ?: article.slugFr }}</td>
                 <td>{{ article.publishedAt ? article.publishedAt|date('d/m/Y H:i') : '-' }}</td>
               </tr>
             {% else %}
               <tr>
-                <td colspan="3" class="muted">Aucun article a afficher.</td>
+                <td colspan="3" class="ds-empty">Aucun article a afficher.</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -190,16 +47,17 @@
       </div>
     </div>
 
-    <div>
-      <div class="panel-header">
+    <div class="ds-surface">
+      <div class="ds-section-head">
         <div>
-          <h2>Subscriptions</h2>
-          <p>Derniers comptes et etat d abonnement.</p>
+          <h2 class="ds-section-title">Subscriptions</h2>
+          <p class="ds-section-text">Derniers comptes et etat d abonnement.</p>
         </div>
-        <a class="panel-link" href="{{ path('admin_subscriptions') }}">Ouvrir</a>
+        <a class="ds-section-link" href="{{ path('admin_subscriptions') }}">Ouvrir</a>
       </div>
-      <div class="admin-list">
-        <table>
+
+      <div class="ds-table-wrap">
+        <table class="ds-table">
           <thead>
             <tr>
               <th>Utilisateur</th>
@@ -211,21 +69,21 @@
             {% for user in recentUsers %}
               {% set subscription = user.userSubscription %}
               <tr>
-                <td>{{ user.email }}</td>
+                <td class="ds-title-strong">{{ user.email }}</td>
                 <td>{{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</td>
                 <td>
                   {% if subscription and subscription.isActive %}
-                    <span class="status-badge success">{{ subscription.status ?: 'active' }}</span>
+                    {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'active', tone: 'success' } only %}
                   {% elseif subscription %}
-                    <span class="status-badge warning">{{ subscription.status ?: 'inactive' }}</span>
+                    {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'inactive', tone: 'warning' } only %}
                   {% else %}
-                    <span class="status-badge muted">aucun</span>
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'aucun', tone: 'muted' } only %}
                   {% endif %}
                 </td>
               </tr>
             {% else %}
               <tr>
-                <td colspan="3" class="muted">Aucun utilisateur a afficher.</td>
+                <td colspan="3" class="ds-empty">Aucun utilisateur a afficher.</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -233,5 +91,4 @@
       </div>
     </div>
   </section>
-</div>
 {% endblock %}
