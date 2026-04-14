@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /app/
+Disallow: /guest/
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
 Disallow: /admin/
 Disallow: /api/internal/
 
@@ -9,4 +14,16 @@ User-agent: Googlebot
 Allow: /
 
 User-agent: bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
 Allow: /

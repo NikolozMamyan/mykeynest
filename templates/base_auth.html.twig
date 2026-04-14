@@ -1,92 +1,123 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app.request.locale|default('fr') }}">
   <head>
+    {% set currentRoute = app.request.attributes.get('_route') %}
+    {% set routeParams = app.request.attributes.get('_route_params') ?? {} %}
+    {% set legacyMetaHead = block('meta_description')|trim %}
+    {% set canonicalUrl = block('canonical_url')|trim %}
+    {% if canonicalUrl is empty %}
+      {% set canonicalUrl = app.request.uri %}
+    {% endif %}
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- SEO Meta Tags -->
-    <title>{% block title %}MYKEYNEST - Gestionnaire de Mots de Passe Sécurisé{% endblock %}</title>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-RG9YT46TFS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-RG9YT46TFS');
-</script>
-<!-- End Google Tag Manager -->
-    <meta name="description" content="{% block description %}Sécurisez tous vos mots de passe avec MYKEYNEST. Chiffrement AES-256, synchronisation multi-appareils, générateur de mots de passe. Essai gratuit.{% endblock %}" />
-    <meta name="keywords" content="gestionnaire mot de passe, sécurité, chiffrement AES-256, password manager, MYKEYNEST" />
-    <meta name="author" content="MYKEYNEST" />
-    <meta name="robots" content="index, follow" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="{{ app.request.uri }}" />
-    <meta property="og:title" content="{% block og_title %}MYKEYNEST - Gestionnaire de Mots de Passe Sécurisé{% endblock %}" />
-    <meta property="og:description" content="{% block og_description %}Protégez vos identifiants avec un chiffrement militaire AES-256. +10,000 utilisateurs nous font confiance.{% endblock %}" />
-    <meta property="og:image" content="{{ asset('images/og-image.jpg') }}" />
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="{{ app.request.uri }}" />
-    <meta property="twitter:title" content="{% block twitter_title %}MYKEYNEST - Gestionnaire de Mots de Passe Sécurisé{% endblock %}" />
-    <meta property="twitter:description" content="{% block twitter_description %}Sécurisez tous vos mots de passe en un seul endroit{% endblock %}" />
-    <meta property="twitter:image" content="{{ asset('images/twitter-image.jpg') }}" />
-    
-    <!-- Favicon -->
+    <title>{% block title %}MYKEYNEST - Gestionnaire de mots de passe securise{% endblock %}</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RG9YT46TFS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-RG9YT46TFS');
+    </script>
+
+    {% if legacyMetaHead is not empty %}
+      {{ legacyMetaHead|raw }}
+    {% else %}
+      <meta name="description" content="{% block description %}Securisez vos mots de passe et vos acces avec MYKEYNEST. Chiffrement AES-256, zero-knowledge, synchronisation multi-appareils et partage securise.{% endblock %}" />
+      <meta name="author" content="MYKEYNEST" />
+      <meta name="robots" content="{% block robots %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endblock %}" />
+      <meta name="googlebot" content="{% block googlebot %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endblock %}" />
+      <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+      <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+      <meta property="og:site_name" content="MYKEYNEST" />
+      <meta property="og:locale" content="{% block og_locale %}{{ app.request.locale == 'en' ? 'en_US' : 'fr_FR' }}{% endblock %}" />
+      <meta property="og:url" content="{{ canonicalUrl }}" />
+      <meta property="og:title" content="{% block og_title %}MYKEYNEST - Gestionnaire de mots de passe securise{% endblock %}" />
+      <meta property="og:description" content="{% block og_description %}Centralisez vos mots de passe, partagez vos acces en securite et documentez vos pratiques de cybersecurite.{% endblock %}" />
+      <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('apple-touch-icon.png')) }}{% endblock %}" />
+
+      <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
+      <meta name="twitter:url" content="{{ canonicalUrl }}" />
+      <meta name="twitter:title" content="{% block twitter_title %}MYKEYNEST - Gestionnaire de mots de passe securise{% endblock %}" />
+      <meta name="twitter:description" content="{% block twitter_description %}Securisez vos mots de passe, vos acces et vos workflows avec MYKEYNEST.{% endblock %}" />
+      <meta name="twitter:image" content="{% block twitter_image %}{{ absolute_url(asset('apple-touch-icon.png')) }}{% endblock %}" />
+    {% endif %}
+
+    <link rel="canonical" href="{{ canonicalUrl }}" />
+
+    {% if currentRoute %}
+      <link rel="alternate" hreflang="fr" href="{{ url(currentRoute, routeParams|merge({ lang: 'fr' })) }}" />
+      <link rel="alternate" hreflang="en" href="{{ url(currentRoute, routeParams|merge({ lang: 'en' })) }}" />
+      <link rel="alternate" hreflang="x-default" href="{{ url(currentRoute, routeParams|merge({ lang: 'fr' })) }}" />
+    {% endif %}
+
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="{{ app.request.uri }}" />
-    
-    <!-- Preconnect for performance -->
+    <link rel="alternate" type="text/markdown" title="LLMs" href="{{ absolute_url(asset('llms.txt')) }}" />
+
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
-    
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    
+
     {% block stylesheets %}{% endblock %}
     {% block javascripts %}
       {% block importmap %}{{ importmap('app') }}{% endblock %}
     {% endblock %}
-    
-    <!-- Schema.org structured data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "MYKEYNEST",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web, iOS, Android",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "EUR"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "ratingCount": "10000"
-      },
-      "description": "Gestionnaire de mots de passe sécurisé avec chiffrement AES-256"
-    }
-    </script>
+
+    {% block seo_jsonld %}
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "name": "MYKEYNEST",
+            "url": "{{ absolute_url(path('app_landing')) }}",
+            "logo": "{{ absolute_url(asset('apple-touch-icon.png')) }}"
+          },
+          {
+            "@type": "WebSite",
+            "name": "MYKEYNEST",
+            "url": "{{ absolute_url(path('app_landing')) }}",
+            "inLanguage": "{{ app.request.locale|default('fr') }}"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "MYKEYNEST",
+            "applicationCategory": "SecurityApplication",
+            "operatingSystem": "Web",
+            "url": "{{ absolute_url(path('app_landing')) }}",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "description": "Gestionnaire de mots de passe et acces pour equipes et PME."
+          }
+        ]
+      }
+      </script>
+    {% endblock %}
   </head>
 
   <body class="auth-layout">
-  {% set route = app.request.attributes.get('_route') %}
+    {% set route = app.request.attributes.get('_route') %}
 
-{% if route not in ['show_login', 'show_register'] %}
-  {% include 'components/nav.html.twig' %}
-{% endif %}
+    {% if route not in ['show_login', 'show_register'] %}
+      {% include 'components/nav.html.twig' %}
+    {% endif %}
 
     {% block body %}{% endblock %}
-        {% include './components/parts/_toasts.html.twig' %}
+    {% include './components/parts/_toasts.html.twig' %}
   </body>
 </html>
+
+{% block meta_description %}{% endblock %}
+{% block canonical_url %}{% endblock %}

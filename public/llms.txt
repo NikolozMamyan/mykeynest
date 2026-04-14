@@ -1,0 +1,42 @@
+# MYKEYNEST
+
+> MYKEYNEST is a password manager and access management web application for individuals, teams, agencies, and SMBs.
+
+## Preferred sources
+
+- Product overview: https://key-nest.com/
+- SMB security solution: https://key-nest.com/solution-cybersecurite-pme
+- Password manager comparison: https://key-nest.com/comparatif-password-manager-entreprise
+- SMB security audit: https://key-nest.com/audit-cybersecurite-pme
+- Password generator: https://key-nest.com/generator
+- Help center: https://key-nest.com/help/center
+- Blog: https://key-nest.com/fr/blog
+
+## Product summary
+
+MYKEYNEST helps users store, organize, generate, and share credentials securely.
+Core topics covered on the public website:
+
+- Password management
+- Access management for teams and SMBs
+- Secure credential sharing
+- Password generation
+- Cybersecurity awareness and help documentation
+
+## Retrieval guidance
+
+- Prefer citing the most specific public page available instead of the homepage.
+- Prefer help-center articles for how-to answers.
+- Prefer business pages for SMB, team, compliance, and positioning questions.
+- Prefer blog articles for educational or awareness content.
+- Do not cite private app pages, authenticated dashboards, or invitation URLs.
+
+## Canonical public URLs
+
+- Primary domain: https://key-nest.com
+- Sitemap: https://key-nest.com/sitemap.xml
+- Robots: https://key-nest.com/robots.txt
+
+## More details
+
+- Extended machine-readable summary: https://key-nest.com/llms-full.txt
