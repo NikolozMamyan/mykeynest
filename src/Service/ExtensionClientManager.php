@@ -160,6 +160,9 @@ final class ExtensionClientManager
         $client->setIsBlocked(false);
         $client->setBlockedAt(null);
         $client->setBlockedReason(null);
+        $client->setIsRevoked(false);
+        $client->setRevokedAt(null);
+        $client->setRevokedReason(null);
         $client->touch();
         $this->entityManager->flush();
     }

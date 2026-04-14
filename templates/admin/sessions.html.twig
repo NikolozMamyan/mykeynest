@@ -1,0 +1,262 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Sessions{% endblock %}
+
+{% block body %}
+<style>
+.admin-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.admin-header,
+.flash-box,
+.table-wrap {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.admin-header,
+.flash-box {
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-header h1 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.admin-header p,
+.table-note {
+  color: #64748b;
+}
+
+.table-wrap {
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mono {
+  font-family: Consolas, Monaco, monospace;
+  font-size: 0.8rem;
+}
+
+.status-badges,
+.stack-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.muted {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.inline-form {
+  margin: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-warning {
+  background: #d97706;
+}
+
+.btn-danger {
+  background: #dc2626;
+}
+
+.btn-success {
+  background: #059669;
+}
+
+@media (max-width: 768px) {
+  .table-wrap {
+    overflow-x: auto;
+  }
+}
+</style>
+
+<div class="admin-page">
+  <div class="admin-header">
+    <h1>Sessions</h1>
+    <p>Surveillance des sessions users avec actions de revocation et blocage appareil.</p>
+  </div>
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+      <div class="flash-box">
+        <strong>{{ label|capitalize }}</strong>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Appareil</th>
+          <th>Reseau</th>
+          <th>Activite</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in sessions %}
+          <tr>
+            <td>
+              <div class="user-meta">
+                <strong>#{{ session.id }} {{ session.user.email }}</strong>
+                <span class="table-note">{{ session.user.company ?: '-' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="user-meta">
+                <strong>{{ session.deviceName ?: 'Appareil inconnu' }}</strong>
+                <span class="mono">{{ session.deviceId ?: 'device: -' }}</span>
+                <span class="table-note">{{ session.userAgent ?: '-' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="user-meta">
+                <span class="mono">{{ session.ipAddress ?: '-' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="user-meta">
+                <span>Creee: {{ session.createdAt ? session.createdAt|date('d/m/Y H:i') : '-' }}</span>
+                <span>Derniere activite: {{ session.lastActivityAt ? session.lastActivityAt|date('d/m/Y H:i') : '-' }}</span>
+                <span>Expire: {{ session.expiresAt ? session.expiresAt|date('d/m/Y H:i') : '-' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="status-badges">
+                {% if session.isBlocked %}
+                  <span class="status-badge danger">bloquee</span>
+                {% endif %}
+                {% if session.isRevoked %}
+                  <span class="status-badge warning">revoquee</span>
+                {% endif %}
+                {% if not session.isBlocked and not session.isRevoked and session.expiresAt and session.expiresAt > date() %}
+                  <span class="status-badge success">active</span>
+                {% endif %}
+                {% if session.expiresAt and session.expiresAt <= date() %}
+                  <span class="status-badge muted">expiree</span>
+                {% endif %}
+              </div>
+              <div class="user-meta" style="margin-top:0.5rem;">
+                {% if session.blockedReason %}
+                  <span class="table-note">Blocage: {{ session.blockedReason }}</span>
+                {% endif %}
+                {% if session.revokedReason %}
+                  <span class="table-note">Revocation: {{ session.revokedReason }}</span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              <div class="stack-actions">
+                {% if not session.isRevoked %}
+                  <form method="post" action="{{ path('admin_session_revoke', {id: session.id}) }}" class="inline-form" onsubmit="return confirm('Revoquer cette session ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_session_' ~ session.id) }}">
+                    <button type="submit" class="btn btn-warning">Revoquer</button>
+                  </form>
+                {% endif %}
+
+                {% if session.deviceId and not session.isBlocked %}
+                  <form method="post" action="{{ path('admin_session_block_device', {id: session.id}) }}" class="inline-form" onsubmit="return confirm('Bloquer cet appareil et ses sessions ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_block_device_' ~ session.id) }}">
+                    <button type="submit" class="btn btn-danger">Bloquer appareil</button>
+                  </form>
+                {% endif %}
+
+                {% if session.deviceId and session.isBlocked %}
+                  <form method="post" action="{{ path('admin_session_unblock_device', {id: session.id}) }}" class="inline-form" onsubmit="return confirm('Debloquer cet appareil ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_unblock_device_' ~ session.id) }}">
+                    <button type="submit" class="btn btn-success">Debloquer appareil</button>
+                  </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="6">Aucune session a afficher.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

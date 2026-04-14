@@ -3,14 +3,22 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Article;
+use App\Entity\ExtensionClient;
+use App\Entity\ExtensionInstallationChallenge;
 use App\Entity\User;
 use App\Entity\UserSubscription;
 use App\Form\Admin\ArticleType;
+use App\Repository\ExtensionClientRepository;
+use App\Repository\ExtensionInstallationChallengeRepository;
 use App\Repository\UserRepository;
+use App\Repository\UserSessionRepository;
 use App\Repository\UserSubscriptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
+use App\Service\ExtensionClientManager;
+use App\Service\ExtensionInstallationChallengeManager;
+use App\Service\SessionManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -76,6 +84,52 @@ final class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/sessions', name: 'admin_sessions', methods: ['GET'])]
+    public function sessions(UserSessionRepository $userSessionRepository): Response
+    {
+        $sessions = $userSessionRepository->createQueryBuilder('s')
+            ->leftJoin('s.user', 'u')
+            ->addSelect('u')
+            ->orderBy('s.lastActivityAt', 'DESC')
+            ->addOrderBy('s.id', 'DESC')
+            ->setMaxResults(200)
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('admin/sessions.html.twig', [
+            'sessions' => $sessions,
+        ]);
+    }
+
+    #[Route('/extensions', name: 'admin_extensions', methods: ['GET'])]
+    public function extensions(
+        ExtensionClientRepository $extensionClientRepository,
+        ExtensionInstallationChallengeRepository $challengeRepository
+    ): Response {
+        $clients = $extensionClientRepository->createQueryBuilder('ec')
+            ->leftJoin('ec.user', 'u')
+            ->addSelect('u')
+            ->orderBy('ec.lastSeenAt', 'DESC')
+            ->addOrderBy('ec.id', 'DESC')
+            ->setMaxResults(200)
+            ->getQuery()
+            ->getResult();
+
+        $challenges = $challengeRepository->createQueryBuilder('c')
+            ->leftJoin('c.user', 'u')
+            ->addSelect('u')
+            ->orderBy('c.createdAt', 'DESC')
+            ->addOrderBy('c.id', 'DESC')
+            ->setMaxResults(200)
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('admin/extensions.html.twig', [
+            'clients' => $clients,
+            'challenges' => $challenges,
+        ]);
+    }
+
     #[Route('/users/{id}/subscription/assign-pro', name: 'admin_user_subscription_assign_pro', methods: ['POST'])]
     public function assignProToUser(
         User $user,
@@ -123,6 +177,184 @@ final class AdminController extends AbstractController
         $this->addFlash('warning', 'Abonnement desactive pour ' . $user->getEmail() . '.');
 
         return $this->redirectToRoute('admin_subscriptions');
+    }
+
+    #[Route('/sessions/{id}/revoke', name: 'admin_session_revoke', methods: ['POST'])]
+    public function revokeSession(
+        Request $request,
+        UserSessionRepository $userSessionRepository,
+        SessionManager $sessionManager,
+        int $id
+    ): Response {
+        $session = $userSessionRepository->find($id);
+        if (!$session) {
+            throw $this->createNotFoundException('Session introuvable.');
+        }
+
+        if (!$this->isCsrfTokenValid('admin_revoke_session_' . $session->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_sessions');
+        }
+
+        if (!$session->isRevoked()) {
+            $sessionManager->revoke($session, 'admin_revoked');
+            $this->addFlash('success', 'Session revoquee pour ' . $session->getUser()?->getEmail() . '.');
+        }
+
+        return $this->redirectToRoute('admin_sessions');
+    }
+
+    #[Route('/sessions/{id}/block-device', name: 'admin_session_block_device', methods: ['POST'])]
+    public function blockSessionDevice(
+        int $id,
+        Request $request,
+        UserSessionRepository $userSessionRepository,
+        SessionManager $sessionManager
+    ): Response {
+        $session = $userSessionRepository->find($id);
+        if (!$session) {
+            throw $this->createNotFoundException('Session introuvable.');
+        }
+
+        if (!$this->isCsrfTokenValid('admin_block_device_' . $session->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_sessions');
+        }
+
+        $deviceId = $session->getDeviceId();
+        if (!$deviceId) {
+            $this->addFlash('warning', 'Aucun device id pour cette session.');
+
+            return $this->redirectToRoute('admin_sessions');
+        }
+
+        $count = $sessionManager->blockDevice($session->getUser(), $deviceId, 'admin_blocked');
+        $this->addFlash('warning', $count . ' session(s) bloquees pour cet appareil.');
+
+        return $this->redirectToRoute('admin_sessions');
+    }
+
+    #[Route('/sessions/{id}/unblock-device', name: 'admin_session_unblock_device', methods: ['POST'])]
+    public function unblockSessionDevice(
+        int $id,
+        Request $request,
+        UserSessionRepository $userSessionRepository,
+        SessionManager $sessionManager
+    ): Response {
+        $session = $userSessionRepository->find($id);
+        if (!$session) {
+            throw $this->createNotFoundException('Session introuvable.');
+        }
+
+        if (!$this->isCsrfTokenValid('admin_unblock_device_' . $session->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_sessions');
+        }
+
+        $deviceId = $session->getDeviceId();
+        if (!$deviceId) {
+            $this->addFlash('warning', 'Aucun device id pour cette session.');
+
+            return $this->redirectToRoute('admin_sessions');
+        }
+
+        $count = $sessionManager->unblockDevice($session->getUser(), $deviceId);
+        $this->addFlash('success', $count . ' session(s) debloquees pour cet appareil.');
+
+        return $this->redirectToRoute('admin_sessions');
+    }
+
+    #[Route('/extensions/clients/{id}/block', name: 'admin_extension_client_block', methods: ['POST'])]
+    public function blockExtensionClient(
+        ExtensionClient $client,
+        Request $request,
+        ExtensionClientManager $extensionClientManager
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_block_extension_' . $client->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_extensions');
+        }
+
+        $extensionClientManager->block($client, 'admin_blocked');
+        $this->addFlash('warning', 'Extension bloquee pour ' . $client->getUser()?->getEmail() . '.');
+
+        return $this->redirectToRoute('admin_extensions');
+    }
+
+    #[Route('/extensions/clients/{id}/unblock', name: 'admin_extension_client_unblock', methods: ['POST'])]
+    public function unblockExtensionClient(
+        ExtensionClient $client,
+        Request $request,
+        ExtensionClientManager $extensionClientManager
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_unblock_extension_' . $client->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_extensions');
+        }
+
+        $extensionClientManager->unblock($client);
+        $this->addFlash('success', 'Extension debloquee pour ' . $client->getUser()?->getEmail() . '.');
+
+        return $this->redirectToRoute('admin_extensions');
+    }
+
+    #[Route('/extensions/clients/{id}/revoke', name: 'admin_extension_client_revoke', methods: ['POST'])]
+    public function revokeExtensionClient(
+        ExtensionClient $client,
+        Request $request,
+        ExtensionClientManager $extensionClientManager
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_revoke_extension_' . $client->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_extensions');
+        }
+
+        $extensionClientManager->revoke($client, 'admin_revoked');
+        $this->addFlash('warning', 'Extension revoquee pour ' . $client->getUser()?->getEmail() . '.');
+
+        return $this->redirectToRoute('admin_extensions');
+    }
+
+    #[Route('/extensions/challenges/{id}/approve', name: 'admin_extension_challenge_approve', methods: ['POST'])]
+    public function approveExtensionChallenge(
+        ExtensionInstallationChallenge $challenge,
+        Request $request,
+        ExtensionInstallationChallengeManager $challengeManager
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_approve_extension_challenge_' . $challenge->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_extensions');
+        }
+
+        $challengeManager->approve($challenge);
+        $this->addFlash('success', 'Demande d installation approuvee.');
+
+        return $this->redirectToRoute('admin_extensions');
+    }
+
+    #[Route('/extensions/challenges/{id}/reject', name: 'admin_extension_challenge_reject', methods: ['POST'])]
+    public function rejectExtensionChallenge(
+        ExtensionInstallationChallenge $challenge,
+        Request $request,
+        ExtensionInstallationChallengeManager $challengeManager
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_reject_extension_challenge_' . $challenge->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_extensions');
+        }
+
+        $challengeManager->reject($challenge);
+        $this->addFlash('warning', 'Demande d installation rejetee.');
+
+        return $this->redirectToRoute('admin_extensions');
     }
 
     #[Route('/articles/new', name: 'admin_article_new', methods: ['GET', 'POST'])]

@@ -29,6 +29,18 @@
         <i class="fas fa-credit-card"></i>
         <span>Subscriptions</span>
       </a>
+
+      <a href="{{ path('admin_sessions') }}"
+         class="nav-item {{ app.request.attributes.get('_route') in ['admin_sessions', 'admin_session_revoke', 'admin_session_block_device', 'admin_session_unblock_device'] ? 'active' : '' }}">
+        <i class="fas fa-user-shield"></i>
+        <span>Sessions</span>
+      </a>
+
+      <a href="{{ path('admin_extensions') }}"
+         class="nav-item {{ app.request.attributes.get('_route') in ['admin_extensions', 'admin_extension_client_block', 'admin_extension_client_unblock', 'admin_extension_client_revoke', 'admin_extension_challenge_approve', 'admin_extension_challenge_reject'] ? 'active' : '' }}">
+        <i class="fas fa-puzzle-piece"></i>
+        <span>Extension install</span>
+      </a>
     </div>
   </nav>
 
