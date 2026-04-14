@@ -20,7 +20,7 @@
 {% block body %}
 <main data-controller="help-center">
 
-    {# ?? Hero ?? #}
+    {# Hero #}
     <section class="hc-hero">
         <div class="hc-hero-inner">
             <div class="hc-eyebrow">
@@ -77,7 +77,7 @@
         </div>
     </section>
 
-    {# ?? Stats ?? #}
+    {# Stats #}
     <div class="hc-stats" aria-label="{{ 'help_center.stats.aria'|trans }}">
         <div class="hc-stat">
             <div class="hc-stat-number">{{ totalArticles }}</div>
@@ -129,7 +129,7 @@
             </div>
         </section>
 
-        {# ?? Categories ?? #}
+        {# Categories #}
         <div class="hc-section-label">{{ 'help_center.sections.explore_label'|trans }}</div>
         <h2 class="hc-section-title">{{ 'help_center.sections.all_categories_title'|trans }}</h2>
         <p class="hc-section-sub">{{ 'help_center.sections.all_categories_sub'|trans }}</p>
@@ -155,7 +155,7 @@
             {% endfor %}
         </div>
 
-        {# ?? No results message ?? #}
+        {# No results message #}
         <div class="hc-no-results" id="hcNoResults" aria-live="polite" hidden data-help-center-target="noResults">
             <div class="hc-no-results-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></div>
             <p class="hc-no-results-title">
@@ -169,7 +169,7 @@
             </p>
         </div>
 
-        {# ?? Popular Articles + Sidebar ?? #}
+        {# Popular Articles + Sidebar #}
         <div class="hc-two-col">
             <div>
                 <div class="hc-section-label">{{ 'help_center.popular.label'|trans }}</div>
@@ -197,7 +197,7 @@
                 </div>
             </div>
 
-            {# ?? Sidebar ?? #}
+            {# Sidebar #}
             <aside class="hc-sidebar" aria-label="{{ 'help_center.sidebar.aria'|trans }}">
                 <div class="hc-contact-card">
                     <div class="hc-contact-icon-wrap">
@@ -236,7 +236,7 @@
             </aside>
         </div>
 
-        {# ?? FAQ Accordion ?? #}
+        {# FAQ Accordion #}
         <div class="hc-faq-section">
             <div class="hc-section-label">{{ 'help_center.faq.label'|trans }}</div>
             <h2 class="hc-section-title">{{ 'help_center.faq.title'|trans }}</h2>
@@ -261,7 +261,7 @@
             </div>
         </div>
 
-        {# ?? CTA Banner ?? #}
+        {# CTA Banner #}
         <div class="hc-cta">
             <div class="hc-cta-text">
                 <div class="hc-cta-title">{{ 'help_center.cta.title'|trans }}</div>

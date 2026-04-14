@@ -12,53 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Space+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 {% endblock %}
 
-{#
-?????????????????????????????????????????????????????????????????????????????
-CONTROLLER ? exemple de donn?es ? passer :
-
-$article = [
-    'slug'        => 'zero-knowledge-explique',
-    'title'       => "Qu'est-ce que l'architecture zero-knowledge ?",
-    'excerpt'     => "D?couvrez comment MYKEYNEST garantit que personne, m?me nous, ne peut lire vos mots de passe.",
-    'readTime'    => 4,
-    'updatedAt'   => new \DateTime('2026-01-15'),
-    'author'      => 'Ã‰quipe MYKEYNEST',
-    'popular'     => true,
-    'tags'        => ['s?curit?', 'chiffrement', 'architecture'],
-    'helpfulYes'  => 142,   // compteur votes positifs
-    'helpfulNo'   => 8,     // compteur votes n?gatifs
-    'sections'    => [      // sections du contenu
-        [
-            'id'      => 'intro',
-            'title'   => 'Introduction',
-            'content' => '<p>Le chiffrement zero-knowledge signifie...</p>',
-        ],
-        [
-            'id'      => 'comment-ca-marche',
-            'title'   => 'Comment ?a marche ?',
-            'content' => '<p>Lorsque vous cr?ez votre compte...</p><ul><li>...</li></ul>',
-        ],
-    ],
-];
-
-$category = [
-    'slug'  => 'securite',
-    'icon'  => '??',
-    'title' => 'S?curit? & Chiffrement',
-];
-
-$relatedArticles = [
-    [
-        'slug'     => 'aes-256-explique',
-        'title'    => 'Comment fonctionne le chiffrement AES-256 ?',
-        'excerpt'  => 'Plongez dans les d?tails du standard de chiffrement utilis? par MYKEYNEST.',
-        'readTime' => 5,
-    ],
-    ...
-];
-?????????????????????????????????????????????????????????????????????????????
-#}
-
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/help-article.css') }}">
 {% endblock %}
@@ -70,7 +23,7 @@ $relatedArticles = [
 
 <main>
 
-    {# ?? Breadcrumb (sticky) ?? #}
+    {# Breadcrumb #}
     <nav class="art-breadcrumb" aria-label="{{ 'help_article.breadcrumb.aria'|trans }}">
         <div class="art-breadcrumb-inner">
             <div class="art-breadcrumb-nav">
@@ -102,10 +55,10 @@ $relatedArticles = [
         </div>
     </nav>
 
-    {# ?? Layout ?? #}
+    {# Layout #}
     <div class="art-layout">
 
-        {# ?? Left TOC ?? #}
+        {# Left TOC #}
         <nav class="art-toc" aria-label="{{ 'help_article.toc.aria'|trans }}">
             <p class="art-toc-title">{{ 'help_article.toc.title'|trans }}</p>
             <ul class="art-toc-list">
@@ -119,7 +72,7 @@ $relatedArticles = [
             </ul>
         </nav>
 
-        {# ?? Main article ?? #}
+        {# Main article #}
         <div>
             {# Back link #}
             <a href="{{ path('app_help_category', { slug: category.slug }) }}" class="art-back-link">
@@ -182,7 +135,7 @@ $relatedArticles = [
                 </div>
             </article>
 
-            {# ?? Like / Dislike ?? #}
+            {# Like / Dislike #}
             <div class="art-helpful-card" id="artHelpfulCard"
                  data-article="{{ article.slug }}"
                  data-yes="{{ article.helpfulYes }}"
@@ -215,7 +168,7 @@ $relatedArticles = [
             </div>
         </div>
 
-        {# ?? Right sidebar ?? #}
+        {# Right sidebar #}
         <aside class="art-sidebar" aria-label="{{ 'help_article.sidebar.aria'|trans }}">
 
             {# Related articles #}
