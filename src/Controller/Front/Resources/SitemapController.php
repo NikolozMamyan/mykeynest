@@ -180,6 +180,15 @@ final class SitemapController extends AbstractController
 
         $urls = array_merge($urls, $this->localizedPublicEntries(
             $urlGenerator,
+            'business_password_manager',
+            [],
+            $now,
+            'weekly',
+            '0.9'
+        ));
+
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
             'legal_cgu',
             [],
             $now,

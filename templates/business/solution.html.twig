@@ -45,7 +45,64 @@
     <link rel="stylesheet" href="{{ asset('styles/pages/business-solution.css') }}">
 {% endblock %}
 
+{% block page_styles %}
+<style>
+  .solution-demo { padding: 0 0 4rem; }
+  .solution-demo-shell {
+    display: grid;
+    grid-template-columns: 1fr 1.02fr;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #eff6ff, #ecfdf5 55%, #f8fafc);
+    border: 1px solid #dbeafe;
+    box-shadow: 0 22px 50px rgba(148, 163, 184, .16);
+  }
+  .solution-demo-copy h2 { margin: 0 0 .75rem; }
+  .solution-demo-copy p { color: #475569; line-height: 1.8; margin: 0 0 1rem; }
+  .solution-demo-note {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .45rem .8rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid rgba(5,150,105,.16);
+    color: #059669;
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: .9rem;
+  }
+  .solution-demo-player {
+    border-radius: 26px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0f172a, #111827);
+    padding: 1rem;
+    box-shadow: 0 28px 60px rgba(15,23,42,.22);
+  }
+  .solution-demo-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: .8rem;
+    color: #94a3b8;
+    font-size: .78rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .solution-demo-dots { display:flex; gap:.35rem; }
+  .solution-demo-dots span { width:.62rem; height:.62rem; border-radius:999px; background:#475569; display:block; }
+  .solution-demo-screen { aspect-ratio: 16 / 10; border-radius: 20px; overflow: hidden; border: 1px solid rgba(148,163,184,.18); }
+  .solution-demo-screen iframe { width: 100%; height: 100%; border: 0; }
+  @media (max-width: 960px) { .solution-demo-shell { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
 {% block body %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
 <main>
 
 {# ======================== HERO ======================== #}
@@ -87,7 +144,7 @@
         <i class="fas fa-rocket" aria-hidden="true"></i>
         {{ 'business.solution.hero.cta_primary'|trans }}
       </a>
-      <a href="{{ path('business_audit') }}" class="btn btn-outline btn-lg btn-w">
+      <a href="{{ path('business_audit', localeParams) }}" class="btn btn-outline btn-lg btn-w">
         {{ 'business.solution.hero.cta_secondary'|trans }}
       </a>
     </div>
@@ -106,17 +163,17 @@
     <div class="shead-eye" style="margin-bottom:0.75rem;"><i class="fas fa-bolt"></i> {{ isEn ? 'Quick summary' : 'Resume rapide' }}</div>
     <h2 id="solution-summary-title" style="margin-bottom:0.75rem;">{{ isEn ? 'What this page answers' : 'Ce que cette page explique' }}</h2>
     <p style="margin-bottom:1rem;color:#475569;">
-      {{ isEn ? 'This page is designed for SMBs evaluating a password manager plus operational support, employee onboarding, and security guidance.' : 'Cette page s adresse aux PME qui cherchent un gestionnaire de mots de passe avec accompagnement, formation des equipes et cadre de securite.' }}
+      {{ isEn ? 'This page is designed for SMBs evaluating an enterprise password manager, practical cybersecurity support, employee onboarding, and day-to-day IT security guidance.' : 'Cette page s adresse aux PME qui cherchent un gestionnaire de mots de passe entreprise, un accompagnement cybersécurité PME, de la formation équipes et un cadre de sécurité informatique simple au quotidien.' }}
     </p>
     <ul style="margin:0 0 1rem 1.25rem;color:#334155;line-height:1.7;">
-      <li>{{ isEn ? 'MYKEYNEST combines password management, maintenance, training, and audit support in one offer.' : 'MYKEYNEST combine gestion des mots de passe, maintenance, formation et accompagnement audit dans une seule offre.' }}</li>
-      <li>{{ isEn ? 'The offer targets SMBs, agencies, and teams that need a practical cybersecurity baseline without building it in-house.' : 'L offre vise les PME, agences et equipes qui veulent un socle cyber operationnel sans recruter une equipe interne.' }}</li>
+      <li>{{ isEn ? 'MYKEYNEST combines password management, maintenance, employee training, and SMB cybersecurity audit support in one offer.' : 'MYKEYNEST combine gestion des mots de passe, maintenance, formation collaborateurs et audit cybersécurité PME dans une seule offre.' }}</li>
+      <li>{{ isEn ? 'The offer targets SMBs, agencies, and teams that need a practical cybersecurity baseline, phishing awareness, and secure password policies without building it in-house.' : 'L offre vise les PME, agences et equipes qui veulent un socle cybersécurité concret, de la sensibilisation phishing et des politiques de mots de passe sûres sans recruter une équipe interne.' }}</li>
       <li>{{ isEn ? 'Use the comparison and audit pages below if you need vendor evaluation or a services-first entry point.' : 'Utilisez ensuite le comparatif et la page audit si vous avez besoin d une aide au choix ou d une entree orientee services.' }}</li>
     </ul>
     <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
-      <a href="{{ path('business_comparatif') }}" class="btn btn-outline">{{ isEn ? 'See the comparison' : 'Voir le comparatif' }}</a>
-      <a href="{{ path('business_audit') }}" class="btn btn-outline">{{ isEn ? 'See audit services' : 'Voir les services d audit' }}</a>
-      <a href="{{ path('app_help_center') }}" class="btn btn-outline">{{ isEn ? 'Visit the help center' : 'Consulter le centre d aide' }}</a>
+      <a href="{{ path('business_comparatif', localeParams) }}" class="btn btn-outline">{{ isEn ? 'See the comparison' : 'Voir le comparatif' }}</a>
+      <a href="{{ path('business_audit', localeParams) }}" class="btn btn-outline">{{ isEn ? 'See audit services' : 'Voir les services d audit' }}</a>
+      <a href="{{ path('app_help_center', localeParams) }}" class="btn btn-outline">{{ isEn ? 'Visit the help center' : 'Consulter le centre d aide' }}</a>
     </div>
   </div>
 </section>
@@ -272,6 +329,37 @@
   </div>
 </section>
 
+<section class="solution-demo">
+  <div class="wrap">
+    <div class="solution-demo-shell">
+      <div class="solution-demo-copy">
+        <div class="solution-demo-note"><i class="fas fa-play-circle"></i> {{ 'business.solution.demo.eyebrow'|trans }}</div>
+        <h2>{{ 'business.solution.demo.title'|trans }}</h2>
+        <p>{{ 'business.solution.demo.text'|trans }}</p>
+        <a href="{{ path('business_password_manager', localeParams) }}" class="btn btn-green">
+          <i class="fas fa-arrow-right"></i> {{ 'business.solution.demo.cta'|trans }}
+        </a>
+      </div>
+      <div class="solution-demo-player">
+        <div class="solution-demo-topbar">
+          <div class="solution-demo-dots"><span></span><span></span><span></span></div>
+          <span>mykeynest://demo/workspace</span>
+        </div>
+        <div class="solution-demo-screen">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/IS4YgAdW-H8?rel=0"
+            title="{{ 'business.solution.demo.iframe_title'|trans }}"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 {# ======================== EXPLORE ======================== #}
 <section class="explore-section" id="explorer">
   <div class="wrap">
@@ -282,7 +370,19 @@
     </div>
 
     <div class="explore-grid">
-      <a href="{{ path('business_comparatif') }}" class="explore-card">
+      <a href="{{ path('business_password_manager', localeParams) }}" class="explore-card">
+        <div class="explore-card-top">
+          <div class="explore-icon" aria-hidden="true"><i class="fas fa-key"></i></div>
+          <div>
+            <span class="explore-badge">{{ app.request.locale == 'en' ? 'Access' : 'Acces' }}</span>
+            <div class="explore-card-title">{{ app.request.locale == 'en' ? 'Enterprise password manager for SMBs' : 'Gestionnaire de mot de passe entreprise pour PME' }}</div>
+          </div>
+        </div>
+        <div class="explore-desc">{{ app.request.locale == 'en' ? 'See how to secure business passwords, share access safely, and improve password hygiene without adding operational friction.' : 'Voyez comment securiser les mots de passe professionnels, partager les acces proprement et ameliorer l hygiene des mots de passe sans alourdir les operations.' }}</div>
+        <div class="explore-arrow"><i class="fas fa-arrow-right"></i> {{ app.request.locale == 'en' ? 'Open the page' : 'Voir la page' }}</div>
+      </a>
+
+      <a href="{{ path('business_comparatif', localeParams) }}" class="explore-card">
         <div class="explore-card-top">
           <div class="explore-icon" aria-hidden="true"><i class="fas fa-scale-balanced"></i></div>
           <div>
@@ -294,7 +394,7 @@
         <div class="explore-arrow"><i class="fas fa-arrow-right"></i> {{ app.request.locale == 'en' ? 'Open the comparison' : 'Voir le comparatif' }}</div>
       </a>
 
-      <a href="{{ path('business_audit') }}" class="explore-card">
+      <a href="{{ path('business_audit', localeParams) }}" class="explore-card">
         <div class="explore-card-top">
           <div class="explore-icon" aria-hidden="true"><i class="fas fa-vial"></i></div>
           <div>

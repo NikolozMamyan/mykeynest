@@ -14,15 +14,15 @@
     "subscription": "Subscriptions"
   },
   "user": {
-  "field": {
-    "firstname": "First name",
-    "lastname": "Last name",
-    "company": "Company",
-    "email": "Email address",
-    "phone": "Phone number"
-  }
-},
-"email": {
+    "field": {
+      "firstname": "First name",
+      "lastname": "Last name",
+      "company": "Company",
+      "email": "Email address",
+      "phone": "Phone number"
+    }
+  },
+  "email": {
     "welcome": {
       "title": "Welcome to MYKEYNEST",
       "message": "We are delighted to welcome you, <strong>%email%</strong>! Complete your profile to fully enjoy the application.",
@@ -42,12 +42,12 @@
       "disclaimer": "You are receiving this email because you signed up for KeyNest."
     }
   },
-"common": {
-  "back": "Back",
-  "cancel": "Cancel",
-  "save_changes": "Save changes"
-},
-   "header": {
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "save_changes": "Save changes"
+  },
+  "header": {
     "burger_aria": "Menu",
     "notifications": {
       "aria": "Notifications",
@@ -70,12 +70,12 @@
         "desc": "Sign out"
       }
     },
-     "upgrade": {
+    "upgrade": {
       "label": "Upgrade",
       "text": "Go PRO"
     }
   },
-    "sidebar": {
+  "sidebar": {
     "sections": {
       "main": "Main",
       "tools": "Tools",
@@ -95,7 +95,7 @@
       "logout": "Log out"
     }
   },
-   "landing": {
+  "landing": {
     "nav": {
       "menu": "Menu",
       "features": "Features",
@@ -107,11 +107,11 @@
     },
     "hero": {
       "title_before": "Manage your team's passwords and access,",
-  "title_highlight": "in one secure place",
-  "subtitle": "MYKEYNEST is a password and access management solution for SMBs, agencies, and teams. AES-256 encryption, zero-knowledge architecture, secure sharing, security audit, and auto-fill.",
-  "cta_start": "Get started for free",
-  "cta_start_aria": "Create a free account on MYKEYNEST",
-  "cta_discover": "Learn more",
+      "title_highlight": "in one secure place",
+      "subtitle": "MYKEYNEST is a password and access management solution for SMBs, agencies, and teams. AES-256 encryption, zero-knowledge architecture, secure sharing, security audit, and auto-fill.",
+      "cta_start": "Get started for free",
+      "cta_start_aria": "Create a free account on MYKEYNEST",
+      "cta_discover": "Learn more",
       "trust_aria": "MYKEYNEST security guarantees",
       "trust": {
         "aes": "AES-256 encryption",
@@ -125,9 +125,9 @@
       }
     },
     "features": {
-"label": "Features",
-  "title": "Secure password and access management",
-  "subtitle": "Everything your team needs to protect credentials, share access securely, and stay in control every day.",
+      "label": "Features",
+      "title": "Secure password and access management",
+      "subtitle": "Everything your team needs to protect credentials, share access securely, and stay in control every day.",
       "cards": {
         "e2e_title": "End-to-end encryption",
         "e2e_text": "Your data is encrypted locally with AES-256 before being synchronized. Only you can access it.",
@@ -146,19 +146,25 @@
         "twofactor_text": "Manage and secure your account's active sessions."
       }
     },
-"how": {
-  "label": "Simple et efficace",
-  "title": "Comment MYKEYNEST aide votre équipe",
-  "subtitle": "Centralisez vos mots de passe, partagez les accès et gardez le contrôle en trois étapes.",
-  "steps": {
-    "s1_title": "Créez votre espace sécurisé",
-    "s1_text": "Inscrivez votre équipe et créez votre mot de passe maître pour accéder à votre coffre-fort sécurisé.",
-    "s2_title": "Ajoutez et organisez vos accès",
-    "s2_text": "Importez vos identifiants, classez-les et partagez les accès en toute sécurité selon vos besoins.",
-    "s3_title": "Accédez partout, en toute sécurité",
-    "s3_text": "Retrouvez vos mots de passe et accès sur tous vos appareils grâce à la synchronisation sécurisée."
-  }
-},
+    "how": {
+      "label": "Simple et efficace",
+      "title": "Comment MYKEYNEST aide votre équipe",
+      "subtitle": "Centralisez vos mots de passe, partagez les accès et gardez le contrôle en trois étapes.",
+      "demo": {
+        "eyebrow": "Video demo",
+        "title": "Watch the product first, then move through the setup steps",
+        "text": "This short walkthrough gives visitors a concrete view of MYKEYNEST in action before the implementation steps below. The goal is simple: make the product tangible first, then explain the method.",
+        "iframe_title": "MYKEYNEST demo video"
+      },
+      "steps": {
+        "s1_title": "Créez votre espace sécurisé",
+        "s1_text": "Inscrivez votre équipe et créez votre mot de passe maître pour accéder à votre coffre-fort sécurisé.",
+        "s2_title": "Ajoutez et organisez vos accès",
+        "s2_text": "Importez vos identifiants, classez-les et partagez les accès en toute sécurité selon vos besoins.",
+        "s3_title": "Accédez partout, en toute sécurité",
+        "s3_text": "Retrouvez vos mots de passe et accès sur tous vos appareils grâce à la synchronisation sécurisée."
+      }
+    },
     "security": {
       "label": "Unbreakable security",
       "title": "You alone control access",
@@ -261,13 +267,13 @@
         "a8": "2FA adds an extra layer of security: in addition to your master password, a temporary code is required at each login. Available via an authenticator app (TOTP) or email."
       }
     },
-"cta": {
-  "title": "Ready to secure your team's access?",
-  "subtitle": "Centralize passwords, share access securely, and stay in control with MYKEYNEST.",
-  "note": "14-day free trial · No credit card required · Cancel anytime",
-  "start": "Get started for free",
-  "login": "Log in"
-},
+    "cta": {
+      "title": "Ready to secure your team's access?",
+      "subtitle": "Centralize passwords, share access securely, and stay in control with MYKEYNEST.",
+      "note": "14-day free trial · No credit card required · Cancel anytime",
+      "start": "Get started for free",
+      "login": "Log in"
+    },
     "footer": {
       "brand_text": "A modern password manager that combines security, simplicity, and privacy. 100% European solution.",
       "product": "Product",
@@ -294,7 +300,7 @@
       }
     }
   },
-    "auth": {
+  "auth": {
     "login": {
       "hero": {
         "title": "Password Manager",
@@ -341,7 +347,7 @@
       }
     }
   },
-    "credential": {
+  "credential": {
     "index": {
       "meta": {
         "title": "Password Manager"
@@ -394,7 +400,7 @@
         "submit": "Share access"
       }
     },
-     "pro_banner": {
+    "pro_banner": {
       "title": "Limit reached!",
       "description": "You’ve reached the limit of 5 credentials. Upgrade to PRO to store unlimited credentials and unlock all premium features.",
       "action": "Upgrade to PRO"
@@ -446,7 +452,7 @@
       "action": "Upgrade to PRO"
     }
   },
-    "extension": {
+  "extension": {
     "page": {
       "hero": {
         "title": "Browser extension",
@@ -562,8 +568,7 @@
       }
     }
   },
-
-"dashboard": {
+  "dashboard": {
     "title": "Dashboard",
     "stats": {
       "credentials": "Credentials",
@@ -574,7 +579,6 @@
         "plus_this_month": "+ this month",
         "plus_this_week": "+ this week",
         "stable": "Stable",
-
         "plus_n_this_month": "+%count% this month",
         "minus_n_this_month": "-%count% this month",
         "plus_n_this_week": "+%count% this week",
@@ -629,9 +633,15 @@
       "improve": "Improve my security"
     },
     "activity": {
-      "credential_created": { "title": "New credential created" },
-      "draft_created": { "title": "Draft created" },
-      "share_created": { "title": "Access shared" },
+      "credential_created": {
+        "title": "New credential created"
+      },
+      "draft_created": {
+        "title": "Draft created"
+      },
+      "share_created": {
+        "title": "Access shared"
+      },
       "fallback_credential": "Credential",
       "fallback_unnamed": "Untitled"
     }
@@ -655,27 +665,43 @@
       "medium": "Medium",
       "weak": "Weak"
     },
-
     "history": {
       "title": "History",
       "subtitle": "Manage your passwords",
-      "tabs": { "recents": "Recents", "drafts": "Saved" },
+      "tabs": {
+        "recents": "Recents",
+        "drafts": "Saved"
+      },
       "tooltip": "You can convert your drafts into permanent passwords in your vault — easy to find and protected.",
       "delete_all": "Delete all"
     },
-
     "modals": {
-      "save": { "title": "Save", "placeholder": "Draft name", "cancel": "Cancel", "confirm": "Save" },
-      "convert": { "title": "Convert", "name": "Name", "domain": "Domain", "username": "Username", "cancel": "Cancel", "confirm": "Convert" },
-      "confirm_clear": { "title": "Delete all?", "text": "Delete all recents?", "cancel": "Cancel", "confirm": "Confirm" }
+      "save": {
+        "title": "Save",
+        "placeholder": "Draft name",
+        "cancel": "Cancel",
+        "confirm": "Save"
+      },
+      "convert": {
+        "title": "Convert",
+        "name": "Name",
+        "domain": "Domain",
+        "username": "Username",
+        "cancel": "Cancel",
+        "confirm": "Convert"
+      },
+      "confirm_clear": {
+        "title": "Delete all?",
+        "text": "Delete all recents?",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
     },
-
     "list": {
       "empty_recents": "No password",
       "loading": "Loading...",
       "empty_drafts": "No drafts"
     },
-
     "toast": {
       "options": "Options",
       "choose_one_type": "Choose at least one character type.",
@@ -702,12 +728,10 @@
   "security_checker": {
     "title": "Security checker",
     "page_title": "Security checker",
-
     "global_score": {
       "label": "Overall score",
       "based_on_decipherable": "Based on decipherable passwords"
     },
-
     "summary": {
       "title": "Summary",
       "total": "Total",
@@ -717,29 +741,22 @@
       "undecipherable": "Undecipherable",
       "rotation_rule": "Rotation rule: recommended change every %days% days (~4 months)."
     },
-
     "details": {
       "title": "Details per access"
     },
-
     "item": {
       "domain": "Domain",
       "username": "Username",
-
       "last_change": "Last change",
       "date": "Date",
       "days_ago": "%days% days ago",
       "rotate_now": "To rotate",
-
       "issues": "Detected issues",
       "no_issues": "No issues detected",
-
       "recommendations": "Recommendations",
-
       "suggested_password": "Suggested password",
       "copy_password": "Copy password"
     },
-
     "labels": {
       "strong": "Strong",
       "good": "Good",
@@ -747,7 +764,6 @@
       "weak": "Weak",
       "unknown": "Unknown"
     },
-
     "toast": {
       "password_copied": "Password copied!",
       "password_not_found": "Password not found",
@@ -786,8 +802,8 @@
       }
     }
   },
-    "subscription": {
-      "page_title": "Subscriptions - Password Manager",
+  "subscription": {
+    "page_title": "Subscriptions - Password Manager",
     "hero": {
       "badge": "Our plans",
       "title_before": "Choose the",
@@ -926,67 +942,56 @@
       "already_used": "This link has already been used."
     }
   },
-"settings": {
-  "title": "Settings",
-
-  "profile": {
-    "fallback_name": "Profile",
-    "change_avatar": "Change avatar",
-    "avatar_alt": "Avatar",
-    "title": "Profile",
-    "edit_title": "Edit my profile",
-    "section_identity": "Identity",
-    "section_business": "Company",
-    "section_contact": "Contact details",
-    "company_help": "Your company or organization name."
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "fallback_name": "Profile",
+      "change_avatar": "Change avatar",
+      "avatar_alt": "Avatar",
+      "title": "Profile",
+      "edit_title": "Edit my profile",
+      "section_identity": "Identity",
+      "section_business": "Company",
+      "section_contact": "Contact details",
+      "company_help": "Your company or organization name."
+    },
+    "menu": {
+      "personal_data": "Personal data",
+      "preferences": "Preferences",
+      "subscription": "Subscription management",
+      "contact": "Contact",
+      "terms_cgu": "Terms of Use",
+      "terms_cgv": "Terms of Sale"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": {
+        "title": "Language",
+        "description": "Choose the language used for the application interface."
+      },
+      "engagement": {
+        "title": "Notifications and engagement",
+        "description": "Manage your communication and interaction preferences."
+      },
+      "feedback": {
+        "label": "Feedback requests",
+        "description": "Allow feedback requests to help improve your experience."
+      },
+      "security": {
+        "title": "Cybersecurity",
+        "description": "Settings related to security and sensitive communications."
+      },
+      "cybersecurity": {
+        "label": "Interest in cybersecurity",
+        "description": "Receive content and recommendations related to cybersecurity."
+      },
+      "security_emails": {
+        "label": "Security emails",
+        "description": "Receive important security alerts and notifications."
+      }
+    },
+    "hint": "Tip: click the “+” button to change your avatar."
   },
-
-  "menu": {
-    "personal_data": "Personal data",
-    "preferences": "Preferences",
-    "subscription": "Subscription management",
-    "contact": "Contact",
-    "terms_cgu": "Terms of Use",
-    "terms_cgv": "Terms of Sale"
-  },
-
-  "preferences": {
-    "title": "Preferences",
-
-    "language": {
-      "title": "Language",
-      "description": "Choose the language used for the application interface."
-    },
-
-    "engagement": {
-      "title": "Notifications and engagement",
-      "description": "Manage your communication and interaction preferences."
-    },
-
-    "feedback": {
-      "label": "Feedback requests",
-      "description": "Allow feedback requests to help improve your experience."
-    },
-
-    "security": {
-      "title": "Cybersecurity",
-      "description": "Settings related to security and sensitive communications."
-    },
-
-    "cybersecurity": {
-      "label": "Interest in cybersecurity",
-      "description": "Receive content and recommendations related to cybersecurity."
-    },
-
-    "security_emails": {
-      "label": "Security emails",
-      "description": "Receive important security alerts and notifications."
-    }
-  },
-
-  "hint": "Tip: click the “+” button to change your avatar."
-},
-
   "teams": {
     "page_title": "My teams",
     "header": {
@@ -1012,7 +1017,6 @@
       "created_at": "Created on %date%",
       "owner": "Owner: %email%",
       "na": "N/A",
-
       "credentials": {
         "title": "Shared credentials",
         "add": "Add",
@@ -1052,13 +1056,13 @@
         "credentials_help": "Select the credentials to share with this team right away"
       }
     },
-      "pro_banner": {
+    "pro_banner": {
       "title": "Limit reached!",
       "description": "You’ve reached the limit for available teams. Upgrade to PRO to create unlimited teams and collaborate without limits.",
       "action": "Upgrade to PRO"
     }
   },
-   "public_generator": {
+  "public_generator": {
     "hero": {
       "title_before": "Create",
       "title_highlight": "passwords",
@@ -1146,7 +1150,7 @@
       "button": "Create a free account"
     }
   },
-    "help_center": {
+  "help_center": {
     "hero": {
       "eyebrow": "Help center",
       "title_line1": "How can we",
@@ -1220,7 +1224,7 @@
       "create_account": "Create an account"
     }
   },
-   "help_category": {
+  "help_category": {
     "breadcrumb": {
       "aria": "Breadcrumb",
       "help_center": "Help center"
@@ -1316,9 +1320,9 @@
   "business": {
     "solution": {
       "meta": {
-        "title": "SMB Cybersecurity Solution — Password Management & Support | MYKEYNEST",
-        "description": "Complete cybersecurity solution for SMBs: AES-256 password management software, included maintenance, employee training and security audit. From €6.99/user/month.",
-        "keywords": "SMB cybersecurity solution, enterprise password manager, SMB security audit, cybersecurity training, business password manager"
+        "title": "SMB Cybersecurity Solution, Enterprise Password Manager & Audit | MYKEYNEST",
+        "description": "Cybersecurity solution for SMBs: enterprise password manager, SMB cybersecurity audit, phishing awareness, GDPR-minded security practices, and practical support from €6.99/user/month.",
+        "keywords": "SMB cybersecurity solution, SMB IT security, enterprise password manager, business password manager, secure passwords for SMBs, SMB cybersecurity audit, IT security audit for SMBs, ransomware protection for SMBs, phishing awareness, GDPR compliance for SMBs"
       },
       "schema": {
         "name": "MYKEYNEST — SMB Cybersecurity Solution",
@@ -1400,13 +1404,143 @@
         "subtitle": "Join MYKEYNEST and protect your business data today.",
         "primary": "Free trial — no credit card",
         "secondary": "Contact our team"
+      },
+      "demo": {
+        "eyebrow": "Demo",
+        "title": "A quick walkthrough to make the solution tangible",
+        "text": "Instead of staying at a high-level promise, this sequence shows the product with enough realism to understand how MYKEYNEST fits into the day-to-day workflow of an SMB.",
+        "cta": "View the dedicated password manager page",
+        "iframe_title": "MYKEYNEST demo walkthrough"
+      }
+    },
+    "password_manager": {
+      "meta": {
+        "title": "Enterprise Password Manager for SMBs | MYKEYNEST",
+        "description": "Secure your SMB access with an enterprise password manager built for secure sharing, access audits, compliance, and phishing risk reduction.",
+        "keywords": "enterprise password manager, business password manager, SMB password manager, secure passwords for SMBs, password sharing for teams, access audit business"
+      },
+      "breadcrumb": {
+        "aria": "Breadcrumb",
+        "home": "Home",
+        "solution": "Enterprise solution",
+        "current": "Enterprise password manager"
+      },
+      "hero": {
+        "eyebrow": "Access management",
+        "h1_before": "An",
+        "h1_highlight": "enterprise password manager",
+        "h1_after": "built for SMBs and teams",
+        "subtitle": "Centralize business passwords, share access without friction, reduce phishing risk, and keep clear visibility on who can access what.",
+        "pill1": "Secure access sharing",
+        "pill2": "Audit and traceability",
+        "pill3": "SMB cybersecurity baseline",
+        "cta_primary": "Try MYKEYNEST",
+        "cta_secondary": "Compare solutions",
+        "console_1": "vault_status : encrypted / team-ready",
+        "console_2": "policy_audit : weak passwords flagged",
+        "console_3": "share_status : access granted with trace",
+        "console_4": "risk_reduction : phishing surface reduced"
+      },
+      "why": {
+        "title": "Why an SMB needs an enterprise password manager",
+        "subtitle": "As soon as a team shares tools, cloud accounts, or client access, passwords become an IT security issue, not just a convenience issue.",
+        "card1": {
+          "title": "Scattered passwords create blind spots",
+          "text": "Spreadsheets, emails, chat tools, and unmanaged browsers lead to untracked access, password reuse, and poor offboarding when employees leave."
+        },
+        "card2": {
+          "title": "Access sharing must stay controlled",
+          "text": "SMBs need to hand over access quickly without exposing accounts. Secure sharing avoids sensitive credentials being sent through unsafe channels."
+        },
+        "card3": {
+          "title": "SMB cybersecurity often starts with access control",
+          "text": "A compromised account often opens the door to phishing, fraud, or ransomware. An enterprise password manager helps secure this first critical layer."
+        },
+        "band_title": "In practice",
+        "band_text": "If you are looking for a practical way to secure SMB passwords without deploying a heavy stack, this page answers that exact need."
+      },
+      "features": {
+        "title": "What a good business password manager should actually cover",
+        "subtitle": "The goal is not just to store passwords, but to create a simple, secure, and usable access framework for the whole team.",
+        "card1": {
+          "title": "Credential protection",
+          "item1": "Strong encryption for business passwords",
+          "item2": "Detection of weak or reused passwords",
+          "item3": "Reduced risk from compromised accounts"
+        },
+        "card2": {
+          "title": "Secure sharing between teammates",
+          "item1": "Controlled transfer of team access",
+          "item2": "Visibility over shared credentials",
+          "item3": "Simpler revocation and rotation of access"
+        },
+        "card3": {
+          "title": "Audit, compliance, and control",
+          "item1": "Traceability of usage and shared access",
+          "item2": "A stronger base for GDPR and internal procedures",
+          "item3": "Better password hygiene across the SMB"
+        }
+      },
+      "steps": {
+        "title": "How to deploy an enterprise password manager without friction",
+        "subtitle": "The goal is not to change every habit overnight, but to build a secure baseline quickly.",
+        "step1": {
+          "title": "Map critical access points",
+          "text": "List the tools, shared accounts, cloud consoles, mailboxes, and sensitive access already used in the business."
+        },
+        "step2": {
+          "title": "Centralize risky credentials first",
+          "text": "Start with exposed accounts: business tools, finance, hosting, marketing, support, and client environments."
+        },
+        "step3": {
+          "title": "Define sharing and rotation rules",
+          "text": "Decide who can view, share, or rotate access in order to reduce gray areas and single-person dependencies."
+        },
+        "step4": {
+          "title": "Train the team on the right habits",
+          "text": "Pair the password manager with practical rules: unique passwords, phishing awareness, MFA, and timely access removal."
+        }
+      },
+      "links": {
+        "title": "Go further",
+        "subtitle": "Explore the related pages if you are comparing tools, looking for a broader cybersecurity solution, or preparing an SMB security audit.",
+        "solution": {
+          "label": "Solution",
+          "title": "Explore the SMB cybersecurity solution",
+          "text": "The broader view: passwords, support, training, and audit in a single offer."
+        },
+        "comparatif": {
+          "label": "Comparison",
+          "title": "Compare MYKEYNEST with Bitwarden and 1Password",
+          "text": "An SMB-focused analysis to choose the best enterprise password manager for your constraints."
+        },
+        "audit": {
+          "label": "Audit",
+          "title": "Audit your access and risks",
+          "text": "Complement password management with an SMB cybersecurity audit and phishing awareness."
+        }
+      },
+      "cta": {
+        "title": "Ready to secure access across your business?",
+        "subtitle": "Move from improvised password sharing to clear, encrypted, SMB-friendly access management.",
+        "primary": "Create an account",
+        "secondary": "Contact the team"
+      },
+      "demo": {
+        "eyebrow": "Product demo",
+        "title": "See MYKEYNEST in a realistic product-like environment",
+        "text": "This walkthrough shows how to centralize access, share a credential properly, and keep operational visibility without adding friction to the team's day-to-day work.",
+        "point1": "Quickly show product value to a decision-maker or team.",
+        "point2": "Project a concrete workflow around secure sharing and traceability.",
+        "point3": "Support the sales narrative with a more credible visual proof point.",
+        "iframe_title": "MYKEYNEST demo video"
       }
     },
     "comparatif": {
       "meta": {
-        "title": "MYKEYNEST vs Bitwarden vs 1Password: SMB comparison | MYKEYNEST",
-        "description": "Objective, factual comparison between MYKEYNEST, Bitwarden Teams and 1Password Business. Pricing, features, maintenance and training: which solution to choose for your SMB?",
-        "keywords": "enterprise password manager comparison, MYKEYNEST vs Bitwarden, MYKEYNEST vs 1Password, best SMB password manager"
+        "title": "Best Enterprise Password Manager? MYKEYNEST vs Bitwarden vs 1Password",
+        "description": "Enterprise password manager comparison for SMBs: MYKEYNEST vs Bitwarden vs 1Password. Compare pricing, security, audit, support, and training to choose the best password manager for your business.",
+        "keywords": "best password manager, enterprise password manager comparison, enterprise password manager, business password manager, SMB password manager, MYKEYNEST vs Bitwarden, MYKEYNEST vs 1Password, secure passwords for SMBs"
       },
       "schema": {
         "headline": "MYKEYNEST vs Bitwarden vs 1Password: which solution for SMBs?",
@@ -1483,9 +1617,9 @@
     },
     "audit": {
       "meta": {
-        "title": "SMB Cybersecurity Audit & Training | MYKEYNEST",
-        "description": "Remote or on-site cybersecurity audit for SMBs + employee training on phishing awareness and best practices. Vulnerability report included.",
-        "keywords": "SMB cybersecurity audit, employee cybersecurity training, business phishing awareness, SMB vulnerability report"
+        "title": "SMB Cybersecurity Audit, Phishing Awareness & Employee Training | MYKEYNEST",
+        "description": "Remote or on-site cybersecurity audit for SMBs, phishing awareness, ransomware risk reduction, and employee cybersecurity training with a vulnerability report and remediation roadmap.",
+        "keywords": "SMB cybersecurity audit, IT security audit for SMBs, SMB cybersecurity, ransomware protection for SMBs, ransomware solution for SMBs, employee cybersecurity training, business phishing awareness, how to prevent phishing in business, SMB vulnerability report, cybersecurity provider for SMBs"
       },
       "schema": {
         "name": "SMB Cybersecurity Audit & Training",

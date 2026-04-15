@@ -25,4 +25,10 @@ final class BusinessController extends AbstractController
     {
         return $this->render('business/audit.html.twig');
     }
+
+    #[Route('/gestionnaire-mot-de-passe-entreprise', name: 'business_password_manager')]
+    public function passwordManager(): Response
+    {
+        return $this->render('business/password_manager.html.twig');
+    }
 }

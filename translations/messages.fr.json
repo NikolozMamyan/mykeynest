@@ -14,15 +14,15 @@
     "subscription": "Abonnements"
   },
   "user": {
-  "field": {
-    "firstname": "Prénom",
-    "lastname": "Nom",
-    "company": "Entreprise",
-    "email": "Adresse email",
-    "phone": "Téléphone"
-  }
-},
-"email": {
+    "field": {
+      "firstname": "Prénom",
+      "lastname": "Nom",
+      "company": "Entreprise",
+      "email": "Adresse email",
+      "phone": "Téléphone"
+    }
+  },
+  "email": {
     "welcome": {
       "title": "Bienvenue sur MYKEYNEST",
       "message": "Nous sommes ravis de vous accueillir, <strong>%email%</strong> ! Complétez votre profil pour profiter pleinement de l'application.",
@@ -43,10 +43,10 @@
     }
   },
   "common": {
-  "back": "Retour",
-  "cancel": "Annuler",
-  "save_changes": "Enregistrer les modifications"
-},
+    "back": "Retour",
+    "cancel": "Annuler",
+    "save_changes": "Enregistrer les modifications"
+  },
   "header": {
     "burger_aria": "Menu",
     "notifications": {
@@ -70,7 +70,7 @@
         "desc": "Se déconnecter"
       }
     },
-     "upgrade": {
+    "upgrade": {
       "label": "Mise à niveau",
       "text": "Passez à PRO"
     }
@@ -95,7 +95,7 @@
       "logout": "Déconnexion"
     }
   },
- "landing": {
+  "landing": {
     "nav": {
       "menu": "Menu",
       "features": "Fonctionnalités",
@@ -107,11 +107,11 @@
     },
     "hero": {
       "title_before": "Gérez les mots de passe et accès de votre équipe,",
-  "title_highlight": "dans un seul espace sécurisé",
-  "subtitle": "MYKEYNEST est une solution de gestion des mots de passe et des accès pour PME, agences et équipes. Chiffrement AES-256, architecture zero-knowledge, partage sécurisé, audit de sécurité et auto-remplissage.",
-  "cta_start": "Commencer gratuitement",
-  "cta_start_aria": "Créer un compte gratuit sur MYKEYNEST",
-  "cta_discover": "En savoir plus",
+      "title_highlight": "dans un seul espace sécurisé",
+      "subtitle": "MYKEYNEST est une solution de gestion des mots de passe et des accès pour PME, agences et équipes. Chiffrement AES-256, architecture zero-knowledge, partage sécurisé, audit de sécurité et auto-remplissage.",
+      "cta_start": "Commencer gratuitement",
+      "cta_start_aria": "Créer un compte gratuit sur MYKEYNEST",
+      "cta_discover": "En savoir plus",
       "trust_aria": "Garanties de sécurité MYKEYNEST",
       "trust": {
         "aes": "Chiffrement AES-256",
@@ -125,9 +125,9 @@
       }
     },
     "features": {
- "label": "Fonctionnalités",
-  "title": "Gestion sécurisée des mots de passe et accès",
-  "subtitle": "Toutes les fonctionnalités essentielles pour protéger les identifiants, partager les accès et sécuriser les équipes au quotidien.",
+      "label": "Fonctionnalités",
+      "title": "Gestion sécurisée des mots de passe et accès",
+      "subtitle": "Toutes les fonctionnalités essentielles pour protéger les identifiants, partager les accès et sécuriser les équipes au quotidien.",
       "cards": {
         "e2e_title": "Chiffrement de bout en bout",
         "e2e_text": "Vos données sont chiffrées localement avec AES-256 avant d'être synchronisées. Seul vous y avez accès.",
@@ -150,6 +150,12 @@
       "label": "Simple et efficace",
       "title": "Comment ça marche ?",
       "subtitle": "Sécurisez vos mots de passe en trois étapes simples.",
+      "demo": {
+        "eyebrow": "Démo vidéo",
+        "title": "Regardez le produit avant de passer aux étapes",
+        "text": "Cette courte démonstration permet de visualiser MYKEYNEST en action avant de voir le parcours de mise en place. L’objectif est simple : comprendre le produit rapidement, puis passer à la méthode.",
+        "iframe_title": "Vidéo de démonstration MYKEYNEST"
+      },
       "steps": {
         "s1_title": "Créez votre compte",
         "s1_text": "Inscrivez-vous gratuitement et créez votre mot de passe maître. C'est le seul à retenir.",
@@ -261,13 +267,13 @@
         "a8": "Le 2FA ajoute une couche de sécurité supplémentaire : en plus de votre mot de passe maître, un code temporaire est requis à chaque connexion. Disponible avec une application d'authentification (TOTP) ou par email."
       }
     },
-"cta": {
-  "title": "Prêt à sécuriser les accès de votre équipe ?",
-  "subtitle": "Centralisez vos mots de passe, partagez vos accès en toute sécurité et gardez le contrôle avec MYKEYNEST.",
-  "note": "Essai gratuit 14 jours · Sans carte bancaire · Résiliable à tout moment",
-  "start": "Commencer gratuitement",
-  "login": "Se connecter"
-},
+    "cta": {
+      "title": "Prêt à sécuriser les accès de votre équipe ?",
+      "subtitle": "Centralisez vos mots de passe, partagez vos accès en toute sécurité et gardez le contrôle avec MYKEYNEST.",
+      "note": "Essai gratuit 14 jours · Sans carte bancaire · Résiliable à tout moment",
+      "start": "Commencer gratuitement",
+      "login": "Se connecter"
+    },
     "footer": {
       "brand_text": "Un gestionnaire de mots de passe moderne qui allie sécurité, simplicité et confidentialité. Solution 100% européenne.",
       "product": "Produit",
@@ -294,7 +300,7 @@
       }
     }
   },
-    "guest_register": {
+  "guest_register": {
     "title_page": "Créer mon compte",
     "hero": {
       "title": "Bienvenue sur MYKEYNEST",
@@ -389,7 +395,7 @@
       }
     }
   },
-"credential": {
+  "credential": {
     "index": {
       "meta": {
         "title": "Gestionnaire de mots de passe"
@@ -494,7 +500,7 @@
       "action": "Passer à PRO"
     }
   },
-   "extension": {
+  "extension": {
     "page": {
       "hero": {
         "title": "Extension navigateur",
@@ -610,7 +616,7 @@
       }
     }
   },
- "dashboard": {
+  "dashboard": {
     "title": "Tableau de bord",
     "stats": {
       "credentials": "Identifiants",
@@ -621,7 +627,6 @@
         "plus_this_month": "+ ce mois",
         "plus_this_week": "+ cette semaine",
         "stable": "Stable",
-
         "plus_n_this_month": "+%count% ce mois-ci",
         "minus_n_this_month": "-%count% ce mois-ci",
         "plus_n_this_week": "+%count% cette semaine",
@@ -676,14 +681,20 @@
       "improve": "Améliorer ma sécurité"
     },
     "activity": {
-      "credential_created": { "title": "Nouvel identifiant créé" },
-      "draft_created": { "title": "Brouillon créé" },
-      "share_created": { "title": "Accès partagé" },
+      "credential_created": {
+        "title": "Nouvel identifiant créé"
+      },
+      "draft_created": {
+        "title": "Brouillon créé"
+      },
+      "share_created": {
+        "title": "Accès partagé"
+      },
       "fallback_credential": "Identifiant",
       "fallback_unnamed": "Sans nom"
     }
   },
-    "generator": {
+  "generator": {
     "title": "Générateur",
     "subtitle": "Créez un mot de passe fort et enregistrez-le.",
     "copy": "Copier",
@@ -702,27 +713,43 @@
       "medium": "Moyenne",
       "weak": "Faible"
     },
-
     "history": {
       "title": "Historique",
       "subtitle": "Gérez vos mots de passe",
-      "tabs": { "recents": "Récents", "drafts": "Enregistrés" },
+      "tabs": {
+        "recents": "Récents",
+        "drafts": "Enregistrés"
+      },
       "tooltip": "Vous pouvez transformer vos brouillons en mots de passe permanents dans votre coffre — simples à retrouver et protégés.",
       "delete_all": "Tout supprimer"
     },
-
     "modals": {
-      "save": { "title": "Enregistrer", "placeholder": "Nom du brouillon", "cancel": "Annuler", "confirm": "Enregistrer" },
-      "convert": { "title": "Convertir", "name": "Nom", "domain": "Domaine", "username": "Identifiant", "cancel": "Annuler", "confirm": "Convertir" },
-      "confirm_clear": { "title": "Tout supprimer ?", "text": "Supprimer tous les récents ?", "cancel": "Annuler", "confirm": "Confirmer" }
+      "save": {
+        "title": "Enregistrer",
+        "placeholder": "Nom du brouillon",
+        "cancel": "Annuler",
+        "confirm": "Enregistrer"
+      },
+      "convert": {
+        "title": "Convertir",
+        "name": "Nom",
+        "domain": "Domaine",
+        "username": "Identifiant",
+        "cancel": "Annuler",
+        "confirm": "Convertir"
+      },
+      "confirm_clear": {
+        "title": "Tout supprimer ?",
+        "text": "Supprimer tous les récents ?",
+        "cancel": "Annuler",
+        "confirm": "Confirmer"
+      }
     },
-
     "list": {
       "empty_recents": "Aucun mot de passe",
       "loading": "Chargement...",
       "empty_drafts": "Aucun brouillon"
     },
-
     "toast": {
       "options": "Options",
       "choose_one_type": "Choisissez au moins un type de caractère.",
@@ -746,10 +773,9 @@
       "load_error": "Erreur de chargement."
     }
   },
-   "subscription": {
+  "subscription": {
     "page_title": "Abonnements - Gestionnaire de mots de passe",
     "hero": {
-      
       "badge": "Nos offres",
       "title_before": "Choisissez le",
       "title_highlight": "plan",
@@ -851,12 +877,10 @@
   "security_checker": {
     "title": "Vérificateur de sécurité",
     "page_title": "Vérificateur de sécurité",
-
     "global_score": {
       "label": "Score global",
       "based_on_decipherable": "Basé sur les mots de passe déchiffrables"
     },
-
     "summary": {
       "title": "Résumé",
       "total": "Total",
@@ -866,29 +890,22 @@
       "undecipherable": "Indéchiffrables",
       "rotation_rule": "Règle rotation : recommande de changer tous les %days% jours (~4 mois)."
     },
-
     "details": {
       "title": "Détails par accès"
     },
-
     "item": {
       "domain": "Domaine",
       "username": "Identifiant",
-
       "last_change": "Dernier changement",
       "date": "Date",
       "days_ago": "Il y a %days% jours",
       "rotate_now": "À renouveler",
-
       "issues": "Problèmes détectés",
       "no_issues": "Aucun problème détecté",
-
       "recommendations": "Recommandations",
-
       "suggested_password": "Mot de passe suggéré",
       "copy_password": "Copier le mot de passe"
     },
-
     "labels": {
       "strong": "Fort",
       "good": "Bon",
@@ -896,13 +913,12 @@
       "weak": "Faible",
       "unknown": "Inconnu"
     },
-
     "toast": {
       "password_copied": "Mot de passe copié !",
       "password_not_found": "Mot de passe introuvable",
       "copy_error": "Erreur lors de la copie"
     },
-     "issues": {
+    "issues": {
       "reused": "Mot de passe réutilisé",
       "rotation_due": "Mot de passe à renouveler (>%days% jours)",
       "undecipherable": "Impossible de déchiffrer (clé manquante ou donnée invalide)",
@@ -935,62 +951,57 @@
       }
     }
   },
-"settings": {
-  "title": "Réglages",
-
-  "profile": {
-    "fallback_name": "Profil",
-    "change_avatar": "Changer l’avatar",
-    "avatar_alt": "Avatar",
-    "title": "Profil",
-    "edit_title": "Modifier mon profil",
-    "section_identity": "Identité",
-    "section_business": "Entreprise",
-    "section_contact": "Coordonnées",
-    "company_help": "Le nom de votre entreprise ou organisation."
+  "settings": {
+    "title": "Réglages",
+    "profile": {
+      "fallback_name": "Profil",
+      "change_avatar": "Changer l’avatar",
+      "avatar_alt": "Avatar",
+      "title": "Profil",
+      "edit_title": "Modifier mon profil",
+      "section_identity": "Identité",
+      "section_business": "Entreprise",
+      "section_contact": "Coordonnées",
+      "company_help": "Le nom de votre entreprise ou organisation."
+    },
+    "menu": {
+      "personal_data": "Données personnelles",
+      "preferences": "Préférences",
+      "subscription": "Gestion d’abonnement",
+      "contact": "Contact",
+      "terms_cgu": "CGU",
+      "terms_cgv": "CGV"
+    },
+    "preferences": {
+      "title": "Préférences",
+      "language": {
+        "title": "Langue",
+        "description": "Choisissez la langue utilisée pour l’interface de l’application."
+      },
+      "engagement": {
+        "title": "Notifications et engagement",
+        "description": "Gérez vos préférences de communication et d’interaction."
+      },
+      "feedback": {
+        "label": "Demandes de feedback",
+        "description": "Autoriser l’envoi de demandes de retour pour améliorer votre expérience."
+      },
+      "security": {
+        "title": "Cybersécurité",
+        "description": "Paramètres liés à la sécurité et aux communications sensibles."
+      },
+      "cybersecurity": {
+        "label": "Intérêt pour la cybersécurité",
+        "description": "Recevoir du contenu et des recommandations liés à la cybersécurité."
+      },
+      "security_emails": {
+        "label": "Emails de sécurité",
+        "description": "Recevoir des alertes et informations importantes concernant la sécurité."
+      }
+    },
+    "hint": "Astuce : cliquez sur le bouton “+” pour changer votre avatar."
   },
-
-  "menu": {
-    "personal_data": "Données personnelles",
-    "preferences": "Préférences",
-    "subscription": "Gestion d’abonnement",
-    "contact": "Contact",
-    "terms_cgu": "CGU",
-    "terms_cgv": "CGV"
-  },
-
-  "preferences": {
-    "title": "Préférences",
-
-    "language": {
-      "title": "Langue",
-      "description": "Choisissez la langue utilisée pour l’interface de l’application."
-    },
-    "engagement": {
-      "title": "Notifications et engagement",
-      "description": "Gérez vos préférences de communication et d’interaction."
-    },
-    "feedback": {
-      "label": "Demandes de feedback",
-      "description": "Autoriser l’envoi de demandes de retour pour améliorer votre expérience."
-    },
-    "security": {
-      "title": "Cybersécurité",
-      "description": "Paramètres liés à la sécurité et aux communications sensibles."
-    },
-    "cybersecurity": {
-      "label": "Intérêt pour la cybersécurité",
-      "description": "Recevoir du contenu et des recommandations liés à la cybersécurité."
-    },
-    "security_emails": {
-      "label": "Emails de sécurité",
-      "description": "Recevoir des alertes et informations importantes concernant la sécurité."
-    }
-  },
-
-  "hint": "Astuce : cliquez sur le bouton “+” pour changer votre avatar."
-},
-   "teams": {
+  "teams": {
     "page_title": "Mes équipes",
     "header": {
       "title": "Mes équipes",
@@ -1008,14 +1019,13 @@
       "view": "Voir l'équipe",
       "owner_fallback": "N/A"
     },
-     "show": {
+    "show": {
       "title": "Équipe %name%",
       "back": "Retour aux équipes",
       "delete_team": "Supprimer l'équipe",
       "created_at": "Créée le %date%",
       "owner": "Propriétaire : %email%",
       "na": "N/A",
-
       "credentials": {
         "title": "Identifiants partagés",
         "add": "Ajouter",
@@ -1061,7 +1071,7 @@
       "action": "Passer à PRO"
     }
   },
-   "public_generator": {
+  "public_generator": {
     "hero": {
       "title_before": "Créez des",
       "title_highlight": "mots de passe",
@@ -1149,7 +1159,7 @@
       "button": "Créer un compte gratuit"
     }
   },
-   "help_center": {
+  "help_center": {
     "hero": {
       "eyebrow": "Centre d'aide",
       "title_line1": "Comment pouvons-nous",
@@ -1267,7 +1277,7 @@
       }
     }
   },
-"help_article": {
+  "help_article": {
     "breadcrumb": {
       "aria": "Fil d'Ariane",
       "help_center": "Centre d'aide"
@@ -1319,9 +1329,9 @@
   "business": {
     "solution": {
       "meta": {
-        "title": "Solution cybersécurité PME — Gestion mots de passe & accompagnement | MYKEYNEST",
-        "description": "Solution de cybersécurité complète pour PME : logiciel de gestion des mots de passe AES-256, maintenance incluse, formation collaborateurs et audit de sécurité. Dès 6,99 €/utilisateur/mois.",
-        "keywords": "solution cybersécurité PME, gestionnaire mots de passe entreprise, audit sécurité PME, formation cybersécurité, password manager entreprise"
+        "title": "Solution cybersécurité PME, gestionnaire de mots de passe entreprise & audit | MYKEYNEST",
+        "description": "Solution de cybersécurité pour PME : gestionnaire de mots de passe entreprise, audit cybersécurité PME, sensibilisation phishing, conformité RGPD et accompagnement sécurité informatique dès 6,99 €/utilisateur/mois.",
+        "keywords": "cybersécurité PME, sécurité informatique PME, solution cybersécurité entreprise, gestionnaire de mot de passe entreprise, password manager entreprise, sécuriser mots de passe PME, audit cybersécurité PME, audit sécurité informatique PME, protection contre ransomware PME, conformité RGPD PME"
       },
       "schema": {
         "name": "MYKEYNEST — Solution cybersécurité PME",
@@ -1403,13 +1413,143 @@
         "subtitle": "Rejoignez MYKEYNEST et protégez vos données d'entreprise dès aujourd'hui.",
         "primary": "Essai gratuit — sans carte bancaire",
         "secondary": "Contacter notre équipe"
+      },
+      "demo": {
+        "eyebrow": "Démonstration",
+        "title": "Une démo rapide pour visualiser la solution côté usage",
+        "text": "Au lieu de rester sur une promesse abstraite, cette séquence montre le produit avec un niveau de réalisme suffisant pour comprendre comment MYKEYNEST s’intègre dans le quotidien d’une PME.",
+        "cta": "Voir la page dédiée au gestionnaire",
+        "iframe_title": "Vidéo de démonstration MYKEYNEST"
+      }
+    },
+    "password_manager": {
+      "meta": {
+        "title": "Gestionnaire de mot de passe entreprise pour PME | MYKEYNEST",
+        "description": "Sécurisez les accès de votre PME avec un gestionnaire de mot de passe entreprise pensé pour le partage sécurisé, l’audit des accès, la conformité et la réduction du risque phishing.",
+        "keywords": "gestionnaire de mot de passe entreprise, password manager entreprise, gestionnaire mots de passe PME, sécuriser mots de passe PME, outil mot de passe PME, partage sécurisé accès entreprise"
+      },
+      "breadcrumb": {
+        "aria": "Fil d'Ariane",
+        "home": "Accueil",
+        "solution": "Solution entreprise",
+        "current": "Gestionnaire de mot de passe entreprise"
+      },
+      "hero": {
+        "eyebrow": "Gestion des accès",
+        "h1_before": "Un",
+        "h1_highlight": "gestionnaire de mot de passe entreprise",
+        "h1_after": "pensé pour les PME et les équipes",
+        "subtitle": "Centralisez les mots de passe professionnels, partagez les accès sans friction, réduisez le risque phishing et gardez une vraie visibilité sur qui accède à quoi.",
+        "pill1": "Partage sécurisé des accès",
+        "pill2": "Audit et traçabilité",
+        "pill3": "Socle cybersécurité PME",
+        "cta_primary": "Essayer MYKEYNEST",
+        "cta_secondary": "Comparer les solutions",
+        "console_1": "vault_status : encrypted / team-ready",
+        "console_2": "policy_audit : weak passwords flagged",
+        "console_3": "share_status : access granted with trace",
+        "console_4": "risk_reduction : phishing surface reduced"
+      },
+      "why": {
+        "title": "Pourquoi une PME a besoin d’un gestionnaire de mots de passe entreprise",
+        "subtitle": "Dès qu’une équipe partage des outils, des comptes cloud ou des accès clients, les mots de passe deviennent un sujet de sécurité informatique, pas juste de confort.",
+        "card1": {
+          "title": "Les mots de passe dispersés créent des angles morts",
+          "text": "Excel, emails, messageries instantanées et navigateurs non maîtrisés favorisent les accès non tracés, les réutilisations de mots de passe et les départs de collaborateurs mal gérés."
+        },
+        "card2": {
+          "title": "Le partage d’accès doit rester contrôlé",
+          "text": "Une PME a besoin de transmettre des accès rapidement sans exposer ses comptes. Le partage sécurisé évite les envois sensibles hors canal et réduit les erreurs humaines."
+        },
+        "card3": {
+          "title": "La cybersécurité PME commence souvent par les accès",
+          "text": "Un compte compromis ouvre souvent la porte au phishing, à la fraude ou à un ransomware. Un gestionnaire de mots de passe entreprise aide à sécuriser ce premier niveau critique."
+        },
+        "band_title": "En pratique",
+        "band_text": "Si vous cherchez comment sécuriser les mots de passe de votre PME sans déployer une usine à gaz, cette page répond précisément à ce besoin."
+      },
+      "features": {
+        "title": "Ce qu’un bon password manager entreprise doit vraiment couvrir",
+        "subtitle": "L’enjeu n’est pas seulement de stocker des mots de passe, mais de mettre en place un cadre simple, sûr et exploitable par toute l’équipe.",
+        "card1": {
+          "title": "Protection des identifiants",
+          "item1": "Chiffrement fort des mots de passe professionnels",
+          "item2": "Détection des mots de passe faibles ou réutilisés",
+          "item3": "Réduction du risque lié aux accès compromis"
+        },
+        "card2": {
+          "title": "Partage sécurisé entre collaborateurs",
+          "item1": "Transmission contrôlée des accès d’équipe",
+          "item2": "Visibilité sur les identifiants partagés",
+          "item3": "Retrait ou rotation plus simple des accès"
+        },
+        "card3": {
+          "title": "Audit, conformité et pilotage",
+          "item1": "Traçabilité des usages et des partages",
+          "item2": "Base solide pour le RGPD et les procédures internes",
+          "item3": "Meilleure hygiène d’accès pour la PME"
+        }
+      },
+      "steps": {
+        "title": "Comment déployer un gestionnaire de mots de passe entreprise sans friction",
+        "subtitle": "L’objectif n’est pas de changer les habitudes du jour au lendemain, mais de construire une base saine rapidement.",
+        "step1": {
+          "title": "Cartographier les accès critiques",
+          "text": "Lister les outils, comptes partagés, consoles cloud, boîtes mail et accès sensibles déjà utilisés dans l’entreprise."
+        },
+        "step2": {
+          "title": "Centraliser les identifiants à risque",
+          "text": "Regrouper en priorité les comptes exposés : outils métier, finance, hébergement, marketing, support et accès clients."
+        },
+        "step3": {
+          "title": "Définir les règles de partage et de rotation",
+          "text": "Décider qui peut voir, partager ou renouveler les accès afin d’éviter les zones grises et les dépendances à une seule personne."
+        },
+        "step4": {
+          "title": "Former l’équipe aux bons réflexes",
+          "text": "Associer le gestionnaire à des pratiques simples : mots de passe uniques, vigilance phishing, 2FA et retrait des accès au bon moment."
+        }
+      },
+      "links": {
+        "title": "Aller plus loin",
+        "subtitle": "Explorez les autres pages utiles si vous comparez les outils, cherchez une solution globale ou préparez un audit cybersécurité PME.",
+        "solution": {
+          "label": "Solution",
+          "title": "Découvrir la solution cybersécurité PME",
+          "text": "Vision d’ensemble : mots de passe, accompagnement, formation et audit dans une seule offre."
+        },
+        "comparatif": {
+          "label": "Comparatif",
+          "title": "Comparer MYKEYNEST à Bitwarden et 1Password",
+          "text": "Analyse orientée PME pour choisir le meilleur gestionnaire de mot de passe entreprise selon vos contraintes."
+        },
+        "audit": {
+          "label": "Audit",
+          "title": "Auditer vos accès et vos risques",
+          "text": "Complétez le sujet mots de passe avec un audit cybersécurité PME et de la sensibilisation phishing."
+        }
+      },
+      "cta": {
+        "title": "Prêt à sécuriser les accès de votre entreprise ?",
+        "subtitle": "Passez d’un partage improvisé des mots de passe à une gestion claire, chiffrée et adaptée aux PME.",
+        "primary": "Créer un compte",
+        "secondary": "Contacter l’équipe"
+      },
+      "demo": {
+        "eyebrow": "Démo produit",
+        "title": "Voir MYKEYNEST en situation dans une interface proche du réel",
+        "text": "Cette démonstration montre comment centraliser un accès, partager un identifiant proprement et garder une visibilité opérationnelle sans alourdir le quotidien de l’équipe.",
+        "point1": "Montrer rapidement la valeur produit à un dirigeant ou à une équipe.",
+        "point2": "Projeter un usage concret autour du partage sécurisé et de la traçabilité.",
+        "point3": "Appuyer le discours commercial avec une preuve visuelle plus crédible.",
+        "iframe_title": "Démo vidéo MYKEYNEST"
       }
     },
     "comparatif": {
       "meta": {
-        "title": "MYKEYNEST vs Bitwarden vs 1Password : comparatif pour PME | MYKEYNEST",
-        "description": "Comparatif objectif et factuel entre MYKEYNEST, Bitwarden Teams et 1Password Business. Prix, fonctionnalités, maintenance et formation : quelle solution choisir pour votre PME ?",
-        "keywords": "comparatif password manager entreprise, MYKEYNEST vs Bitwarden, MYKEYNEST vs 1Password, meilleur gestionnaire mots de passe PME"
+        "title": "Meilleur gestionnaire de mot de passe entreprise ? MYKEYNEST vs Bitwarden vs 1Password",
+        "description": "Comparatif password manager entreprise pour PME : MYKEYNEST vs Bitwarden vs 1Password. Prix, sécurité, audit, support et formation pour choisir le meilleur gestionnaire de mots de passe PME.",
+        "keywords": "meilleur gestionnaire de mot de passe, meilleur gestionnaire mot de passe, comparatif password manager entreprise, gestionnaire de mot de passe entreprise, gestionnaire mot de passe PME, MYKEYNEST vs Bitwarden, MYKEYNEST vs 1Password, sécuriser mots de passe PME"
       },
       "schema": {
         "headline": "MYKEYNEST vs Bitwarden vs 1Password : quelle solution pour PME ?",
@@ -1486,9 +1626,9 @@
     },
     "audit": {
       "meta": {
-        "title": "Audit & Formation cybersécurité PME | MYKEYNEST",
-        "description": "Audit cybersécurité à distance ou sur site pour PME + formation des collaborateurs à la sensibilisation phishing et aux bonnes pratiques. Rapport de vulnérabilité inclus.",
-        "keywords": "audit cybersécurité PME, formation cybersécurité collaborateurs, sensibilisation phishing entreprise, rapport vulnérabilité PME"
+        "title": "Audit cybersécurité PME, phishing & formation collaborateurs | MYKEYNEST",
+        "description": "Audit cybersécurité PME à distance ou sur site, sensibilisation phishing, réduction du risque ransomware et formation cybersécurité collaborateurs avec rapport de vulnérabilité et plan de remédiation.",
+        "keywords": "audit cybersécurité PME, audit sécurité informatique PME, cybersécurité PME, cyberattaque PME que faire, protection contre ransomware PME, ransomware PME solution, sensibilisation phishing entreprise, comment éviter phishing entreprise, formation cybersécurité collaborateurs, prestataire cybersécurité PME"
       },
       "schema": {
         "name": "Audit & Formation cybersécurité PME",

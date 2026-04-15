@@ -1,12 +1,12 @@
 ﻿{% extends 'base_auth.html.twig' %}
 
-{% block title %}Centre d'aide | MYKEYNEST{% endblock %}
+{% block title %}{{ app.request.locale == 'en' ? 'Cybersecurity Help Center for SMBs | MYKEYNEST' : 'Centre d aide cybersécurité PME | MYKEYNEST' }}{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="Trouvez des r?ponses ? toutes vos questions sur MYKEYNEST. Guides, tutoriels, FAQ et support pour vous aider ? s?curiser vos mots de passe.">
-<meta name="keywords" content="aide mykeynest, centre aide, faq, support, tutoriel gestionnaire mots de passe">
-<meta property="og:title" content="Centre d'aide | MYKEYNEST">
-<meta property="og:description" content="Trouvez des r?ponses ? toutes vos questions sur MYKEYNEST.">
+<meta name="description" content="{{ app.request.locale == 'en' ? 'Help center for SMB cybersecurity, password manager setup, phishing awareness, browser extension support, and secure password best practices.' : 'Centre d aide sur la cybersécurité PME, le gestionnaire de mots de passe, le phishing, l extension navigateur et les bonnes pratiques pour sécuriser les mots de passe.' }}">
+<meta name="keywords" content="{{ app.request.locale == 'en' ? 'help center password manager, SMB cybersecurity help, phishing awareness, secure password guide, browser extension support' : 'centre aide cybersécurité PME, aide gestionnaire de mot de passe, sécuriser mots de passe PME, phishing entreprise, support extension navigateur' }}">
+<meta property="og:title" content="{{ app.request.locale == 'en' ? 'Cybersecurity Help Center for SMBs | MYKEYNEST' : 'Centre d aide cybersécurité PME | MYKEYNEST' }}">
+<meta property="og:description" content="{{ app.request.locale == 'en' ? 'Guides and answers about passwords, phishing, browser extension setup, and SMB cybersecurity.' : 'Guides et réponses sur les mots de passe, le phishing, l extension navigateur et la cybersécurité PME.' }}">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

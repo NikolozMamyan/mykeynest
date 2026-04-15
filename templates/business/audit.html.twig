@@ -104,13 +104,14 @@
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
             <div class="aud-section-eyebrow">{{ isEn ? 'Quick summary' : 'Resume rapide' }}</div>
             <h2 class="aud-section-title" id="aud-summary-title">{{ isEn ? 'When this page is relevant' : 'Quand cette page est pertinente' }}</h2>
-            <p class="aud-section-sub">{{ isEn ? 'This page is for SMBs that need a cybersecurity audit, employee awareness, or phishing-risk reduction alongside password hygiene improvements.' : 'Cette page est utile aux PME qui ont besoin d un audit cyber, de sensibilisation collaborateurs ou d une reduction du risque phishing en plus de l hygiene des mots de passe.' }}</p>
+            <p class="aud-section-sub">{{ isEn ? 'This page is for SMBs that need a cybersecurity audit, employee awareness, phishing-risk reduction, or ransomware risk mitigation alongside password hygiene improvements.' : 'Cette page est utile aux PME qui ont besoin d un audit cybersécurité, de sensibilisation collaborateurs, d une reduction du risque phishing ou d une réponse plus solide au risque ransomware en plus de l hygiene des mots de passe.' }}</p>
             <ul style="margin:0 0 1rem 1.25rem;color:#334155;line-height:1.7;">
-                <li>{{ isEn ? 'The offer combines audit, awareness, and a remediation roadmap.' : 'L offre combine audit, sensibilisation et feuille de route de remediation.' }}</li>
-                <li>{{ isEn ? 'It can be used independently of the software, or as a complement to MYKEYNEST adoption.' : 'Elle peut etre utilisee independamment du logiciel ou en complement d un deploiement MYKEYNEST.' }}</li>
+                <li>{{ isEn ? 'The offer combines SMB cybersecurity audit, phishing awareness, and a remediation roadmap.' : 'L offre combine audit cybersécurité PME, sensibilisation phishing et feuille de route de remediation.' }}</li>
+                <li>{{ isEn ? 'It can be used independently of the software, or as a complement to MYKEYNEST adoption and secure password deployment.' : 'Elle peut etre utilisee independamment du logiciel ou en complement d un deploiement MYKEYNEST et d une politique de mots de passe securises.' }}</li>
                 <li>{{ isEn ? 'If you are still comparing vendors, the comparison and solution pages provide the broader product context.' : 'Si vous etes encore en phase de comparaison, les pages comparatif et solution donnent le contexte produit plus large.' }}</li>
             </ul>
             <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                <a href="{{ path('business_password_manager') }}" class="aud-cta-btn-ghost" style="text-decoration:none;">{{ isEn ? 'Password manager page' : 'Page gestionnaire de mots de passe' }}</a>
                 <a href="{{ path('business_solution') }}" class="aud-cta-btn-white" style="text-decoration:none;">{{ isEn ? 'View the full solution' : 'Voir la solution complete' }}</a>
                 <a href="{{ path('business_comparatif') }}" class="aud-cta-btn-ghost" style="text-decoration:none;">{{ isEn ? 'Open the comparison' : 'Ouvrir le comparatif' }}</a>
             </div>

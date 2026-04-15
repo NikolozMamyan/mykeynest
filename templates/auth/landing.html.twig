@@ -1,11 +1,11 @@
 ﻿{% extends 'base_auth.html.twig' %}
 
-{% block title %}MYKEYNEST - Gestion des mots de passe et acces pour PME{% endblock %}
-{% block description %}MYKEYNEST est une solution de gestion des mots de passe et des acces pour PME, equipes et agences. Chiffrement AES-256, zero-knowledge, 2FA, partage securise, audit de securite et auto-remplissage. Essai gratuit 14 jours.{% endblock %}
-{% block og_title %}MYKEYNEST - Gestion des mots de passe et acces pour PME{% endblock %}
-{% block og_description %}Centralisez vos mots de passe, partagez vos acces en toute securite et protegez votre equipe avec une solution 100% europeenne. Essai gratuit 14 jours.{% endblock %}
-{% block twitter_title %}MYKEYNEST - Gestion des mots de passe et acces pour PME{% endblock %}
-{% block twitter_description %}Solution de gestion des acces et mots de passe pour PME : AES-256, 2FA, audit de securite, partage securise et auto-remplissage.{% endblock %}
+{% block title %}{{ app.request.locale == 'en' ? 'SMB Cybersecurity Solution & Enterprise Password Manager | MYKEYNEST' : 'Cybersécurité PME & gestionnaire de mots de passe entreprise | MYKEYNEST' }}{% endblock %}
+{% block description %}{{ app.request.locale == 'en' ? 'MYKEYNEST helps SMBs secure passwords, reduce phishing risk, protect access, and improve cybersecurity with an enterprise password manager, audit tools, and practical guidance.' : 'MYKEYNEST aide les PME à sécuriser les mots de passe, réduire le risque phishing, protéger les accès et renforcer la cybersécurité avec un gestionnaire de mots de passe entreprise, des outils d audit et un accompagnement concret.' }}{% endblock %}
+{% block og_title %}{{ app.request.locale == 'en' ? 'SMB Cybersecurity Solution & Enterprise Password Manager | MYKEYNEST' : 'Cybersécurité PME & gestionnaire de mots de passe entreprise | MYKEYNEST' }}{% endblock %}
+{% block og_description %}{{ app.request.locale == 'en' ? 'Secure passwords, protect accounts, and give your SMB a practical cybersecurity baseline with MYKEYNEST.' : 'Sécurisez les mots de passe, protégez les comptes et donnez à votre PME un socle de cybersécurité concret avec MYKEYNEST.' }}{% endblock %}
+{% block twitter_title %}{{ app.request.locale == 'en' ? 'SMB Cybersecurity Solution & Enterprise Password Manager | MYKEYNEST' : 'Cybersécurité PME & gestionnaire de mots de passe entreprise | MYKEYNEST' }}{% endblock %}
+{% block twitter_description %}{{ app.request.locale == 'en' ? 'Enterprise password manager, phishing awareness, security audit, and access protection for SMBs.' : 'Gestionnaire de mots de passe entreprise, sensibilisation phishing, audit cybersécurité et protection des accès pour PME.' }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/landing.css') }}">
@@ -220,6 +220,29 @@
       <span class="sh-label"><i class="fas fa-map"></i> {{ 'landing.how.label'|trans }}</span>
       <h2>{{ 'landing.how.title'|trans }}</h2>
       <p>{{ 'landing.how.subtitle'|trans }}</p>
+    </div>
+    <div class="how-demo">
+      <div class="how-demo-copy">
+        <span class="how-demo-eyebrow"><i class="fas fa-play-circle"></i> {{ 'landing.how.demo.eyebrow'|trans }}</span>
+        <h3>{{ 'landing.how.demo.title'|trans }}</h3>
+        <p>{{ 'landing.how.demo.text'|trans }}</p>
+      </div>
+      <div class="how-demo-shell" aria-hidden="true">
+        <div class="how-demo-bar">
+          <div class="how-demo-dots"><span></span><span></span><span></span></div>
+          <span>mykeynest://demo/onboarding</span>
+        </div>
+        <div class="how-demo-screen">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/IS4YgAdW-H8?rel=0"
+            title="{{ 'landing.how.demo.iframe_title'|trans }}"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
     </div>
     <div class="steps">
       <div class="step">
