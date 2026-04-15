@@ -595,7 +595,7 @@
     </div>
 
     {# Corps du formulaire #}
-    {{ form_start(form) }}
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
     
     <div class="form-body">
 
@@ -778,6 +778,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const uploadUrl = '{{ path("admin_article_upload_image") }}';
+  const editors = [];
+  const articleForm = document.querySelector('form[name="{{ form.vars.name }}"]');
 
   class BlogImageUploadAdapter {
     constructor(loader) {
@@ -831,6 +833,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function createEditor(element) {
     return ClassicEditor.create(element, {
       extraPlugins: [BlogImageUploadAdapterPlugin]
+    }).then((editor) => {
+      editors.push(editor);
+      return editor;
     }).catch(console.error);
   }
 
@@ -869,6 +874,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (en && window.ClassicEditor) {
     createEditor(en);
+  }
+
+  if (articleForm) {
+    articleForm.addEventListener('submit', async function() {
+      await Promise.all(editors.map((editor) => editor.updateSourceElement()));
+    });
   }
 });
 

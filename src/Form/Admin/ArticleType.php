@@ -33,10 +33,12 @@ final class ArticleType extends AbstractType
 
 ->add('contentFr', TextareaType::class, [
     'label' => 'Contenu FR',
+    'required' => false,
     'attr' => ['class' => 'wysiwyg'],
 ])
 ->add('contentEn', TextareaType::class, [
     'label' => 'Contenu EN',
+    'required' => false,
     'attr' => ['class' => 'wysiwyg'],
 ])
 
