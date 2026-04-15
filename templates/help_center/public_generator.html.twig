@@ -3,6 +3,7 @@
 {% block title %}{{ app.request.locale == 'en' ? 'Free Secure Password Generator | MYKEYNEST' : 'Generateur de mot de passe securise gratuit | MYKEYNEST' }}{% endblock %}
 
 {% block meta_description %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
 <meta name="description" content="{{ 'public_generator.hero.subtitle'|trans }}">
 <meta property="og:title" content="{{ app.request.locale == 'en' ? 'Free Secure Password Generator | MYKEYNEST' : 'Generateur de mot de passe securise gratuit | MYKEYNEST' }}">
 <meta property="og:description" content="{{ 'public_generator.hero.subtitle'|trans }}">
@@ -22,29 +23,26 @@
           "@type": "ListItem",
           "position": 1,
           "name": "{{ app.request.locale == 'en' ? 'Home' : 'Accueil' }}",
-          "item": "{{ absolute_url(path('app_landing')) }}"
+          "item": "{{ absolute_url(path('app_landing', localeParams)) }}"
         },
         {
           "@type": "ListItem",
           "position": 2,
           "name": "{{ app.request.locale == 'en' ? 'Help center' : 'Centre d aide' }}",
-          "item": "{{ absolute_url(path('app_help_center')) }}"
+          "item": "{{ absolute_url(path('app_help_center', localeParams)) }}"
         },
         {
           "@type": "ListItem",
           "position": 3,
           "name": "{{ app.request.locale == 'en' ? 'Password generator' : 'Generateur de mot de passe' }}",
-          "item": "{{ absolute_url(path('app_public_generator')) }}"
+          "item": "{{ absolute_url(path('app_public_generator', localeParams)) }}"
         }
       ]
     },
     {
-      "@type": "WebApplication",
+      "@type": "WebPage",
       "name": "{{ app.request.locale == 'en' ? 'MYKEYNEST Password Generator' : 'Generateur de mot de passe MYKEYNEST' }}",
-      "url": "{{ absolute_url(path('app_public_generator')) }}",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
-      "isAccessibleForFree": true,
+      "url": "{{ absolute_url(path('app_public_generator', localeParams)) }}",
       "inLanguage": "{{ app.request.locale|default('fr') }}",
       "description": "{{ 'public_generator.hero.subtitle'|trans|e('js') }}"
     }

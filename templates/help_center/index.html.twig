@@ -17,6 +17,41 @@
     <link rel="stylesheet" href="{{ asset('styles/pages/help-center.css') }}">
 {% endblock %}
 
+{% block seo_jsonld %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "{{ app.request.locale == 'en' ? 'Home' : 'Accueil' }}",
+          "item": "{{ absolute_url(path('app_landing', localeParams)) }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ app.request.locale == 'en' ? 'Help center' : 'Centre d aide' }}",
+          "item": "{{ absolute_url(path('app_help_center', localeParams)) }}"
+        }
+      ]
+    },
+    {
+      "@type": "CollectionPage",
+      "name": "{{ app.request.locale == 'en' ? 'MYKEYNEST Help Center' : 'Centre d aide MYKEYNEST' }}",
+      "url": "{{ absolute_url(path('app_help_center', localeParams)) }}",
+      "inLanguage": "{{ app.request.locale|default('fr') }}",
+      "description": "{{ 'help_center.hero.subtitle'|trans|e('js') }}"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
 {% block body %}
 <main data-controller="help-center">
 

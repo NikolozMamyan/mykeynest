@@ -16,6 +16,62 @@
     <link rel="stylesheet" href="{{ asset('styles/pages/help-article.css') }}">
 {% endblock %}
 
+{% block seo_jsonld %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "{{ app.request.locale == 'en' ? 'Home' : 'Accueil' }}",
+          "item": "{{ absolute_url(path('app_landing', localeParams)) }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ 'help_article.breadcrumb.help_center'|trans|e('js') }}",
+          "item": "{{ absolute_url(path('app_help_center', localeParams)) }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "{{ category.title|e('js') }}",
+          "item": "{{ absolute_url(path('app_help_category', localeParams|merge({ slug: category.slug }))) }}"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "{{ article.title|e('js') }}",
+          "item": "{{ absolute_url(path('app_help_article', localeParams|merge({ categorySlug: category.slug, articleSlug: article.slug }))) }}"
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "headline": "{{ article.title|e('js') }}",
+      "description": "{{ article.excerpt|e('js') }}",
+      "mainEntityOfPage": "{{ absolute_url(path('app_help_article', localeParams|merge({ categorySlug: category.slug, articleSlug: article.slug }))) }}",
+      "dateModified": "{{ article.updatedAt|date('c') }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ article.author|e('js') }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "MYKEYNEST"
+      },
+      "inLanguage": "{{ app.request.locale|default('fr') }}"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
 {% block body %}
 <div data-controller="help-article">
 {# Reading progress bar #}

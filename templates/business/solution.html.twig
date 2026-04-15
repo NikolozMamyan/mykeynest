@@ -3,6 +3,7 @@
 {% block title %}{{ 'business.solution.meta.title'|trans }}{% endblock %}
 
 {% block meta_description %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
 <meta name="description" content="{{ 'business.solution.meta.description'|trans }}">
 <meta name="keywords" content="{{ 'business.solution.meta.keywords'|trans }}">
 <meta property="og:title" content="{{ 'business.solution.meta.title'|trans }}">
@@ -19,8 +20,8 @@
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "MYKEYNEST", "item": "{{ absolute_url(path('app_landing')) }}" },
-        { "@type": "ListItem", "position": 2, "name": "{{ 'business.solution.hero.eyebrow'|trans }}", "item": "{{ absolute_url(path('business_solution')) }}" }
+        { "@type": "ListItem", "position": 1, "name": "MYKEYNEST", "item": "{{ absolute_url(path('app_landing', localeParams)) }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ 'business.solution.hero.eyebrow'|trans }}", "item": "{{ absolute_url(path('business_solution', localeParams)) }}" }
       ]
     },
     {

@@ -3,6 +3,7 @@
 {% block title %}{{ 'business.audit.meta.title'|trans }}{% endblock %}
 
 {% block meta_description %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
 <meta name="description" content="{{ 'business.audit.meta.description'|trans }}">
 <meta name="keywords" content="{{ 'business.audit.meta.keywords'|trans }}">
 <meta property="og:title" content="{{ 'business.audit.meta.title'|trans }}">
@@ -18,9 +19,9 @@
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "{{ 'business.audit.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing')) }}" },
-        { "@type": "ListItem", "position": 2, "name": "{{ 'business.audit.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution')) }}" },
-        { "@type": "ListItem", "position": 3, "name": "{{ 'business.audit.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_audit')) }}" }
+        { "@type": "ListItem", "position": 1, "name": "{{ 'business.audit.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing', localeParams)) }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ 'business.audit.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution', localeParams)) }}" },
+        { "@type": "ListItem", "position": 3, "name": "{{ 'business.audit.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_audit', localeParams)) }}" }
       ]
     },
     {
@@ -28,6 +29,7 @@
       "name": "{{ 'business.audit.schema.name'|trans }}",
       "description": "{{ 'business.audit.schema.description'|trans }}",
       "provider": { "@type": "Organization", "name": "MYKEYNEST" },
+      "url": "{{ absolute_url(path('business_audit', localeParams)) }}",
       "serviceType": ["Audit cybersecurite PME", "Formation cybersecurite collaborateurs"]
     },
     {

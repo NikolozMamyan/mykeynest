@@ -3,6 +3,7 @@
 {% block title %}{{ 'business.comparatif.meta.title'|trans }}{% endblock %}
 
 {% block meta_description %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
 <meta name="description" content="{{ 'business.comparatif.meta.description'|trans }}">
 <meta name="keywords" content="{{ 'business.comparatif.meta.keywords'|trans }}">
 <meta property="og:title" content="{{ 'business.comparatif.meta.title'|trans }}">
@@ -18,15 +19,17 @@
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "{{ 'business.comparatif.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing')) }}" },
-        { "@type": "ListItem", "position": 2, "name": "{{ 'business.comparatif.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution')) }}" },
-        { "@type": "ListItem", "position": 3, "name": "{{ 'business.comparatif.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_comparatif')) }}" }
+        { "@type": "ListItem", "position": 1, "name": "{{ 'business.comparatif.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing', localeParams)) }}" },
+        { "@type": "ListItem", "position": 2, "name": "{{ 'business.comparatif.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution', localeParams)) }}" },
+        { "@type": "ListItem", "position": 3, "name": "{{ 'business.comparatif.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_comparatif', localeParams)) }}" }
       ]
     },
     {
       "@type": "Article",
       "headline": "{{ 'business.comparatif.schema.headline'|trans }}",
       "description": "{{ 'business.comparatif.schema.description'|trans }}",
+      "mainEntityOfPage": "{{ absolute_url(path('business_comparatif', localeParams)) }}",
+      "inLanguage": "{{ app.request.locale|default('fr') }}",
       "dateModified": "{{ "now"|date("Y-m-d") }}"
     }
   ]

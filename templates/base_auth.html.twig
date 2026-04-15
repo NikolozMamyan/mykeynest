@@ -124,19 +124,6 @@
             "name": "MYKEYNEST",
             "url": "{{ absolute_url(path('app_landing')) }}",
             "inLanguage": "{{ app.request.locale|default('fr') }}"
-          },
-          {
-            "@type": "SoftwareApplication",
-            "name": "MYKEYNEST",
-            "applicationCategory": "SecurityApplication",
-            "operatingSystem": "Web",
-            "url": "{{ absolute_url(path('app_landing')) }}",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "EUR"
-            },
-            "description": "Gestionnaire de mots de passe et acces pour equipes et PME."
           }
         ]
       }
