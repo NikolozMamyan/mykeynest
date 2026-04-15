@@ -382,6 +382,16 @@
       },
       "confirm": {
         "delete": "Are you sure you want to delete this credential?"
+      },
+      "quick_share": {
+        "title": "Quick share",
+        "subtitle": "Enter the recipient email to share this credential without leaving the page.",
+        "close": "Close share dialog",
+        "email_label": "Recipient email",
+        "email_placeholder": "example@domain.com",
+        "email_hint": "The standard sharing flow will be applied: invitation, limits, and notifications.",
+        "cancel": "Cancel",
+        "submit": "Share access"
       }
     },
      "pro_banner": {

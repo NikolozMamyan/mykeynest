@@ -430,6 +430,16 @@
       },
       "confirm": {
         "delete": "Êtes-vous sûr de vouloir supprimer cet identifiant ?"
+      },
+      "quick_share": {
+        "title": "Partager rapidement",
+        "subtitle": "Saisissez l'email du destinataire pour partager cet identifiant sans quitter la page.",
+        "close": "Fermer la fenêtre de partage",
+        "email_label": "Email du destinataire",
+        "email_placeholder": "exemple@domaine.com",
+        "email_hint": "La logique de partage habituelle sera appliquée : invitation, limites et notifications.",
+        "cancel": "Annuler",
+        "submit": "Partager l'accès"
       }
     },
     "pro_banner": {

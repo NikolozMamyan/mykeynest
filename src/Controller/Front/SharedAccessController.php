@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SharedAccessController extends AbstractController
 {
@@ -87,149 +88,19 @@ class SharedAccessController extends AbstractController
         $limit = 3;
 
         if ($request->isMethod('POST')) {
-            $email = strtolower(trim((string) $request->request->get('email')));
-            $credentialIds = $request->request->all('credentials') ?? [];
-
-            $guest = $userRepository->findOneBy(['email' => $email]);
-
-            if (!$guest) {
-                $token = bin2hex(random_bytes(32));
-                $expiresAt = new \DateTimeImmutable('+6 hours');
-
-                $guest = new User();
-                $guest->setEmail($email);
-                $guest->setCompany('');
-                $guest->setPassword('');
-                $guest->setRoles(['ROLE_GUEST']);
-                $guest->setApiToken($token);
-                $guest->setTokenExpiresAt($expiresAt);
-                $guest->regenerateApiExtensionToken();
-
-                $entityManager->persist($guest);
-                $entityManager->flush();
-
-                $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
-                $this->addFlash('success', 'Une invitation a ete envoyee a ' . $email . '.');
-            } elseif (in_array('ROLE_GUEST', $guest->getRoles(), true) && $guest->getApiToken() !== null) {
-                $token = bin2hex(random_bytes(32));
-                $expiresAt = new \DateTimeImmutable('+24 hours');
-
-                $guest->setApiToken($token);
-                $guest->setTokenExpiresAt($expiresAt);
-                $entityManager->flush();
-
-                $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
-                $this->addFlash('success', 'Une nouvelle invitation a ete envoyee a ' . $email . '.');
-            }
-
-            if ($guest === $owner) {
-                $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-meme.');
-
-                return $this->redirectToRoute('shared_access_new');
-            }
-
-            if (!$hasSubscription) {
-                $existingCount = $entityManager->getRepository(SharedAccess::class)->count(['owner' => $owner]);
-                $newToCreate = 0;
-
-                foreach ($credentialIds as $credentialId) {
-                    $credential = $credentialRepository->find($credentialId);
-
-                    if (!$credential || $credential->getUser() !== $owner) {
-                        continue;
-                    }
-
-                    $exists = $entityManager->getRepository(SharedAccess::class)->findOneBy([
-                        'owner' => $owner,
-                        'guest' => $guest,
-                        'credential' => $credential,
-                    ]);
-
-                    if (!$exists) {
-                        $newToCreate++;
-                    }
-                }
-
-                if (($existingCount + $newToCreate) > $limit) {
-                    $remaining = max(0, $limit - $existingCount);
-                    $this->addFlash(
-                        'warning',
-                        sprintf(
-                            'Limite atteinte : %d partages maximum sans abonnement. Il vous reste %d partage(s) possible(s).',
-                            $limit,
-                            $remaining
-                        )
-                    );
-
-                    return $this->redirectToRoute('shared_access_new');
-                }
-            }
-
-            $createdCount = 0;
-
-            foreach ($credentialIds as $credentialId) {
-                $credential = $credentialRepository->find($credentialId);
-
-                if (!$credential || $credential->getUser() !== $owner) {
-                    continue;
-                }
-
-                $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
-                    'owner' => $owner,
-                    'guest' => $guest,
-                    'credential' => $credential,
-                ]);
-
-                if (!$existingAccess) {
-                    $sharedAccess = new SharedAccess();
-                    $sharedAccess->setOwner($owner);
-                    $sharedAccess->setGuest($guest);
-                    $sharedAccess->setCredential($credential);
-                    $sharedAccess->setCreatedAt(new \DateTimeImmutable());
-
-                    $entityManager->persist($sharedAccess);
-                    $createdCount++;
-                }
-            }
-
-            if ($createdCount > 0) {
-                $entityManager->flush();
-                $this->addFlash('success', $createdCount . ' identifiant(s) partage(s) avec succes.');
-
-                $isActiveUser = in_array('ROLE_USER', $guest->getRoles(), true)
-                    && !in_array('ROLE_GUEST', $guest->getRoles(), true);
-
-                if ($isActiveUser) {
-                    $sharedCredentials = [];
-
-                    foreach ($credentialIds as $credentialId) {
-                        $credential = $credentialRepository->find($credentialId);
-                        if ($credential && $credential->getUser() === $owner) {
-                            $sharedCredentials[] = $credential;
-                        }
-                    }
-
-                    $mailer->send(
-                        $guest->getEmail(),
-                        $owner->getEmail() . ' a partage des identifiants avec vous',
-                        'emails/share_notification.html.twig',
-                        [
-                            'owner' => $owner,
-                            'guest' => $guest,
-                            'credentials' => $sharedCredentials,
-                            'app_url' => $urlGenerator->generate(
-                                'shared_access_index',
-                                [],
-                                UrlGeneratorInterface::ABSOLUTE_URL
-                            ),
-                        ]
-                    );
-                }
-            } else {
-                $this->addFlash('info', 'Aucun nouvel identifiant n\'a ete partage.');
-            }
-
-            return $this->redirectToRoute('shared_access_index');
+            return $this->handleShareSubmission(
+                $request,
+                $owner,
+                $entityManager,
+                $userRepository,
+                $mailer,
+                $logger,
+                $urlGenerator,
+                $credentialRepository,
+                $hasSubscription,
+                $limit,
+                'shared_access_index'
+            );
         }
 
         $credentials = $credentialRepository->findBy(['user' => $owner]);
@@ -238,6 +109,42 @@ class SharedAccessController extends AbstractController
             'credentials' => $credentials,
             'heading' => 'Partages',
         ]);
+    }
+
+    #[Route('/app/shared-access/quick', name: 'shared_access_quick', methods: ['POST'])]
+    public function quickShare(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
+        MailerService $mailer,
+        LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        CredentialRepository $credentialRepository
+    ): Response {
+        /** @var User $owner */
+        $owner = $this->getUser();
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        if (!$owner) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $credentialId = $request->request->getInt('credential_id');
+        $request->request->set('credentials', $credentialId > 0 ? [$credentialId] : []);
+
+        return $this->handleShareSubmission(
+            $request,
+            $owner,
+            $entityManager,
+            $userRepository,
+            $mailer,
+            $logger,
+            $urlGenerator,
+            $credentialRepository,
+            $owner->hasActiveSubscription(),
+            3,
+            'app_credential'
+        );
     }
 
     #[Route('/app/shared-access/{id}/revoke', name: 'shared_access_revoke', methods: ['POST'])]
@@ -285,5 +192,180 @@ class SharedAccessController extends AbstractController
             'owner' => $owner,
             'heading' => 'Partages',
         ]);
+    }
+
+    private function handleShareSubmission(
+        Request $request,
+        User $owner,
+        EntityManagerInterface $entityManager,
+        UserRepository $userRepository,
+        MailerService $mailer,
+        LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        CredentialRepository $credentialRepository,
+        bool $hasSubscription,
+        int $limit,
+        string $redirectRoute
+    ): RedirectResponse {
+        $email = strtolower(trim((string) $request->request->get('email')));
+        $credentialIds = $request->request->all('credentials') ?? [];
+
+        if ($email === '') {
+            $this->addFlash('error', 'Veuillez renseigner une adresse email valide.');
+
+            return $this->redirectToRoute($redirectRoute);
+        }
+
+        if ($credentialIds === []) {
+            $this->addFlash('error', 'Aucun identifiant n\'a ete selectionne pour le partage.');
+
+            return $this->redirectToRoute($redirectRoute);
+        }
+
+        $guest = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$guest) {
+            $token = bin2hex(random_bytes(32));
+            $expiresAt = new \DateTimeImmutable('+6 hours');
+
+            $guest = new User();
+            $guest->setEmail($email);
+            $guest->setCompany('');
+            $guest->setPassword('');
+            $guest->setRoles(['ROLE_GUEST']);
+            $guest->setApiToken($token);
+            $guest->setTokenExpiresAt($expiresAt);
+            $guest->regenerateApiExtensionToken();
+
+            $entityManager->persist($guest);
+            $entityManager->flush();
+
+            $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
+            $this->addFlash('success', 'Une invitation a ete envoyee a ' . $email . '.');
+        } elseif (in_array('ROLE_GUEST', $guest->getRoles(), true) && $guest->getApiToken() !== null) {
+            $token = bin2hex(random_bytes(32));
+            $expiresAt = new \DateTimeImmutable('+24 hours');
+
+            $guest->setApiToken($token);
+            $guest->setTokenExpiresAt($expiresAt);
+            $entityManager->flush();
+
+            $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
+            $this->addFlash('success', 'Une nouvelle invitation a ete envoyee a ' . $email . '.');
+        }
+
+        if ($guest === $owner) {
+            $this->addFlash('error', 'Vous ne pouvez pas partager des identifiants avec vous-meme.');
+
+            return $this->redirectToRoute($redirectRoute);
+        }
+
+        if (!$hasSubscription) {
+            $existingCount = $entityManager->getRepository(SharedAccess::class)->count(['owner' => $owner]);
+            $newToCreate = 0;
+
+            foreach ($credentialIds as $credentialId) {
+                $credential = $credentialRepository->find($credentialId);
+
+                if (!$credential || $credential->getUser() !== $owner) {
+                    continue;
+                }
+
+                $exists = $entityManager->getRepository(SharedAccess::class)->findOneBy([
+                    'owner' => $owner,
+                    'guest' => $guest,
+                    'credential' => $credential,
+                ]);
+
+                if (!$exists) {
+                    $newToCreate++;
+                }
+            }
+
+            if (($existingCount + $newToCreate) > $limit) {
+                $remaining = max(0, $limit - $existingCount);
+                $this->addFlash(
+                    'warning',
+                    sprintf(
+                        'Limite atteinte : %d partages maximum sans abonnement. Il vous reste %d partage(s) possible(s).',
+                        $limit,
+                        $remaining
+                    )
+                );
+
+                return $this->redirectToRoute($redirectRoute);
+            }
+        }
+
+        $createdCount = 0;
+        $sharedCredentials = [];
+
+        foreach ($credentialIds as $credentialId) {
+            $credential = $credentialRepository->find($credentialId);
+
+            if (!$credential || $credential->getUser() !== $owner) {
+                continue;
+            }
+
+            $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
+                'owner' => $owner,
+                'guest' => $guest,
+                'credential' => $credential,
+            ]);
+
+            if ($existingAccess) {
+                continue;
+            }
+
+            $sharedAccess = new SharedAccess();
+            $sharedAccess->setOwner($owner);
+            $sharedAccess->setGuest($guest);
+            $sharedAccess->setCredential($credential);
+            $sharedAccess->setCreatedAt(new \DateTimeImmutable());
+
+            $entityManager->persist($sharedAccess);
+            $sharedCredentials[] = $credential;
+            $createdCount++;
+        }
+
+        if ($createdCount === 0) {
+            $this->addFlash('info', 'Aucun nouvel identifiant n\'a ete partage.');
+
+            return $this->redirectToRoute($redirectRoute);
+        }
+
+        $entityManager->flush();
+        $this->addFlash('success', $createdCount . ' identifiant(s) partage(s) avec succes.');
+
+        $isActiveUser = in_array('ROLE_USER', $guest->getRoles(), true)
+            && !in_array('ROLE_GUEST', $guest->getRoles(), true);
+
+        if ($isActiveUser) {
+            try {
+                $mailer->send(
+                    $guest->getEmail(),
+                    $owner->getEmail() . ' a partage des identifiants avec vous',
+                    'emails/share_notification.html.twig',
+                    [
+                        'owner' => $owner,
+                        'guest' => $guest,
+                        'credentials' => $sharedCredentials,
+                        'app_url' => $urlGenerator->generate(
+                            'shared_access_index',
+                            [],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
+                    ]
+                );
+            } catch (\Throwable $exception) {
+                $logger->warning('Unable to send share notification email.', [
+                    'guest_email' => $guest->getEmail(),
+                    'owner_id' => $owner->getId(),
+                    'exception' => $exception->getMessage(),
+                ]);
+            }
+        }
+
+        return $this->redirectToRoute($redirectRoute);
     }
 }
