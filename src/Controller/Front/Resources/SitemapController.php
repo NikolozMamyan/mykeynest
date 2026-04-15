@@ -10,7 +10,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class SitemapController extends AbstractController
 {
-    // Même structure que HelpCenterController — les deux doivent rester synchros
     private function getHelpCenterData(): array
     {
         return [
@@ -68,94 +67,165 @@ final class SitemapController extends AbstractController
         ];
     }
 
+    private function localizedPublicEntries(
+        UrlGeneratorInterface $urlGenerator,
+        string $routeName,
+        array $params,
+        \DateTimeInterface $lastmod,
+        string $changefreq,
+        string $priority
+    ): array {
+        return [
+            $this->entry(
+                $urlGenerator->generate($routeName, $params, UrlGeneratorInterface::ABSOLUTE_URL),
+                $lastmod,
+                $changefreq,
+                $priority
+            ),
+            $this->entry(
+                $urlGenerator->generate($routeName, array_merge($params, ['lang' => 'en']), UrlGeneratorInterface::ABSOLUTE_URL),
+                $lastmod,
+                $changefreq,
+                $priority
+            ),
+        ];
+    }
+
     #[Route('/sitemap.xml', name: 'sitemap', methods: ['GET'])]
     public function sitemap(
         UrlGeneratorInterface $urlGenerator,
         ArticleRepository $articleRepository
     ): Response {
         $urls = [];
-        $now  = new \DateTimeImmutable('now');
+        $now = new \DateTimeImmutable('now');
 
-        // ── Pages publiques ────────────────────────────────────────────────
-        $urls[] = $this->entry(
-            $urlGenerator->generate('app_landing', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            $now, 'weekly', '1.0'
-        );
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'app_landing',
+            [],
+            $now,
+            'weekly',
+            '1.0'
+        ));
 
-        $urls[] = $this->entry(
-            $urlGenerator->generate('app_public_generator', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            $now, 'monthly', '1.0'
-        );
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'app_public_generator',
+            [],
+            $now,
+            'monthly',
+            '1.0'
+        ));
 
-        // ── Help Center — index ───────────────────────────────────────────
-        $urls[] = $this->entry(
-            $urlGenerator->generate('app_help_center', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            $now, 'weekly', '0.9'
-        );
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'app_help_center',
+            [],
+            $now,
+            'weekly',
+            '0.9'
+        ));
 
-        // ── Help Center — pages catégories ───────────────────────────────
         foreach ($this->getHelpCenterData() as $category) {
-            $urls[] = $this->entry(
-                $urlGenerator->generate('app_help_category', [
-                    'slug' => $category['categorySlug'],
-                ], UrlGeneratorInterface::ABSOLUTE_URL),
-                $now, 'weekly', '0.8'
-            );
+            $urls = array_merge($urls, $this->localizedPublicEntries(
+                $urlGenerator,
+                'app_help_category',
+                ['slug' => $category['categorySlug']],
+                $now,
+                'weekly',
+                '0.8'
+            ));
 
-            // ── Help Center — pages articles ─────────────────────────────
             foreach ($category['articles'] as $articleSlug) {
-                $urls[] = $this->entry(
-                    $urlGenerator->generate('app_help_article', [
+                $urls = array_merge($urls, $this->localizedPublicEntries(
+                    $urlGenerator,
+                    'app_help_article',
+                    [
                         'categorySlug' => $category['categorySlug'],
-                        'articleSlug'  => $articleSlug,
-                    ], UrlGeneratorInterface::ABSOLUTE_URL),
-                    $now, 'monthly', '0.7'
-                );
+                        'articleSlug' => $articleSlug,
+                    ],
+                    $now,
+                    'monthly',
+                    '0.7'
+                ));
             }
         }
 
-        // ── Pages business / entreprise ──────────────────────────────────
-        $urls[] = $this->entry(
-            $urlGenerator->generate('business_solution', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            $now, 'weekly', '0.9'
-        );
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'business_solution',
+            [],
+            $now,
+            'weekly',
+            '0.9'
+        ));
 
-        $urls[] = $this->entry(
-            $urlGenerator->generate('business_comparatif', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            $now, 'monthly', '0.8'
-        );
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'business_comparatif',
+            [],
+            $now,
+            'monthly',
+            '0.8'
+        ));
 
-        $urls[] = $this->entry(
-            $urlGenerator->generate('business_audit', [], UrlGeneratorInterface::ABSOLUTE_URL),
-            $now, 'weekly', '0.8'
-        );
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'business_audit',
+            [],
+            $now,
+            'weekly',
+            '0.8'
+        ));
 
-        // ── Blog — index par locale ───────────────────────────────────────
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'legal_cgu',
+            [],
+            $now,
+            'yearly',
+            '0.3'
+        ));
+
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'legal_cgv',
+            [],
+            $now,
+            'yearly',
+            '0.3'
+        ));
+
         foreach (['fr', 'en'] as $locale) {
             $urls[] = $this->entry(
                 $urlGenerator->generate('blog_index', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),
-                $now, 'weekly', '0.9'
+                $now,
+                'weekly',
+                '0.9'
             );
         }
 
-        // ── Blog — articles ───────────────────────────────────────────────
         foreach ($articleRepository->findAllForSitemap() as $article) {
             $lastmod = $article->getUpdatedAt() ?? $article->getPublishedAt();
 
             $urls[] = $this->entry(
                 $urlGenerator->generate('blog_article_show', [
                     '_locale' => 'fr',
-                    'slug'    => $article->getSlugFr(),
+                    'slug' => $article->getSlugFr(),
                 ], UrlGeneratorInterface::ABSOLUTE_URL),
-                $lastmod, 'monthly', '0.7'
+                $lastmod,
+                'monthly',
+                '0.7'
             );
 
             $urls[] = $this->entry(
                 $urlGenerator->generate('blog_article_show', [
                     '_locale' => 'en',
-                    'slug'    => $article->getSlugEn(),
+                    'slug' => $article->getSlugEn(),
                 ], UrlGeneratorInterface::ABSOLUTE_URL),
-                $lastmod, 'monthly', '0.7'
+                $lastmod,
+                'monthly',
+                '0.7'
             );
         }
 
@@ -169,10 +239,10 @@ final class SitemapController extends AbstractController
     private function entry(string $loc, \DateTimeInterface $lastmod, string $changefreq, string $priority): array
     {
         return [
-            'loc'        => $loc,
-            'lastmod'    => $lastmod,
+            'loc' => $loc,
+            'lastmod' => $lastmod,
             'changefreq' => $changefreq,
-            'priority'   => $priority,
+            'priority' => $priority,
         ];
     }
 }

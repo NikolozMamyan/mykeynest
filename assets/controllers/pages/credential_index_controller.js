@@ -94,12 +94,6 @@ export default class extends Controller {
     document.body.classList.remove("quick-share-open");
   }
 
-  handleModalBackdrop(event) {
-    if (event.target === this.quickShareModalTarget || event.target.classList.contains("quick-share-backdrop")) {
-      this.closeQuickShare();
-    }
-  }
-
   initializeFavicons() {
     const images = this.element.querySelectorAll("[data-favicon-url][data-domain]");
 

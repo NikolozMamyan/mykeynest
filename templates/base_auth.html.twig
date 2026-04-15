@@ -3,10 +3,35 @@
   <head>
     {% set currentRoute = app.request.attributes.get('_route') %}
     {% set routeParams = app.request.attributes.get('_route_params') ?? {} %}
+    {% set queryParams = app.request.query.all %}
+    {% set currentLocale = app.request.locale|default('fr') %}
+    {% set seoPublicRoutes = [
+      'app_landing',
+      'app_public_generator',
+      'app_help_center',
+      'app_help_category',
+      'app_help_article',
+      'business_solution',
+      'business_comparatif',
+      'business_audit',
+      'legal_cgu',
+      'legal_cgv'
+    ] %}
     {% set legacyMetaHead = block('meta_description')|trim %}
     {% set canonicalUrl = block('canonical_url')|trim %}
     {% if canonicalUrl is empty %}
-      {% set canonicalUrl = app.request.uri %}
+      {% if currentRoute and currentRoute in seoPublicRoutes %}
+        {% set canonicalQueryParams = {} %}
+        {% if queryParams.page is defined %}
+          {% set canonicalQueryParams = canonicalQueryParams|merge({ page: queryParams.page }) %}
+        {% endif %}
+        {% if currentLocale == 'en' %}
+          {% set canonicalQueryParams = canonicalQueryParams|merge({ lang: 'en' }) %}
+        {% endif %}
+        {% set canonicalUrl = url(currentRoute, routeParams|merge(canonicalQueryParams)) %}
+      {% else %}
+        {% set canonicalUrl = app.request.uri %}
+      {% endif %}
     {% endif %}
 
     <meta charset="UTF-8" />
@@ -49,9 +74,21 @@
     <link rel="canonical" href="{{ canonicalUrl }}" />
 
     {% if currentRoute %}
-      <link rel="alternate" hreflang="fr" href="{{ url(currentRoute, routeParams|merge({ lang: 'fr' })) }}" />
-      <link rel="alternate" hreflang="en" href="{{ url(currentRoute, routeParams|merge({ lang: 'en' })) }}" />
-      <link rel="alternate" hreflang="x-default" href="{{ url(currentRoute, routeParams|merge({ lang: 'fr' })) }}" />
+      {% set hreflangBaseParams = routeParams %}
+      {% if queryParams.page is defined %}
+        {% set hreflangBaseParams = hreflangBaseParams|merge({ page: queryParams.page }) %}
+      {% endif %}
+      {% set frUrl = currentLocale == 'fr'
+        ? canonicalUrl
+        : url(currentRoute, hreflangBaseParams) %}
+      {% set enUrl = currentLocale == 'en'
+        ? canonicalUrl
+        : url(currentRoute, hreflangBaseParams|merge({ lang: 'en' })) %}
+      {% set defaultUrl = url(currentRoute, hreflangBaseParams) %}
+
+      <link rel="alternate" hreflang="fr" href="{{ frUrl }}" />
+      <link rel="alternate" hreflang="en" href="{{ enUrl }}" />
+      <link rel="alternate" hreflang="x-default" href="{{ defaultUrl }}" />
     {% endif %}
 
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
