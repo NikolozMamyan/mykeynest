@@ -777,6 +777,63 @@
 {# Script pour prévisualisation d'image #}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  const uploadUrl = '{{ path("admin_article_upload_image") }}';
+
+  class BlogImageUploadAdapter {
+    constructor(loader) {
+      this.loader = loader;
+      this.controller = new AbortController();
+    }
+
+    async upload() {
+      const file = await this.loader.file;
+      const formData = new FormData();
+      formData.append('upload', file);
+
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        signal: this.controller.signal
+      });
+
+      let payload = {};
+
+      try {
+        payload = await response.json();
+      } catch (error) {
+        throw new Error('Réponse invalide du serveur.');
+      }
+
+      if (!response.ok || !payload.url) {
+        throw new Error(payload?.error?.message || 'Erreur lors de l’upload de l’image.');
+      }
+
+      return {
+        default: payload.url
+      };
+    }
+
+    abort() {
+      this.controller.abort();
+    }
+  }
+
+  function BlogImageUploadAdapterPlugin(editor) {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+      return new BlogImageUploadAdapter(loader);
+    };
+  }
+
+  function createEditor(element) {
+    return ClassicEditor.create(element, {
+      extraPlugins: [BlogImageUploadAdapterPlugin]
+    }).catch(console.error);
+  }
+
   const fileInput = document.querySelector('input[type="file"]');
   if (fileInput) {
     fileInput.addEventListener('change', function(e) {
@@ -807,21 +864,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const en = document.querySelector('#{{ form.contentEn.vars.id }}');
 
   if (fr && window.ClassicEditor) {
-    ClassicEditor.create(fr, {
-      simpleUpload: {
-        uploadUrl: '{{ path("admin_article_upload_image") }}',
-        withCredentials: true
-      }
-    }).catch(console.error);
+    createEditor(fr);
   }
 
   if (en && window.ClassicEditor) {
-    ClassicEditor.create(en, {
-      simpleUpload: {
-        uploadUrl: '{{ path("admin_article_upload_image") }}',
-        withCredentials: true
-      }
-    }).catch(console.error);
+    createEditor(en);
   }
 });
 

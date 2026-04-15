@@ -518,16 +518,21 @@ final class AdminController extends AbstractController
         }
 
         try {
+            if (!is_dir($this->contentImagesDir) && !mkdir($concurrentDirectory = $this->contentImagesDir, 0775, true) && !is_dir($concurrentDirectory)) {
+                throw new \RuntimeException(sprintf('Impossible de créer le dossier d\'upload "%s".', $this->contentImagesDir));
+            }
+
             // Génère un nom de fichier sécurisé
             $filename = bin2hex(random_bytes(16)) . '.' . $extension;
             $file->move($this->contentImagesDir, $filename);
 
             return $this->json([
-                'url' => '/uploads/articles/content/' . $filename
+                'url' => '/uploads/blog/content/' . $filename
             ]);
-        } catch (FileException $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('Erreur lors de l\'upload d\'image', [
                 'error' => $e->getMessage(),
+                'target_directory' => $this->contentImagesDir,
             ]);
             
             return $this->json([
