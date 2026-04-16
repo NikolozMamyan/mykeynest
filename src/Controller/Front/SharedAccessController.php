@@ -180,11 +180,20 @@ class SharedAccessController extends AbstractController
         $credential = $sharedAccess->getCredential();
         $owner = $sharedAccess->getOwner();
 
-        if ($owner?->getApiExtensionToken()) {
-            $encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
-        }
+        $decryptedPassword = '';
+        if ($owner) {
+            $primaryKey = $owner->getCredentialEncryptionKey();
+            if (is_string($primaryKey) && $primaryKey !== '') {
+                $encryptionService->setKeyFromUserSecret($primaryKey);
+                $decryptedPassword = $encryptionService->decrypt((string) $credential?->getPassword());
+            }
 
-        $decryptedPassword = $encryptionService->decrypt((string) $credential?->getPassword());
+            $legacyKey = $owner->getApiExtensionToken();
+            if ($decryptedPassword === '' && is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
+                $encryptionService->setKeyFromUserSecret($legacyKey);
+                $decryptedPassword = $encryptionService->decrypt((string) $credential?->getPassword());
+            }
+        }
 
         return $this->render('shared_access/view_credential.html.twig', [
             'credential' => $credential,

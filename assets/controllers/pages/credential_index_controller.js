@@ -179,8 +179,8 @@ export default class extends Controller {
       if (show) visible += 1;
     });
 
-    ["mine", "shared"].forEach((section) => {
-      const label = this.element.querySelector(`#section-${section}`);
+    this.element.querySelectorAll("[id^='section-']").forEach((label) => {
+      const section = label.id.replace("section-", "");
       const grid = this.element.querySelector(`#grid-${section}`);
       if (!label) return;
 

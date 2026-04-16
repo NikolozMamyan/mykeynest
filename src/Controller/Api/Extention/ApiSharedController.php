@@ -159,6 +159,27 @@ final class ApiSharedController extends AbstractController
         return $credentialDomain === $domain || str_ends_with($credentialDomain, '.' . $domain);
     }
 
+    private function decryptWithUserKeys(User $user, string $encrypted): string
+    {
+        $primaryKey = $user->getCredentialEncryptionKey();
+        if (is_string($primaryKey) && $primaryKey !== '') {
+            $this->encryptionService->setKeyFromUserSecret($primaryKey);
+            $plaintext = $this->encryptionService->decrypt($encrypted);
+            if ($plaintext !== '') {
+                return $plaintext;
+            }
+        }
+
+        $legacyKey = $user->getApiExtensionToken();
+        if (is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
+            $this->encryptionService->setKeyFromUserSecret($legacyKey);
+
+            return $this->encryptionService->decrypt($encrypted);
+        }
+
+        return '';
+    }
+
     /**
      * @return array{user: User, client: ExtensionClient, issuedInstallationToken: ?string}|array{rate_limited: JsonResponse}|array{response: JsonResponse}|null
      */
@@ -400,12 +421,11 @@ final class ApiSharedController extends AbstractController
         }
 
         $owner = $cred->getUser();
-        if (!$owner || !$owner->getApiExtensionToken()) {
+        if (!$owner) {
             return $this->withInstallationToken($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 
-        $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
-        $password = $this->encryptionService->decrypt((string) $cred->getPassword());
+        $password = $this->decryptWithUserKeys($owner, (string) $cred->getPassword());
 
         if ($password === '') {
             return $this->withInstallationToken($this->json(['error' => 'Unable to decrypt credential'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
@@ -474,7 +494,7 @@ final class ApiSharedController extends AbstractController
             ], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 
-        $this->encryptionService->setKeyFromUserToken((string) $auth['user']->getApiExtensionToken());
+        $this->encryptionService->setKeyFromUserSecret($auth['user']->ensureCredentialEncryptionKey());
         $encryptedPassword = $this->encryptionService->encrypt($password);
 
         $credential = new Credential();

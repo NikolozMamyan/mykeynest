@@ -18,8 +18,13 @@ class EncryptionService
      */
     public function setKeyFromUserToken(string $userToken): void
     {
+        $this->setKeyFromUserSecret($userToken);
+    }
+
+    public function setKeyFromUserSecret(string $secret): void
+    {
         $appSecret = $_ENV['APP_SECRET'] ?? '';
-        $this->key = $this->deriveKey($appSecret . '|' . $userToken);
+        $this->key = $this->deriveKey($appSecret . '|' . $secret);
     }
 
     /**

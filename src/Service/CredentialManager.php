@@ -13,6 +13,32 @@ final class CredentialManager
         private EntityManagerInterface $entityManager
     ) {}
 
+    private function configureEncryptionForWrite(User $user): void
+    {
+        $this->encryptionService->setKeyFromUserSecret($user->ensureCredentialEncryptionKey());
+    }
+
+    private function decryptWithUserKeys(User $user, string $encrypted): string
+    {
+        $primaryKey = $user->getCredentialEncryptionKey();
+        if (is_string($primaryKey) && $primaryKey !== '') {
+            $this->encryptionService->setKeyFromUserSecret($primaryKey);
+            $plaintext = $this->encryptionService->decrypt($encrypted);
+            if ($plaintext !== '') {
+                return $plaintext;
+            }
+        }
+
+        $legacyKey = $user->getApiExtensionToken();
+        if (is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
+            $this->encryptionService->setKeyFromUserSecret($legacyKey);
+
+            return $this->encryptionService->decrypt($encrypted);
+        }
+
+        return '';
+    }
+
     /**
      * Ajoute un nouvel identifiant pour un utilisateur.
      */
@@ -22,7 +48,7 @@ public function create(Credential $credential, User $user): void
     $this->normalizeDomain($credential);
 
     // ✅ clé correcte pour CE user
-    $this->encryptionService->setKeyFromUserToken($user->getApiExtensionToken());
+    $this->configureEncryptionForWrite($user);
 
     $plainPassword = (string) $credential->getPassword();
     $credential->setPassword($this->encryptionService->encrypt($plainPassword));
@@ -40,12 +66,12 @@ public function update(Credential $credential, string $decryptedPassword, string
     $this->normalizeDomain($credential);
 
     $owner = $credential->getUser();
-    if (!$owner || !$owner->getApiExtensionToken()) {
-        throw new \RuntimeException('Owner missing apiExtensionToken, cannot encrypt/decrypt safely.');
+    if (!$owner) {
+        throw new \RuntimeException('Owner missing, cannot encrypt/decrypt safely.');
     }
 
     // ✅ clé correcte (owner)
-    $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+    $this->configureEncryptionForWrite($owner);
 
     $plainPassword = (string) $credential->getPassword();
 
@@ -79,13 +105,11 @@ public function update(Credential $credential, string $decryptedPassword, string
 public function decryptPassword(Credential $credential): string
 {
     $owner = $credential->getUser();
-    if (!$owner || !$owner->getApiExtensionToken()) {
+    if (!$owner) {
         return '';
     }
 
-    $this->encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
-
-    return $this->encryptionService->decrypt((string) $credential->getPassword());
+    return $this->decryptWithUserKeys($owner, (string) $credential->getPassword());
 }
 
 

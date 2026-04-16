@@ -7,6 +7,7 @@ use App\Entity\Credential;
 use App\Form\CredentialType;
 use App\Repository\CredentialRepository;
 use App\Repository\SharedAccessRepository;
+use App\Repository\TeamRepository;
 use App\Service\CredentialManager;
 use App\Service\SecurityCheckerService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,15 +43,64 @@ final class CredentialPageController extends AbstractController
     public function index(
         SharedAccessRepository $sharedAccessRepository,
         CredentialRepository $credentialRepository,
-        
+        TeamRepository $teamRepository,
     ): Response {
-        $user = $this->getUser();
+        $user = $this->getAuthenticatedUser();
+        $credentials = $credentialRepository->findByUser($user);
         $sharedAccesses = $sharedAccessRepository->findBy(['guest' => $user]);
+        $teams = $teamRepository->findTeamWithCredentialsByUser($user);
+
+        $excludedCredentialIds = [];
+        foreach ($credentials as $credential) {
+            if ($credential->getId() !== null) {
+                $excludedCredentialIds[$credential->getId()] = true;
+            }
+        }
+
+        foreach ($sharedAccesses as $sharedAccess) {
+            $sharedCredential = $sharedAccess->getCredential();
+            if ($sharedCredential instanceof Credential && $sharedCredential->getId() !== null) {
+                $excludedCredentialIds[$sharedCredential->getId()] = true;
+            }
+        }
+
+        $teamSharedCredentials = [];
+        foreach ($teams as $team) {
+            foreach ($team->getCredentials() as $credential) {
+                $credentialId = $credential->getId();
+                if ($credentialId === null || isset($excludedCredentialIds[$credentialId])) {
+                    continue;
+                }
+
+                $owner = $credential->getUser();
+                if (!$owner || $owner->getId() === $user->getId()) {
+                    continue;
+                }
+
+                if (!isset($teamSharedCredentials[$credentialId])) {
+                    $teamSharedCredentials[$credentialId] = [
+                        'credential' => $credential,
+                        'owner' => $owner,
+                        'teams' => [],
+                    ];
+                }
+
+                $teamSharedCredentials[$credentialId]['teams'][$team->getId()] = $team->getName();
+            }
+        }
 
 
         return $this->render('credential/index.html.twig', [
-            'credentials' => $credentialRepository->findByUser($user),
+            'credentials' => $credentials,
             'sharedAccesses' => $sharedAccesses,
+            'teamSharedCredentials' => array_values(array_map(
+                static function (array $entry): array {
+                    $entry['teams'] = array_values($entry['teams']);
+
+                    return $entry;
+                },
+                $teamSharedCredentials
+            )),
             'heading' => 'Mes accès',
         ]);
     }

@@ -49,6 +49,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $apiExtensionToken = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $credentialEncryptionKey = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
@@ -83,6 +86,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->extensionClients = new ArrayCollection();
+        $this->ensureCredentialEncryptionKey();
     }
 
     public function getId(): ?int
@@ -207,6 +211,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getApiExtensionToken(): ?string
     {
         return $this->apiExtensionToken;
+    }
+
+    public function getCredentialEncryptionKey(): ?string
+    {
+        return $this->credentialEncryptionKey;
+    }
+
+    public function setCredentialEncryptionKey(?string $credentialEncryptionKey): static
+    {
+        $this->credentialEncryptionKey = $credentialEncryptionKey;
+
+        return $this;
+    }
+
+    public function ensureCredentialEncryptionKey(): string
+    {
+        if (!is_string($this->credentialEncryptionKey) || $this->credentialEncryptionKey === '') {
+            $this->credentialEncryptionKey = bin2hex(random_bytes(32));
+        }
+
+        return $this->credentialEncryptionKey;
     }
 
     public function regenerateApiExtensionToken(): static

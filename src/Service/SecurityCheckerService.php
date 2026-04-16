@@ -26,6 +26,28 @@ class SecurityCheckerService
         private RouterInterface $router,
     ) {}
 
+    private function decryptWithUserKeys(User $user, string $encrypted): ?string
+    {
+        $primaryKey = $user->getCredentialEncryptionKey();
+        if (is_string($primaryKey) && $primaryKey !== '') {
+            $this->encryptionService->setKeyFromUserSecret($primaryKey);
+            $plaintext = $this->encryptionService->decrypt($encrypted);
+            if ($plaintext !== '') {
+                return $plaintext;
+            }
+        }
+
+        $legacyKey = $user->getApiExtensionToken();
+        if (is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
+            $this->encryptionService->setKeyFromUserSecret($legacyKey);
+            $plaintext = $this->encryptionService->decrypt($encrypted);
+
+            return $plaintext !== '' ? $plaintext : null;
+        }
+
+        return null;
+    }
+
     /**
      * @return array{
      *   overallScore:int,
@@ -98,27 +120,17 @@ class SecurityCheckerService
         $plainById = [];
         $hashCounts = [];
 
-        $viewerKey = $viewer->getApiExtensionToken() ?? '';
-
         foreach ($allCreds as $cred) {
             $owner = $cred->getUser();
-            $ownerKey = $owner?->getApiExtensionToken();
-
-            if (!$ownerKey) {
+            if (!$owner) {
                 $plainById[$cred->getId()] = null;
                 continue;
             }
 
-            $this->encryptionService->setKeyFromUserToken($ownerKey);
-            $plain = $this->encryptionService->decrypt((string) $cred->getPassword());
+            $plain = $this->decryptWithUserKeys($owner, (string) $cred->getPassword());
+            $plainById[$cred->getId()] = $plain;
 
-            if ($viewerKey !== '') {
-                $this->encryptionService->setKeyFromUserToken($viewerKey);
-            }
-
-            $plainById[$cred->getId()] = $plain !== '' ? $plain : null;
-
-            if ($plain !== '') {
+            if ($plain !== null && $plain !== '') {
                 $h = hash('sha256', $plain);
                 $hashCounts[$h] = ($hashCounts[$h] ?? 0) + 1;
             }

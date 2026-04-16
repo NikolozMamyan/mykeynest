@@ -13,10 +13,36 @@ final class DraftPasswordManager
         private EncryptionService $encryptionService
     ) {}
 
+    private function configureEncryptionForWrite(User $user): void
+    {
+        $this->encryptionService->setKeyFromUserSecret($user->ensureCredentialEncryptionKey());
+    }
+
+    private function decryptWithUserKeys(User $user, string $encrypted): string
+    {
+        $primaryKey = $user->getCredentialEncryptionKey();
+        if (is_string($primaryKey) && $primaryKey !== '') {
+            $this->encryptionService->setKeyFromUserSecret($primaryKey);
+            $plaintext = $this->encryptionService->decrypt($encrypted);
+            if ($plaintext !== '') {
+                return $plaintext;
+            }
+        }
+
+        $legacyKey = $user->getApiExtensionToken();
+        if (is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
+            $this->encryptionService->setKeyFromUserSecret($legacyKey);
+
+            return $this->encryptionService->decrypt($encrypted);
+        }
+
+        return '';
+    }
+
     public function create(string $password, ?string $name, User $user): DraftPassword
     {
         // Crée une copie du service avec la clé utilisateur
-        $this->encryptionService->setEncryptionKey($user->getApiExtensionToken() ?? 'default_key_if_no_user');
+        $this->configureEncryptionForWrite($user);
 
         $draft = new DraftPassword();
         $draft->setUser($user);
@@ -32,9 +58,7 @@ final class DraftPasswordManager
     public function decryptPassword(DraftPassword $draft): string
     {
         $user = $draft->getUser();
-        $this->encryptionService->setEncryptionKey($user->getApiExtensionToken() ?? 'default_key_if_no_user');
-
-        return $this->encryptionService->decrypt($draft->getPassword());
+        return $this->decryptWithUserKeys($user, $draft->getPassword());
     }
 
     public function delete(DraftPassword $draft): void

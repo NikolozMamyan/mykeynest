@@ -220,16 +220,28 @@ class AuthPageController extends AbstractController
             $credential = $sharedAccess->getCredential();
             $owner = $sharedAccess->getOwner();
 
-            if (!$credential || !$owner || !$owner->getApiExtensionToken()) {
+            if (!$credential || !$owner) {
                 continue;
             }
 
-            $encryptionService->setKeyFromUserToken($owner->getApiExtensionToken());
+            $decryptedPassword = '';
+            $primaryKey = $owner->getCredentialEncryptionKey();
+            if (is_string($primaryKey) && $primaryKey !== '') {
+                $encryptionService->setKeyFromUserSecret($primaryKey);
+                $decryptedPassword = $encryptionService->decrypt((string) $credential->getPassword());
+            }
+
+            $legacyKey = $owner->getApiExtensionToken();
+            if ($decryptedPassword === '' && is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
+                $encryptionService->setKeyFromUserSecret($legacyKey);
+                $decryptedPassword = $encryptionService->decrypt((string) $credential->getPassword());
+            }
+
             $sharedCredentials[] = [
                 'sharedAccess' => $sharedAccess,
                 'credential' => $credential,
                 'owner' => $owner,
-                'decryptedPassword' => $encryptionService->decrypt((string) $credential->getPassword()),
+                'decryptedPassword' => $decryptedPassword,
             ];
         }
 
