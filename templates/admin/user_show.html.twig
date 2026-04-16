@@ -1,0 +1,199 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin User {{ user.email }}{% endblock %}
+{% block admin_page_class %}ds-page--wide{% endblock %}
+{% block admin_page_title %}Fiche Utilisateur{% endblock %}
+{% block admin_page_intro %}Vue admin centralisee pour suivre abonnement, sessions et extensions d un compte.{% endblock %}
+
+{% block admin_toolbar %}
+  <div class="ds-toolbar-group">
+    <a href="{{ path('admin_users') }}" class="ds-btn ds-btn--secondary">Retour users</a>
+    <a href="{{ path('admin_subscriptions', { q: user.email }) }}" class="ds-btn ds-btn--secondary">Voir abonnement</a>
+    <a href="{{ path('admin_sessions', { q: user.email }) }}" class="ds-btn ds-btn--secondary">Voir sessions</a>
+  </div>
+{% endblock %}
+
+{% block admin_content %}
+  {% set subscription = user.userSubscription %}
+
+  <section class="ds-grid-3">
+    {% include 'components/ui/metric_card.html.twig' with { label: 'User ID', value: user.id } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Sessions recentes', value: sessions|length } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Extensions', value: extensionClients|length } only %}
+  </section>
+
+  <section class="ds-grid-2">
+    <div class="ds-surface">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">{{ user.email }}</h2>
+          <p class="ds-section-text">{{ user.company ?: 'Entreprise non renseignee' }}</p>
+        </div>
+      </div>
+
+      <div class="ds-cell-stack">
+        <span><strong>Roles:</strong> {{ user.roles ? user.roles|join(', ') : 'ROLE_USER' }}</span>
+        <span><strong>Locale:</strong> {{ user.locale }}</span>
+        <span><strong>Telephone:</strong> {{ user.phone ?: '-' }}</span>
+        <span><strong>Extension token:</strong> {{ user.apiExtensionToken ? 'present' : 'absent' }}</span>
+      </div>
+    </div>
+
+    <div class="ds-surface">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">Abonnement</h2>
+          <p class="ds-section-text">Etat courant et actions rapides.</p>
+        </div>
+      </div>
+
+      <div class="ds-cell-stack">
+        <span><strong>Plan:</strong> {{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</span>
+        <span><strong>Statut:</strong> {{ subscription and subscription.status ? subscription.status : 'aucun' }}</span>
+        <span><strong>Customer Stripe:</strong> <span class="ds-mono">{{ subscription and subscription.stripeCustomerId ? subscription.stripeCustomerId : '-' }}</span></span>
+        <span><strong>Subscription Stripe:</strong> <span class="ds-mono">{{ subscription and subscription.stripeSubscriptionId ? subscription.stripeSubscriptionId : '-' }}</span></span>
+      </div>
+
+      <div class="ds-actions-stack" style="margin-top:1rem;">
+        {% if not subscription or not subscription.isActive %}
+          <form method="post" action="{{ path('admin_user_subscription_assign_pro', {id: user.id}) }}" class="ds-inline-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('assign_pro_' ~ user.id) }}">
+            <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Activer Pro</button>
+          </form>
+        {% endif %}
+        {% if subscription %}
+          <form method="post" action="{{ path('admin_user_subscription_deactivate', {id: user.id}) }}" class="ds-inline-form" onsubmit="return confirm('Desactiver cet abonnement ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('deactivate_subscription_' ~ user.id) }}">
+            <button type="submit" class="ds-btn ds-btn--warning ds-btn--block">Desactiver</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-grid-2">
+    <div class="ds-surface ds-table-wrap">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">Sessions recentes</h2>
+          <p class="ds-section-text">Controle rapide des sessions et appareils.</p>
+        </div>
+        <form method="post" action="{{ path('admin_user_sessions_revoke_all', {id: user.id}) }}" class="ds-inline-form" onsubmit="return confirm('Revoquer toutes les sessions de cet utilisateur ?');">
+          <input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_all_sessions_' ~ user.id) }}">
+          <button type="submit" class="ds-btn ds-btn--danger">Revoquer toutes</button>
+        </form>
+      </div>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Session</th>
+            <th>Appareil</th>
+            <th>Reseau</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in sessions %}
+            <tr>
+              <td>
+                <div class="ds-cell-stack">
+                  <span class="ds-title-strong">#{{ session.id }}</span>
+                  <span class="ds-muted">{{ session.lastActivityAt ? session.lastActivityAt|date('d/m/Y H:i') : '-' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="ds-cell-stack">
+                  <span>{{ session.deviceName ?: 'Appareil inconnu' }}</span>
+                  <span class="ds-mono">{{ session.deviceId ?: '-' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="ds-cell-stack">
+                  <span class="ds-mono">{{ session.ipAddress ?: '-' }}</span>
+                  <span class="ds-muted ds-text-break">{{ session.userAgent ?: '-' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="ds-badges">
+                  {% if session.isBlocked %}
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'bloquee', tone: 'danger' } only %}
+                  {% elseif session.isRevoked %}
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'revoquee', tone: 'warning' } only %}
+                  {% elseif session.expiresAt and session.expiresAt <= date() %}
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'expiree', tone: 'muted' } only %}
+                  {% else %}
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'active', tone: 'success' } only %}
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4" class="ds-empty">Aucune session recente.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ds-surface ds-table-wrap">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">Extensions et challenges</h2>
+          <p class="ds-section-text">Visibilite sur les installations associees.</p>
+        </div>
+      </div>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Derniere activite</th>
+            <th>Etat</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for client in extensionClients %}
+            <tr>
+              <td>
+                <div class="ds-cell-stack">
+                  <span class="ds-title-strong">{{ client.deviceLabel ?: client.clientId }}</span>
+                  <span class="ds-muted">{{ client.browserName ?: '-' }} {{ client.browserVersion ?: '' }}</span>
+                </div>
+              </td>
+              <td>{{ client.lastSeenAt ? client.lastSeenAt|date('d/m/Y H:i') : '-' }}</td>
+              <td>
+                <div class="ds-badges">
+                  {% if client.isBlocked %}
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'bloquee', tone: 'danger' } only %}
+                  {% elseif client.isRevoked %}
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'revoquee', tone: 'warning' } only %}
+                  {% else %}
+                    {% include 'components/ui/status_badge.html.twig' with { label: 'active', tone: 'success' } only %}
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+          {% for challenge in extensionChallenges %}
+            <tr>
+              <td>
+                <div class="ds-cell-stack">
+                  <span class="ds-title-strong">Challenge {{ challenge.requestedClientId ?: '#' ~ challenge.id }}</span>
+                  <span class="ds-muted">{{ challenge.deviceLabel ?: challenge.browserName ?: '-' }}</span>
+                </div>
+              </td>
+              <td>{{ challenge.createdAt ? challenge.createdAt|date('d/m/Y H:i') : '-' }}</td>
+              <td>{% include 'components/ui/status_badge.html.twig' with { label: challenge.status ?: 'pending', tone: challenge.status == 'approved' ? 'success' : (challenge.status == 'rejected' ? 'warning' : 'muted') } only %}</td>
+            </tr>
+          {% else %}
+            {% if extensionClients is empty %}
+              <tr>
+                <td colspan="3" class="ds-empty">Aucune extension ni challenge recent.</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

@@ -11,6 +11,12 @@
     {% include 'components/ui/metric_card.html.twig' with { label: 'Subscriptions actives', value: activeSubscriptionsCount } only %}
   </section>
 
+  <section class="ds-grid-3">
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Sessions actives', value: activeSessionsCount } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Sessions bloquees', value: blockedSessionsCount } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Users recents', value: recentUsers|length } only %}
+  </section>
+
   <section class="ds-grid-2">
     <div class="ds-surface">
       <div class="ds-section-head">

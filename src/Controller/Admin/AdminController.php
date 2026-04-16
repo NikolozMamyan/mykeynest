@@ -13,6 +13,7 @@ use App\Repository\ExtensionInstallationChallengeRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserSessionRepository;
 use App\Repository\UserSubscriptionRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
@@ -51,7 +52,8 @@ final class AdminController extends AbstractController
     public function index(
         EntityManagerInterface $em,
         Request $request,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        UserSessionRepository $userSessionRepository
     ): Response
     {
         return $this->render('admin/index.html.twig', [
@@ -60,6 +62,8 @@ final class AdminController extends AbstractController
             'articlesCount' => $this->countArticles($em),
             'usersCount' => $this->countUsers($userRepository),
             'activeSubscriptionsCount' => $this->countActiveSubscriptions($userRepository),
+            'activeSessionsCount' => $this->countActiveSessions($userSessionRepository),
+            'blockedSessionsCount' => $this->countBlockedSessions($userSessionRepository),
         ]);
     }
 
@@ -76,28 +80,111 @@ final class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/users', name: 'admin_users', methods: ['GET'])]
+    public function users(
+        Request $request,
+        UserRepository $userRepository,
+        UserSessionRepository $userSessionRepository,
+        ExtensionClientRepository $extensionClientRepository
+    ): Response {
+        $filters = $this->buildUserFilters($request);
+        $qb = $userRepository->createQueryBuilder('u')
+            ->leftJoin('u.userSubscription', 's')
+            ->addSelect('s');
+
+        $this->applyUserFilters($qb, $filters);
+
+        /** @var list<User> $users */
+        $users = $qb
+            ->setMaxResults(200)
+            ->getQuery()
+            ->getResult();
+
+        $userIds = array_map(static fn(User $user) => $user->getId(), $users);
+
+        return $this->render('admin/users.html.twig', [
+            'users' => $users,
+            'filters' => $filters,
+            'sessionCounts' => $this->fetchUserCounts($userSessionRepository, 's.user', $userIds, 's'),
+            'extensionCounts' => $this->fetchUserCounts($extensionClientRepository, 'ec.user', $userIds, 'ec'),
+        ]);
+    }
+
     #[Route('/subscriptions', name: 'admin_subscriptions', methods: ['GET'])]
-    public function subscriptions(UserRepository $userRepository): Response
+    public function subscriptions(Request $request, UserRepository $userRepository): Response
     {
+        $filters = $this->buildUserFilters($request);
+        $qb = $userRepository->createQueryBuilder('u')
+            ->leftJoin('u.userSubscription', 's')
+            ->addSelect('s');
+
+        $this->applyUserFilters($qb, $filters);
+
         return $this->render('admin/subscriptions.html.twig', [
-            'users' => $this->getUsers($userRepository),
+            'users' => $qb->setMaxResults(200)->getQuery()->getResult(),
+            'filters' => $filters,
         ]);
     }
 
     #[Route('/sessions', name: 'admin_sessions', methods: ['GET'])]
-    public function sessions(UserSessionRepository $userSessionRepository): Response
+    public function sessions(Request $request, UserSessionRepository $userSessionRepository): Response
     {
-        $sessions = $userSessionRepository->createQueryBuilder('s')
+        $filters = $this->buildSessionFilters($request);
+        $qb = $userSessionRepository->createQueryBuilder('s')
             ->leftJoin('s.user', 'u')
             ->addSelect('u')
             ->orderBy('s.lastActivityAt', 'DESC')
-            ->addOrderBy('s.id', 'DESC')
-            ->setMaxResults(200)
+            ->addOrderBy('s.id', 'DESC');
+
+        $this->applySessionFilters($qb, $filters);
+
+        $sessions = $qb
+            ->setMaxResults(250)
             ->getQuery()
             ->getResult();
 
         return $this->render('admin/sessions.html.twig', [
             'sessions' => $sessions,
+            'filters' => $filters,
+        ]);
+    }
+
+    #[Route('/users/{id}', name: 'admin_user_show', methods: ['GET'])]
+    public function showUser(
+        User $user,
+        UserSessionRepository $userSessionRepository,
+        ExtensionClientRepository $extensionClientRepository,
+        ExtensionInstallationChallengeRepository $challengeRepository
+    ): Response {
+        $sessions = $userSessionRepository->createQueryBuilder('s')
+            ->andWhere('s.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('s.lastActivityAt', 'DESC')
+            ->setMaxResults(25)
+            ->getQuery()
+            ->getResult();
+
+        $extensionClients = $extensionClientRepository->createQueryBuilder('ec')
+            ->andWhere('ec.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('ec.lastSeenAt', 'DESC')
+            ->setMaxResults(15)
+            ->getQuery()
+            ->getResult();
+
+        $extensionChallenges = $challengeRepository->createQueryBuilder('c')
+            ->andWhere('c.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('c.createdAt', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('admin/user_show.html.twig', [
+            'user' => $user,
+            'sessions' => $sessions,
+            'extensionClients' => $extensionClients,
+            'extensionChallenges' => $extensionChallenges,
         ]);
     }
 
@@ -177,6 +264,24 @@ final class AdminController extends AbstractController
         $this->addFlash('warning', 'Abonnement desactive pour ' . $user->getEmail() . '.');
 
         return $this->redirectToRoute('admin_subscriptions');
+    }
+
+    #[Route('/users/{id}/sessions/revoke-all', name: 'admin_user_sessions_revoke_all', methods: ['POST'])]
+    public function revokeAllUserSessions(
+        User $user,
+        Request $request,
+        SessionManager $sessionManager
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_revoke_all_sessions_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_user_show', ['id' => $user->getId()]);
+        }
+
+        $count = $sessionManager->revokeAllForUser($user);
+        $this->addFlash('warning', sprintf('%d session(s) revoquee(s) pour %s.', $count, $user->getEmail()));
+
+        return $this->redirectToRoute('admin_user_show', ['id' => $user->getId()]);
     }
 
     #[Route('/sessions/{id}/revoke', name: 'admin_session_revoke', methods: ['POST'])]
@@ -721,5 +826,151 @@ final class AdminController extends AbstractController
             ->setParameter('active', true)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    private function countActiveSessions(UserSessionRepository $userSessionRepository): int
+    {
+        return (int) $userSessionRepository->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->andWhere('s.isBlocked = false')
+            ->andWhere('s.isRevoked = false')
+            ->andWhere('s.expiresAt > :now')
+            ->setParameter('now', new DateTimeImmutable())
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    private function countBlockedSessions(UserSessionRepository $userSessionRepository): int
+    {
+        return (int) $userSessionRepository->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->andWhere('s.isBlocked = true')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return array{q:string,subscription:string,role:string,sort:string}
+     */
+    private function buildUserFilters(Request $request): array
+    {
+        $subscription = (string) $request->query->get('subscription', 'all');
+        $role = (string) $request->query->get('role', 'all');
+        $sort = (string) $request->query->get('sort', 'newest');
+
+        return [
+            'q' => $this->sanitizeSearchQuery($request->query->get('q', '')),
+            'subscription' => in_array($subscription, ['all', 'active', 'inactive', 'free'], true) ? $subscription : 'all',
+            'role' => in_array($role, ['all', 'admin', 'user', 'guest'], true) ? $role : 'all',
+            'sort' => in_array($sort, ['newest', 'oldest', 'email', 'company'], true) ? $sort : 'newest',
+        ];
+    }
+
+    /**
+     * @param array{q:string,subscription:string,role:string,sort:string} $filters
+     */
+    private function applyUserFilters(QueryBuilder $qb, array $filters): void
+    {
+        if ($filters['q'] !== '') {
+            if (ctype_digit($filters['q'])) {
+                $qb->andWhere('u.id = :exactId OR u.email LIKE :query OR u.company LIKE :query')
+                    ->setParameter('exactId', (int) $filters['q']);
+            } else {
+                $qb->andWhere('u.email LIKE :query OR u.company LIKE :query');
+            }
+
+            $qb->setParameter('query', '%' . $filters['q'] . '%');
+        }
+
+        match ($filters['subscription']) {
+            'active' => $qb->andWhere('s.isActive = true'),
+            'inactive' => $qb->andWhere('s.id IS NOT NULL')->andWhere('s.isActive = false'),
+            'free' => $qb->andWhere('s.id IS NULL'),
+            default => null,
+        };
+
+        match ($filters['role']) {
+            'admin' => $qb->andWhere('u.roles LIKE :roleAdmin')->setParameter('roleAdmin', '%ROLE_ADMIN%'),
+            'user' => $qb->andWhere('u.roles LIKE :roleUser')->setParameter('roleUser', '%ROLE_USER%'),
+            'guest' => $qb->andWhere('u.roles LIKE :roleGuest')->setParameter('roleGuest', '%ROLE_GUEST%'),
+            default => null,
+        };
+
+        match ($filters['sort']) {
+            'oldest' => $qb->orderBy('u.id', 'ASC'),
+            'email' => $qb->orderBy('u.email', 'ASC'),
+            'company' => $qb->orderBy('u.company', 'ASC')->addOrderBy('u.email', 'ASC'),
+            default => $qb->orderBy('u.id', 'DESC'),
+        };
+    }
+
+    /**
+     * @return array{q:string,status:string}
+     */
+    private function buildSessionFilters(Request $request): array
+    {
+        $status = (string) $request->query->get('status', 'all');
+
+        return [
+            'q' => $this->sanitizeSearchQuery($request->query->get('q', '')),
+            'status' => in_array($status, ['all', 'active', 'blocked', 'revoked', 'expired'], true) ? $status : 'all',
+        ];
+    }
+
+    /**
+     * @param array{q:string,status:string} $filters
+     */
+    private function applySessionFilters(QueryBuilder $qb, array $filters): void
+    {
+        if ($filters['q'] !== '') {
+            if (ctype_digit($filters['q'])) {
+                $qb->andWhere('s.id = :sessionId OR u.id = :userId OR u.email LIKE :query OR u.company LIKE :query OR s.deviceName LIKE :query OR s.deviceId LIKE :query OR s.ipAddress LIKE :query')
+                    ->setParameter('sessionId', (int) $filters['q'])
+                    ->setParameter('userId', (int) $filters['q']);
+            } else {
+                $qb->andWhere('u.email LIKE :query OR u.company LIKE :query OR s.deviceName LIKE :query OR s.deviceId LIKE :query OR s.ipAddress LIKE :query');
+            }
+
+            $qb->setParameter('query', '%' . $filters['q'] . '%');
+        }
+
+        match ($filters['status']) {
+            'active' => $qb->andWhere('s.isBlocked = false')->andWhere('s.isRevoked = false')->andWhere('s.expiresAt > :now'),
+            'blocked' => $qb->andWhere('s.isBlocked = true'),
+            'revoked' => $qb->andWhere('s.isRevoked = true'),
+            'expired' => $qb->andWhere('s.expiresAt <= :now'),
+            default => null,
+        };
+
+        if ($filters['status'] !== 'all') {
+            $qb->setParameter('now', new DateTimeImmutable());
+        }
+    }
+
+    /**
+     * @param list<int|null> $userIds
+     * @return array<int, int>
+     */
+    private function fetchUserCounts(object $repository, string $field, array $userIds, string $alias): array
+    {
+        $userIds = array_values(array_filter($userIds, static fn(?int $id) => $id !== null));
+        if ($userIds === []) {
+            return [];
+        }
+
+        $rows = $repository->createQueryBuilder($alias)
+            ->select('IDENTITY(' . $field . ') AS userId, COUNT(' . $alias . '.id) AS itemCount')
+            ->andWhere($field . ' IN (:userIds)')
+            ->setParameter('userIds', $userIds)
+            ->groupBy($field)
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['userId']] = (int) $row['itemCount'];
+        }
+
+        return $counts;
     }
 }

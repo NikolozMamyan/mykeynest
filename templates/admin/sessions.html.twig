@@ -5,6 +5,20 @@
 {% block admin_page_title %}Sessions{% endblock %}
 {% block admin_page_intro %}Surveillance des sessions users avec actions de revocation et blocage appareil.{% endblock %}
 
+{% block admin_toolbar %}
+  <form method="get" action="{{ path('admin_sessions') }}" class="ds-search-form ds-toolbar-grow">
+    <input class="ds-input" type="search" name="q" value="{{ filters.q }}" placeholder="Email, entreprise, device, IP, session ID">
+    <select class="ds-select" name="status">
+      <option value="all" {{ filters.status == 'all' ? 'selected' : '' }}>Tous statuts</option>
+      <option value="active" {{ filters.status == 'active' ? 'selected' : '' }}>Actives</option>
+      <option value="blocked" {{ filters.status == 'blocked' ? 'selected' : '' }}>Bloquees</option>
+      <option value="revoked" {{ filters.status == 'revoked' ? 'selected' : '' }}>Revoquees</option>
+      <option value="expired" {{ filters.status == 'expired' ? 'selected' : '' }}>Expirees</option>
+    </select>
+    <button type="submit" class="ds-btn ds-btn--primary">Filtrer</button>
+  </form>
+{% endblock %}
+
 {% block admin_content %}
   <div class="ds-surface ds-table-wrap">
     <table class="ds-table">
@@ -68,6 +82,7 @@
             </td>
             <td>
               <div class="ds-actions-stack">
+                <a href="{{ path('admin_user_show', {id: session.user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Fiche user</a>
                 {% if not session.isRevoked %}
                   <form method="post" action="{{ path('admin_session_revoke', {id: session.id}) }}" class="ds-inline-form" onsubmit="return confirm('Revoquer cette session ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_session_' ~ session.id) }}">

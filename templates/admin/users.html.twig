@@ -1,0 +1,84 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Users{% endblock %}
+{% block admin_page_title %}Utilisateurs{% endblock %}
+{% block admin_page_intro %}Recherche transverse sur les comptes, leur abonnement et leur activite recente.{% endblock %}
+
+{% block admin_toolbar %}
+  <form method="get" action="{{ path('admin_users') }}" class="ds-search-form ds-toolbar-grow">
+    <input class="ds-input" type="search" name="q" value="{{ filters.q }}" placeholder="Email, entreprise ou ID">
+    <select class="ds-select" name="subscription">
+      <option value="all" {{ filters.subscription == 'all' ? 'selected' : '' }}>Tous abonnements</option>
+      <option value="active" {{ filters.subscription == 'active' ? 'selected' : '' }}>Actifs</option>
+      <option value="inactive" {{ filters.subscription == 'inactive' ? 'selected' : '' }}>Inactifs</option>
+      <option value="free" {{ filters.subscription == 'free' ? 'selected' : '' }}>Sans abonnement</option>
+    </select>
+    <select class="ds-select" name="role">
+      <option value="all" {{ filters.role == 'all' ? 'selected' : '' }}>Tous roles</option>
+      <option value="admin" {{ filters.role == 'admin' ? 'selected' : '' }}>Admins</option>
+      <option value="user" {{ filters.role == 'user' ? 'selected' : '' }}>Users</option>
+      <option value="guest" {{ filters.role == 'guest' ? 'selected' : '' }}>Guests</option>
+    </select>
+    <select class="ds-select" name="sort">
+      <option value="newest" {{ filters.sort == 'newest' ? 'selected' : '' }}>Plus recents</option>
+      <option value="oldest" {{ filters.sort == 'oldest' ? 'selected' : '' }}>Plus anciens</option>
+      <option value="email" {{ filters.sort == 'email' ? 'selected' : '' }}>Email</option>
+      <option value="company" {{ filters.sort == 'company' ? 'selected' : '' }}>Entreprise</option>
+    </select>
+    <button type="submit" class="ds-btn ds-btn--primary">Filtrer</button>
+  </form>
+{% endblock %}
+
+{% block admin_content %}
+  <div class="ds-surface ds-table-wrap">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Entreprise</th>
+          <th>Roles</th>
+          <th>Abonnement</th>
+          <th>Sessions</th>
+          <th>Extensions</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          {% set subscription = user.userSubscription %}
+          <tr>
+            <td>
+              <div class="ds-cell-stack">
+                <span class="ds-title-strong">#{{ user.id }} {{ user.email }}</span>
+                <span class="ds-muted">{{ subscription ? 'MAJ abonnement: ' ~ subscription.updatedAt|date('d/m/Y H:i') : 'Compte sans abonnement' }}</span>
+              </div>
+            </td>
+            <td>{{ user.company ?: '-' }}</td>
+            <td class="ds-text-break">{{ user.roles ? user.roles|join(', ') : 'ROLE_USER' }}</td>
+            <td>
+              <div class="ds-cell-stack">
+                <span class="ds-title-strong">{{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</span>
+                {% if subscription and subscription.isActive %}
+                  {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'active', tone: 'success' } only %}
+                {% elseif subscription %}
+                  {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'inactive', tone: 'warning' } only %}
+                {% else %}
+                  {% include 'components/ui/status_badge.html.twig' with { label: 'aucun', tone: 'muted' } only %}
+                {% endif %}
+              </div>
+            </td>
+            <td>{{ sessionCounts[user.id] ?? 0 }}</td>
+            <td>{{ extensionCounts[user.id] ?? 0 }}</td>
+            <td>
+              <a href="{{ path('admin_user_show', {id: user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Ouvrir la fiche</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="ds-empty">Aucun utilisateur ne correspond aux filtres.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -4,6 +4,25 @@
 {% block admin_page_title %}Subscriptions{% endblock %}
 {% block admin_page_intro %}Vue rapide des 100 derniers comptes avec leur statut d abonnement.{% endblock %}
 
+{% block admin_toolbar %}
+  <form method="get" action="{{ path('admin_subscriptions') }}" class="ds-search-form ds-toolbar-grow">
+    <input class="ds-input" type="search" name="q" value="{{ filters.q }}" placeholder="Email, entreprise ou ID">
+    <select class="ds-select" name="subscription">
+      <option value="all" {{ filters.subscription == 'all' ? 'selected' : '' }}>Tous abonnements</option>
+      <option value="active" {{ filters.subscription == 'active' ? 'selected' : '' }}>Actifs</option>
+      <option value="inactive" {{ filters.subscription == 'inactive' ? 'selected' : '' }}>Inactifs</option>
+      <option value="free" {{ filters.subscription == 'free' ? 'selected' : '' }}>Sans abonnement</option>
+    </select>
+    <select class="ds-select" name="role">
+      <option value="all" {{ filters.role == 'all' ? 'selected' : '' }}>Tous roles</option>
+      <option value="admin" {{ filters.role == 'admin' ? 'selected' : '' }}>Admins</option>
+      <option value="user" {{ filters.role == 'user' ? 'selected' : '' }}>Users</option>
+      <option value="guest" {{ filters.role == 'guest' ? 'selected' : '' }}>Guests</option>
+    </select>
+    <button type="submit" class="ds-btn ds-btn--primary">Filtrer</button>
+  </form>
+{% endblock %}
+
 {% block admin_content %}
   <div class="ds-surface ds-table-wrap">
     <table class="ds-table">
@@ -52,6 +71,7 @@
             <td>{{ subscription ? subscription.updatedAt|date('d/m/Y H:i') : '-' }}</td>
             <td>
               <div class="ds-actions-stack">
+                <a href="{{ path('admin_user_show', {id: user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Fiche user</a>
                 {% if not subscription or not subscription.isActive %}
                   <form method="post" action="{{ path('admin_user_subscription_assign_pro', {id: user.id}) }}" class="ds-inline-form">
                     <input type="hidden" name="_token" value="{{ csrf_token('assign_pro_' ~ user.id) }}">
