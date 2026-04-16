@@ -2,6 +2,7 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\User;
 use App\Entity\Credential;
 use App\Form\CredentialType;
 use App\Repository\CredentialRepository;
@@ -27,6 +28,16 @@ final class CredentialPageController extends AbstractController
         private CredentialRepository $credentialRepository
     ) {}
 
+    private function getAuthenticatedUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $user;
+    }
+
     #[Route('/app/credential', name: 'app_credential')]
     public function index(
         SharedAccessRepository $sharedAccessRepository,
@@ -47,10 +58,7 @@ final class CredentialPageController extends AbstractController
 #[Route('/app/credential/new', name: 'credential_new', methods: ['GET', 'POST'])]
 public function new(Request $request): Response
 {
-    $user = $this->getUser();
-    if (!$user) {
-        throw $this->createAccessDeniedException();
-    }
+    $user = $this->getAuthenticatedUser();
 
     // 1) Vérifier la limite si pas d'abonnement
     // Adapte ces 2 lignes à ton projet (repo / relation / méthode)
@@ -96,6 +104,7 @@ public function new(Request $request): Response
     #[Route('/app/credential/{id}', name: 'credential_show', methods: ['GET'])]
     public function show(Credential $credential): Response
     {
+        $this->denyAccessUnlessGranted('CREDENTIAL_VIEW', $credential);
         $decryptedPassword = $this->credentialManager->decryptPassword($credential);
 
         return $this->render('credential/show.html.twig', [
@@ -108,6 +117,8 @@ public function new(Request $request): Response
 #[Route('/app/credential/{id}/edit', name: 'credential_edit', methods: ['GET', 'POST'])]
 public function edit(Request $request, Credential $credential): Response
 {
+    $this->denyAccessUnlessGranted('CREDENTIAL_EDIT', $credential);
+
     // Sauvegarder le mot de passe chiffré original
     $originalEncryptedPassword = $credential->getPassword();
     
@@ -115,7 +126,7 @@ public function edit(Request $request, Credential $credential): Response
     $decryptedPassword = $this->credentialManager->decryptPassword($credential);
     
     $form = $this->createForm(CredentialType::class, $credential, [
-        'user' => $this->getUser(),
+        'user' => $this->getAuthenticatedUser(),
         'is_edit' => true,
     ]);
 
@@ -150,6 +161,8 @@ public function edit(Request $request, Credential $credential): Response
     #[Route('/app/credential/{id}', name: 'credential_delete', methods: ['POST'])]
     public function delete(Request $request, Credential $credential): Response
     {
+        $this->denyAccessUnlessGranted('CREDENTIAL_DELETE', $credential);
+
         if ($this->isCsrfTokenValid('delete'.$credential->getId(), $request->request->get('_token'))) {
             $this->credentialManager->delete($credential);
             $this->addFlash('success', 'Identifiant supprimé avec succès.');
@@ -162,10 +175,7 @@ public function importCredentials(Request $request): Response
 {
     $results = [];
 
-    $user = $this->getUser();
-    if (!$user) {
-        throw $this->createAccessDeniedException();
-    }
+    $user = $this->getAuthenticatedUser();
 
     // ✅ Tu veux interdire l’import si pas abonné
     if (!$user->hasActiveSubscription()) {
@@ -301,10 +311,7 @@ public function importCredentials(Request $request): Response
 #[Route('/app/credential/{id}/details/modal', name: 'credential_details_modal', methods: ['GET'])]
 public function detailsModal(Credential $credential): Response
 {
-    $user = $this->getUser();
-    if (!$user || $credential->getUser() !== $user) {
-        throw $this->createAccessDeniedException();
-    }
+    $this->denyAccessUnlessGranted('CREDENTIAL_EDIT', $credential);
 
     return $this->render('credential/_details_modal.html.twig', [
         'credential' => $credential,
@@ -315,8 +322,9 @@ public function detailsModal(Credential $credential): Response
 #[Route('/app/credential/{id}/details', name: 'credential_details_update', methods: ['POST'])]
 public function detailsUpdate(Request $request, Credential $credential, EntityManagerInterface $entityManager): JsonResponse
 {
-    $user = $this->getUser();
-    if (!$user || $credential->getUser() !== $user) {
+    try {
+        $this->denyAccessUnlessGranted('CREDENTIAL_EDIT', $credential);
+    } catch (\Symfony\Component\Security\Core\Exception\AccessDeniedException) {
         return $this->json(['success' => false, 'message' => 'Accès refusé'], 403);
     }
 

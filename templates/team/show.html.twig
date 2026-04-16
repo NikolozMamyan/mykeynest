@@ -91,7 +91,9 @@
                             </svg>
                         </div>
                         <div class="credential-info">
-                            <div class="credential-name">{{ credential.name }}</div>
+                            <div class="credential-name">
+                                <a href="{{ path('credential_show', {'id': credential.id}) }}">{{ credential.name }}</a>
+                            </div>
                             {% if credential.domain %}
                                 <div class="credential-url">{{ credential.domain }}</div>
                             {% endif %}

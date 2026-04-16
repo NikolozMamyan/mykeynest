@@ -144,6 +144,21 @@ final class ApiSharedController extends AbstractController
         return $value === '' ? null : mb_substr($value, 0, 1000);
     }
 
+    private function normalizeDomain(string $domain): string
+    {
+        $domain = preg_replace('#^https?://#', '', $domain);
+        $domain = preg_replace('#^www\.#', '', $domain);
+
+        return strtolower(trim($domain));
+    }
+
+    private function credentialMatchesDomain(Credential $credential, string $domain): bool
+    {
+        $credentialDomain = $this->normalizeDomain((string) $credential->getDomain());
+
+        return $credentialDomain === $domain || str_ends_with($credentialDomain, '.' . $domain);
+    }
+
     /**
      * @return array{user: User, client: ExtensionClient, issuedInstallationToken: ?string}|array{rate_limited: JsonResponse}|array{response: JsonResponse}|null
      */
@@ -218,7 +233,7 @@ final class ApiSharedController extends AbstractController
     }
 
     #[Route('/extention/api/search', name: 'api_credential_search', methods: ['POST', 'OPTIONS'])]
-    public function apiSearch(Request $request, CredentialRepository $credentialRepository): JsonResponse
+    public function apiSearch(Request $request, CredentialRepository $credentialRepository, SharedAccessRepository $sharedAccessRepository, TeamRepository $teamRepository): JsonResponse
     {
         if ($pf = $this->preflight($request)) {
             return $pf;
@@ -241,11 +256,31 @@ final class ApiSharedController extends AbstractController
             return $this->badRequest('Domaine non spécifié');
         }
 
-        $domain = preg_replace('#^https?://#', '', $domain);
-        $domain = preg_replace('#^www\.#', '', $domain);
-        $domain = strtolower(trim($domain));
+        $domain = $this->normalizeDomain($domain);
 
-        $credentials = $credentialRepository->findByDomainAndUser($domain, $auth['user']);
+        $user = $auth['user'];
+        $credentialsById = [];
+
+        foreach ($credentialRepository->findByDomainAndUser($domain, $user) as $credential) {
+            $credentialsById[$credential->getId()] = $credential;
+        }
+
+        foreach ($sharedAccessRepository->findSharedWith($user) as $sharedAccess) {
+            $credential = $sharedAccess->getCredential();
+            if ($credential instanceof Credential && $this->credentialMatchesDomain($credential, $domain)) {
+                $credentialsById[$credential->getId()] = $credential;
+            }
+        }
+
+        foreach ($teamRepository->findTeamWithCredentialsByUser($user) as $team) {
+            foreach ($team->getCredentials() as $credential) {
+                if ($this->credentialMatchesDomain($credential, $domain)) {
+                    $credentialsById[$credential->getId()] = $credential;
+                }
+            }
+        }
+
+        $credentials = array_values($credentialsById);
         $result = array_map(
             static fn(Credential $credential) => [
                 'id' => $credential->getId(),
