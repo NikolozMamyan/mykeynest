@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <title>{{ title }}</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 100%);
+      color: #1e293b;
+    }
+    .card {
+      width: min(100%, 480px);
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+      padding: 28px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+    p {
+      margin: 0 0 24px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #475569;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hint {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid #cbd5e1;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      background: #fff;
+      color: #334155;
+    }
+    .btn-primary {
+      background: #059669;
+      border-color: #059669;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>{{ title }}</h1>
+    <p>{{ message }}</p>
+    <form method="post" id="challenge-action-form">
+      <input type="hidden" name="_token" value="{{ csrf_token(csrfTokenId) }}">
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">{{ confirmLabel }}</button>
+        <a href="/login" class="btn">{{ cancelLabel }}</a>
+      </div>
+      {% if autoSubmit|default(false) %}
+        <p class="hint">Validation en cours...</p>
+      {% endif %}
+    </form>
+    {% if autoSubmit|default(false) %}
+      <script>
+        window.setTimeout(() => {
+          document.getElementById('challenge-action-form')?.submit();
+        }, 60);
+      </script>
+    {% endif %}
+  </main>
+</body>
+</html>

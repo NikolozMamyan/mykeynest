@@ -21,11 +21,18 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class AuthController extends AbstractController
 {
+    public function __construct(
+        private RateLimiterFactory $authLoginLimiter,
+        private RateLimiterFactory $authRegisterLimiter
+    ) {
+    }
+
     private function getPostAuthRedirectUrl(UrlGeneratorInterface $urlGenerator, User $user, bool $isFirstLogin): string
     {
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
@@ -75,6 +82,14 @@ final class AuthController extends AbstractController
             ->withExpires(new \DateTimeImmutable('+15 minutes'));
     }
 
+    private function buildLimiterKey(Request $request, ?string $identifier = null): string
+    {
+        $ip = (string) ($request->getClientIp() ?? 'unknown');
+        $identifier = $identifier !== null ? trim(mb_strtolower($identifier)) : '';
+
+        return $identifier !== '' ? $ip . '|' . $identifier : $ip;
+    }
+
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(
         Request $request,
@@ -89,6 +104,17 @@ final class AuthController extends AbstractController
         AdminNotificationService $adminNotificationService
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
+        $email = is_array($data) && isset($data['email']) && is_string($data['email']) ? $data['email'] : null;
+        $limit = $this->authRegisterLimiter->create($this->buildLimiterKey($request, $email))->consume(1);
+
+        if (!$limit->isAccepted()) {
+            $retryAfter = $limit->getRetryAfter();
+
+            return new JsonResponse([
+                'error' => 'Too many registration attempts. Please try again later.',
+                'retryAfter' => $retryAfter?->format(DATE_ATOM),
+            ], 429);
+        }
 
         if (!is_array($data) || !isset($data['email'], $data['password'])) {
             return new JsonResponse(['error' => 'Email and password are required'], 400);
@@ -197,6 +223,17 @@ final class AuthController extends AbstractController
         UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
+        $email = is_array($data) && isset($data['email']) && is_string($data['email']) ? $data['email'] : null;
+        $limit = $this->authLoginLimiter->create($this->buildLimiterKey($request, $email))->consume(1);
+
+        if (!$limit->isAccepted()) {
+            $retryAfter = $limit->getRetryAfter();
+
+            return new JsonResponse([
+                'error' => 'Too many login attempts. Please try again later.',
+                'retryAfter' => $retryAfter?->format(DATE_ATOM),
+            ], 429);
+        }
 
         if (!is_array($data) || !isset($data['email'], $data['password'])) {
             return new JsonResponse(['error' => 'Email and password are required'], 400);
@@ -389,8 +426,9 @@ final class AuthController extends AbstractController
         return $response;
     }
 
-    #[Route('/api/login-challenge/{token}/approve', name: 'api_login_challenge_approve', methods: ['GET'])]
+    #[Route('/api/login-challenge/{token}/approve', name: 'api_login_challenge_approve', methods: ['GET', 'POST'])]
     public function approveLoginChallenge(
+        Request $request,
         string $token,
         LoginChallengeManager $loginChallengeManager
     ): Response {
@@ -403,6 +441,21 @@ final class AuthController extends AbstractController
             );
         }
 
+        if ($request->isMethod(Request::METHOD_GET)) {
+            return $this->render('security/challenge_action_confirm.html.twig', [
+                'title' => 'Confirmer la connexion',
+                'message' => 'Confirmez-vous cette tentative de connexion ?',
+                'confirmLabel' => 'Oui, approuver la connexion',
+                'cancelLabel' => 'Annuler',
+                'csrfTokenId' => 'login_challenge_approve_' . $token,
+                'autoSubmit' => true,
+            ]);
+        }
+
+        if (!$this->isCsrfTokenValid('login_challenge_approve_' . $token, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('CSRF token invalide.');
+        }
+
         $loginChallengeManager->approve($challenge);
 
         return new Response(
@@ -410,8 +463,9 @@ final class AuthController extends AbstractController
         );
     }
 
-    #[Route('/api/login-challenge/{token}/reject', name: 'api_login_challenge_reject', methods: ['GET'])]
+    #[Route('/api/login-challenge/{token}/reject', name: 'api_login_challenge_reject', methods: ['GET', 'POST'])]
     public function rejectLoginChallenge(
+        Request $request,
         string $token,
         LoginChallengeManager $loginChallengeManager,
         SessionManager $sessionManager
@@ -423,6 +477,21 @@ final class AuthController extends AbstractController
                 '<h1>Lien invalide ou expiré</h1><p>Cette demande de connexion n’est plus valide.</p>',
                 400
             );
+        }
+
+        if ($request->isMethod(Request::METHOD_GET)) {
+            return $this->render('security/challenge_action_confirm.html.twig', [
+                'title' => 'Refuser la connexion',
+                'message' => 'Refuser cette tentative bloquera l’appareil concerné. Voulez-vous continuer ?',
+                'confirmLabel' => 'Oui, refuser et bloquer',
+                'cancelLabel' => 'Annuler',
+                'csrfTokenId' => 'login_challenge_reject_' . $token,
+                'autoSubmit' => true,
+            ]);
+        }
+
+        if (!$this->isCsrfTokenValid('login_challenge_reject_' . $token, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('CSRF token invalide.');
         }
 
         $loginChallengeManager->reject($challenge);

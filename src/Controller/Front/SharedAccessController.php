@@ -14,12 +14,18 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SharedAccessController extends AbstractController
 {
+    public function __construct(
+        private RateLimiterFactory $shareInvitationLimiter
+    ) {
+    }
+
     private function sendGuestInvitationEmail(
         MailerService $mailer,
         UrlGeneratorInterface $urlGenerator,
@@ -218,6 +224,14 @@ class SharedAccessController extends AbstractController
     ): RedirectResponse {
         $email = strtolower(trim((string) $request->request->get('email')));
         $credentialIds = $request->request->all('credentials') ?? [];
+        $limitKey = sprintf('%s|%s', $owner->getId() ?? 0, $email);
+        $limit = $this->shareInvitationLimiter->create($limitKey)->consume(1);
+
+        if (!$limit->isAccepted()) {
+            $this->addFlash('warning', 'Trop de tentatives de partage. Reessayez plus tard.');
+
+            return $this->redirectToRoute($redirectRoute);
+        }
 
         if ($email === '') {
             $this->addFlash('error', 'Veuillez renseigner une adresse email valide.');

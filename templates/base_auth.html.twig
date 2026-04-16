@@ -18,10 +18,14 @@
       'legal_cgu',
       'legal_cgv'
     ] %}
+    {% set sensitiveAuthRoutes = ['app_guest_register', 'app_guest_shared_preview'] %}
+    {% set isSensitiveAuthRoute = currentRoute in sensitiveAuthRoutes %}
     {% set legacyMetaHead = block('meta_description')|trim %}
     {% set canonicalUrl = block('canonical_url')|trim %}
     {% if canonicalUrl is empty %}
-      {% if currentRoute and currentRoute in seoPublicRoutes %}
+      {% if isSensitiveAuthRoute and currentRoute %}
+        {% set canonicalUrl = url(currentRoute, routeParams) %}
+      {% elseif currentRoute and currentRoute in seoPublicRoutes %}
         {% set canonicalQueryParams = {} %}
         {% if queryParams.page is defined %}
           {% set canonicalQueryParams = canonicalQueryParams|merge({ page: queryParams.page }) %}
@@ -40,22 +44,24 @@
 
     <title>{% block title %}MYKEYNEST - Gestionnaire de mots de passe securise{% endblock %}</title>
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RG9YT46TFS"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-RG9YT46TFS');
-    </script>
+    {% if not isSensitiveAuthRoute %}
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-RG9YT46TFS"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-RG9YT46TFS');
+      </script>
+    {% endif %}
 
     {% if legacyMetaHead is not empty %}
       {{ legacyMetaHead|raw }}
     {% else %}
       <meta name="description" content="{% block description %}Securisez vos mots de passe et vos acces avec MYKEYNEST. Chiffrement AES-256, zero-knowledge, synchronisation multi-appareils et partage securise.{% endblock %}" />
       <meta name="author" content="MYKEYNEST" />
-      <meta name="robots" content="{% block robots %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endblock %}" />
-      <meta name="googlebot" content="{% block googlebot %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endblock %}" />
-      <meta name="referrer" content="strict-origin-when-cross-origin" />
+      <meta name="robots" content="{% block robots %}{% if isSensitiveAuthRoute %}noindex,nofollow,noarchive{% else %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endif %}{% endblock %}" />
+      <meta name="googlebot" content="{% block googlebot %}{% if isSensitiveAuthRoute %}noindex,nofollow,noarchive{% else %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endif %}{% endblock %}" />
+      <meta name="referrer" content="{% if isSensitiveAuthRoute %}no-referrer{% else %}strict-origin-when-cross-origin{% endif %}" />
 
       <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
       <meta property="og:site_name" content="MYKEYNEST" />
@@ -96,13 +102,15 @@
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
     <link rel="alternate" type="text/markdown" title="LLMs" href="{{ absolute_url(asset('llms.txt')) }}" />
 
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+    {% if not isSensitiveAuthRoute %}
+      <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+      <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      />
+    {% endif %}
 
     {% block stylesheets %}{% endblock %}
     {% block page_styles %}{% endblock %}
