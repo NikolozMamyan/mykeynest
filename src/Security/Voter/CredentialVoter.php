@@ -4,6 +4,8 @@ namespace App\Security\Voter;
 
 use App\Entity\Credential;
 use App\Entity\User;
+use App\Repository\SharedAccessRepository;
+use App\Repository\TeamRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -12,6 +14,12 @@ class CredentialVoter extends Voter
     public const VIEW = 'CREDENTIAL_VIEW';
     public const EDIT = 'CREDENTIAL_EDIT';
     public const DELETE = 'CREDENTIAL_DELETE';
+
+    public function __construct(
+        private readonly ?SharedAccessRepository $sharedAccessRepository = null,
+        private readonly ?TeamRepository $teamRepository = null,
+    ) {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -50,6 +58,10 @@ class CredentialVoter extends Voter
 
     private function hasDirectShareAccess(Credential $credential, User $user): bool
     {
+        if ($this->sharedAccessRepository !== null) {
+            return $this->sharedAccessRepository->userHasAccessToCredential($user, $credential);
+        }
+
         foreach ($credential->getSharedAccesses() as $sharedAccess) {
             if ($this->sameUser($sharedAccess->getGuest(), $user)) {
                 return true;
@@ -61,6 +73,10 @@ class CredentialVoter extends Voter
 
     private function hasTeamAccess(Credential $credential, User $user): bool
     {
+        if ($this->teamRepository !== null) {
+            return $this->teamRepository->userHasTeamAccessToCredential($user, $credential);
+        }
+
         foreach ($credential->getTeams() as $team) {
             if ($this->sameUser($team->getOwner(), $user)) {
                 return true;
