@@ -25,9 +25,13 @@ class CredentialRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('c')
+            ->addSelect('CASE WHEN c.pinPosition IS NULL THEN 1 ELSE 0 END AS HIDDEN pin_sort')
             ->andWhere('c.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('c.domain', 'ASC')
+            ->orderBy('pin_sort', 'ASC')
+            ->addOrderBy('c.pinPosition', 'ASC')
+            ->addOrderBy('c.domain', 'ASC')
+            ->addOrderBy('c.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -56,7 +60,7 @@ class CredentialRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function countByUser($user): int
+public function countByUser($user): int
 {
     return $this->createQueryBuilder('c')
         ->select('COUNT(c.id)')
@@ -65,4 +69,36 @@ class CredentialRepository extends ServiceEntityRepository
         ->getQuery()
         ->getSingleScalarResult();
 }
+
+    public function findNextPinPositionForUser(User $user): int
+    {
+        $max = $this->createQueryBuilder('c')
+            ->select('MAX(c.pinPosition)')
+            ->where('c.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return ((int) $max) + 1;
+    }
+
+    public function compactPinPositionsForUser(User $user): void
+    {
+        $pinnedCredentials = $this->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.pinPosition IS NOT NULL')
+            ->setParameter('user', $user)
+            ->orderBy('c.pinPosition', 'ASC')
+            ->addOrderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $position = 1;
+        foreach ($pinnedCredentials as $credential) {
+            if ($credential->getPinPosition() !== $position) {
+                $credential->setPinPosition($position);
+            }
+            $position++;
+        }
+    }
 }

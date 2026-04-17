@@ -61,6 +61,9 @@ private Collection $teams;
 #[ORM\Column(type: 'text', nullable: true)]
 private ?string $details = null;
 
+#[ORM\Column(nullable: true)]
+private ?int $pinPosition = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -225,6 +228,18 @@ public function getDetails(): ?string
 public function setDetails(?string $details): static
 {
     $this->details = $details;
+
+    return $this;
+}
+
+public function getPinPosition(): ?int
+{
+    return $this->pinPosition;
+}
+
+public function setPinPosition(?int $pinPosition): static
+{
+    $this->pinPosition = $pinPosition;
 
     return $this;
 }

@@ -1,0 +1,139 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Team {{ team.name }}{% endblock %}
+{% block admin_page_class %}ds-page--wide{% endblock %}
+{% block admin_page_title %}Fiche Equipe{% endblock %}
+{% block admin_page_intro %}Gestion admin d une equipe: membres, invitation et suppression.{% endblock %}
+
+{% block admin_toolbar %}
+  <div class="ds-toolbar-group">
+    <a href="{{ path('admin_teams') }}" class="ds-btn ds-btn--secondary">Retour teams</a>
+    <form method="post" action="{{ path('admin_team_delete', {id: team.id}) }}" class="ds-inline-form" onsubmit="return confirm('Supprimer cette equipe ?');">
+      <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_team_' ~ team.id) }}">
+      <button type="submit" class="ds-btn ds-btn--danger">Supprimer l equipe</button>
+    </form>
+  </div>
+{% endblock %}
+
+{% block admin_content %}
+  <section class="ds-grid-3">
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Team ID', value: team.id } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Membres', value: team.members|length } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Credentials', value: team.credentials|length } only %}
+  </section>
+
+  <section class="ds-grid-2">
+    <div class="ds-surface">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">{{ team.name }}</h2>
+          <p class="ds-section-text">Owner: {{ team.owner.email ?: '-' }}</p>
+        </div>
+      </div>
+
+      <div class="ds-cell-stack">
+        <span><strong>Creation:</strong> {{ team.createdAt|date('d/m/Y H:i') }}</span>
+        <span><strong>Owner id:</strong> #{{ team.owner.id ?: '-' }}</span>
+        <span><strong>Total membres:</strong> {{ team.members|length }}</span>
+        <span><strong>Total credentials:</strong> {{ team.credentials|length }}</span>
+      </div>
+    </div>
+
+    <div class="ds-surface">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">Inviter un membre</h2>
+          <p class="ds-section-text">Ajout direct ou invitation guest si le compte n existe pas encore.</p>
+        </div>
+      </div>
+
+      <form method="post" action="{{ path('admin_team_member_add', {id: team.id}) }}" class="ds-stack-md">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_team_add_member_' ~ team.id) }}">
+        <input class="ds-input" type="email" name="email" placeholder="email@exemple.com" required>
+        <select class="ds-select" name="role">
+          <option value="MEMBER">Membre</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+        <button type="submit" class="ds-btn ds-btn--primary">Ajouter / inviter</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="ds-grid-2">
+    <div class="ds-surface ds-table-wrap">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">Membres</h2>
+          <p class="ds-section-text">Gestion des membres rattaches a l equipe.</p>
+        </div>
+      </div>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Utilisateur</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for member in team.members %}
+            <tr>
+              <td>
+                <div class="ds-cell-stack">
+                  <span class="ds-title-strong">{{ member.user.email }}</span>
+                  <span class="ds-muted">#{{ member.user.id ?: '-' }}</span>
+                </div>
+              </td>
+              <td>{{ member.role.value|upper }}</td>
+              <td>{{ member.joinedAt|date('d/m/Y H:i') }}</td>
+              <td>
+                {% if member.role != constant('App\\Enum\\TeamRole::OWNER') %}
+                  <form method="post" action="{{ path('admin_team_member_remove', {id: team.id, memberId: member.id}) }}" class="ds-inline-form" onsubmit="return confirm('Supprimer ce membre ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_remove_team_member_' ~ member.id) }}">
+                    <button type="submit" class="ds-btn ds-btn--warning ds-btn--block">Retirer</button>
+                  </form>
+                {% else %}
+                  <span class="ds-muted">Owner</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4" class="ds-empty">Aucun membre.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ds-surface ds-table-wrap">
+      <div class="ds-section-head">
+        <div>
+          <h2 class="ds-section-title">Credentials attribues</h2>
+          <p class="ds-section-text">Vue simple: nom du credential et quantite totale.</p>
+        </div>
+      </div>
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Domaine</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for credential in team.credentials %}
+            <tr>
+              <td class="ds-title-strong">{{ credential.name }}</td>
+              <td>{{ credential.domain ?: '-' }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="2" class="ds-empty">Aucun credential rattache.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

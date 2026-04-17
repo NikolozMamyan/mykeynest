@@ -47,6 +47,12 @@
         <i class="fas fa-envelope"></i>
         <span>Emailing</span>
       </a>
+
+      <a href="{{ path('admin_teams') }}"
+         class="nav-item {{ app.request.attributes.get('_route') in ['admin_teams', 'admin_team_show', 'admin_team_member_add', 'admin_team_member_remove', 'admin_team_delete'] ? 'active' : '' }}">
+        <i class="fas fa-users"></i>
+        <span>Teams</span>
+      </a>
     </div>
   </nav>
 

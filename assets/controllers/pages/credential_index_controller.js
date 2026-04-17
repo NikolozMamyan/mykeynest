@@ -65,6 +65,50 @@ export default class extends Controller {
     }
   }
 
+  async togglePin(event) {
+    const button = event.currentTarget;
+    const card = button.closest(".cred-card");
+    if (!button || !card || button.classList.contains("is-loading")) {
+      return;
+    }
+
+    const url = button.dataset.toggleUrl;
+    const token = button.dataset.toggleToken;
+
+    if (!url || !token) {
+      return;
+    }
+
+    button.classList.add("is-loading");
+
+    try {
+      const body = new URLSearchParams({ _token: token });
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          "X-Requested-With": "XMLHttpRequest",
+          Accept: "application/json",
+        },
+        body: body.toString(),
+        credentials: "same-origin",
+      });
+
+      const payload = await response.json();
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.message || "Pin request failed");
+      }
+
+      this.updatePinnedCard(card, button, payload);
+      this.reorderMineCards();
+      this.applySearch();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      button.classList.remove("is-loading");
+    }
+  }
+
   openQuickShare(event) {
     if (!this.hasQuickShareModalTarget) {
       return;
@@ -160,6 +204,64 @@ export default class extends Controller {
 
   normalizeDomain(domain) {
     return (domain || "").trim().toLowerCase();
+  }
+
+  updatePinnedCard(card, button, payload) {
+    const pinned = Boolean(payload.pinned);
+    const pinPosition = payload.pinPosition ?? "";
+
+    card.classList.toggle("is-pinned", pinned);
+    card.dataset.pinPosition = pinPosition === null ? "" : String(pinPosition);
+
+    button.classList.toggle("is-active", pinned);
+    button.setAttribute("aria-pressed", pinned ? "true" : "false");
+    button.title = pinned ? "Retirer des epingles" : "Epingler en haut";
+  }
+
+  reorderMineCards() {
+    const grid = this.element.querySelector("#grid-mine");
+    if (!grid) {
+      return;
+    }
+
+    const cards = Array.from(grid.querySelectorAll(".cred-card"));
+    cards
+      .sort((left, right) => this.compareCards(left, right))
+      .forEach((card) => grid.appendChild(card));
+  }
+
+  compareCards(left, right) {
+    const leftPinned = this.readPinPosition(left);
+    const rightPinned = this.readPinPosition(right);
+
+    if (leftPinned !== null && rightPinned !== null) {
+      return leftPinned - rightPinned;
+    }
+
+    if (leftPinned !== null) {
+      return -1;
+    }
+
+    if (rightPinned !== null) {
+      return 1;
+    }
+
+    const domainCompare = (left.dataset.domain || "").localeCompare(right.dataset.domain || "");
+    if (domainCompare !== 0) {
+      return domainCompare;
+    }
+
+    return (left.dataset.name || "").localeCompare(right.dataset.name || "");
+  }
+
+  readPinPosition(card) {
+    const rawValue = card.dataset.pinPosition;
+    if (!rawValue) {
+      return null;
+    }
+
+    const parsedValue = Number.parseInt(rawValue, 10);
+    return Number.isNaN(parsedValue) ? null : parsedValue;
   }
 
   applySearch() {

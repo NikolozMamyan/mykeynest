@@ -6,12 +6,17 @@ use App\Entity\Article;
 use App\Entity\EmailCampaign;
 use App\Entity\ExtensionClient;
 use App\Entity\ExtensionInstallationChallenge;
+use App\Entity\Team;
+use App\Entity\TeamMember;
 use App\Entity\User;
 use App\Entity\UserSubscription;
+use App\Enum\TeamRole;
 use App\Form\Admin\ArticleType;
 use App\Repository\ExtensionClientRepository;
 use App\Repository\ExtensionInstallationChallengeRepository;
 use App\Repository\EmailCampaignRepository;
+use App\Repository\TeamMemberRepository;
+use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserSessionRepository;
 use App\Repository\UserSubscriptionRepository;
@@ -30,6 +35,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -343,6 +349,202 @@ final class AdminController extends AbstractController
             'formData' => $formData,
             'campaigns' => $campaigns,
         ]);
+    }
+
+    #[Route('/teams', name: 'admin_teams', methods: ['GET'])]
+    public function teams(Request $request, TeamRepository $teamRepository): Response
+    {
+        $q = $this->sanitizeSearchQuery($request->query->get('q', ''));
+
+        $qb = $teamRepository->createQueryBuilder('t')
+            ->leftJoin('t.owner', 'o')
+            ->addSelect('o')
+            ->leftJoin('t.members', 'm')
+            ->addSelect('m')
+            ->leftJoin('m.user', 'mu')
+            ->addSelect('mu')
+            ->leftJoin('t.credentials', 'c')
+            ->addSelect('c')
+            ->orderBy('t.createdAt', 'DESC')
+            ->addOrderBy('t.id', 'DESC');
+
+        if ($q !== '') {
+            $qb->andWhere('t.name LIKE :q OR o.email LIKE :q OR mu.email LIKE :q')
+                ->setParameter('q', '%' . $q . '%');
+        }
+
+        /** @var list<Team> $teams */
+        $teams = $qb->setMaxResults(250)->getQuery()->getResult();
+
+        return $this->render('admin/teams.html.twig', [
+            'teams' => $teams,
+            'q' => $q,
+        ]);
+    }
+
+    #[Route('/teams/{id}', name: 'admin_team_show', methods: ['GET'])]
+    public function showTeam(Team $team): Response
+    {
+        return $this->render('admin/team_show.html.twig', [
+            'team' => $team,
+        ]);
+    }
+
+    #[Route('/teams/{id}/members/add', name: 'admin_team_member_add', methods: ['POST'])]
+    public function addTeamMember(
+        Team $team,
+        Request $request,
+        UserRepository $userRepository,
+        TeamMemberRepository $teamMemberRepository,
+        EntityManagerInterface $em,
+        MailerService $mailerService,
+        UrlGeneratorInterface $urlGenerator
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_team_add_member_' . $team->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        $email = mb_strtolower(trim((string) $request->request->get('email', '')));
+        $roleRaw = (string) $request->request->get('role', TeamRole::MEMBER->value);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->addFlash('error', 'Adresse email invalide.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        $role = TeamRole::tryFrom($roleRaw);
+        if (!$role || $role === TeamRole::OWNER) {
+            $role = TeamRole::MEMBER;
+        }
+
+        $memberUser = $userRepository->findOneBy(['email' => $email]);
+        $isGuestInvitation = false;
+        $guestInvitationExpiresAt = null;
+
+        if (!$memberUser) {
+            $isGuestInvitation = true;
+            $guestInvitationExpiresAt = new DateTimeImmutable('+24 hours');
+
+            $memberUser = new User();
+            $memberUser->setEmail($email);
+            $memberUser->setCompany('');
+            $memberUser->setPassword('');
+            $memberUser->setRoles(['ROLE_GUEST']);
+            $memberUser->setApiToken(bin2hex(random_bytes(32)));
+            $memberUser->setTokenExpiresAt($guestInvitationExpiresAt);
+            $memberUser->regenerateApiExtensionToken();
+
+            $em->persist($memberUser);
+        } elseif (in_array('ROLE_GUEST', $memberUser->getRoles(), true)) {
+            $isGuestInvitation = true;
+            $guestInvitationExpiresAt = new DateTimeImmutable('+24 hours');
+            $memberUser->setApiToken(bin2hex(random_bytes(32)));
+            $memberUser->setTokenExpiresAt($guestInvitationExpiresAt);
+        }
+
+        if ($team->getOwner()?->getId() === $memberUser->getId()) {
+            $this->addFlash('warning', 'Le proprietaire est deja membre de cette equipe.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        $existing = $teamMemberRepository->findOneBy([
+            'team' => $team,
+            'user' => $memberUser,
+        ]);
+
+        if ($existing) {
+            $this->addFlash('warning', 'Cet utilisateur est deja membre de cette equipe.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        $member = new TeamMember();
+        $member->setTeam($team);
+        $member->setUser($memberUser);
+        $member->setRole($role);
+
+        $em->persist($member);
+        $em->flush();
+
+        if ($isGuestInvitation && $guestInvitationExpiresAt instanceof DateTimeImmutable) {
+            try {
+                $this->sendTeamGuestInvitationEmail($mailerService, $urlGenerator, $memberUser, $team, $guestInvitationExpiresAt);
+                $this->addFlash('success', 'Invitation envoyee et membre ajoute a l equipe.');
+            } catch (\Throwable $exception) {
+                $this->logger->warning('Unable to send admin team invitation email.', [
+                    'guest_email' => $memberUser->getEmail(),
+                    'team_id' => $team->getId(),
+                    'exception' => $exception->getMessage(),
+                ]);
+                $this->addFlash('warning', 'Membre ajoute, mais impossible d envoyer l invitation email.');
+            }
+        } else {
+            $this->addFlash('success', 'Membre ajoute avec succes a l equipe.');
+        }
+
+        return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+    }
+
+    #[Route('/teams/{id}/members/{memberId}/remove', name: 'admin_team_member_remove', methods: ['POST'])]
+    public function removeTeamMember(
+        Team $team,
+        int $memberId,
+        Request $request,
+        TeamMemberRepository $teamMemberRepository,
+        EntityManagerInterface $em
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_remove_team_member_' . $memberId, (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        $member = $teamMemberRepository->find($memberId);
+        if (!$member || $member->getTeam()?->getId() !== $team->getId()) {
+            $this->addFlash('error', 'Membre introuvable dans cette equipe.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        if ($member->getRole() === TeamRole::OWNER) {
+            $this->addFlash('warning', 'Le proprietaire ne peut pas etre supprime.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        $em->remove($member);
+        $em->flush();
+
+        $this->addFlash('success', 'Membre supprime de l equipe.');
+
+        return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+    }
+
+    #[Route('/teams/{id}/delete', name: 'admin_team_delete', methods: ['POST'])]
+    public function deleteTeam(Team $team, Request $request, EntityManagerInterface $em): Response
+    {
+        if (!$this->isCsrfTokenValid('admin_delete_team_' . $team->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
+        }
+
+        $teamName = $team->getName() ?? 'cette equipe';
+
+        foreach ($team->getMembers() as $member) {
+            $em->remove($member);
+        }
+
+        $em->remove($team);
+        $em->flush();
+
+        $this->addFlash('success', sprintf('Equipe "%s" supprimee.', $teamName));
+
+        return $this->redirectToRoute('admin_teams');
     }
 
     #[Route('/users/{id}/subscription/assign-pro', name: 'admin_user_subscription_assign_pro', methods: ['POST'])]
@@ -871,6 +1073,32 @@ final class AdminController extends AbstractController
         $subject = trim(preg_replace('/\s+/', ' ', $subject) ?? '');
 
         return mb_substr($subject, 0, 255);
+    }
+
+    private function sendTeamGuestInvitationEmail(
+        MailerService $mailer,
+        UrlGeneratorInterface $urlGenerator,
+        User $guest,
+        Team $team,
+        DateTimeImmutable $expiresAt
+    ): void {
+        $guestRegisterUrl = $urlGenerator->generate(
+            'app_guest_register',
+            ['token' => $guest->getApiToken(), 'email' => $guest->getEmail()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $mailer->send(
+            $guest->getEmail(),
+            'Vous avez ete invite dans une equipe MYKEYNEST',
+            'emails/team_invitation.html.twig',
+            [
+                'user' => $guest,
+                'team' => $team,
+                'guest_register' => $guestRegisterUrl,
+                'expiresAt' => $expiresAt,
+            ]
+        );
     }
 
     /**

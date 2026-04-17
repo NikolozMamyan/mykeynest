@@ -1,0 +1,58 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Teams{% endblock %}
+{% block admin_page_title %}Teams{% endblock %}
+{% block admin_page_intro %}Vue globale des equipes creees dans l application avec owner, membres et credentials rattaches.{% endblock %}
+
+{% block admin_toolbar %}
+  <form method="get" action="{{ path('admin_teams') }}" class="ds-search-form ds-toolbar-grow">
+    <input class="ds-input" type="search" name="q" value="{{ q }}" placeholder="Nom d equipe, owner ou membre">
+    <button type="submit" class="ds-btn ds-btn--primary">Filtrer</button>
+  </form>
+{% endblock %}
+
+{% block admin_content %}
+  <div class="ds-surface ds-table-wrap">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th>Equipe</th>
+          <th>Owner</th>
+          <th>Membres</th>
+          <th>Credentials</th>
+          <th>Creation</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in teams %}
+          <tr>
+            <td>
+              <div class="ds-cell-stack">
+                <span class="ds-title-strong">#{{ team.id }} {{ team.name }}</span>
+                <span class="ds-muted">
+                  {% set memberEmails = [] %}
+                  {% for member in team.members|slice(0, 3) %}
+                    {% set memberEmails = memberEmails|merge([member.user.email]) %}
+                  {% endfor %}
+                  {{ memberEmails ? memberEmails|join(', ') : 'Aucun membre' }}
+                </span>
+              </div>
+            </td>
+            <td>{{ team.owner.email ?: '-' }}</td>
+            <td>{{ team.members|length }}</td>
+            <td>{{ team.credentials|length }}</td>
+            <td>{{ team.createdAt|date('d/m/Y H:i') }}</td>
+            <td>
+              <a href="{{ path('admin_team_show', {id: team.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Ouvrir</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="6" class="ds-empty">Aucune equipe ne correspond a la recherche.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
