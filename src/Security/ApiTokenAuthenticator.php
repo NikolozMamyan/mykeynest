@@ -108,6 +108,13 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
         }
 
         $this->sessionManager->touch($session);
+        $cookieToken = $request->cookies->get('AUTH_TOKEN');
+        if (is_string($cookieToken) && trim($cookieToken) !== '' && hash_equals(trim($cookieToken), $plainToken)) {
+            $request->attributes->set('_auth_token_refresh', [
+                'plainToken' => $plainToken,
+                'expiresAt' => $session->getExpiresAt(),
+            ]);
+        }
 
         return new SelfValidatingPassport(
             new UserBadge(
