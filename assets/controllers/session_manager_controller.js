@@ -48,6 +48,7 @@ export default class extends Controller {
   getSessionCard(device) {
     const deviceIcon = this.getDeviceIcon(device.userAgent)
     const deviceName = device.deviceName || this.getDeviceName(device.userAgent)
+    const deviceTypeLabel = device.deviceType === 'mobile' ? 'Mobile' : 'Desktop'
     const isBlocked = device.isBlocked
     const isCurrent = device.isCurrent
     const cardClass = `session-card ${isCurrent ? 'current' : ''} ${isBlocked ? 'blocked' : ''}`
@@ -63,6 +64,10 @@ export default class extends Controller {
               <div class="device-details">
                 <h3>${this.escapeHtml(deviceName)}</h3>
                 <p>${this.escapeHtml(device.ipAddress || 'IP inconnue')}</p>
+                <div class="device-type-row">
+                  <span class="session-badge badge-device badge-device--${device.deviceType === 'mobile' ? 'mobile' : 'desktop'}">${deviceTypeLabel}</span>
+                  <span class="device-expiry">Cookie: ${this.escapeHtml(device.sessionLifetimeLabel || '30 jours')}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -82,6 +87,10 @@ export default class extends Controller {
           <div class="meta-item">
             <i class="fas fa-layer-group"></i>
             <span>${device.sessionCount || 0} session(s)</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-cookie-bite"></i>
+            <span>Expire: ${this.formatDate(device.expiresAt)}</span>
           </div>
         </div>
 

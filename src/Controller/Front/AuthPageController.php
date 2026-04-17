@@ -10,8 +10,8 @@ use App\Service\SessionManager;
 use App\Service\TokenCleaner;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -19,6 +19,37 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AuthPageController extends AbstractController
 {
+    private function redirectIfAuthenticatedBySessionCookie(Request $request, SessionManager $sessionManager): ?RedirectResponse
+    {
+        $plainToken = $request->cookies->get('AUTH_TOKEN');
+        if (!is_string($plainToken) || trim($plainToken) === '') {
+            return null;
+        }
+
+        $session = $sessionManager->findActiveSessionByPlainToken(trim($plainToken));
+        $user = $session?->getUser();
+        if ($user === null) {
+            return null;
+        }
+
+        $sessionManager->touch($session);
+
+        $next = $request->query->get('next');
+        $response = null;
+
+        if (is_string($next) && $next !== '' && str_starts_with($next, '/')) {
+            $response = $this->redirect($next);
+        } elseif (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $response = $this->redirectToRoute('app_admin');
+        } else {
+            $response = $this->redirect('/app/credential');
+        }
+
+        $response->headers->setCookie($this->buildAuthCookie($request, trim($plainToken), $session->getExpiresAt()));
+
+        return $response;
+    }
+
     private function buildAuthCookie(Request $request, string $plainToken, \DateTimeInterface $expiresAt): Cookie
     {
         return Cookie::create('AUTH_TOKEN')
@@ -42,16 +73,15 @@ class AuthPageController extends AbstractController
     }
 
     #[Route('/login', name: 'show_login', methods: ['GET'])]
-    public function login(Request $request, TokenCleaner $cleaner, Security $security): Response
+    public function login(Request $request, TokenCleaner $cleaner, SessionManager $sessionManager): Response
     {
-        $response = new Response();
-
-        $cleaner->clearTokenFromRequest($request, $response);
-
-        $user = $this->getUser();
-        if ($user) {
-            $security->logout(false);
+        $redirect = $this->redirectIfAuthenticatedBySessionCookie($request, $sessionManager);
+        if ($redirect !== null) {
+            return $redirect;
         }
+
+        $response = new Response();
+        $cleaner->clearTokenFromRequest($request, $response);
 
         $response->setContent(
             $this->renderView('auth/login.html.twig')
@@ -61,16 +91,15 @@ class AuthPageController extends AbstractController
     }
 
     #[Route('/register', name: 'show_register', methods: ['GET'])]
-    public function showRegister(Request $request, TokenCleaner $cleaner, Security $security): Response
+    public function showRegister(Request $request, TokenCleaner $cleaner, SessionManager $sessionManager): Response
     {
-        $response = new Response();
-
-        $cleaner->clearTokenFromRequest($request, $response);
-
-        $user = $this->getUser();
-        if ($user) {
-            $security->logout(false);
+        $redirect = $this->redirectIfAuthenticatedBySessionCookie($request, $sessionManager);
+        if ($redirect !== null) {
+            return $redirect;
         }
+
+        $response = new Response();
+        $cleaner->clearTokenFromRequest($request, $response);
 
         $response->setContent(
             $this->renderView('auth/register.html.twig')
@@ -80,16 +109,15 @@ class AuthPageController extends AbstractController
     }
 
     #[Route('/', name: 'app_landing', methods: ['GET'])]
-    public function landing(Request $request, TokenCleaner $cleaner, Security $security): Response
+    public function landing(Request $request, TokenCleaner $cleaner, SessionManager $sessionManager): Response
     {
-        $response = new Response();
-
-        $cleaner->clearTokenFromRequest($request, $response);
-
-        $user = $this->getUser();
-        if ($user) {
-            $security->logout(false);
+        $redirect = $this->redirectIfAuthenticatedBySessionCookie($request, $sessionManager);
+        if ($redirect !== null) {
+            return $redirect;
         }
+
+        $response = new Response();
+        $cleaner->clearTokenFromRequest($request, $response);
 
         $response->setContent(
             $this->renderView('auth/landing.html.twig')

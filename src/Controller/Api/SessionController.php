@@ -44,6 +44,8 @@ final class SessionController extends AbstractController
                     'deviceId' => $deviceId,
                     'deviceName' => $session->getDeviceName(),
                     'userAgent' => $session->getUserAgent(),
+                    'deviceType' => $sessionManager->getDeviceType($session->getUserAgent()),
+                    'sessionLifetimeLabel' => $sessionManager->getSessionLifetimeLabel($session->getUserAgent()),
                     'ipAddress' => $session->getIpAddress(),
                     'createdAt' => $session->getCreatedAt()?->format(DATE_ATOM),
                     'lastActivityAt' => $session->getLastActivityAt()?->format(DATE_ATOM),
@@ -94,6 +96,8 @@ final class SessionController extends AbstractController
 
             if (!$devices[$deviceId]['userAgent'] && $session->getUserAgent()) {
                 $devices[$deviceId]['userAgent'] = $session->getUserAgent();
+                $devices[$deviceId]['deviceType'] = $sessionManager->getDeviceType($session->getUserAgent());
+                $devices[$deviceId]['sessionLifetimeLabel'] = $sessionManager->getSessionLifetimeLabel($session->getUserAgent());
             }
 
             if (!$devices[$deviceId]['ipAddress'] && $session->getIpAddress()) {

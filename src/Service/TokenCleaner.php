@@ -31,9 +31,7 @@ class TokenCleaner
             $user->setApiToken(null);
             $user->setTokenExpiresAt(null);
             $this->em->flush();
+            $response->headers->clearCookie('AUTH_TOKEN');
         }
-
-        // Supprimer le cookie AUTH_TOKEN dans la réponse
-        $response->headers->clearCookie('AUTH_TOKEN');
     }
 }

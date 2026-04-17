@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SessionManager
 {
+    private const DEFAULT_SESSION_LIFETIME = '+30 days';
+    private const MOBILE_SESSION_LIFETIME = '+90 days';
+
     public function __construct(
         private EntityManagerInterface $em,
         private UserSessionRepository $userSessionRepository,
@@ -42,7 +45,7 @@ class SessionManager
     $session->setDeviceName($deviceName);
     $session->setUserAgent($userAgent);
     $session->setIpAddress($ipAddress);
-    $session->setExpiresAt(new \DateTimeImmutable('+30 days'));
+    $session->setExpiresAt($this->buildSessionExpiryDate($userAgent));
     $session->setLastActivityAt(new \DateTimeImmutable());
 
     $this->em->persist($session);
@@ -81,7 +84,7 @@ class SessionManager
     public function touch(UserSession $session): void
     {
         $session->setLastActivityAt(new \DateTimeImmutable());
-        $session->setExpiresAt(new \DateTimeImmutable('+30 days'));
+        $session->setExpiresAt($this->buildSessionExpiryDate($session->getUserAgent()));
         $this->em->flush();
     }
 
@@ -229,5 +232,31 @@ class SessionManager
         return $this->userSessionRepository->count([
             'user' => $user,
         ]) === 0;
+    }
+
+    private function buildSessionExpiryDate(?string $userAgent): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable($this->isMobileUserAgent($userAgent)
+            ? self::MOBILE_SESSION_LIFETIME
+            : self::DEFAULT_SESSION_LIFETIME);
+    }
+
+    public function getDeviceType(?string $userAgent): string
+    {
+        return $this->isMobileUserAgent($userAgent) ? 'mobile' : 'desktop';
+    }
+
+    public function getSessionLifetimeLabel(?string $userAgent): string
+    {
+        return $this->isMobileUserAgent($userAgent) ? '90 jours' : '30 jours';
+    }
+
+    private function isMobileUserAgent(?string $userAgent): bool
+    {
+        if (!is_string($userAgent) || trim($userAgent) === '') {
+            return false;
+        }
+
+        return (bool) preg_match('/Android|iPhone|iPad|iPod/i', $userAgent);
     }
 }
