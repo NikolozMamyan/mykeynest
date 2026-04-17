@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Entity\Team;
 use App\Entity\TeamMember;
 use App\Entity\Credential;
+use App\Entity\User;
 use App\Enum\TeamRole;
 use App\Form\TeamType;
 use App\Form\TeamAddMemberType;
@@ -219,6 +220,56 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
 
         $this->addFlash('success', 'Membre supprimé de léquipe.');
         return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
+    }
+
+    #[Route('/{id}/leave', name: 'leave', methods: ['POST'])]
+    public function leave(
+        Team $team,
+        Request $request,
+        TeamMemberRepository $teamMemberRepository,
+        EntityManagerInterface $em,
+        Security $security
+    ): Response {
+        $this->denyAccessUnlessGranted('TEAM_VIEW', $team);
+
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('leave_team_' . $team->getId(), $token)) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
+        }
+
+        /** @var User|null $user */
+        $user = $security->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $member = $teamMemberRepository->findOneBy([
+            'team' => $team,
+            'user' => $user,
+        ]);
+
+        if (!$member) {
+            $this->addFlash('warning', 'Vous n etes pas membre de cette equipe.');
+
+            return $this->redirectToRoute('app_team_index');
+        }
+
+        if ($member->getRole() === TeamRole::OWNER) {
+            $this->addFlash('warning', 'Le proprietaire ne peut pas quitter l equipe. Supprimez-la pour la fermer.');
+
+            return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
+        }
+
+        $teamName = $team->getName() ?? 'cette equipe';
+
+        $em->remove($member);
+        $em->flush();
+
+        $this->addFlash('success', sprintf('Vous avez quitte l equipe "%s".', $teamName));
+
+        return $this->redirectToRoute('app_team_index');
     }
 
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]

@@ -19,6 +19,14 @@
   margin-bottom: 0.5rem;
 }
 
+.team-show-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .btn-back {
   display: inline-flex;
   align-items: center;
@@ -52,6 +60,32 @@
   font-size: 0.9375rem;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.btn-secondary-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: white;
+  color: var(--color-text-dark);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-outline:hover {
+  background: var(--color-bg-light);
+  border-color: var(--color-text-medium);
+  transform: translateY(-2px);
+}
+
+.btn-secondary-outline svg {
+  width: 18px;
+  height: 18px;
 }
 
 .btn-danger-outline:hover {
@@ -865,6 +899,11 @@
     gap: 1rem;
   }
 
+  .team-show-header-actions {
+    width: 100%;
+  }
+
+  .btn-secondary-outline,
   .btn-danger-outline {
     width: 100%;
     justify-content: center;

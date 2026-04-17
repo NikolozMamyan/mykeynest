@@ -18,14 +18,38 @@
             {{ 'teams.show.back'|trans }}
         </a>
 
-        {% if is_granted('TEAM_DELETE', team) %}
-            <button type="button" class="btn-danger-outline" data-action="click->team-show#confirmDeleteTeam">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-                {{ 'teams.show.delete_team'|trans }}
-            </button>
-        {% endif %}
+        <div class="team-show-header-actions">
+            {% set currentMember = null %}
+            {% for member in team.members %}
+                {% if member.user and app.user and member.user.id == app.user.id %}
+                    {% set currentMember = member %}
+                {% endif %}
+            {% endfor %}
+
+            {% if currentMember and currentMember.role != constant('App\\Enum\\TeamRole::OWNER') %}
+                <form method="post"
+                      action="{{ path('app_team_leave', {id: team.id}) }}"
+                      data-action="submit->team-show#confirmForm"
+                      data-confirm-message="Voulez-vous vraiment quitter cette equipe ?">
+                    <input type="hidden" name="_token" value="{{ csrf_token('leave_team_' ~ team.id) }}">
+                    <button type="submit" class="btn-secondary-outline">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"/>
+                        </svg>
+                        Quitter l equipe
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if is_granted('TEAM_DELETE', team) %}
+                <button type="button" class="btn-danger-outline" data-action="click->team-show#confirmDeleteTeam">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    {{ 'teams.show.delete_team'|trans }}
+                </button>
+            {% endif %}
+        </div>
     </div>
 
     {# Team Info Card #}

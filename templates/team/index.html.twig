@@ -82,6 +82,13 @@
         <div class="teams-grid">
             {% for team in teams %}
                 <div class="team-card">
+                    {% set currentMember = null %}
+                    {% for member in team.members %}
+                        {% if member.user and app.user and member.user.id == app.user.id %}
+                            {% set currentMember = member %}
+                        {% endif %}
+                    {% endfor %}
+
                     <div class="team-card-header">
                         <div class="team-avatar">
                             {{ team.name|slice(0, 2)|upper }}
@@ -133,6 +140,18 @@
                                       d="M9 5l7 7-7 7"/>
                             </svg>
                         </a>
+
+                        {% if currentMember and currentMember.role != constant('App\\Enum\\TeamRole::OWNER') %}
+                            <form method="post"
+                                  action="{{ path('app_team_leave', {id: team.id}) }}"
+                                  class="team-card-leave-form"
+                                  onsubmit="return confirm('Voulez-vous vraiment quitter cette equipe ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('leave_team_' ~ team.id) }}">
+                                <button type="submit" class="btn-leave-team-card">
+                                    Quitter
+                                </button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
@@ -456,6 +475,11 @@
 .team-card-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .btn-view-team {
@@ -476,6 +500,29 @@
 .btn-view-team svg {
     width: 16px;
     height: 16px;
+}
+
+.team-card-leave-form {
+    margin: 0;
+}
+
+.btn-leave-team-card {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1rem;
+    background: white;
+    color: var(--color-danger-start);
+    border: 1.5px solid #fecaca;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-leave-team-card:hover {
+    background: #fff1f2;
+    border-color: #fca5a5;
 }
 
 @media (max-width: 768px) {
@@ -505,6 +552,17 @@
     
     .teams-grid {
         grid-template-columns: 1fr;
+    }
+
+    .team-card-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-leave-team-card,
+    .btn-view-team {
+        width: 100%;
+        justify-content: center;
     }
 }
 </style>
