@@ -51,6 +51,28 @@ class MailerService
         $this->mailer->send($email);
     }
 
+    public function sendHtml(
+        string $to,
+        string $subject,
+        string $html,
+        ?string $replyTo = null
+    ): void {
+        $text = $this->buildTextBody($html);
+
+        $email = (new Email())
+            ->from(new Address(self::DEFAULT_FROM_EMAIL, self::DEFAULT_FROM_NAME))
+            ->to($to)
+            ->subject($subject)
+            ->text($text)
+            ->html($html);
+
+        if ($replyTo !== null && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+            $email->replyTo($replyTo);
+        }
+
+        $this->mailer->send($email);
+    }
+
     private function generatePdfFromTemplate(string $template, array $context): string
     {
         $html = $this->twig->render($template, $context);

@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Article;
+use App\Entity\EmailCampaign;
 use App\Entity\ExtensionClient;
 use App\Entity\ExtensionInstallationChallenge;
 use App\Entity\User;
@@ -10,6 +11,7 @@ use App\Entity\UserSubscription;
 use App\Form\Admin\ArticleType;
 use App\Repository\ExtensionClientRepository;
 use App\Repository\ExtensionInstallationChallengeRepository;
+use App\Repository\EmailCampaignRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserSessionRepository;
 use App\Repository\UserSubscriptionRepository;
@@ -19,6 +21,7 @@ use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use App\Service\ExtensionClientManager;
 use App\Service\ExtensionInstallationChallengeManager;
+use App\Service\MailerService;
 use App\Service\SessionManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -214,6 +217,131 @@ final class AdminController extends AbstractController
         return $this->render('admin/extensions.html.twig', [
             'clients' => $clients,
             'challenges' => $challenges,
+        ]);
+    }
+
+    #[Route('/emailing', name: 'admin_emailing', methods: ['GET', 'POST'])]
+    public function emailing(
+        Request $request,
+        UserRepository $userRepository,
+        MailerService $mailerService,
+        EmailCampaignRepository $emailCampaignRepository,
+        EntityManagerInterface $em
+    ): Response {
+        $selectedUserIds = array_values(array_unique(array_map(
+            static fn(mixed $value): int => (int) $value,
+            array_filter(
+                $request->request->all('selected_users'),
+                static fn(mixed $value): bool => is_scalar($value) && ctype_digit((string) $value)
+            )
+        )));
+
+        $formData = [
+            'subject' => trim((string) $request->request->get('subject', '')),
+            'recipientEmails' => trim((string) $request->request->get('recipient_emails', '')),
+            'htmlContent' => (string) $request->request->get('html_content', ''),
+            'selectedUserIds' => $selectedUserIds,
+        ];
+
+        $users = $userRepository->createQueryBuilder('u')
+            ->orderBy('u.email', 'ASC')
+            ->setMaxResults(500)
+            ->getQuery()
+            ->getResult();
+
+        $campaigns = $emailCampaignRepository->findBy([], ['sentAt' => 'DESC'], 12);
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('admin_emailing', (string) $request->request->get('_token'))) {
+                $this->addFlash('error', 'Token CSRF invalide.');
+
+                return $this->render('admin/emailing.html.twig', [
+                    'users' => $users,
+                    'formData' => $formData,
+                    'campaigns' => $campaigns,
+                ]);
+            }
+
+            $subject = $this->sanitizeEmailSubject($formData['subject']);
+            $htmlContent = trim($formData['htmlContent']);
+            $selectedUsers = $selectedUserIds === []
+                ? []
+                : $userRepository->createQueryBuilder('u')
+                    ->andWhere('u.id IN (:ids)')
+                    ->setParameter('ids', $selectedUserIds)
+                    ->orderBy('u.email', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+
+            $manualEmails = $this->extractEmailAddresses($formData['recipientEmails']);
+            $invalidEmails = array_values(array_filter(
+                $manualEmails,
+                static fn(string $email): bool => !filter_var($email, FILTER_VALIDATE_EMAIL)
+            ));
+
+            if ($subject === '') {
+                $this->addFlash('error', 'L objet de l email est obligatoire.');
+            }
+
+            if ($htmlContent === '') {
+                $this->addFlash('error', 'Le contenu HTML est obligatoire.');
+            }
+
+            if ($invalidEmails !== []) {
+                $this->addFlash('error', 'Emails invalides detectes: ' . implode(', ', $invalidEmails));
+            }
+
+            $recipients = $this->buildRecipientList($selectedUsers, $manualEmails);
+
+            if ($recipients === []) {
+                $this->addFlash('error', 'Ajoute au moins un destinataire.');
+            }
+
+            if ($subject !== '' && $htmlContent !== '' && $invalidEmails === [] && $recipients !== []) {
+                $sentCount = 0;
+                $failedRecipients = [];
+
+                foreach ($recipients as $recipient) {
+                    try {
+                        $mailerService->sendHtml($recipient, $subject, $htmlContent);
+                        ++$sentCount;
+                    } catch (\Throwable) {
+                        $failedRecipients[] = $recipient;
+                    }
+                }
+
+                if ($sentCount > 0) {
+                    $this->addFlash('success', sprintf('%d email(s) envoye(s) individuellement.', $sentCount));
+                }
+
+                if ($failedRecipients !== []) {
+                    $this->addFlash('warning', 'Echec pour: ' . implode(', ', $failedRecipients));
+                }
+
+                if ($sentCount > 0) {
+                    $campaign = (new EmailCampaign())
+                        ->setSubject($subject)
+                        ->setHtmlContent($htmlContent)
+                        ->setRecipients($recipients)
+                        ->setFailedRecipients($failedRecipients)
+                        ->setSentByEmail($this->getUser() instanceof User ? $this->getUser()->getEmail() : null)
+                        ->setSentAt(new DateTimeImmutable());
+
+                    $em->persist($campaign);
+                    $em->flush();
+                    $campaigns = $emailCampaignRepository->findBy([], ['sentAt' => 'DESC'], 12);
+                }
+
+                if ($sentCount > 0 && $failedRecipients === []) {
+                    return $this->redirectToRoute('admin_emailing');
+                }
+            }
+        }
+
+        return $this->render('admin/emailing.html.twig', [
+            'users' => $users,
+            'formData' => $formData,
+            'campaigns' => $campaigns,
         ]);
     }
 
@@ -736,6 +864,51 @@ final class AdminController extends AbstractController
 
         // Limite la longueur
         return mb_substr($query, 0, 255);
+    }
+
+    private function sanitizeEmailSubject(string $subject): string
+    {
+        $subject = trim(preg_replace('/\s+/', ' ', $subject) ?? '');
+
+        return mb_substr($subject, 0, 255);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function extractEmailAddresses(string $rawRecipients): array
+    {
+        $parts = preg_split('/[\s,;]+/', mb_strtolower($rawRecipients), -1, PREG_SPLIT_NO_EMPTY);
+        if (!is_array($parts)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_map('trim', $parts)));
+    }
+
+    /**
+     * @param list<User> $selectedUsers
+     * @param list<string> $manualEmails
+     * @return list<string>
+     */
+    private function buildRecipientList(array $selectedUsers, array $manualEmails): array
+    {
+        $recipients = [];
+
+        foreach ($selectedUsers as $user) {
+            $email = mb_strtolower(trim((string) $user->getEmail()));
+            if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $recipients[] = $email;
+            }
+        }
+
+        foreach ($manualEmails as $email) {
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $recipients[] = $email;
+            }
+        }
+
+        return array_values(array_unique($recipients));
     }
 
     private function getOrCreateSubscription(

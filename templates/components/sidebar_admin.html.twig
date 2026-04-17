@@ -41,6 +41,12 @@
         <i class="fas fa-puzzle-piece"></i>
         <span>Extension install</span>
       </a>
+
+      <a href="{{ path('admin_emailing') }}"
+         class="nav-item {{ app.request.attributes.get('_route') == 'admin_emailing' ? 'active' : '' }}">
+        <i class="fas fa-envelope"></i>
+        <span>Emailing</span>
+      </a>
     </div>
   </nav>
 

@@ -1,0 +1,185 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Emailing{% endblock %}
+{% block admin_page_class %}ds-page--wide{% endblock %}
+{% block admin_page_title %}Emailing{% endblock %}
+{% block admin_page_intro %}Compose un email HTML, choisis les destinataires et garde un historique rapide des envois admin.{% endblock %}
+
+{% block admin_content %}
+  <div class="emailing-layout ds-stack-lg">
+    <form
+      method="post"
+      class="emailing-page ds-grid-2"
+      data-controller="admin-email-preview"
+    >
+      <input type="hidden" name="_token" value="{{ csrf_token('admin_emailing') }}">
+
+      <section class="ds-surface ds-stack-md">
+        <div class="emailing-section-head">
+          <div>
+            <h2 class="ds-section-title">Composition</h2>
+            <p class="ds-section-text">Le HTML saisi ici sera envoye tel quel dans l email.</p>
+          </div>
+          <span class="ds-badge ds-badge--info" data-admin-email-preview-target="count">0 destinataire</span>
+        </div>
+
+        <label class="emailing-field">
+          <span class="emailing-label">Objet</span>
+          <input
+            type="text"
+            name="subject"
+            class="ds-input"
+            maxlength="255"
+            required
+            value="{{ formData.subject }}"
+            placeholder="Ex: Nouvelle offre MYKEYNEST"
+          >
+        </label>
+
+        <div class="emailing-field">
+          <span class="emailing-label">Destinataires selectionnes</span>
+          <div class="emailing-recipient-box" data-admin-email-preview-target="selectedRecipients"></div>
+          <span class="emailing-help">Les utilisateurs coches apparaissent ici. Les emails saisis manuellement aussi.</span>
+        </div>
+
+        <label class="emailing-field">
+          <span class="emailing-label">Destinataires manuels</span>
+          <textarea
+            name="recipient_emails"
+            class="emailing-textarea emailing-textarea--sm"
+            placeholder="user1@email.com, user2@email.com&#10;user3@email.com"
+            data-admin-email-preview-target="manualRecipients"
+            data-action="input->admin-email-preview#updateSelectedRecipients"
+          >{{ formData.recipientEmails }}</textarea>
+          <span class="emailing-help">Separe les emails par virgule, espace, point-virgule ou retour a la ligne.</span>
+        </label>
+
+        <div class="emailing-field">
+          <span class="emailing-label">Utilisateurs</span>
+          <input
+            type="search"
+            class="ds-input"
+            placeholder="Rechercher un utilisateur par email ou entreprise"
+            data-admin-email-preview-target="userSearch"
+            data-action="input->admin-email-preview#filterUsers"
+          >
+
+          <div class="emailing-user-list">
+            {% for user in users %}
+              <label
+                class="emailing-user-item"
+                data-admin-email-preview-target="userItem"
+                data-search="{{ user.email }} {{ user.company ?: '' }} {{ user.id }}"
+              >
+                <input
+                  type="checkbox"
+                  name="selected_users[]"
+                  value="{{ user.id }}"
+                  class="emailing-user-checkbox"
+                  data-admin-email-preview-target="userCheckbox"
+                  data-email="{{ user.email }}"
+                  data-action="change->admin-email-preview#updateSelectedRecipients"
+                  {{ user.id in formData.selectedUserIds ? 'checked' : '' }}
+                >
+                <div class="emailing-user-meta">
+                  <span class="emailing-user-email">{{ user.email }}</span>
+                  <span class="emailing-user-details">
+                    #{{ user.id }}{% if user.company %} - {{ user.company }}{% endif %}
+                  </span>
+                </div>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <label class="emailing-field">
+          <span class="emailing-label">HTML de l email</span>
+          <textarea
+            name="html_content"
+            class="emailing-textarea emailing-textarea--xl"
+            required
+            spellcheck="false"
+            data-admin-email-preview-target="htmlInput"
+            data-action="input->admin-email-preview#renderPreview"
+            placeholder="<h1>Bonjour</h1><p>Votre contenu HTML ici...</p>"
+          >{{ formData.htmlContent }}</textarea>
+        </label>
+
+        <div class="emailing-actions">
+          <button type="submit" class="ds-btn ds-btn--primary">Envoyer les emails</button>
+        </div>
+      </section>
+
+      <section class="ds-surface ds-stack-md">
+        <div class="emailing-section-head">
+          <div>
+            <h2 class="ds-section-title">Preview</h2>
+            <p class="ds-section-text">Rendu approx. du HTML avant envoi.</p>
+          </div>
+        </div>
+
+        <div class="emailing-preview-shell">
+          <iframe
+            title="Preview email"
+            class="emailing-preview-frame"
+            sandbox
+            data-admin-email-preview-target="previewFrame"
+          ></iframe>
+        </div>
+      </section>
+    </form>
+
+    <section class="ds-surface ds-stack-md">
+      <div class="emailing-section-head">
+        <div>
+          <h2 class="ds-section-title">Historique recent</h2>
+          <p class="ds-section-text">Resume rapide des dernieres campagnes envoyees depuis l admin.</p>
+        </div>
+      </div>
+
+      <div class="ds-table-wrap">
+        <table class="ds-table">
+          <thead>
+            <tr>
+              <th>Quand</th>
+              <th>Objet</th>
+              <th>Destinataires</th>
+              <th>Envoye par</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for campaign in campaigns %}
+              <tr>
+                <td>
+                  <div class="ds-cell-stack">
+                    <span class="ds-title-strong">{{ campaign.sentAt|date('d/m/Y H:i') }}</span>
+                    <span class="ds-muted">
+                      {{ campaign.recipientCount }} envoi(s){% if campaign.failedCount > 0 %}, {{ campaign.failedCount }} echec(s){% endif %}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="ds-cell-stack">
+                    <span class="ds-title-strong">{{ campaign.subject }}</span>
+                    <span class="ds-muted">{{ campaign.htmlContent|striptags|u.truncate(120, '...') }}</span>
+                  </div>
+                </td>
+                <td class="ds-text-break">
+                  {{ campaign.recipients|slice(0, 6)|join(', ') }}
+                  {% if campaign.recipientCount > 6 %}
+                    <span class="ds-muted">+ {{ campaign.recipientCount - 6 }} autre(s)</span>
+                  {% endif %}
+                </td>
+                <td>{{ campaign.sentByEmail ?: '-' }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="4" class="ds-empty">Aucune campagne envoyee pour le moment.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+{% endblock %}
