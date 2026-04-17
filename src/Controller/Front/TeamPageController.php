@@ -2,28 +2,57 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\Credential;
 use App\Entity\Team;
 use App\Entity\TeamMember;
-use App\Entity\Credential;
 use App\Entity\User;
 use App\Enum\TeamRole;
-use App\Form\TeamType;
-use App\Form\TeamAddMemberType;
 use App\Form\TeamAddCredentialsType;
+use App\Form\TeamAddMemberType;
+use App\Form\TeamType;
+use App\Repository\CredentialRepository;
 use App\Repository\TeamMemberRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
-use App\Repository\CredentialRepository;
+use App\Service\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/app/teams', name: 'app_team_')]
 class TeamPageController extends AbstractController
 {
+    private function sendTeamGuestInvitationEmail(
+        MailerService $mailer,
+        UrlGeneratorInterface $urlGenerator,
+        User $guest,
+        Team $team,
+        \DateTimeImmutable $expiresAt
+    ): void {
+        $guestRegisterUrl = $urlGenerator->generate(
+            'app_guest_register',
+            ['token' => $guest->getApiToken(), 'email' => $guest->getEmail()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $mailer->send(
+            $guest->getEmail(),
+            'Vous avez ete invite dans une equipe MYKEYNEST',
+            'emails/team_invitation.html.twig',
+            [
+                'user' => $guest,
+                'team' => $team,
+                'guest_register' => $guestRegisterUrl,
+                'expiresAt' => $expiresAt,
+            ]
+        );
+    }
+
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(TeamRepository $teamRepository, Security $security): Response
     {
@@ -38,62 +67,57 @@ class TeamPageController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-public function new(Request $request, EntityManagerInterface $em, Security $security): Response
-{
-    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    public function new(Request $request, EntityManagerInterface $em, Security $security): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-    /** @var User $user */
-    $user = $security->getUser();
-    if (!$user) {
-        throw $this->createAccessDeniedException();
-    }
+        /** @var User|null $user */
+        $user = $security->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
 
-    // ✅ 1) Bloquer si pas d'abonnement et limite atteinte
-    $hasSubscription = $user->hasActiveSubscription();
+        $hasSubscription = $user->hasActiveSubscription();
 
-    if (!$hasSubscription) {
-        // Méthode A: via repository (recommandé)
-        $countTeams = $em->getRepository(Team::class)->count(['owner' => $user]);
-        // ou si ta Team est liée autrement, adapte le critère (ex: ['createdBy' => $user])
+        if (!$hasSubscription) {
+            $countTeams = $em->getRepository(Team::class)->count(['owner' => $user]);
 
-        if ($countTeams >= 1) {
-            $this->addFlash('warning', 'Limite atteinte : 1 équipes maximum sans abonnement.');
+            if ($countTeams >= 1) {
+                $this->addFlash('warning', 'Limite atteinte : 1 equipes maximum sans abonnement.');
+
+                return $this->redirectToRoute('app_team_index');
+            }
+        }
+
+        $team = new Team();
+
+        $form = $this->createForm(TeamType::class, $team, [
+            'user' => $user,
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $team->setOwner($user);
+
+            $member = new TeamMember();
+            $member->setTeam($team);
+            $member->setUser($user);
+            $member->setRole(TeamRole::OWNER);
+
+            $em->persist($team);
+            $em->persist($member);
+            $em->flush();
+
+            $this->addFlash('success', 'Equipe creee avec succes.');
+
             return $this->redirectToRoute('app_team_index');
         }
+
+        return $this->render('team/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
-
-    // ✅ 2) Création normale
-    $team = new Team();
-
-    $form = $this->createForm(TeamType::class, $team, [
-        'user' => $user,
-    ]);
-
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // owner
-        $team->setOwner($user);
-
-        // créateur = OWNER dans TeamMember
-        $member = new TeamMember();
-        $member->setTeam($team);
-        $member->setUser($user);
-        $member->setRole(TeamRole::OWNER);
-
-        $em->persist($team);
-        $em->persist($member);
-        $em->flush();
-
-        $this->addFlash('success', 'Équipe créée avec succès.');
-
-        return $this->redirectToRoute('app_team_index');
-    }
-
-    return $this->render('team/new.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
 
     #[Route('/{id}', name: 'show', methods: ['GET', 'POST'])]
     public function show(
@@ -102,57 +126,97 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
         UserRepository $userRepository,
         TeamMemberRepository $teamMemberRepository,
         EntityManagerInterface $em,
-        Security $security
+        Security $security,
+        MailerService $mailer,
+        LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator
     ): Response {
         $this->denyAccessUnlessGranted('TEAM_VIEW', $team);
 
         $user = $security->getUser();
 
-        // Par défaut, pas de formulaire si l'utilisateur ne peut pas gérer l'équipe
         $addMemberFormView = null;
         $addCredentialsFormView = null;
 
         if ($this->isGranted('TEAM_MANAGE', $team)) {
-            // Formulaire d'ajout de membre
             $memberForm = $this->createForm(TeamAddMemberType::class);
             $memberForm->handleRequest($request);
 
             if ($memberForm->isSubmitted() && $memberForm->isValid()) {
-                $data  = $memberForm->getData();
-                $email = $data['email'];
+                $data = $memberForm->getData();
+                $email = (string) $data['email'];
                 /** @var TeamRole $role */
-                $role  = $data['role'];
+                $role = $data['role'];
 
-                $user = $userRepository->findOneBy(['email' => $email]);
+                $memberUser = $userRepository->findOneBy(['email' => $email]);
+                $isGuestInvitation = false;
+                $guestInvitationExpiresAt = null;
 
-                if (!$user) {
-                    $this->addFlash('danger', sprintf('Aucun utilisateur trouvé avec lemail "%s".', $email));
-                } else {
-                    // Vérifier si déjà membre
-                    $existing = $teamMemberRepository->findOneBy([
-                        'team' => $team,
-                        'user' => $user,
-                    ]);
+                if (!$memberUser) {
+                    $isGuestInvitation = true;
+                    $guestInvitationExpiresAt = new \DateTimeImmutable('+24 hours');
 
-                    if ($existing) {
-                        $this->addFlash('warning', 'Cet utilisateur est déjà membre de cette équipe.');
-                    } else {
-                        $member = new TeamMember();
-                        $member->setTeam($team);
-                        $member->setUser($user);
-                        $member->setRole($role);
+                    $memberUser = new User();
+                    $memberUser->setEmail($email);
+                    $memberUser->setCompany('');
+                    $memberUser->setPassword('');
+                    $memberUser->setRoles(['ROLE_GUEST']);
+                    $memberUser->setApiToken(bin2hex(random_bytes(32)));
+                    $memberUser->setTokenExpiresAt($guestInvitationExpiresAt);
+                    $memberUser->regenerateApiExtensionToken();
 
-                        $em->persist($member);
-                        $em->flush();
+                    $em->persist($memberUser);
+                } elseif (in_array('ROLE_GUEST', $memberUser->getRoles(), true)) {
+                    $isGuestInvitation = true;
+                    $guestInvitationExpiresAt = new \DateTimeImmutable('+24 hours');
+                    $memberUser->setApiToken(bin2hex(random_bytes(32)));
+                    $memberUser->setTokenExpiresAt($guestInvitationExpiresAt);
+                }
 
-                        $this->addFlash('success', 'Membre ajouté avec succès à léquipe.');
+                if ($team->getOwner()?->getId() === $memberUser->getId()) {
+                    $this->addFlash('warning', 'Le proprietaire est deja membre de cette equipe.');
+
+                    return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
+                }
+
+                $existing = $teamMemberRepository->findOneBy([
+                    'team' => $team,
+                    'user' => $memberUser,
+                ]);
+
+                if ($existing) {
+                    $this->addFlash('warning', 'Cet utilisateur est deja membre de cette equipe.');
+
+                    return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
+                }
+
+                $member = new TeamMember();
+                $member->setTeam($team);
+                $member->setUser($memberUser);
+                $member->setRole($role);
+
+                $em->persist($member);
+                $em->flush();
+
+                if ($isGuestInvitation && $guestInvitationExpiresAt instanceof \DateTimeImmutable) {
+                    try {
+                        $this->sendTeamGuestInvitationEmail($mailer, $urlGenerator, $memberUser, $team, $guestInvitationExpiresAt);
+                        $this->addFlash('success', 'Invitation envoyee et membre ajoute a l equipe.');
+                    } catch (\Throwable $exception) {
+                        $logger->warning('Unable to send team invitation email.', [
+                            'guest_email' => $memberUser->getEmail(),
+                            'team_id' => $team->getId(),
+                            'exception' => $exception->getMessage(),
+                        ]);
+                        $this->addFlash('warning', 'Membre ajoute, mais impossible d envoyer l invitation email.');
                     }
+                } else {
+                    $this->addFlash('success', 'Membre ajoute avec succes a l equipe.');
                 }
 
                 return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
             }
 
-            // Formulaire d'ajout de credentials
             $credentialsForm = $this->createForm(TeamAddCredentialsType::class, null, [
                 'user' => $user,
                 'team' => $team,
@@ -171,7 +235,8 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
 
                 $em->flush();
 
-                $this->addFlash('success', 'Credentials ajoutés avec succès à l\'équipe.');
+                $this->addFlash('success', 'Credentials ajoutes avec succes a l equipe.');
+
                 return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
             }
 
@@ -180,9 +245,9 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
         }
 
         return $this->render('team/show.html.twig', [
-            'team'                   => $team,
-            'add_member_form'        => $addMemberFormView,
-            'add_credentials_form'   => $addCredentialsFormView,
+            'team' => $team,
+            'add_member_form' => $addMemberFormView,
+            'add_credentials_form' => $addCredentialsFormView,
         ]);
     }
 
@@ -199,26 +264,29 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('remove_member_' . $memberId, $token)) {
             $this->addFlash('danger', 'Token CSRF invalide.');
+
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
         $member = $teamMemberRepository->find($memberId);
 
         if (!$member || $member->getTeam()->getId() !== $team->getId()) {
-            $this->addFlash('danger', 'Membre introuvable dans cette équipe.');
+            $this->addFlash('danger', 'Membre introuvable dans cette equipe.');
+
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
-        // On ne supprime pas l'OWNER
         if ($member->getRole() === TeamRole::OWNER) {
-            $this->addFlash('warning', 'Vous ne pouvez pas supprimer le propriétaire de léquipe.');
+            $this->addFlash('warning', 'Vous ne pouvez pas supprimer le proprietaire de l equipe.');
+
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
         $em->remove($member);
         $em->flush();
 
-        $this->addFlash('success', 'Membre supprimé de léquipe.');
+        $this->addFlash('success', 'Membre supprime de l equipe.');
+
         return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
     }
 
@@ -278,27 +346,26 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
         Request $request,
         EntityManagerInterface $em
     ): Response {
-        // Seul le propriétaire peut supprimer l'équipe
         $this->denyAccessUnlessGranted('TEAM_DELETE', $team);
 
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('delete_team_' . $team->getId(), $token)) {
             $this->addFlash('danger', 'Token CSRF invalide.');
+
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
         $teamName = $team->getName();
 
-        // Supprimer tous les membres
         foreach ($team->getMembers() as $member) {
             $em->remove($member);
         }
 
-        // Supprimer l'équipe
         $em->remove($team);
         $em->flush();
 
-        $this->addFlash('success', sprintf('L\'équipe "%s" a été supprimée avec succès.', $teamName));
+        $this->addFlash('success', sprintf('L equipe "%s" a ete supprimee avec succes.', $teamName));
+
         return $this->redirectToRoute('app_team_index');
     }
 
@@ -315,25 +382,29 @@ public function new(Request $request, EntityManagerInterface $em, Security $secu
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('remove_credential_' . $credentialId, $token)) {
             $this->addFlash('danger', 'Token CSRF invalide.');
+
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
         $credential = $credentialRepository->find($credentialId);
 
-        if (!$credential) {
+        if (!$credential instanceof Credential) {
             $this->addFlash('danger', 'Credential introuvable.');
+
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
         if (!$team->getCredentials()->contains($credential)) {
-            $this->addFlash('warning', 'Ce credential n\'est pas partagé avec cette équipe.');
+            $this->addFlash('warning', 'Ce credential n est pas partage avec cette equipe.');
+
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
         $team->removeCredential($credential);
         $em->flush();
 
-        $this->addFlash('success', 'Credential retiré de l\'équipe avec succès.');
+        $this->addFlash('success', 'Credential retire de l equipe avec succes.');
+
         return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
     }
 }
