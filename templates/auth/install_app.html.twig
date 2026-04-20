@@ -241,6 +241,42 @@
     line-height: 1.6;
   }
 
+  .install-fallback {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-top: 0.9rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(240, 253, 250, 0.92));
+    border: 1px solid rgba(16, 185, 129, 0.22);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
+  }
+
+  .install-fallback__icon {
+    width: 2.1rem;
+    height: 2.1rem;
+    flex: 0 0 2.1rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ecfdf5, #dbeafe);
+    color: #059669;
+  }
+
+  .install-fallback strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: #0f172a;
+  }
+
+  .install-fallback p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.6;
+  }
+
   @media (max-width: 900px) {
     .install-grid {
       grid-template-columns: 1fr;
@@ -333,6 +369,16 @@
             data-error-text="{{ 'install_app.hero.install_error'|trans }}"
             data-missing-text="{{ 'install_app.hero.install_missing'|trans }}"
           ></div>
+
+          <div class="install-fallback">
+            <div class="install-fallback__icon">
+              <i class="fas fa-ellipsis-vertical"></i>
+            </div>
+            <div>
+              <strong>{{ 'install_app.hero.fallback_title'|trans }}</strong>
+              <p>{{ 'install_app.hero.fallback_text'|trans }}</p>
+            </div>
+          </div>
         {% endif %}
       </div>
 

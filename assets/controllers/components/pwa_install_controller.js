@@ -53,10 +53,15 @@ export default class extends Controller {
     const promptEvent = this.deferredPrompt;
     this.setButtonsDisabled(true);
     this.setInstallHint("pendingText");
+    const choicePromise = promptEvent.userChoice;
 
     try {
+      if (typeof promptEvent.prompt !== "function") {
+        throw new Error("Install prompt is not callable");
+      }
+
       await promptEvent.prompt();
-      const choiceResult = await promptEvent.userChoice;
+      const choiceResult = await choicePromise;
 
       if (choiceResult?.outcome === "accepted") {
         this.setInstallHint("acceptedText");

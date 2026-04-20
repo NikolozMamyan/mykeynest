@@ -373,7 +373,9 @@
       "install_accepted": "Installation acceptee. Android devrait terminer l'ajout de l'application.",
       "install_dismissed": "L'installation a ete fermee ou annulee. Tu peux aussi essayer via le menu du navigateur.",
       "install_error": "Le navigateur n'a pas pu ouvrir la fenetre d'installation. Essaie via le menu du navigateur puis Installer l'application.",
-      "install_missing": "Le prompt d'installation n'est plus disponible. Recharge la page ou essaie via le menu du navigateur."
+      "install_missing": "Le prompt d'installation n'est plus disponible. Recharge la page ou essaie via le menu du navigateur.",
+      "fallback_title": "Si le bouton ne declenche rien",
+      "fallback_text": "Sur Android, ouvre le menu du navigateur puis cherche Installer l'application ou Ajouter a l'ecran d'accueil."
     },
     "context": {
       "android": {

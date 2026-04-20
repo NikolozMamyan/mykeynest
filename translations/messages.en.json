@@ -372,7 +372,9 @@
       "install_accepted": "Installation accepted. Android should finish adding the app.",
       "install_dismissed": "The install flow was closed or dismissed. You can also try from the browser menu.",
       "install_error": "The browser could not open the install prompt. Try from the browser menu, then Install app.",
-      "install_missing": "The install prompt is no longer available. Reload the page or try from the browser menu."
+      "install_missing": "The install prompt is no longer available. Reload the page or try from the browser menu.",
+      "fallback_title": "If the button does nothing",
+      "fallback_text": "On Android, open the browser menu and look for Install app or Add to Home screen."
     },
     "context": {
       "android": {
