@@ -87,6 +87,10 @@
 
 .nav-link:hover { color: var(--color-primary); }
 
+.nav-link-mobile-only {
+  display: inline-flex;
+}
+
 .btn {
   padding: 0.625rem 1.25rem;
   border-radius: var(--border-radius-sm);
@@ -154,6 +158,10 @@
     gap: 2rem;
     border: 0;
     background: transparent;
+  }
+
+  .nav-link-mobile-only {
+    display: none;
   }
 
   .nav-cta { display: flex; }

@@ -71,11 +71,19 @@ export default class extends Controller {
       return;
     }
 
-    this.textTarget.textContent = mode === "ios"
-      ? "Ajoute MYKEYNEST a l ecran d accueil depuis Partager puis Sur l ecran d accueil."
-      : "Installe MYKEYNEST sur ton telephone pour l ouvrir comme une vraie app.";
+    this.textTarget.textContent = this.getBannerText(mode);
     this.installButtonTarget.hidden = mode !== "android";
     this.bannerTarget.hidden = false;
+  }
+
+  getBannerText(mode) {
+    const { iosText, androidText } = this.bannerTarget.dataset;
+
+    if (mode === "ios") {
+      return iosText || "Add MYKEYNEST from Share, then Add to Home Screen.";
+    }
+
+    return androidText || "Install MYKEYNEST on your phone for quicker access.";
   }
 
   hideBanner() {

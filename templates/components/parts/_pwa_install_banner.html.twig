@@ -1,6 +1,8 @@
 <div
   class="pwa-install-banner"
   data-pwa-install-target="banner"
+  data-ios-text="{{ 'install_app.banner.ios_text'|trans }}"
+  data-android-text="{{ 'install_app.banner.android_text'|trans }}"
   hidden
 >
   <div class="pwa-install-banner__content">
@@ -18,14 +20,14 @@
       data-action="click->pwa-install#install"
       hidden
     >
-      Installer
+      {{ 'install_app.banner.install'|trans }}
     </button>
     <button
       type="button"
       class="pwa-install-banner__button"
       data-action="click->pwa-install#dismiss"
     >
-      Plus tard
+      {{ 'install_app.banner.later'|trans }}
     </button>
   </div>
 </div>

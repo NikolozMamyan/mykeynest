@@ -61,6 +61,10 @@
       "language_aria": "Langue",
       "language_fr": "Français",
       "language_en": "English",
+      "install_hybrid_app": {
+        "label": "Installer sur mobile",
+        "desc": "Ajouter MYKEYNEST a l'ecran d'accueil"
+      },
       "settings": {
         "label": "Paramètres",
         "desc": "Gérer votre compte"
@@ -101,6 +105,7 @@
       "features": "Fonctionnalités",
       "how_it_works": "Comment ça marche",
       "pricing": "Tarifs",
+      "install_hybrid_app": "Installer sur mobile",
       "login": "Connexion",
       "free_trial": "Essai gratuit",
       "language": "Langue"
@@ -346,6 +351,90 @@
       "missing": "Lien d'invitation invalide.",
       "expired": "Ce lien d'invitation a expiré.",
       "already_used": "Ce lien a déjà été utilisé."
+    }
+  },
+  "install_app": {
+    "meta": {
+      "title": "Installer MYKEYNEST sur mobile"
+    },
+    "hero": {
+      "eyebrow": "Application mobile MYKEYNEST",
+      "title": "Installe MYKEYNEST proprement sur ton telephone.",
+      "text": "Ajoute MYKEYNEST a l'ecran d'accueil pour ouvrir ton coffre plus vite et garder un acces simple a tes mots de passe depuis mobile.",
+      "badge": "Le raccourci le plus pratique pour mobile",
+      "primary_cta": "Lancer l'installation",
+      "secondary_cta_logged": "Ouvrir mes acces",
+      "secondary_cta_guest": "Creer un compte",
+      "mobile_note": "Sur Android, le navigateur peut afficher une vraie fenetre d'installation. Sur iPhone et iPad, l'ajout se fait via le menu de partage.",
+      "desktop_note": "L'installation se fait depuis ton telephone. Ouvre cette page sur mobile pour suivre les bonnes etapes selon ton appareil."
+    },
+    "context": {
+      "android": {
+        "label": "Android detecte",
+        "text": "Tu peux tenter l'installation directement ici. Si rien ne s'ouvre, le navigateur n'autorise pas encore le prompt."
+      },
+      "ios": {
+        "label": "iPhone ou iPad detecte",
+        "text": "Sur iOS, il faut ajouter MYKEYNEST manuellement via Partager puis Sur l'ecran d'accueil."
+      },
+      "desktop": {
+        "label": "Ouvert depuis un ordinateur",
+        "text": "Cette page te sert de guide. Ouvre-la ensuite sur ton telephone pour finaliser l'installation."
+      }
+    },
+    "flow": {
+      "title": "Le bon flux selon ton appareil",
+      "badge": "Installation guidee",
+      "android": {
+        "intro": "Sur Android, l'installation est la plus directe quand le navigateur propose le prompt.",
+        "title": "Installation sur Android",
+        "step_1": "Ouvre cette page dans Chrome ou un navigateur compatible sur ton telephone.",
+        "step_2": "Appuie sur <strong>Lancer l'installation</strong> quand le bouton est disponible.",
+        "step_3": "Confirme pour ajouter MYKEYNEST a ton ecran d'accueil et l'ouvrir comme une app."
+      },
+      "ios": {
+        "intro": "Sur iPhone et iPad, Apple ne fournit pas de pop-up d'installation automatique.",
+        "title": "Installation sur iPhone / iPad",
+        "step_1": "Ouvre cette page dans Safari.",
+        "step_2": "Touche <strong>Partager</strong> puis <strong>Sur l'ecran d'accueil</strong>.",
+        "step_3": "Valide pour ajouter MYKEYNEST a ton ecran d'accueil."
+      },
+      "desktop": {
+        "intro": "Depuis un ordinateur, le plus utile est de preparer le bon parcours avant de passer sur ton telephone.",
+        "title": "Depuis un ordinateur",
+        "step_1": "Ouvre cette meme page sur ton telephone.",
+        "step_2": "Si tu es sur Android, utilise le bouton d'installation quand il apparait.",
+        "step_3": "Si tu es sur iPhone ou iPad, passe par Safari puis Sur l'ecran d'accueil."
+      }
+    },
+    "benefits": {
+      "title": "Pourquoi l'installer",
+      "items": {
+        "speed": {
+          "title": "Acces plus direct",
+          "text": "Tu ouvres MYKEYNEST depuis l'ecran d'accueil, sans chercher un onglet navigateur."
+        },
+        "experience": {
+          "title": "Usage mobile plus propre",
+          "text": "L'interface prend moins l'apparence d'un site classique et ressemble davantage a une app."
+        },
+        "security": {
+          "title": "La meme securite",
+          "text": "Tu gardes le meme compte, les memes protections et la meme base web que dans le navigateur."
+        }
+      }
+    },
+    "tips": {
+      "title": "A savoir",
+      "item_1": "Le bouton d'installation ne s'affiche pas tout le temps sur Android : c'est le navigateur qui decide.",
+      "item_2": "Sur iPhone et iPad, utilise Safari pour avoir l'option Sur l'ecran d'accueil.",
+      "item_3": "Une fois ajoutee, l'application ouvre le meme coffre et les memes donnees que la version web."
+    },
+    "banner": {
+      "ios_text": "Ajoute MYKEYNEST depuis Partager, puis Sur l'ecran d'accueil.",
+      "android_text": "Installe MYKEYNEST sur ton telephone pour y acceder plus vite.",
+      "install": "Installer",
+      "later": "Plus tard"
     }
   },
   "auth": {

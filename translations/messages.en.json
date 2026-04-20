@@ -61,6 +61,10 @@
       "language_aria": "Language",
       "language_fr": "French",
       "language_en": "English",
+      "install_hybrid_app": {
+        "label": "Install on mobile",
+        "desc": "Add MYKEYNEST to your home screen"
+      },
       "settings": {
         "label": "Settings",
         "desc": "Manage your account"
@@ -101,6 +105,7 @@
       "features": "Features",
       "how_it_works": "How it works",
       "pricing": "Pricing",
+      "install_hybrid_app": "Install on mobile",
       "login": "Log in",
       "free_trial": "Free trial",
       "language": "Language"
@@ -345,6 +350,90 @@
         "hint": "Already have an account?",
         "hint_link": "Log in"
       }
+    }
+  },
+  "install_app": {
+    "meta": {
+      "title": "Install MYKEYNEST on mobile"
+    },
+    "hero": {
+      "eyebrow": "MYKEYNEST mobile app",
+      "title": "Install MYKEYNEST cleanly on your phone.",
+      "text": "Add MYKEYNEST to your home screen to open your vault faster and keep your passwords easy to reach from mobile.",
+      "badge": "The most practical shortcut for mobile",
+      "primary_cta": "Start installation",
+      "secondary_cta_logged": "Open my access",
+      "secondary_cta_guest": "Create an account",
+      "mobile_note": "On Android, the browser may show a real install prompt. On iPhone and iPad, the app is added from the share menu.",
+      "desktop_note": "Installation happens from your phone. Open this page on mobile to follow the right steps for your device."
+    },
+    "context": {
+      "android": {
+        "label": "Android detected",
+        "text": "You can try the direct install flow here. If nothing opens, your browser is not exposing the prompt yet."
+      },
+      "ios": {
+        "label": "iPhone or iPad detected",
+        "text": "On iOS, you need to add MYKEYNEST manually from Share, then Add to Home Screen."
+      },
+      "desktop": {
+        "label": "Opened from a computer",
+        "text": "This page is your guide. Open it on your phone to complete the installation."
+      }
+    },
+    "flow": {
+      "title": "The right flow for your device",
+      "badge": "Guided install",
+      "android": {
+        "intro": "On Android, installation is the most direct when the browser exposes the install prompt.",
+        "title": "Install on Android",
+        "step_1": "Open this page in Chrome or another compatible browser on your phone.",
+        "step_2": "Tap <strong>Start installation</strong> when the button is available.",
+        "step_3": "Confirm to add MYKEYNEST to your home screen and open it like an app."
+      },
+      "ios": {
+        "intro": "On iPhone and iPad, Apple does not provide an automatic install pop-up.",
+        "title": "Install on iPhone / iPad",
+        "step_1": "Open this page in Safari.",
+        "step_2": "Tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.",
+        "step_3": "Confirm to add MYKEYNEST to your home screen."
+      },
+      "desktop": {
+        "intro": "From a computer, the most useful step is to prepare the right path before switching to your phone.",
+        "title": "From a computer",
+        "step_1": "Open this same page on your phone.",
+        "step_2": "If you use Android, use the install button when it appears.",
+        "step_3": "If you use iPhone or iPad, go through Safari, then Add to Home Screen."
+      }
+    },
+    "benefits": {
+      "title": "Why install it",
+      "items": {
+        "speed": {
+          "title": "More direct access",
+          "text": "Open MYKEYNEST from your home screen instead of going back through a browser tab."
+        },
+        "experience": {
+          "title": "Cleaner mobile usage",
+          "text": "The interface feels less like a normal website and closer to a real app."
+        },
+        "security": {
+          "title": "The same security",
+          "text": "You keep the same account, the same protections, and the same web foundation as in the browser."
+        }
+      }
+    },
+    "tips": {
+      "title": "Good to know",
+      "item_1": "The install button does not appear all the time on Android: the browser decides when it can show it.",
+      "item_2": "On iPhone and iPad, use Safari if you want the Add to Home Screen option.",
+      "item_3": "Once added, the app opens the same vault and the same data as the web version."
+    },
+    "banner": {
+      "ios_text": "Add MYKEYNEST from Share, then Add to Home Screen.",
+      "android_text": "Install MYKEYNEST on your phone for quicker access.",
+      "install": "Install",
+      "later": "Later"
     }
   },
   "credential": {

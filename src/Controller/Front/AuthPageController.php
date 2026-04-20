@@ -126,6 +126,27 @@ class AuthPageController extends AbstractController
         return $response;
     }
 
+    #[Route('/install-app', name: 'app_install_app', methods: ['GET'])]
+    public function installAppPage(Request $request): Response
+    {
+        $userAgent = strtolower((string) $request->headers->get('User-Agent', ''));
+        $isIos = preg_match('/iphone|ipad|ipod/', $userAgent) === 1;
+        $isAndroid = str_contains($userAgent, 'android');
+        $isMobileDevice = $isIos || $isAndroid || preg_match('/mobile/', $userAgent) === 1;
+
+        $installPlatform = 'desktop';
+        if ($isAndroid) {
+            $installPlatform = 'android';
+        } elseif ($isIos) {
+            $installPlatform = 'ios';
+        }
+
+        return $this->render('auth/install_app.html.twig', [
+            'install_platform' => $installPlatform,
+            'is_mobile_device' => $isMobileDevice,
+        ]);
+    }
+
     #[Route('/guest/register', name: 'app_guest_register', methods: ['GET', 'POST'])]
     public function guestRegister(
         Request $request,
