@@ -331,13 +331,31 @@
 .is-standalone-app .main-content {
   max-width: none;
   min-height: calc(100dvh - env(safe-area-inset-top));
-  padding: 0 max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  padding: 0 max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
   border-radius: 0;
   box-shadow: none;
 }
 
 .is-standalone-app .sidebar-backdrop {
   top: 0;
+}
+
+.is-standalone-app .breadcrumb {
+  margin-top: 0.25rem;
+}
+
+.is-standalone-app .page-header,
+.is-standalone-app .page-title-wrapper,
+.is-standalone-app .settings-hero,
+.is-standalone-app .dashboard-hero {
+  margin-top: 0;
+}
+
+.is-standalone-app .card,
+.is-standalone-app .settings-card,
+.is-standalone-app .metric-card,
+.is-standalone-app .stat-card {
+  border-radius: 16px;
 }
 
 @media (max-width: 768px) {
@@ -357,5 +375,11 @@
   .pwa-install-banner__button {
     flex: 1;
     text-align: center;
+  }
+
+  .is-standalone-app .main-content {
+    padding-left: max(6px, env(safe-area-inset-left));
+    padding-right: max(6px, env(safe-area-inset-right));
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
   }
 }

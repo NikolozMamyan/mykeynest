@@ -17,6 +17,54 @@
   display: none;
 }
 
+.is-standalone-app .header-upgrade-badge {
+  display: none;
+}
+
+.is-standalone-app .header_top {
+  min-height: 58px;
+}
+
+.is-standalone-app .header_right {
+  gap: 8px;
+}
+
+.is-standalone-app .burger-btn,
+.is-standalone-app .notification-btn {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.is-standalone-app .notification-btn {
+  box-shadow: none;
+}
+
+.is-standalone-app .user-profile {
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+}
+
+.is-standalone-app .header_right img {
+  width: 36px;
+  height: 36px;
+}
+
+.is-standalone-app .company-name {
+  font-size: 14px;
+}
+
+.is-standalone-app .notification-panel {
+  top: calc(100% + 10px);
+  width: min(420px, calc(100vw - 20px));
+  max-height: min(78vh, 620px);
+}
+
+.is-standalone-app .user-dropdown {
+  top: calc(100% + 10px);
+}
+
 .header-upgrade-badge {
   display: flex;
   align-items: center;
@@ -659,6 +707,41 @@
   }
   .notification-panel::before,
   .user-dropdown::before { right: 50%; transform: translateX(50%) rotate(45deg); }
+
+  .is-standalone-app .header_top {
+    padding-bottom: 10px;
+  }
+
+  .is-standalone-app .header-logo,
+  .is-standalone-app .company-name {
+    display: none;
+  }
+
+  .is-standalone-app .burger-btn {
+    display: flex;
+  }
+
+  .is-standalone-app .header_right {
+    gap: 6px;
+  }
+
+  .is-standalone-app .user-profile {
+    padding-right: 4px;
+  }
+
+  .is-standalone-app .notification-panel {
+    right: -10px;
+    width: calc(100vw - 16px);
+    margin: 0 8px;
+    border-radius: 18px;
+  }
+
+  .is-standalone-app .user-dropdown {
+    right: -8px;
+    width: calc(100vw - 16px);
+    max-width: none;
+    border-radius: 18px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -666,4 +749,9 @@
   .header-upgrade-badge { padding: 5px 8px; margin-left: 8px; }
   .notification-panel { width: calc(100vw - 16px); margin: 0 8px; }
   .user-dropdown { width: calc(100vw - 16px); max-width: none; }
+
+  .is-standalone-app .header_top {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
 }

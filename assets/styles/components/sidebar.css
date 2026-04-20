@@ -11,6 +11,25 @@
   height: 90vh;
 }
 
+.is-standalone-app .sidebar {
+  height: 100dvh;
+  border-right: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+  box-shadow: none;
+}
+
+.is-standalone-app .sidebar-header {
+  padding-top: max(18px, env(safe-area-inset-top));
+}
+
+.is-standalone-app .sidebar-nav {
+  padding-top: 14px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+.is-standalone-app .sidebar-footer {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
 .sidebar-header {
   padding: 20px 16px;
   display: none;
@@ -259,6 +278,12 @@
     height: 100vh;
     z-index: 999;
     box-shadow: none;
+  }
+
+  .is-standalone-app .sidebar {
+    width: min(86vw, 300px);
+    left: calc(min(86vw, 300px) * -1);
+    height: 100dvh;
   }
 
   .sidebar-header { display: block; }
