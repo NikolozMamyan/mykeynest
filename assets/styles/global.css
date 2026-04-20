@@ -358,6 +358,19 @@
   border-radius: 16px;
 }
 
+@media (min-width: 769px) {
+  .is-standalone-app .wrapper-layout {
+    margin-left: 280px;
+    padding: 16px 0;
+  }
+
+  .is-standalone-app .main-content {
+    max-width: 1200px;
+    min-height: auto;
+    padding: 10px;
+  }
+}
+
 @media (max-width: 768px) {
   .pwa-install-banner {
     left: 0.75rem;
