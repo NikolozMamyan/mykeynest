@@ -1,52 +1,65 @@
 import { Controller } from "@hotwired/stimulus"
 
-/**
- * Contrôleur global de layout :
- * - Gère la sidebar (ouverture / fermeture / backdrop / ESC)
- * - Met à jour le compteur de mots de passe
- */
 export default class extends Controller {
   static targets = ["sidebar", "backdrop", "passLength"]
 
   connect() {
-    console.log("✅ LayoutController connecté")
     this.loadCredentialCount()
     document.addEventListener("keydown", this.handleEscape)
+    this.syncSidebarState(false)
   }
 
   disconnect() {
     document.removeEventListener("keydown", this.handleEscape)
+    this.syncSidebarState(false)
   }
 
-  // --- OUVERTURE / FERMETURE ---
-
   toggleSidebar() {
-    this.sidebarTarget.classList.toggle("open")
-    this.backdropTarget.classList.toggle("active")
+    if (!this.hasSidebarTarget || !this.hasBackdropTarget) {
+      return
+    }
+
+    this.syncSidebarState(!this.sidebarTarget.classList.contains("open"))
   }
 
   closeSidebar() {
-    this.sidebarTarget.classList.remove("open")
-    this.backdropTarget.classList.remove("active")
+    this.syncSidebarState(false)
   }
 
-  handleEscape = (e) => {
-    if (e.key === "Escape" && this.sidebarTarget.classList.contains("open")) {
+  handleEscape = (event) => {
+    if (this.hasSidebarTarget && event.key === "Escape" && this.sidebarTarget.classList.contains("open")) {
       this.closeSidebar()
     }
   }
 
-  // --- FETCH du nombre de credentials ---
+  syncSidebarState(isOpen) {
+    if (!this.hasSidebarTarget || !this.hasBackdropTarget) {
+      return
+    }
+
+    this.sidebarTarget.classList.toggle("open", isOpen)
+    this.backdropTarget.classList.toggle("active", isOpen)
+    document.documentElement.classList.toggle("is-sidebar-open", isOpen)
+    document.body.classList.toggle("is-sidebar-open", isOpen)
+  }
+
   async loadCredentialCount() {
     try {
-      const response = await fetch("/api/credentials/length", {credentials: "include", headers: { 'Content-Type': 'application/json' },},)
-      if (!response.ok) throw new Error("Erreur réseau")
+      const response = await fetch("/api/credentials/length", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      if (!response.ok) {
+        throw new Error("Erreur reseau")
+      }
+
       const data = await response.json()
       if (this.hasPassLengthTarget) {
         this.passLengthTarget.textContent = data.count ?? 0
       }
     } catch (error) {
-      console.error("❌ Erreur lors de la récupération du count :", error)
+      console.error("Erreur lors de la recuperation du count :", error)
     }
   }
 }

@@ -274,22 +274,26 @@
   .sidebar {
     position: fixed;
     top: 0;
-    left: -280px;
+    left: 0;
     height: 100vh;
     z-index: 999;
     box-shadow: none;
+    transform: translate3d(-100%, 0, 0);
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s ease;
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
   .is-standalone-app .sidebar {
     width: min(86vw, 300px);
-    left: calc(min(86vw, 300px) * -1);
     height: 100dvh;
+    transform: translate3d(-100%, 0, 0);
   }
 
   .sidebar-header { display: block; }
 
   .sidebar.open {
-    left: 0;
+    transform: translate3d(0, 0, 0);
     box-shadow: 8px 0 32px rgba(0, 0, 0, 0.15);
   }
 
@@ -300,13 +304,12 @@
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
     z-index: 998;
-    animation: sidebarFadeIn 0.3s ease;
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
 
-  .sidebar-backdrop.active { display: block; }
-
-  @keyframes sidebarFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  .sidebar-backdrop.active {
+    display: block;
+    opacity: 1;
   }
 }

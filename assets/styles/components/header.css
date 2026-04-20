@@ -695,10 +695,13 @@
   }
   .burger-btn { display: flex; }
   .notification-panel {
-    right: -77px;
+    position: fixed;
+    top: 76px;
+    left: 12px;
+    right: 12px;
     width: calc(100vw - 24px);
     max-width: none;
-    margin: 0 12px;
+    margin: 0;
   }
   .user-dropdown {
     right: -12px;
@@ -730,9 +733,12 @@
   }
 
   .is-standalone-app .notification-panel {
-    right: -10px;
+    position: fixed;
+    top: calc(68px + env(safe-area-inset-top));
+    left: 8px;
+    right: 8px;
     width: calc(100vw - 16px);
-    margin: 0 8px;
+    margin: 0;
     border-radius: 18px;
   }
 
@@ -747,7 +753,7 @@
 @media (max-width: 480px) {
   .header_top { padding: 10px 12px; }
   .header-upgrade-badge { padding: 5px 8px; margin-left: 8px; }
-  .notification-panel { width: calc(100vw - 16px); margin: 0 8px; }
+  .notification-panel { top: 72px; left: 8px; right: 8px; width: calc(100vw - 16px); margin: 0; }
   .user-dropdown { width: calc(100vw - 16px); max-width: none; }
 
   .is-standalone-app .header_top {
