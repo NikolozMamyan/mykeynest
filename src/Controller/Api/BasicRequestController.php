@@ -85,4 +85,19 @@ public function markAllAsRead(NotificationService $notificationService): JsonRes
     
     return $this->json(['success' => true]);
 }
+
+#[Route('/api/notifications/{id}', name: 'api_notification_delete', methods: ['DELETE'])]
+public function deleteNotification(int $id, NotificationService $notificationService): JsonResponse
+{
+    $user = $this->requireAuthenticatedUser();
+    $notification = $notificationService->findByIdAndUser($id, $user);
+
+    if (!$notification instanceof Notification) {
+        return $this->json(['success' => false, 'message' => 'Notification introuvable.'], 404);
+    }
+
+    $notificationService->deleteNotification($notification);
+
+    return $this->json(['success' => true]);
+}
 }

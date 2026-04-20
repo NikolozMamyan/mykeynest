@@ -66,6 +66,37 @@ export default class extends Controller {
     }
   }
 
+  async deleteNotification(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const button = event.currentTarget;
+    const { id } = button.dataset;
+    if (!id) return;
+
+    const original = button.innerHTML;
+    button.disabled = true;
+    button.classList.add("is-loading");
+    button.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+
+    try {
+      const response = await fetch(`/api/notifications/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Erreur reseau");
+
+      await this.loadNotificationsCount();
+      await this.loadNotifications();
+    } catch (error) {
+      console.error(error);
+      button.disabled = false;
+      button.classList.remove("is-loading");
+      button.innerHTML = `<i class="fas fa-times"></i>`;
+
+      window.setTimeout(() => {
+        button.innerHTML = original;
+      }, 1200);
+    }
+  }
+
   openNotification(event) {
     const { url } = event.currentTarget.dataset;
     if (url && url !== "/app/dashboard") window.location.href = url;
@@ -110,23 +141,40 @@ export default class extends Controller {
         : "";
 
       return `
-        <button type="button" class="notification-item ${notification.isRead ? "" : "unread"}" data-action="click->header#openNotification" data-url="${this.escapeAttribute(notification.actionUrl || "")}">
+        <div class="notification-item ${notification.isRead ? "" : "unread"}">
           <div class="notification-icon ${notification.type}">
             <i class="fas ${TYPE_ICONS[notification.type] || "fa-bell"}"></i>
           </div>
-          <div class="notification-content">
-            <div class="notification-title">
-              ${this.escapeHtml(this.translateMaybe(notification.title))}
-              ${priority}
-              ${notification.icon ? `<i class="fas ${this.escapeAttribute(notification.icon)}"></i>` : ""}
+          <button
+            type="button"
+            class="notification-main"
+            data-action="click->header#openNotification"
+            data-url="${this.escapeAttribute(notification.actionUrl || "")}"
+          >
+            <div class="notification-content">
+              <div class="notification-title">
+                ${this.escapeHtml(this.translateMaybe(notification.title))}
+                ${priority}
+                ${notification.icon ? `<i class="fas ${this.escapeAttribute(notification.icon)}"></i>` : ""}
+              </div>
+              <div class="notification-message">${this.escapeHtml(this.translateMaybe(notification.message))}</div>
+              <div class="notification-time">
+                <i class="fas fa-clock"></i>
+                ${this.escapeHtml(notification.timeAgo || "")}
+              </div>
             </div>
-            <div class="notification-message">${this.escapeHtml(this.translateMaybe(notification.message))}</div>
-            <div class="notification-time">
-              <i class="fas fa-clock"></i>
-              ${this.escapeHtml(notification.timeAgo || "")}
-            </div>
-          </div>
-        </button>
+          </button>
+          <button
+            type="button"
+            class="notification-delete"
+            data-id="${this.escapeAttribute(notification.id)}"
+            data-action="click->header#deleteNotification"
+            aria-label="${this.escapeAttribute(this.t("notifications.delete", "Supprimer"))}"
+            title="${this.escapeAttribute(this.t("notifications.delete", "Supprimer"))}"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       `;
     }).join("");
   }
