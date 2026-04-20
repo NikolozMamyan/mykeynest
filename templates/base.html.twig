@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#059669" />
+    <meta name="theme-color" content="#f8fafc" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
@@ -19,6 +19,15 @@
     />
 
     <title>{% block title %}Welcome!{% endblock %}</title>
+
+    <script>
+      (() => {
+        const savedTheme = window.localStorage.getItem('theme') || 'light';
+        const themeColor = savedTheme === 'dark' ? '#0f172a' : '#f8fafc';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
+      })();
+    </script>
 
     <!-- Google Tag Manager -->
 <!-- Google tag (gtag.js) -->

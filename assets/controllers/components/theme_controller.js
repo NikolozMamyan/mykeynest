@@ -22,6 +22,9 @@ export default class extends Controller {
   applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", theme === "dark" ? "#0f172a" : "#f8fafc");
 
     if (!this.hasIconTarget) {
       return;

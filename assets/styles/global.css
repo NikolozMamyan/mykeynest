@@ -305,14 +305,39 @@
 
 .is-standalone-app body {
   overscroll-behavior-y: contain;
+  background: var(--color-white);
+}
+
+.is-standalone-app .app-shell {
+  min-height: 100dvh;
+  background: var(--color-white);
 }
 
 .is-standalone-app .header_top {
-  padding-top: max(0.25rem, env(safe-area-inset-top));
+  padding-top: max(0.35rem, env(safe-area-inset-top));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  background: color-mix(in srgb, var(--color-white) 82%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 88%, transparent);
+  box-shadow: none;
+}
+
+.is-standalone-app .wrapper-layout {
+  margin-left: 0;
+  min-height: calc(100dvh - env(safe-area-inset-top));
+  padding: 0;
 }
 
 .is-standalone-app .main-content {
-  min-height: calc(100vh - env(safe-area-inset-top));
+  max-width: none;
+  min-height: calc(100dvh - env(safe-area-inset-top));
+  padding: 0 max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.is-standalone-app .sidebar-backdrop {
+  top: 0;
 }
 
 @media (max-width: 768px) {
