@@ -458,9 +458,9 @@ final class AuthController extends AbstractController
 
         $loginChallengeManager->approve($challenge);
 
-        return new Response(
-            '<h1>Connexion approuvée</h1><p>Vous pouvez revenir sur votre autre appareil. La connexion va être finalisée automatiquement.</p>'
-        );
+        return $this->redirectToRoute('app_pending_login', [
+            'approved' => 1,
+        ]);
     }
 
     #[Route('/api/login-challenge/{token}/reject', name: 'api_login_challenge_reject', methods: ['GET', 'POST'])]
@@ -551,3 +551,4 @@ final class AuthController extends AbstractController
         ]);
     }
 }
+
