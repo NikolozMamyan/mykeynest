@@ -27,6 +27,9 @@ export default class extends Controller {
   handleBeforeInstallPrompt = (event) => {
     event.preventDefault();
     this.deferredPrompt = event;
+    if (this.hasInstallHintTarget) {
+      this.installHintTarget.dataset.stateLocked = "";
+    }
     this.updateInstallUi();
     this.showBanner("android");
   };
@@ -38,17 +41,31 @@ export default class extends Controller {
     this.updateInstallUi();
   };
 
-  async install() {
+  async install(event) {
+    event?.preventDefault();
+
     if (!this.deferredPrompt) {
+      this.setInstallHint("missingText");
       this.updateInstallUi();
       return;
     }
 
+    const promptEvent = this.deferredPrompt;
     this.setButtonsDisabled(true);
+    this.setInstallHint("pendingText");
 
     try {
-      await this.deferredPrompt.prompt();
-      await this.deferredPrompt.userChoice;
+      await promptEvent.prompt();
+      const choiceResult = await promptEvent.userChoice;
+
+      if (choiceResult?.outcome === "accepted") {
+        this.setInstallHint("acceptedText");
+      } else {
+        this.setInstallHint("dismissedText");
+      }
+    } catch (error) {
+      console.error("PWA install prompt failed", error);
+      this.setInstallHint("errorText");
     } finally {
       this.deferredPrompt = null;
       this.setButtonsDisabled(false);
@@ -150,9 +167,12 @@ export default class extends Controller {
 
     if (this.hasInstallHintTarget) {
       const { waitingText, readyText } = this.installHintTarget.dataset;
-      this.installHintTarget.textContent = isReady
-        ? (readyText || "")
-        : (waitingText || "");
+      const nextText = isReady ? (readyText || "") : (waitingText || "");
+
+      if (!this.installHintTarget.dataset.stateLocked) {
+        this.installHintTarget.textContent = nextText;
+      }
+
       this.installHintTarget.hidden = false;
     }
   }
@@ -162,5 +182,22 @@ export default class extends Controller {
       button.disabled = isDisabled;
       button.setAttribute("aria-disabled", String(isDisabled));
     });
+  }
+
+  setInstallHint(key) {
+    if (!this.hasInstallHintTarget) {
+      return;
+    }
+
+    const text = this.installHintTarget.dataset[key];
+    if (!text) {
+      return;
+    }
+
+    this.installHintTarget.textContent = text;
+    this.installHintTarget.dataset.stateLocked = ["acceptedText", "dismissedText", "errorText", "missingText"].includes(key)
+      ? "true"
+      : "";
+    this.installHintTarget.hidden = false;
   }
 }

@@ -367,7 +367,12 @@
       "mobile_note": "On Android, the browser may show a real install prompt. On iPhone and iPad, the app is added from the share menu.",
       "desktop_note": "Installation happens from your phone. Open this page on mobile to follow the right steps for your device.",
       "install_waiting": "The install button will appear here as soon as your Android browser allows the prompt.",
-      "install_ready": "Your browser is ready: you can start the installation now."
+      "install_ready": "Your browser is ready: you can start the installation now.",
+      "install_pending": "Install request sent to the browser...",
+      "install_accepted": "Installation accepted. Android should finish adding the app.",
+      "install_dismissed": "The install flow was closed or dismissed. You can also try from the browser menu.",
+      "install_error": "The browser could not open the install prompt. Try from the browser menu, then Install app.",
+      "install_missing": "The install prompt is no longer available. Reload the page or try from the browser menu."
     },
     "context": {
       "android": {
