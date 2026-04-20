@@ -3,9 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#059669" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}" />
 
     <link
       rel="stylesheet"
@@ -47,7 +52,7 @@
     {% endblock %}
   </head>
 
-  <body data-controller="layout">
+  <body data-controller="layout pwa-install">
 
     {# ===== Layout wrapper ===== #}
     <div class="app-shell">
@@ -105,6 +110,7 @@
 
     {# ===== Toasts / Alerts (fixed bottom-right) ===== #}
     {% include './components/parts/_toasts.html.twig' %}
+    {% include './components/parts/_pwa_install_banner.html.twig' %}
 
     {# JS page #}
     {% block page_scripts %}{% endblock %}

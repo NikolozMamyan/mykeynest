@@ -12,6 +12,7 @@ import LocaleSwitcherController from "./components/locale_switcher_controller.js
 import ToastsController from "./components/toasts_controller.js";
 import HeaderController from "./components/header_controller.js";
 import FaqAccordionController from "./components/faq_accordion_controller.js";
+import PwaInstallController from "./components/pwa_install_controller.js";
 import HelpCenterController from "./pages/help_center_controller.js";
 import CredentialIndexController from "./pages/credential_index_controller.js";
 import SharedAccessIndexController from "./pages/shared_access_index_controller.js";
@@ -36,6 +37,7 @@ application.register("locale-switcher", LocaleSwitcherController);
 application.register("toasts", ToastsController);
 application.register("header", HeaderController);
 application.register("faq-accordion", FaqAccordionController);
+application.register("pwa-install", PwaInstallController);
 application.register("help-center", HelpCenterController);
 application.register("credential-index", CredentialIndexController);
 application.register("shared-access-index", SharedAccessIndexController);

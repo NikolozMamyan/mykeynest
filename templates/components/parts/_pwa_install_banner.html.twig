@@ -1,0 +1,31 @@
+<div
+  class="pwa-install-banner"
+  data-pwa-install-target="banner"
+  hidden
+>
+  <div class="pwa-install-banner__content">
+    <div class="pwa-install-banner__icon">
+      <i class="fas fa-mobile-alt"></i>
+    </div>
+    <p class="pwa-install-banner__text" data-pwa-install-target="text"></p>
+  </div>
+
+  <div class="pwa-install-banner__actions">
+    <button
+      type="button"
+      class="pwa-install-banner__button pwa-install-banner__button--primary"
+      data-pwa-install-target="installButton"
+      data-action="click->pwa-install#install"
+      hidden
+    >
+      Installer
+    </button>
+    <button
+      type="button"
+      class="pwa-install-banner__button"
+      data-action="click->pwa-install#dismiss"
+    >
+      Plus tard
+    </button>
+  </div>
+</div>

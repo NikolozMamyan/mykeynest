@@ -1,0 +1,64 @@
+{
+  "name": "MYKEYNEST",
+  "short_name": "MYKEYNEST",
+  "description": "Gestionnaire de mots de passe securise et partage d'acces.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#059669",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mes acces",
+      "short_name": "Acces",
+      "url": "/app/credential",
+      "icons": [
+        {
+          "src": "/apple-touch-icon.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "short_name": "Teams",
+      "url": "/app/teams",
+      "icons": [
+        {
+          "src": "/apple-touch-icon.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Generateur",
+      "short_name": "Generateur",
+      "url": "/app/generator",
+      "icons": [
+        {
+          "src": "/apple-touch-icon.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
