@@ -62,10 +62,12 @@
   </head>
 
   <body data-controller="layout pwa-install">
+    {% set currentRoute = app.request.attributes.get('_route') %}
+    {% set hideAppChrome = currentRoute in ['app_pending_login'] %}
 
     {# ===== Layout wrapper ===== #}
     <div class="app-shell">
-      {% if app.user %}
+      {% if app.user and not hideAppChrome %}
         {# Header commun à tous les utilisateurs connectés #}
         {% include './components/header.html.twig' %}
 
@@ -87,7 +89,7 @@
         {% endif %}
       {% endif %}
 
-      <div class="wrapper-layout">
+      <div class="wrapper-layout {{ hideAppChrome ? 'wrapper-layout--bare' : '' }}">
         <main class="main-content" id="main-content" tabindex="-1">
           {# ===== Flash messages ===== #}
           {# {% if app.flashes is not empty %}
@@ -104,7 +106,6 @@
 
           {# ===== Breadcrumb (optionnel) ===== #}
           {% block breadcrumb %}
-            {% set currentRoute = app.request.attributes.get('_route') %}
             {% set breadcrumbItems = breadcrumb_map()[currentRoute] ?? [] %}
             {% if breadcrumbItems is not empty %}
               {% include './components/parts/_breadcrumb.html.twig' with { items: breadcrumbItems } %}

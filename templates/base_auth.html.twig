@@ -158,7 +158,7 @@
   <body class="auth-layout" data-controller="pwa-install">
     {% set route = app.request.attributes.get('_route') %}
 
-    {% if route not in ['show_login', 'show_register'] %}
+    {% if route not in ['show_login', 'show_register', 'app_pending_login'] %}
       {% include 'components/nav.html.twig' %}
     {% endif %}
 

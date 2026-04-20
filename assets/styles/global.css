@@ -60,6 +60,19 @@
 }
 
 
+.wrapper-layout--bare {
+  margin-left: 0;
+  padding: 0;
+}
+
+.wrapper-layout--bare .main-content {
+  max-width: none;
+  min-height: 100vh;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .main-content {
   width: 100%;
   max-width: 1200px;
