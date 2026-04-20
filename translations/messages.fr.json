@@ -366,7 +366,9 @@
       "secondary_cta_logged": "Ouvrir mes acces",
       "secondary_cta_guest": "Creer un compte",
       "mobile_note": "Sur Android, le navigateur peut afficher une vraie fenetre d'installation. Sur iPhone et iPad, l'ajout se fait via le menu de partage.",
-      "desktop_note": "L'installation se fait depuis ton telephone. Ouvre cette page sur mobile pour suivre les bonnes etapes selon ton appareil."
+      "desktop_note": "L'installation se fait depuis ton telephone. Ouvre cette page sur mobile pour suivre les bonnes etapes selon ton appareil.",
+      "install_waiting": "Le bouton d'installation apparaitra ici des que ton navigateur Android autorisera le prompt.",
+      "install_ready": "Le navigateur est pret : tu peux lancer l'installation maintenant."
     },
     "context": {
       "android": {

@@ -365,7 +365,9 @@
       "secondary_cta_logged": "Open my access",
       "secondary_cta_guest": "Create an account",
       "mobile_note": "On Android, the browser may show a real install prompt. On iPhone and iPad, the app is added from the share menu.",
-      "desktop_note": "Installation happens from your phone. Open this page on mobile to follow the right steps for your device."
+      "desktop_note": "Installation happens from your phone. Open this page on mobile to follow the right steps for your device.",
+      "install_waiting": "The install button will appear here as soon as your Android browser allows the prompt.",
+      "install_ready": "Your browser is ready: you can start the installation now."
     },
     "context": {
       "android": {

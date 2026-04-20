@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["banner", "text", "installButton"];
+  static targets = ["banner", "text", "pageInstallButton", "bannerInstallButton", "installHint"];
 
   connect() {
     this.dismissStorageKey = "pwa-install:dismissed";
@@ -9,6 +9,7 @@ export default class extends Controller {
 
     this.applyStandaloneState();
     this.registerServiceWorker();
+    this.updateInstallUi();
 
     window.addEventListener("beforeinstallprompt", this.handleBeforeInstallPrompt);
     window.addEventListener("appinstalled", this.handleAppInstalled);
@@ -26,6 +27,7 @@ export default class extends Controller {
   handleBeforeInstallPrompt = (event) => {
     event.preventDefault();
     this.deferredPrompt = event;
+    this.updateInstallUi();
     this.showBanner("android");
   };
 
@@ -33,21 +35,24 @@ export default class extends Controller {
     this.deferredPrompt = null;
     this.hideBanner();
     this.applyStandaloneState();
+    this.updateInstallUi();
   };
 
   async install() {
     if (!this.deferredPrompt) {
+      this.updateInstallUi();
       return;
     }
 
-    this.installButtonTarget.disabled = true;
+    this.setButtonsDisabled(true);
 
     try {
       await this.deferredPrompt.prompt();
       await this.deferredPrompt.userChoice;
     } finally {
       this.deferredPrompt = null;
-      this.installButtonTarget.disabled = false;
+      this.setButtonsDisabled(false);
+      this.updateInstallUi();
       this.hideBanner();
     }
   }
@@ -63,7 +68,7 @@ export default class extends Controller {
   }
 
   showBanner(mode) {
-    if (!this.hasBannerTarget || !this.hasTextTarget || !this.hasInstallButtonTarget) {
+    if (!this.hasBannerTarget || !this.hasTextTarget) {
       return;
     }
 
@@ -72,7 +77,9 @@ export default class extends Controller {
     }
 
     this.textTarget.textContent = this.getBannerText(mode);
-    this.installButtonTarget.hidden = mode !== "android";
+    this.bannerInstallButtonTargets.forEach((button) => {
+      button.hidden = mode !== "android" || !this.deferredPrompt;
+    });
     this.bannerTarget.hidden = false;
   }
 
@@ -124,5 +131,36 @@ export default class extends Controller {
     } catch (error) {
       console.error("Service worker registration failed", error);
     }
+  }
+
+  updateInstallUi() {
+    const isReady = Boolean(this.deferredPrompt) && !this.isStandalone();
+
+    this.pageInstallButtonTargets.forEach((button) => {
+      button.hidden = !isReady;
+      button.disabled = !isReady;
+      button.setAttribute("aria-disabled", String(!isReady));
+    });
+
+    this.bannerInstallButtonTargets.forEach((button) => {
+      button.hidden = !isReady;
+      button.disabled = !isReady;
+      button.setAttribute("aria-disabled", String(!isReady));
+    });
+
+    if (this.hasInstallHintTarget) {
+      const { waitingText, readyText } = this.installHintTarget.dataset;
+      this.installHintTarget.textContent = isReady
+        ? (readyText || "")
+        : (waitingText || "");
+      this.installHintTarget.hidden = false;
+    }
+  }
+
+  setButtonsDisabled(isDisabled) {
+    [...this.pageInstallButtonTargets, ...this.bannerInstallButtonTargets].forEach((button) => {
+      button.disabled = isDisabled;
+      button.setAttribute("aria-disabled", String(isDisabled));
+    });
   }
 }

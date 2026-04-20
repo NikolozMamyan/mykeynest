@@ -273,7 +273,7 @@
   {% set nextRoute = app.user ? path('app_credential') : path('show_register') %}
   {% set nextLabel = app.user ? 'install_app.hero.secondary_cta_logged'|trans : 'install_app.hero.secondary_cta_guest'|trans %}
 
-  <section class="install-app-page" data-controller="pwa-install">
+  <section class="install-app-page">
     <div class="install-shell">
       <div class="install-hero">
         <div class="install-hero__eyebrow">
@@ -302,8 +302,9 @@
             <button
               type="button"
               class="install-cta install-cta--primary"
-              data-pwa-install-target="installButton"
+              data-pwa-install-target="pageInstallButton"
               data-action="click->pwa-install#install"
+              hidden
             >
               <i class="fas fa-download"></i>
               {{ 'install_app.hero.primary_cta'|trans }}
@@ -319,6 +320,15 @@
         <div class="install-note">
           {{ is_mobile_device ? 'install_app.hero.mobile_note'|trans : 'install_app.hero.desktop_note'|trans }}
         </div>
+
+        {% if install_platform == 'android' %}
+          <div
+            class="install-note"
+            data-pwa-install-target="installHint"
+            data-waiting-text="{{ 'install_app.hero.install_waiting'|trans }}"
+            data-ready-text="{{ 'install_app.hero.install_ready'|trans }}"
+          ></div>
+        {% endif %}
       </div>
 
       <div class="install-grid">
