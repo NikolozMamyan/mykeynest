@@ -103,6 +103,7 @@
 
 {% block body %}
 {% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
+{% set isEn = app.request.locale == 'en' %}
 <main>
 
 {# ======================== HERO ======================== #}
@@ -158,7 +159,6 @@
 </section>
 
 <section class="wrap" aria-labelledby="solution-summary-title" style="padding: 2rem 0 0;">
-  {% set isEn = app.request.locale == 'en' %}
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
     <div class="shead-eye" style="margin-bottom:0.75rem;"><i class="fas fa-bolt"></i> {{ isEn ? 'Quick summary' : 'Resume rapide' }}</div>
     <h2 id="solution-summary-title" style="margin-bottom:0.75rem;">{{ isEn ? 'What this page answers' : 'Ce que cette page explique' }}</h2>
@@ -448,6 +448,45 @@
     </div>
   </div>
 </section>
+
+{% include 'components/seo/_internal_links.html.twig' with {
+  sectionTitle: isEn ? 'Next pages to keep evaluating the offer' : 'Pages suivantes pour continuer l evaluation',
+  sectionSubtitle: isEn ? 'This solution page should lead visitors to deeper comparison, product detail, support content, and cybersecurity services instead of ending the journey here.' : 'Cette page solution doit envoyer le visiteur vers plus de comparaison, plus de detail produit, plus de contenu support et plus de services cybersécurité au lieu de terminer le parcours ici.',
+  links: [
+    {
+      route: 'business_password_manager',
+      params: localeParams,
+      icon: 'fa-solid fa-key',
+      label: isEn ? 'Core product' : 'Produit central',
+      title: isEn ? 'Open the enterprise password manager page' : 'Ouvrir la page gestionnaire de mots de passe entreprise',
+      text: isEn ? 'Focus on sharing, access control, adoption, and password hygiene for SMB teams.' : 'Concentrez-vous sur le partage, le controle des acces, l adoption et l hygiene des mots de passe pour les equipes PME.'
+    },
+    {
+      route: 'business_comparatif',
+      params: localeParams,
+      icon: 'fa-solid fa-scale-balanced',
+      label: isEn ? 'Competitive view' : 'Vue concurrentielle',
+      title: isEn ? 'Compare MYKEYNEST to other password managers' : 'Comparer MYKEYNEST aux autres gestionnaires de mots de passe',
+      text: isEn ? 'Useful for prospects already comparing Dashlane, Bitwarden, or 1Password.' : 'Utile pour les prospects deja en comparaison avec Dashlane, Bitwarden ou 1Password.'
+    },
+    {
+      route: 'business_audit',
+      params: localeParams,
+      icon: 'fa-solid fa-shield-virus',
+      label: isEn ? 'Human risk' : 'Risque humain',
+      title: isEn ? 'See the cybersecurity audit and awareness offer' : 'Voir l offre audit cybersécurité et sensibilisation',
+      text: isEn ? 'Bridge product interest with phishing reduction, training, and remediation support.' : 'Faites le lien entre l interet produit et la reduction du phishing, la formation et l accompagnement remediation.'
+    },
+    {
+      route: 'app_help_center',
+      params: localeParams,
+      icon: 'fa-solid fa-book-open',
+      label: isEn ? 'Help center' : 'Centre d aide',
+      title: isEn ? 'Visit the documentation and setup articles' : 'Consulter la documentation et les guides de mise en place',
+      text: isEn ? 'Guide prospects toward practical answers without losing them in navigation.' : 'Guidez les prospects vers des reponses pratiques sans les perdre dans la navigation.'
+    }
+  ]
+} only %}
 
 {# ======================== CTA ======================== #}
 <section class="cta-section">

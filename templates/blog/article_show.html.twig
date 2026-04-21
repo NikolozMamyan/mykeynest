@@ -47,6 +47,7 @@
 {% endblock %}
 
 {% block body %}
+{% set isEn = app.request.locale == 'en' %}
 <article itemscope itemtype="https://schema.org/Article">
     <header>
         <h1 class="blog-page-title" itemprop="headline">{{ vm.h1 }}</h1>
@@ -69,6 +70,58 @@
         {{ vm.content|raw }}
     </section>
 </article>
+
+{% include 'components/seo/_internal_links.html.twig' with {
+  compact: true,
+  sectionTitle: isEn ? 'Related pages to continue after this article' : 'Pages utiles pour continuer apres cet article',
+  sectionSubtitle: isEn ? 'Move from reading to evaluation with four useful next pages.' : 'Passez de la lecture a l evaluation avec quatre pages vraiment utiles.',
+  links: [
+    {
+      route: 'business_password_manager',
+      params: app.request.locale == 'en' ? { lang: 'en' } : {},
+      icon: 'fa-solid fa-key',
+      label: isEn ? 'Product page' : 'Page produit',
+      kicker: isEn ? 'Secure access' : 'Acces securises',
+      title: isEn ? 'Enterprise password manager for SMBs' : 'Gestionnaire de mots de passe entreprise pour PME',
+      text: isEn ? 'See the core product and key access-control features.' : 'Voir le produit central et ses fonctions clefs.',
+      image: 'images/seo/gestoinnaire-mots-passes.png',
+      imageAlt: isEn ? 'Password manager dashboard illustration' : 'Illustration gestionnaire de mots de passe'
+    },
+    {
+      route: 'business_comparatif',
+      params: app.request.locale == 'en' ? { lang: 'en' } : {},
+      icon: 'fa-solid fa-scale-balanced',
+      label: isEn ? 'Comparison' : 'Comparatif',
+      kicker: isEn ? 'Vendor choice' : 'Choix fournisseur',
+      title: isEn ? 'Compare MYKEYNEST with Dashlane and Bitwarden' : 'Comparer MYKEYNEST a Dashlane et Bitwarden',
+      text: isEn ? 'Useful if the reader is already evaluating alternatives.' : 'Utile si le lecteur compare deja des alternatives.',
+      image: 'images/seo/comparatif.png',
+      imageAlt: isEn ? 'Software comparison illustration' : 'Illustration comparatif logiciel'
+    },
+    {
+      route: 'app_help_center',
+      params: app.request.locale == 'en' ? { lang: 'en' } : {},
+      icon: 'fa-solid fa-circle-question',
+      label: isEn ? 'Help center' : 'Centre d aide',
+      kicker: isEn ? 'Implementation' : 'Mise en place',
+      title: isEn ? 'Setup guides and practical documentation' : 'Guides de mise en place et documentation pratique',
+      text: isEn ? 'Answer product questions without leaving the site.' : 'Repondre aux questions produit sans quitter le site.',
+      image: 'images/seo/help.png',
+      imageAlt: isEn ? 'Documentation and onboarding illustration' : 'Illustration documentation et onboarding'
+    },
+    {
+      route: 'business_audit',
+      params: app.request.locale == 'en' ? { lang: 'en' } : {},
+      icon: 'fa-solid fa-shield-virus',
+      label: isEn ? 'Cyber services' : 'Services cyber',
+      kicker: isEn ? 'Risk reduction' : 'Reduction du risque',
+      title: isEn ? 'Cybersecurity audit and awareness services' : 'Audit cybersécurité et sensibilisation',
+      text: isEn ? 'Explore phishing, awareness, and SMB security support.' : 'Explorer phishing, sensibilisation et accompagnement PME.',
+      image: 'images/seo/audit.png',
+      imageAlt: isEn ? 'Cybersecurity audit illustration' : 'Illustration audit cybersécurité'
+    }
+  ]
+} only %}
 {% endblock %}
 
 {% block footer %}

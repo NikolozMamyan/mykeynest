@@ -42,6 +42,8 @@
 {% endblock %}
 
 {% block body %}
+{% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
+{% set isEn = app.request.locale == 'en' %}
 <main>
     {# Breadcrumb #}
     <nav class="cmp-breadcrumb" aria-label="{{ 'business.comparatif.breadcrumb.aria'|trans }}">
@@ -76,7 +78,6 @@
     </section>
 
     <section class="cmp-layout" aria-labelledby="cmp-summary-title" style="padding-top: 2rem;">
-        {% set isEn = app.request.locale == 'en' %}
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
             <div class="cmp-section-eyebrow">{{ isEn ? 'Quick verdict' : 'Verdict rapide' }}</div>
             <h2 class="cmp-section-title" id="cmp-summary-title">{{ isEn ? 'What this comparison says' : 'Ce que dit ce comparatif' }}</h2>
@@ -239,6 +240,45 @@
                 <p class="cmp-why-desc">{{ 'business.comparatif.why.french.desc'|trans }}</p>
             </div>
         </div>
+
+        {% include 'components/seo/_internal_links.html.twig' with {
+          sectionTitle: isEn ? 'Useful next steps after the comparison' : 'Etapes utiles apres le comparatif',
+          sectionSubtitle: isEn ? 'Once a visitor compares vendors, the best path is to send them toward the product page, practical cybersecurity services, documentation, and educational content.' : 'Quand un visiteur compare les fournisseurs, le meilleur parcours consiste a l envoyer vers la page produit, les services cybersécurité concrets, la documentation et les contenus educatifs.',
+          links: [
+            {
+              route: 'business_password_manager',
+              params: localeParams,
+              icon: 'fa-solid fa-key',
+              label: isEn ? 'Product detail' : 'Detail produit',
+              title: isEn ? 'Review the enterprise password manager page' : 'Relire la page gestionnaire de mots de passe entreprise',
+              text: isEn ? 'Go deeper on access control, sharing, and operational fit for SMB teams.' : 'Approfondissez le controle des acces, le partage et l adequation operationnelle pour les equipes PME.'
+            },
+            {
+              route: 'business_solution',
+              params: localeParams,
+              icon: 'fa-solid fa-layer-group',
+              label: isEn ? 'Full solution' : 'Solution complete',
+              title: isEn ? 'See how the software and the services work together' : 'Voir comment le logiciel et les services fonctionnent ensemble',
+              text: isEn ? 'Useful when the buyer evaluates more than a password vault alone.' : 'Utile quand l acheteur evalue plus qu un simple coffre-fort de mots de passe.'
+            },
+            {
+              route: 'business_audit',
+              params: localeParams,
+              icon: 'fa-solid fa-shield-virus',
+              label: isEn ? 'Cyber services' : 'Services cyber',
+              title: isEn ? 'Explore audit, awareness, and phishing-risk reduction' : 'Explorer audit, sensibilisation et reduction du risque phishing',
+              text: isEn ? 'Move from product comparison to broader cybersecurity support.' : 'Passez du comparatif produit a un accompagnement cybersécurité plus large.'
+            },
+            {
+              route: 'blog_index',
+              params: { _locale: app.request.locale },
+              icon: 'fa-solid fa-newspaper',
+              label: isEn ? 'Educational content' : 'Contenus educatifs',
+              title: isEn ? 'Read the cybersecurity blog for SMB buyers' : 'Lire le blog cybersécurité pour acheteurs PME',
+              text: isEn ? 'Use supporting articles to keep commercial comparison pages connected to top-of-funnel content.' : 'Utilisez les articles de support pour relier les pages comparatives aux contenus haut de funnel.'
+            }
+          ]
+        } only %}
 
         {# CTA #}
         <div class="cmp-cta">

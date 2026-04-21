@@ -98,6 +98,7 @@
 {% endblock %}
 
 {% block body %}
+{% set isEn = app.request.locale == 'en' %}
 <main>
     {# ?? Breadcrumb ?? #}
     <nav class="aud-breadcrumb" aria-label="{{ 'business.audit.breadcrumb.aria'|trans }}">
@@ -131,7 +132,6 @@
     </section>
 
     <section class="aud-layout" aria-labelledby="aud-summary-title" style="padding-top: 2rem;">
-        {% set isEn = app.request.locale == 'en' %}
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
             <div class="aud-section-eyebrow">{{ isEn ? 'Quick summary' : 'Resume rapide' }}</div>
             <h2 class="aud-section-title" id="aud-summary-title">{{ isEn ? 'When this page is relevant' : 'Quand cette page est pertinente' }}</h2>
@@ -304,6 +304,45 @@
                 <a href="{{ path('business_solution') }}" class="aud-cta-btn-ghost">{{ 'business.audit.cta.secondary'|trans }}</a>
             </div>
         </div>
+
+        {% include 'components/seo/_internal_links.html.twig' with {
+          sectionTitle: isEn ? 'Useful pages after the audit offer' : 'Pages utiles apres l offre audit',
+          sectionSubtitle: isEn ? 'This page should connect service-oriented visitors to the product, the broader solution, the help center, and educational content instead of leaving them at a dead end.' : 'Cette page doit reconnecter les visiteurs orientes services vers le produit, la solution globale, le centre d aide et les contenus educatifs au lieu de les laisser en impasse.',
+          links: [
+            {
+              route: 'business_password_manager',
+              params: localeParams,
+              icon: 'fa-solid fa-key',
+              label: isEn ? 'Password manager' : 'Gestionnaire',
+              title: isEn ? 'See the enterprise password manager for SMB teams' : 'Voir le gestionnaire de mots de passe entreprise pour equipes PME',
+              text: isEn ? 'Useful when audit findings lead to stronger access control and password hygiene needs.' : 'Utile lorsque les constats d audit conduisent a renforcer le controle des acces et l hygiene des mots de passe.'
+            },
+            {
+              route: 'business_solution',
+              params: localeParams,
+              icon: 'fa-solid fa-layer-group',
+              label: isEn ? 'Full offer' : 'Offre complete',
+              title: isEn ? 'Review the full SMB cybersecurity solution' : 'Relire la solution cybersécurité complete pour PME',
+              text: isEn ? 'Connect services, software, support, and onboarding in one commercial path.' : 'Reliez services, logiciel, support et onboarding dans un seul parcours commercial.'
+            },
+            {
+              route: 'app_help_center',
+              params: localeParams,
+              icon: 'fa-solid fa-book-open',
+              label: isEn ? 'Documentation' : 'Documentation',
+              title: isEn ? 'Read the help center and practical implementation guides' : 'Lire le centre d aide et les guides pratiques de mise en place',
+              text: isEn ? 'Answer operational questions before the prospect leaves the site.' : 'Repondez aux questions operationnelles avant que le prospect ne quitte le site.'
+            },
+            {
+              route: 'blog_index',
+              params: { _locale: app.request.locale },
+              icon: 'fa-solid fa-newspaper',
+              label: isEn ? 'Blog' : 'Blog',
+              title: isEn ? 'Open the cybersecurity blog and educational articles' : 'Ouvrir le blog cybersécurité et les articles educatifs',
+              text: isEn ? 'Keep top-of-funnel visitors engaged with phishing, policy, and password-security content.' : 'Gardez engages les visiteurs haut de funnel avec des contenus sur le phishing, les politiques et la securite des mots de passe.'
+            }
+          ]
+        } only %}
 
     </div>
 </main>
