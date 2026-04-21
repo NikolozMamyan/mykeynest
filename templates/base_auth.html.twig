@@ -71,6 +71,10 @@
       {{ legacyMetaHead|raw }}
     {% else %}
       <meta name="description" content="{% block description %}Securisez vos mots de passe et vos acces avec MYKEYNEST. Chiffrement AES-256, zero-knowledge, synchronisation multi-appareils et partage securise.{% endblock %}" />
+      {% set keywords = block('keywords')|trim %}
+      {% if keywords is not empty %}
+        <meta name="keywords" content="{{ keywords }}" />
+      {% endif %}
       <meta name="author" content="MYKEYNEST" />
       <meta name="robots" content="{% block robots %}{% if isSensitiveAuthRoute %}noindex,nofollow,noarchive{% else %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endif %}{% endblock %}" />
       <meta name="googlebot" content="{% block googlebot %}{% if isSensitiveAuthRoute %}noindex,nofollow,noarchive{% else %}index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1{% endif %}{% endblock %}" />
@@ -126,6 +130,7 @@
       />
     {% endif %}
 
+    {% block head_extras %}{% endblock %}
     {% block stylesheets %}{% endblock %}
     {% block page_styles %}{% endblock %}
     {% block javascripts %}
@@ -170,3 +175,4 @@
 
 {% block meta_description %}{% endblock %}
 {% block canonical_url %}{% endblock %}
+{% block keywords %}{% endblock %}

@@ -2,64 +2,95 @@
 
 {% block title %}{{ 'business.audit.meta.title'|trans }}{% endblock %}
 
-{% block meta_description %}
 {% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
-<meta name="description" content="{{ 'business.audit.meta.description'|trans }}">
-<meta name="keywords" content="{{ 'business.audit.meta.keywords'|trans }}">
-<meta property="og:title" content="{{ 'business.audit.meta.title'|trans }}">
-<meta property="og:description" content="{{ 'business.audit.meta.description'|trans }}">
-<meta property="og:type" content="website">
+{% set auditUrl = absolute_url(path('business_audit', localeParams)) %}
+
+{% block description %}{{ 'business.audit.meta.description'|trans }}{% endblock %}
+{% block keywords %}{{ 'business.audit.meta.keywords'|trans }}{% endblock %}
+{% block og_title %}{{ 'business.audit.meta.title'|trans }}{% endblock %}
+{% block og_description %}{{ 'business.audit.meta.description'|trans }}{% endblock %}
+{% block twitter_title %}{{ 'business.audit.meta.title'|trans }}{% endblock %}
+{% block twitter_description %}{{ 'business.audit.meta.description'|trans }}{% endblock %}
+{% block canonical_url %}{{ auditUrl }}{% endblock %}
+
+{% block head_extras %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "{{ 'business.audit.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing', localeParams)) }}" },
-        { "@type": "ListItem", "position": 2, "name": "{{ 'business.audit.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution', localeParams)) }}" },
-        { "@type": "ListItem", "position": 3, "name": "{{ 'business.audit.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_audit', localeParams)) }}" }
-      ]
-    },
-    {
-      "@type": "Service",
-      "name": "{{ 'business.audit.schema.name'|trans }}",
-      "description": "{{ 'business.audit.schema.description'|trans }}",
-      "provider": { "@type": "Organization", "name": "MYKEYNEST" },
-      "url": "{{ absolute_url(path('business_audit', localeParams)) }}",
-      "serviceType": ["Audit cybersecurite PME", "Formation cybersecurite collaborateurs"]
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "{{ 'business.audit.faq.q1.question'|trans|e('js') }}",
-          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q1.answer'|trans|e('js') }}" }
-        },
-        {
-          "@type": "Question",
-          "name": "{{ 'business.audit.faq.q2.question'|trans|e('js') }}",
-          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q2.answer'|trans|e('js') }}" }
-        },
-        {
-          "@type": "Question",
-          "name": "{{ 'business.audit.faq.q3.question'|trans|e('js') }}",
-          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q3.answer'|trans|e('js') }}" }
-        },
-        {
-          "@type": "Question",
-          "name": "{{ 'business.audit.faq.q4.question'|trans|e('js') }}",
-          "acceptedAnswer": { "@type": "Answer", "text": "{{ 'business.audit.faq.q4.answer'|trans|e('js') }}" }
+{% endblock %}
+
+{% block seo_jsonld %}
+{% set faqEntities = [] %}
+{% for faq in ['q1', 'q2', 'q3', 'q4'] %}
+    {% set faqEntities = faqEntities|merge([{
+        '@type': 'Question',
+        'name': ('business.audit.faq.' ~ faq ~ '.question')|trans,
+        'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': ('business.audit.faq.' ~ faq ~ '.answer')|trans
         }
-      ]
-    }
-  ]
-}
-</script>
+    }]) %}
+{% endfor %}
+{% set seoGraph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+        {
+            '@type': 'Organization',
+            'name': 'MYKEYNEST',
+            'url': absolute_url(path('app_landing', localeParams)),
+            'logo': absolute_url(asset('apple-touch-icon.png'))
+        },
+        {
+            '@type': 'WebPage',
+            'name': 'business.audit.meta.title'|trans,
+            'description': 'business.audit.meta.description'|trans,
+            'url': auditUrl,
+            'inLanguage': app.request.locale|default('fr')
+        },
+        {
+            '@type': 'BreadcrumbList',
+            'itemListElement': [
+                {
+                    '@type': 'ListItem',
+                    'position': 1,
+                    'name': 'business.audit.breadcrumb.home'|trans,
+                    'item': absolute_url(path('app_landing', localeParams))
+                },
+                {
+                    '@type': 'ListItem',
+                    'position': 2,
+                    'name': 'business.audit.breadcrumb.solution'|trans,
+                    'item': absolute_url(path('business_solution', localeParams))
+                },
+                {
+                    '@type': 'ListItem',
+                    'position': 3,
+                    'name': 'business.audit.breadcrumb.current'|trans,
+                    'item': auditUrl
+                }
+            ]
+        },
+        {
+            '@type': 'Service',
+            'name': 'business.audit.schema.name'|trans,
+            'description': 'business.audit.schema.description'|trans,
+            'provider': {
+                '@type': 'Organization',
+                'name': 'MYKEYNEST'
+            },
+            'url': auditUrl,
+            'serviceType': [
+                'Audit cybersecurite PME',
+                'Formation cybersecurite collaborateurs'
+            ]
+        },
+        {
+            '@type': 'FAQPage',
+            'mainEntity': faqEntities
+        }
+    ]
+} %}
+<script type="application/ld+json">{{ seoGraph|json_encode|raw }}</script>
 {% endblock %}
 
 {% block stylesheets %}
