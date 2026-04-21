@@ -108,13 +108,23 @@ class NotificationRepository extends ServiceEntityRepository
             ->getResult();
     }
     public function existsByUniqueKey(string $key): bool
-{
-    return (bool) $this->createQueryBuilder('n')
-        ->select('1')
-        ->where('n.uniqueKey = :key')
-        ->setParameter('key', $key)
-        ->getQuery()
-        ->getOneOrNullResult();
-}
+    {
+        return (bool) $this->createQueryBuilder('n')
+            ->select('1')
+            ->where('n.uniqueKey = :key')
+            ->setParameter('key', $key)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function deleteAllByUser(User $user): int
+    {
+        return $this->createQueryBuilder('n')
+            ->delete()
+            ->andWhere('n.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
+    }
 
 }

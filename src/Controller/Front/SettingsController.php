@@ -68,6 +68,13 @@ final class SettingsController extends AbstractController
             return $this->redirectToRoute('app_settings');
         }
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true) as $error) {
+                $this->addFlash('error', $error->getMessage());
+                break;
+            }
+        }
+
         return $this->render('settings/index.html.twig', [
             'form' => $form->createView(),
         ]);

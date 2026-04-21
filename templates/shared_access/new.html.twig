@@ -192,9 +192,9 @@
   font-size: 0.9375rem;
 }
 .toast-error {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  color: var(--color-danger-end);
 }
 .toast svg { width: 20px; height: 20px; flex-shrink: 0; }
 .toast button { margin-left: auto; background: none; border: none; cursor: pointer; color: inherit; opacity: 0.6; display: flex; }
@@ -205,13 +205,14 @@
 .empty-state {
   text-align: center;
   padding: 5rem 2rem;
-  background: white;
+  background: var(--color-white);
   border-radius: 16px;
   border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 .empty-icon {
   width: 72px; height: 72px;
-  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14), rgba(16, 185, 129, 0.08));
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 1.5rem;
@@ -229,7 +230,7 @@
 }
 .title-icon {
   width: 48px; height: 48px;
-  background: linear-gradient(135deg, #059669, #047857);
+  background: linear-gradient(135deg, var(--color-primary), #047857);
   border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 12px rgba(5,150,105,0.3);
@@ -255,7 +256,7 @@
 
 /* ── Panels ── */
 .panel {
-  background: white;
+  background: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: 16px;
   overflow: hidden;
@@ -344,7 +345,7 @@
   padding: 0.25rem 0.625rem;
   background: rgba(5,150,105,0.08);
   border: 1px solid rgba(5,150,105,0.2);
-  color: #047857;
+  color: var(--color-primary);
   border-radius: 100px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -380,7 +381,7 @@
   transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 .btn-primary:not(:disabled):hover {
-  background: #047857;
+  background: var(--color-primary);
   box-shadow: 0 4px 16px rgba(5,150,105,0.35);
   transform: translateY(-1px);
 }
@@ -439,7 +440,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  background: white;
+  background: var(--color-white);
   box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
 }
 .search-input::placeholder { color: var(--color-text-light); }
@@ -567,6 +568,35 @@
 }
 .no-results svg { width: 36px; height: 36px; margin: 0 auto 0.75rem; display: block; color: var(--color-text-light); }
 .no-results p { font-size: 0.9375rem; }
+
+[data-theme="dark"] .panel-label {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14), rgba(16, 185, 129, 0.08));
+}
+
+[data-theme="dark"] .field-input {
+  background: var(--color-white);
+}
+
+[data-theme="dark"] .chip {
+  background: rgba(16, 185, 129, 0.14);
+  color: #a7f3d0;
+}
+
+[data-theme="dark"] .btn-ghost:hover {
+  background: var(--color-bg-hover);
+}
+
+[data-theme="dark"] .search-input:focus {
+  background: var(--color-white);
+}
+
+[data-theme="dark"] .cred-item:has(.cred-checkbox:checked) {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.18), rgba(16, 185, 129, 0.1));
+}
+
+[data-theme="dark"] .cred-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
 
 /* ── Responsive ── */
 @media (max-width: 768px) {

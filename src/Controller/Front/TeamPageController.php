@@ -15,6 +15,7 @@ use App\Repository\TeamMemberRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\MailerService;
+use App\Service\TeamNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -129,7 +130,8 @@ class TeamPageController extends AbstractController
         Security $security,
         MailerService $mailer,
         LoggerInterface $logger,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        TeamNotifier $teamNotifier
     ): Response {
         $this->denyAccessUnlessGranted('TEAM_VIEW', $team);
 
@@ -197,6 +199,9 @@ class TeamPageController extends AbstractController
 
                 $em->persist($member);
                 $em->flush();
+                if ($user instanceof User) {
+                    $teamNotifier->notifyMemberAdded($team, $memberUser, $user, $role);
+                }
 
                 if ($isGuestInvitation && $guestInvitationExpiresAt instanceof \DateTimeImmutable) {
                     try {
@@ -226,14 +231,19 @@ class TeamPageController extends AbstractController
             if ($credentialsForm->isSubmitted() && $credentialsForm->isValid()) {
                 $data = $credentialsForm->getData();
                 $credentials = $data['credentials'];
+                $addedCredentials = [];
 
                 foreach ($credentials as $credential) {
                     if (!$team->getCredentials()->contains($credential)) {
                         $team->addCredential($credential);
+                        $addedCredentials[] = $credential;
                     }
                 }
 
                 $em->flush();
+                if ($user instanceof User) {
+                    $teamNotifier->notifyCredentialsAdded($team, $user, $addedCredentials);
+                }
 
                 $this->addFlash('success', 'Credentials ajoutes avec succes a l equipe.');
 
@@ -257,7 +267,8 @@ class TeamPageController extends AbstractController
         int $memberId,
         Request $request,
         TeamMemberRepository $teamMemberRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        TeamNotifier $teamNotifier
     ): Response {
         $this->denyAccessUnlessGranted('TEAM_MANAGE', $team);
 
@@ -282,8 +293,13 @@ class TeamPageController extends AbstractController
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
+        $actor = $this->getUser();
+        $removedUser = $member->getUser();
         $em->remove($member);
         $em->flush();
+        if ($actor instanceof User && $removedUser instanceof User) {
+            $teamNotifier->notifyMemberRemoved($team, $removedUser, $actor);
+        }
 
         $this->addFlash('success', 'Membre supprime de l equipe.');
 
@@ -296,7 +312,8 @@ class TeamPageController extends AbstractController
         Request $request,
         TeamMemberRepository $teamMemberRepository,
         EntityManagerInterface $em,
-        Security $security
+        Security $security,
+        TeamNotifier $teamNotifier
     ): Response {
         $this->denyAccessUnlessGranted('TEAM_VIEW', $team);
 
@@ -334,6 +351,7 @@ class TeamPageController extends AbstractController
 
         $em->remove($member);
         $em->flush();
+        $teamNotifier->notifyMemberLeft($team, $user);
 
         $this->addFlash('success', sprintf('Vous avez quitte l equipe "%s".', $teamName));
 

@@ -726,6 +726,42 @@
       }
     }
   },
+  "app_notifications": {
+    "shared_access": {
+      "shared_single_title": "Identifiant partage avec vous",
+      "shared_multiple_title": "Identifiants partages avec vous",
+      "shared_single_message": "%owner% a partage \"%credential%\" avec vous.",
+      "shared_multiple_message": "%owner% a partage %count% identifiants avec vous.",
+      "revoked_title": "Partage revoque",
+      "revoked_message": "%owner% a revoque l'acces a \"%credential%\"."
+    },
+    "team": {
+      "member_added_title": "Ajoute a l'equipe",
+      "member_added_message": "%actor% vous a ajoute a l'equipe \"%team%\" comme %role%.",
+      "credentials_added_title": "Credentials d'equipe mis a jour",
+      "credentials_added_single_message": "%actor% a ajoute \"%credential%\" a l'equipe \"%team%\".",
+      "credentials_added_multiple_message": "%actor% a ajoute %count% credentials a l'equipe \"%team%\".",
+      "member_removed_title": "Retire de l'equipe",
+      "member_removed_message": "%actor% vous a retire de l'equipe \"%team%\".",
+      "member_left_title": "Un membre a quitte l'equipe",
+      "member_left_message": "%member% a quitte l'equipe \"%team%\"."
+    },
+    "note": {
+      "created_title": "Nouvelle note",
+      "created_message": "\"%title%\" a ete creee.",
+      "assigned_title": "Note assignee",
+      "assigned_message": "Vous avez ete assigne a \"%title%\".",
+      "status_changed_title": "Statut de note mis a jour",
+      "status_changed_message": "\"%title%\" est passe de %old_status% a %new_status%.",
+      "deleted_title": "Note supprimee",
+      "deleted_message": "\"%title%\" a ete supprimee.",
+      "unassigned_title": "Retire de la note",
+      "unassigned_message": "Vous n'etes plus assigne a \"%title%\".",
+      "updated_title": "Note mise a jour",
+      "updated_message": "\"%title%\" a ete mise a jour (%field%).",
+      "updated_with_values_message": "\"%title%\" a mis a jour %field% de %old% a %new%."
+    }
+  },
   "dashboard": {
     "title": "Tableau de bord",
     "stats": {
@@ -1072,7 +1108,17 @@
       "section_identity": "Identité",
       "section_business": "Entreprise",
       "section_contact": "Coordonnées",
-      "company_help": "Le nom de votre entreprise ou organisation."
+      "company_help": "Le nom de votre entreprise ou organisation.",
+      "avatar_upload": {
+        "title": "Photo de profil",
+        "hint": "JPG, PNG, WebP ou GIF. Taille maximale : 2 Mo. Une prévisualisation s'affiche puis l'envoi se lance automatiquement.",
+        "idle": "Aucun nouveau fichier sélectionné",
+        "button": "Choisir une image",
+        "selected": "Fichier prêt",
+        "uploading": "Import en cours...",
+        "error_too_large": "L'image dépasse la taille autorisée (%size% max).",
+        "error_invalid_type": "Format non pris en charge. Utilisez JPG, PNG, WebP ou GIF."
+      }
     },
     "menu": {
       "personal_data": "Données personnelles",

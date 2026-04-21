@@ -785,7 +785,7 @@ color:var(--color-text-dark);
 }
 
 .toast {
-  background: white;
+  background: var(--color-white);
   border: 1px solid var(--color-border);
   border-left: 4px solid var(--color-success);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -846,6 +846,58 @@ color:var(--color-text-dark);
   color: var(--color-text-medium);
   font-size: 0.9rem;
   line-height: 1.4;
+}
+
+[data-theme="dark"] .onboarding-banner {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14) 0%, rgba(16, 185, 129, 0.08) 100%);
+  border-color: rgba(16, 185, 129, 0.24);
+}
+
+[data-theme="dark"] .secondary-btn {
+  background: rgba(15, 23, 42, 0.72);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .secondary-btn:hover {
+  background: rgba(5, 150, 105, 0.12);
+}
+
+[data-theme="dark"] .card-header {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.12) 0%, rgba(5, 150, 105, 0.04) 100%);
+}
+
+[data-theme="dark"] .browser-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 41, 59, 0.78) 100%);
+}
+
+[data-theme="dark"] .browser-steps code {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+[data-theme="dark"] .token-section {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14) 0%, rgba(16, 185, 129, 0.08) 100%);
+}
+
+[data-theme="dark"] .icon-btn {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.94) 0%, rgba(15, 23, 42, 0.94) 100%);
+}
+
+[data-theme="dark"] .alert-info {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.14) 100%);
+  color: #bfdbfe;
+}
+
+[data-theme="dark"] .alert-warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.18) 100%);
+  color: #fde68a;
+}
+
+[data-theme="dark"] .final-step {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14) 0%, rgba(16, 185, 129, 0.08) 100%);
+}
+
+[data-theme="dark"] .toast {
+  box-shadow: 0 14px 28px rgba(2, 6, 23, 0.34);
 }
 
 /* ——— Responsive ——— */

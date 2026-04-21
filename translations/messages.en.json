@@ -678,6 +678,42 @@
       }
     }
   },
+  "app_notifications": {
+    "shared_access": {
+      "shared_single_title": "Credential shared with you",
+      "shared_multiple_title": "Credentials shared with you",
+      "shared_single_message": "%owner% shared \"%credential%\" with you.",
+      "shared_multiple_message": "%owner% shared %count% credentials with you.",
+      "revoked_title": "Shared access revoked",
+      "revoked_message": "%owner% revoked access to \"%credential%\"."
+    },
+    "team": {
+      "member_added_title": "Added to team",
+      "member_added_message": "%actor% added you to team \"%team%\" as %role%.",
+      "credentials_added_title": "Team credentials updated",
+      "credentials_added_single_message": "%actor% added \"%credential%\" to team \"%team%\".",
+      "credentials_added_multiple_message": "%actor% added %count% credentials to team \"%team%\".",
+      "member_removed_title": "Removed from team",
+      "member_removed_message": "%actor% removed you from team \"%team%\".",
+      "member_left_title": "Team member left",
+      "member_left_message": "%member% left team \"%team%\"."
+    },
+    "note": {
+      "created_title": "New note created",
+      "created_message": "\"%title%\" has been created.",
+      "assigned_title": "Assigned to note",
+      "assigned_message": "You have been assigned to \"%title%\".",
+      "status_changed_title": "Note status updated",
+      "status_changed_message": "\"%title%\" moved from %old_status% to %new_status%.",
+      "deleted_title": "Note deleted",
+      "deleted_message": "\"%title%\" has been deleted.",
+      "unassigned_title": "Removed from note",
+      "unassigned_message": "You are no longer assigned to \"%title%\".",
+      "updated_title": "Note updated",
+      "updated_message": "\"%title%\" was updated (%field%).",
+      "updated_with_values_message": "\"%title%\" updated %field% from %old% to %new%."
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "stats": {
@@ -1063,7 +1099,17 @@
       "section_identity": "Identity",
       "section_business": "Company",
       "section_contact": "Contact details",
-      "company_help": "Your company or organization name."
+      "company_help": "Your company or organization name.",
+      "avatar_upload": {
+        "title": "Profile photo",
+        "hint": "JPG, PNG, WebP or GIF. Maximum size: 2 MB. A preview is shown, then the upload starts automatically.",
+        "idle": "No new file selected",
+        "button": "Choose an image",
+        "selected": "File ready",
+        "uploading": "Uploading...",
+        "error_too_large": "The image exceeds the allowed size (%size% max).",
+        "error_invalid_type": "Unsupported format. Please use JPG, PNG, WebP or GIF."
+      }
     },
     "menu": {
       "personal_data": "Personal data",

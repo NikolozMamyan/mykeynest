@@ -180,6 +180,125 @@
   transform: scale(.96);
 }
 
+.avatar-upload-panel{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px 16px;
+  border-top: 1px solid rgba(226,232,240,.75);
+  background: linear-gradient(180deg, rgba(248,250,252,.66), rgba(255,255,255,.42));
+}
+
+[data-theme="dark"] .avatar-upload-panel{
+  border-top-color: rgba(51,65,85,.75);
+  background: linear-gradient(180deg, rgba(15,23,42,.32), rgba(15,23,42,.18));
+}
+
+.avatar-upload-copy{
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar-upload-title{
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-text-dark);
+}
+
+.avatar-upload-hint{
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.avatar-upload-meta{
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.avatar-upload-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(5,150,105,.10);
+  border: 1px solid rgba(5,150,105,.18);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  max-width: 100%;
+}
+
+.avatar-upload-pill.is-neutral{
+  background: rgba(100,116,139,.08);
+  border-color: rgba(100,116,139,.16);
+  color: var(--color-text-muted);
+}
+
+.avatar-upload-pill.is-error{
+  background: rgba(239,68,68,.10);
+  border-color: rgba(239,68,68,.2);
+  color: var(--color-danger-end);
+}
+
+.avatar-upload-trigger{
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(5,150,105,.18);
+  border-radius: 14px;
+  background: rgba(5,150,105,.10);
+  color: var(--color-primary);
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.avatar-upload-trigger:hover{
+  transform: translateY(-1px);
+  background: rgba(5,150,105,.14);
+}
+
+.avatar-upload-trigger:disabled{
+  opacity: .65;
+  cursor: wait;
+}
+
+.avatar-upload-errors{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.avatar-upload-error{
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(239,68,68,.10);
+  border: 1px solid rgba(239,68,68,.18);
+  color: var(--color-danger-end);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.avatar-upload-error[hidden]{
+  display: none;
+}
+
 .profile-info{
   flex: 1;
   min-width: 0;
@@ -312,6 +431,14 @@
   .settings-section{ border-radius: 16px; }
   .settings-link{ padding: 13px 14px; }
   .settings-profile{ padding: 14px 14px; }
+  .avatar-upload-panel{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .avatar-upload-trigger{
+    justify-content: center;
+    width: 100%;
+  }
 }
 /* Variantes d’accent par position */
 .settings-item:nth-child(1) .settings-icon { background: rgba(5,150,105,.12); border-color: rgba(5,150,105,.18); color: var(--color-primary); }
@@ -403,7 +530,16 @@
              alt="{{ 'settings.profile.avatar_alt'|trans }}">
 
         {{ form_widget(form.avatar, {
-          attr: { class: 'js-avatar-input', accept: 'image/*', style: 'display:none' }
+          attr: {
+            class: 'js-avatar-input',
+            accept: 'image/jpeg,image/png,image/webp,image/gif',
+            style: 'display:none',
+            'data-max-size': 2097152,
+            'data-error-too-large': 'settings.profile.avatar_upload.error_too_large'|trans({'%size%': '2 Mo'}),
+            'data-error-invalid-type': 'settings.profile.avatar_upload.error_invalid_type'|trans,
+            'data-state-uploading': 'settings.profile.avatar_upload.uploading'|trans,
+            'data-state-selected': 'settings.profile.avatar_upload.selected'|trans
+          }
         }) }}
 
         <button type="button"
@@ -434,6 +570,41 @@
           {% endif %}
         </div>
       </div>
+    </div>
+
+    <div class="avatar-upload-panel">
+      <div class="avatar-upload-copy">
+        <div class="avatar-upload-title">{{ 'settings.profile.avatar_upload.title'|trans }}</div>
+        <div class="avatar-upload-hint">{{ 'settings.profile.avatar_upload.hint'|trans }}</div>
+
+        <div class="avatar-upload-meta">
+          <div class="avatar-upload-pill is-neutral js-avatar-state">
+            <i class="fa-regular fa-image" aria-hidden="true"></i>
+            <span>{{ 'settings.profile.avatar_upload.idle'|trans }}</span>
+          </div>
+        </div>
+
+        <div class="avatar-upload-errors">
+          <div class="avatar-upload-error js-avatar-error" hidden>
+            <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+            <span class="js-avatar-error-text"></span>
+          </div>
+
+          {% if form.avatar.vars.errors|length > 0 %}
+            {% for error in form.avatar.vars.errors %}
+              <div class="avatar-upload-error">
+                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                <span>{{ error.message }}</span>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <button type="button" class="avatar-upload-trigger js-avatar-trigger">
+        <i class="fa-solid fa-upload" aria-hidden="true"></i>
+        <span>{{ 'settings.profile.avatar_upload.button'|trans }}</span>
+      </button>
     </div>
 
     <button type="submit" style="display:none">{{ 'common.save'|trans }}</button>
@@ -511,14 +682,112 @@
   document.addEventListener('DOMContentLoaded', () => {
     const input = document.querySelector('.js-avatar-input');
     const form = document.getElementById('avatar-form');
-    const btn  = document.querySelector('.js-avatar-btn');
+    const floatingBtn = document.querySelector('.js-avatar-btn');
+    const triggerBtn = document.querySelector('.js-avatar-trigger');
+    const avatarImg = document.querySelector('.avatar-img');
+    const statePill = document.querySelector('.js-avatar-state');
+    const stateText = document.querySelector('.js-avatar-state span');
+    const errorBox = document.querySelector('.js-avatar-error');
+    const errorText = document.querySelector('.js-avatar-error-text');
 
-    console.log('FOUND input?', input);
+    if (!input || !form) {
+      return;
+    }
 
-    btn?.addEventListener('click', () => input?.click());
+    const maxSize = Number(input.dataset.maxSize || 2097152);
+    const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+    const defaultAvatarSrc = avatarImg?.getAttribute('src') || '';
 
-    input?.addEventListener('change', () => {
-      if (input.files && input.files.length > 0) form?.submit();
+    const formatSize = (bytes) => {
+      if (bytes < 1024 * 1024) {
+        return `${Math.round(bytes / 102.4) / 10} KB`;
+      }
+
+      return `${Math.round(bytes / 104857.6) / 10} MB`;
+    };
+
+    const openPicker = () => input.click();
+
+    const setError = (message) => {
+      if (errorBox && errorText) {
+        errorText.textContent = message;
+        errorBox.hidden = false;
+      }
+
+      if (statePill && stateText) {
+        statePill.classList.remove('is-neutral');
+        statePill.classList.add('is-error');
+        stateText.textContent = message;
+      }
+    };
+
+    const clearError = () => {
+      if (errorBox) {
+        errorBox.hidden = true;
+      }
+
+      if (statePill) {
+        statePill.classList.remove('is-error');
+        statePill.classList.add('is-neutral');
+      }
+    };
+
+    floatingBtn?.addEventListener('click', openPicker);
+    triggerBtn?.addEventListener('click', openPicker);
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      clearError();
+
+      if (!allowedTypes.has(file.type)) {
+        input.value = '';
+        setError(input.dataset.errorInvalidType || 'Format de fichier non pris en charge.');
+        if (avatarImg) {
+          avatarImg.src = defaultAvatarSrc;
+        }
+        return;
+      }
+
+      if (file.size > maxSize) {
+        input.value = '';
+        setError(input.dataset.errorTooLarge || 'Image trop volumineuse.');
+        if (avatarImg) {
+          avatarImg.src = defaultAvatarSrc;
+        }
+        return;
+      }
+
+      if (avatarImg) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          avatarImg.src = typeof event.target?.result === 'string' ? event.target.result : defaultAvatarSrc;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      if (statePill && stateText) {
+        statePill.classList.remove('is-neutral', 'is-error');
+        stateText.textContent = `${input.dataset.stateSelected || 'Fichier prêt'}: ${file.name} • ${formatSize(file.size)}`;
+      }
+
+      if (triggerBtn) {
+        triggerBtn.disabled = true;
+      }
+
+      if (floatingBtn) {
+        floatingBtn.disabled = true;
+      }
+
+      if (stateText) {
+        stateText.textContent = input.dataset.stateUploading || 'Import en cours...';
+      }
+
+      form.submit();
     });
   });
 </script>

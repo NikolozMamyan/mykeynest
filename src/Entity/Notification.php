@@ -54,7 +54,7 @@ class Notification
     private ?string $relatedEntityType = null;
 
     #[ORM\Column(length: 255, unique: true, nullable: true)]
-    private string $uniqueKey;
+    private ?string $uniqueKey = null;
 
 
     public function __construct()
@@ -189,16 +189,17 @@ class Notification
         $this->priority = $priority;
         return $this;
     }
-    public function getUniqueKey(): string
-{
-    return $this->uniqueKey;
-}
-public function setUniqueKey(string $uniqueKey): self
-{
-    $this->uniqueKey = $uniqueKey;
+    public function getUniqueKey(): ?string
+    {
+        return $this->uniqueKey;
+    }
 
-    return $this;
-}
+    public function setUniqueKey(?string $uniqueKey): static
+    {
+        $this->uniqueKey = $uniqueKey;
+
+        return $this;
+    }
 
 
     public function getRelatedEntityId(): ?int
@@ -257,6 +258,7 @@ public function setUniqueKey(string $uniqueKey): self
     public const TYPE_INFO = 'info';
     public const TYPE_SUCCESS = 'success';
     public const TYPE_WARNING = 'warning';
+    public const TYPE_ERROR = 'error';
 
     // Constantes pour les priorités
     public const PRIORITY_LOW = 'low';

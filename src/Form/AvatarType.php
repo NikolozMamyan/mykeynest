@@ -18,6 +18,7 @@ class AvatarType extends AbstractType
             'constraints' => [
                 new Image([
                     'maxSize' => '2M',
+                    'maxSizeMessage' => 'L’image est trop volumineuse. Taille maximale : 2 Mo.',
                     'mimeTypesMessage' => 'Merci d’uploader une image valide.',
                 ])
             ],

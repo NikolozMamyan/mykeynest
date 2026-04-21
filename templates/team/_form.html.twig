@@ -131,7 +131,7 @@
     font-size: 1rem;
     color: var(--color-text-dark);
     transition: all 0.2s ease;
-    background: white;
+    background: var(--color-white);
 }
 
 .form-input:focus {
@@ -177,7 +177,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.875rem 1rem;
-    background: white;
+    background: var(--color-white);
     border: 2px solid var(--color-border);
     border-radius: var(--border-radius-sm);
     cursor: pointer;
@@ -237,7 +237,7 @@
 
 /* Dropdown Panel */
 .credentials-dropdown {
-    background: white;
+    background: var(--color-white);
     border: 2px solid var(--color-primary);
     border-radius: var(--border-radius-sm);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
@@ -260,7 +260,7 @@
 .dropdown-search {
     position: sticky;
     top: 0;
-    background: white;
+    background: var(--color-white);
     padding: 1rem;
     border-bottom: 1px solid var(--color-border);
     display: flex;
@@ -308,7 +308,7 @@
     justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    background: white;
+    background: var(--color-white);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-sm);
     font-size: 0.8125rem;
@@ -350,7 +350,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    background: white;
+    background: var(--color-white);
     border: 1.5px solid var(--color-border);
     border-radius: var(--border-radius-sm);
     cursor: pointer;
@@ -486,9 +486,21 @@
 }
 
 .btn-submit:hover {
-    background: #047857;
+    background: var(--color-primary);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+[data-theme="dark"] .credentials-trigger:hover {
+    background: rgba(5, 150, 105, 0.08);
+}
+
+[data-theme="dark"] .credential-item:hover {
+    background: rgba(5, 150, 105, 0.08);
+}
+
+[data-theme="dark"] .credential-item.selected {
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.18) 0%, rgba(5, 150, 105, 0.1) 100%);
 }
 
 .btn-submit:active {

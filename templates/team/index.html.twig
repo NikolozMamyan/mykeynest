@@ -221,7 +221,7 @@
 }
 
 .btn-primary-action:hover {
-    background: #047857;
+    background: var(--color-primary);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
 }
@@ -345,7 +345,7 @@
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    background: white;
+    background: var(--color-white);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-sm);
 }
@@ -383,7 +383,7 @@
 }
 
 .team-card {
-    background: white;
+    background: var(--color-white);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
@@ -494,7 +494,7 @@
 
 .btn-view-team:hover {
     gap: 0.75rem;
-    color: #047857;
+    color: var(--color-primary);
 }
 
 .btn-view-team svg {
@@ -511,7 +511,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.625rem 1rem;
-    background: white;
+    background: var(--color-white);
     color: var(--color-danger-start);
     border: 1.5px solid #fecaca;
     border-radius: var(--border-radius-sm);
@@ -523,6 +523,45 @@
 .btn-leave-team-card:hover {
     background: #fff1f2;
     border-color: #fca5a5;
+}
+
+[data-theme="dark"] .btn-primary-action:hover {
+    background: var(--color-primary);
+}
+
+[data-theme="dark"] .btn-disabled,
+[data-theme="dark"] .btn-disabled:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-light);
+}
+
+[data-theme="dark"] .pro-upgrade-banner {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.22) 100%);
+    border-color: rgba(251, 191, 36, 0.4);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .pro-banner-text h3 {
+    color: #fde68a;
+}
+
+[data-theme="dark"] .pro-banner-text p {
+    color: #fef3c7;
+}
+
+[data-theme="dark"] .empty-state,
+[data-theme="dark"] .team-card {
+    background: var(--color-white);
+}
+
+[data-theme="dark"] .btn-leave-team-card {
+    background: var(--color-white);
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+[data-theme="dark"] .btn-leave-team-card:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.5);
 }
 
 @media (max-width: 768px) {

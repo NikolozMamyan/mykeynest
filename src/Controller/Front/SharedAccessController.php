@@ -9,6 +9,7 @@ use App\Repository\SharedAccessRepository;
 use App\Repository\UserRepository;
 use App\Service\EncryptionService;
 use App\Service\MailerService;
+use App\Service\SharedAccessNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -80,7 +81,8 @@ class SharedAccessController extends AbstractController
         MailerService $mailer,
         LoggerInterface $logger,
         UrlGeneratorInterface $urlGenerator,
-        CredentialRepository $credentialRepository
+        CredentialRepository $credentialRepository,
+        SharedAccessNotifier $notifier
     ): Response {
         /** @var User $owner */
         $owner = $this->getUser();
@@ -103,6 +105,7 @@ class SharedAccessController extends AbstractController
                 $logger,
                 $urlGenerator,
                 $credentialRepository,
+                $notifier,
                 $hasSubscription,
                 $limit,
                 'shared_access_index'
@@ -125,7 +128,8 @@ class SharedAccessController extends AbstractController
         MailerService $mailer,
         LoggerInterface $logger,
         UrlGeneratorInterface $urlGenerator,
-        CredentialRepository $credentialRepository
+        CredentialRepository $credentialRepository,
+        SharedAccessNotifier $notifier
     ): Response {
         /** @var User $owner */
         $owner = $this->getUser();
@@ -147,6 +151,7 @@ class SharedAccessController extends AbstractController
             $logger,
             $urlGenerator,
             $credentialRepository,
+            $notifier,
             $owner->hasActiveSubscription(),
             3,
             'app_credential'
@@ -157,15 +162,25 @@ class SharedAccessController extends AbstractController
     public function revoke(
         Request $request,
         SharedAccess $sharedAccess,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SharedAccessNotifier $notifier
     ): Response {
         if ($sharedAccess->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Vous n\'etes pas autorise a revoquer cet acces partage.');
         }
 
         if ($this->isCsrfTokenValid('revoke' . $sharedAccess->getId(), $request->request->get('_token'))) {
+            $guest = $sharedAccess->getGuest();
+            $owner = $sharedAccess->getOwner();
+            $credential = $sharedAccess->getCredential();
+
             $entityManager->remove($sharedAccess);
             $entityManager->flush();
+
+            if ($guest && $owner && $credential) {
+                $notifier->notifyShareRevoked($guest, $owner, $credential);
+            }
+
             $this->addFlash('success', 'Acces partage revoque avec succes.');
         }
 
@@ -218,6 +233,7 @@ class SharedAccessController extends AbstractController
         LoggerInterface $logger,
         UrlGeneratorInterface $urlGenerator,
         CredentialRepository $credentialRepository,
+        SharedAccessNotifier $notifier,
         bool $hasSubscription,
         int $limit,
         string $redirectRoute
@@ -358,6 +374,7 @@ class SharedAccessController extends AbstractController
         }
 
         $entityManager->flush();
+        $notifier->notifyCredentialsShared($guest, $owner, $sharedCredentials);
         $this->addFlash('success', $createdCount . ' identifiant(s) partage(s) avec succes.');
 
         $isActiveUser = in_array('ROLE_USER', $guest->getRoles(), true)

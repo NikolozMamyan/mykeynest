@@ -7,11 +7,13 @@ use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\Notification;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NoteNotifier
 {
     public function __construct(
         private NotificationService $notifications,
+        private TranslatorInterface $translator,
         private ?LoggerInterface $logger = null
     ) {}
 
@@ -115,13 +117,20 @@ class NoteNotifier
      */
     public function notifyNoteCreated(Note $note, User $actor): void
     {
-        $title = 'New note created';
-        $message = sprintf('"%s" has been created', $note->getTitle());
-        
         $team = $note->getTeam();
         if ($team) {
             $url = sprintf('/app/notes/%d', $team->getId());
-            $this->notifyTeam($team, $actor, $title, $message, $url, $note);
+            foreach ($this->getTeamRecipients($team, $actor) as $recipient) {
+                $this->notifyOne(
+                    $recipient,
+                    $this->trans($recipient, 'app_notifications.note.created_title'),
+                    $this->trans($recipient, 'app_notifications.note.created_message', [
+                        '%title%' => (string) $note->getTitle(),
+                    ]),
+                    $url,
+                    $note
+                );
+            }
         }
     }
 
@@ -134,14 +143,19 @@ class NoteNotifier
             return;
         }
 
-        $title = 'Assigned to note';
-        $message = sprintf('You have been assigned to "%s"', $note->getTitle());
-        
         $url = $note->getTeam() 
             ? sprintf('/app/notes/%d', $note->getTeam()->getId())
             : '/app/notes';
             
-        $this->notifyOne($assignee, $title, $message, $url, $note);
+        $this->notifyOne(
+            $assignee,
+            $this->trans($assignee, 'app_notifications.note.assigned_title'),
+            $this->trans($assignee, 'app_notifications.note.assigned_message', [
+                '%title%' => (string) $note->getTitle(),
+            ]),
+            $url,
+            $note
+        );
     }
 
     /**
@@ -149,26 +163,22 @@ class NoteNotifier
      */
     public function notifyStatusChanged(Note $note, User $actor, string $oldStatus, string $newStatus): void
     {
-        $title = 'Note status updated';
-        $message = sprintf('"%s" moved from %s to %s', 
-            $note->getTitle(), 
-            $this->formatStatus($oldStatus),
-            $this->formatStatus($newStatus)
-        );
-        
         $url = $note->getTeam() 
             ? sprintf('/app/notes/%d', $note->getTeam()->getId())
             : '/app/notes';
 
-        // Notify assignees
-        if ($note->getAssignments()->count() > 0) {
-            $this->notifyAssignees($note, $actor, $title, $message, $url);
-        }
-
-        // Also notify team if it exists
-        if ($note->getTeam()) {
-            $this->notifyTeam($note->getTeam(), $actor, $title, $message, $url, $note);
-        }
+        $this->notifyNoteRecipients(
+            $note,
+            $actor,
+            'app_notifications.note.status_changed_title',
+            'app_notifications.note.status_changed_message',
+            [
+                '%title%' => (string) $note->getTitle(),
+                '%old_status%' => $this->formatStatus($oldStatus),
+                '%new_status%' => $this->formatStatus($newStatus),
+            ],
+            $url
+        );
     }
 
     /**
@@ -176,11 +186,71 @@ class NoteNotifier
      */
     public function notifyNoteDeleted(Team $team, User $actor, string $noteTitle): void
     {
-        $title = 'Note deleted';
-        $message = sprintf('"%s" has been deleted', $noteTitle);
         $url = sprintf('/app/notes/%d', $team->getId());
-        
-        $this->notifyTeam($team, $actor, $title, $message, $url, null);
+
+        foreach ($this->getTeamRecipients($team, $actor) as $recipient) {
+            $this->notifyOne(
+                $recipient,
+                $this->trans($recipient, 'app_notifications.note.deleted_title'),
+                $this->trans($recipient, 'app_notifications.note.deleted_message', [
+                    '%title%' => $noteTitle,
+                ]),
+                $url,
+                null
+            );
+        }
+    }
+
+    public function notifyNoteUnassigned(Note $note, User $assignee, User $actor): void
+    {
+        if ($assignee->getId() === $actor->getId()) {
+            return;
+        }
+
+        $url = $note->getTeam()
+            ? sprintf('/app/notes/%d', $note->getTeam()->getId())
+            : '/app/notes';
+
+        $this->notifyUser(
+            $assignee,
+            $actor,
+            $this->trans($assignee, 'app_notifications.note.unassigned_title'),
+            $this->trans($assignee, 'app_notifications.note.unassigned_message', [
+                '%title%' => (string) $note->getTitle(),
+            ]),
+            $url,
+            $note
+        );
+    }
+
+    public function notifyNoteUpdated(
+        Note $note,
+        User $actor,
+        string $fieldLabel,
+        ?string $oldValue = null,
+        ?string $newValue = null
+    ): void {
+        $url = $note->getTeam()
+            ? sprintf('/app/notes/%d', $note->getTeam()->getId())
+            : '/app/notes';
+
+        $messageKey = ($oldValue !== null || $newValue !== null)
+            ? 'app_notifications.note.updated_with_values_message'
+            : 'app_notifications.note.updated_message';
+
+        $this->notifyNoteRecipients(
+            $note,
+            $actor,
+            'app_notifications.note.updated_title',
+            $messageKey,
+            [
+                '%title%' => (string) $note->getTitle(),
+                '%field%' => $fieldLabel,
+                '%old%' => $oldValue ?: 'empty',
+                '%new%' => $newValue ?: 'empty',
+            ],
+            $url
+        );
     }
 
     /**
@@ -226,6 +296,41 @@ class NoteNotifier
         }
         
         return array_values($recipients);
+    }
+
+    private function notifyNoteRecipients(
+        Note $note,
+        User $actor,
+        string $titleKey,
+        ?string $messageKey,
+        array $parameters,
+        string $url
+    ): void {
+        $recipients = [];
+
+        foreach ($this->getAssigneeRecipients($note, $actor) as $recipient) {
+            $recipients[$recipient->getId()] = $recipient;
+        }
+
+        if ($note->getTeam()) {
+            foreach ($this->getTeamRecipients($note->getTeam(), $actor) as $recipient) {
+                $recipients[$recipient->getId()] = $recipient;
+            }
+        }
+
+        foreach (array_values($recipients) as $recipient) {
+            $message = $messageKey === null
+                ? null
+                : $this->trans($recipient, $messageKey, $parameters);
+
+            $this->notifyOne(
+                $recipient,
+                $this->trans($recipient, $titleKey, $parameters),
+                $message,
+                $url,
+                $note
+            );
+        }
     }
 
     /**
@@ -283,5 +388,10 @@ class NoteNotifier
             'done' => 'Done',
             default => ucfirst(str_replace('_', ' ', $status))
         };
+    }
+
+    private function trans(User $user, string $key, array $parameters = []): string
+    {
+        return $this->translator->trans($key, $parameters, null, $user->getLocale());
     }
 }
