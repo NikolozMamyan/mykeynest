@@ -715,6 +715,14 @@
         "title": "Créer une nouvelle note",
         "cancel": "Annuler",
         "create": "Créer la note"
+      },
+      "details": {
+        "open": "Voir le contenu",
+        "content": "Contenu",
+        "available": "Disponible",
+        "empty": "Vide",
+        "no_content": "Aucun contenu pour cette note.",
+        "close": "Fermer"
       }
     }
   },

@@ -331,6 +331,16 @@
       gap: 4px;
     }
 
+    .note-open-trigger {
+      width: 100%;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      color: inherit;
+    }
+
     .note-title-text {
       font-weight: 700;
       font-size: 14px;
@@ -344,10 +354,21 @@
     .note-description {
       font-size: 12px;
       color: var(--color-text-muted);
-      white-space: nowrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
-      text-overflow: ellipsis;
       width: 100%;
+    }
+
+    .note-open-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-primary);
     }
 
     /* Assignees */
@@ -613,6 +634,53 @@
       resize: vertical;
     }
 
+    .note-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .note-detail-card {
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--color-bg-hover);
+      border: 1px solid var(--color-border);
+    }
+
+    .note-detail-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .note-detail-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text-dark);
+      word-break: break-word;
+    }
+
+    .note-detail-content {
+      padding: 18px;
+      border-radius: 14px;
+      background: var(--color-bg-hover);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-dark);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .note-detail-empty {
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
     /* Responsive */
 @media (max-width: 1024px) {
 .table-header,
@@ -628,13 +696,20 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
 }
 
 @media (max-width: 768px) {
+  .notes-container {
+    padding: 16px 12px 24px;
+  }
+
   .notes-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 14px;
   }
 
   .header-actions {
     width: 100%;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .team-selector,
@@ -642,22 +717,80 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
     width: 100%;
   }
 
+  .btn-icon {
+    width: 100%;
+  }
+
   .table-header {
     display: none;
+  }
+
+  .table-body {
+    max-height: none;
+    padding: 10px;
   }
 
   .note-row {
     grid-template-columns: 1fr;
     gap: 12px;
     padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.92);
   }
 
   .cell {
     width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .cell::before {
+    content: attr(data-label);
+    flex: 0 0 96px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .note-title-cell::before {
+    display: none;
   }
 
   .actions-cell {
     justify-content: flex-start;
+  }
+
+  .status-select,
+  .assign-select {
+    width: 100%;
+  }
+
+  .modal {
+    width: min(100vw - 24px, 700px);
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .note-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  [data-theme="dark"] .note-row {
+    background: rgba(15, 23, 42, 0.9);
   }
 }
   </style>
@@ -768,19 +901,33 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                 {% if canSee %}
                   <div class="note-row">
                     <!-- Title -->
-                    <div class="cell note-title-cell">
-                      <div class="note-title-text" title="{{ note.title }}">
-                        {{ note.title }}
-                      </div>
-                      {% if note.content %}
-                        <div class="note-description">
-                          {{ note.content|u.truncate(80, '…') }}
+                    <div class="cell note-title-cell" data-label="{{ 'note.index.board.table.task'|trans }}">
+                      <button
+                        type="button"
+                        class="note-open-trigger"
+                        onclick="openNoteDetails(this)"
+                        data-note-title="{{ note.title|e('html_attr') }}"
+                        data-note-content="{{ (note.content ?? '')|e('html_attr') }}"
+                        data-note-status="{{ config.title|e('html_attr') }}"
+                        data-note-due="{{ note.dueAt ? note.dueAt|date('d/m/Y H:i') : '-' }}"
+                      >
+                        <div class="note-title-text" title="{{ note.title }}">
+                          {{ note.title }}
                         </div>
-                      {% endif %}
+                        {% if note.content %}
+                          <div class="note-description">
+                            {{ note.content|u.truncate(80, '...') }}
+                          </div>
+                        {% endif %}
+                        <span class="note-open-hint">
+                          <i class="fa-solid fa-expand"></i>
+                          {{ 'note.index.details.open'|trans }}
+                        </span>
+                      </button>
                     </div>
 
                     <!-- Assigned -->
-                    <div class="cell assignees-cell">
+                    <div class="cell assignees-cell" data-label="{{ 'note.index.board.table.assigned'|trans }}">
                       {% if note.assignments|length > 0 %}
                         <div class="assignee-avatars">
                           {% for assignment in note.assignments|slice(0, 3) %}
@@ -800,7 +947,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                     </div>
 
                     <!-- Progress -->
-                    <div class="cell progress-cell">
+                    <div class="cell progress-cell" data-label="{{ 'note.index.board.table.progress'|trans }}">
                       {% set progress = statusKey == 'todo' ? 20 : (statusKey == 'in_progress' ? 60 : 100) %}
                       <div class="progress-bar">
                         <div class="progress-fill" style="width: {{ progress }}%"></div>
@@ -809,7 +956,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                     </div>
 
                     <!-- Status -->
-                    <div class="cell">
+                    <div class="cell" data-label="{{ 'note.index.board.table.status'|trans }}">
                       {% if isOwner or isAssignee %}
                         <form method="post" action="{{ path('app_note_status', { id: note.id }) }}" style="width: 100%;">
                           <input type="hidden" name="_token" value="{{ csrf_token('status_note_' ~ note.id) }}">
@@ -831,7 +978,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                     </div>
 
                     <!-- Due Date -->
-                    <div class="cell">
+                    <div class="cell" data-label="{{ 'note.index.board.table.due_date'|trans }}">
                       {% if note.dueAt %}
                         {% set isOverdue = note.dueAt < date() and statusKey != 'done' %}
                         <span class="due-date {{ isOverdue ? 'overdue' : '' }}">
@@ -844,7 +991,7 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                     </div>
 
                     <!-- Actions (Owner only) -->
-                    <div class="cell actions-cell">
+                    <div class="cell actions-cell" data-label="{{ 'note.index.board.table.actions'|trans }}">
                       {% if isOwner %}
                         {% if (teamUsers|length > 0 or not team) %}
                           <form method="post" action="{{ path('app_note_assign', { id: note.id }) }}" class="assign-dropdown">
@@ -891,6 +1038,40 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
     {% endfor %}
   </div>
 </div>
+
+<dialog id="noteDetailsModal" class="modal">
+  <div class="modal-header">
+    <h2 class="modal-title" id="noteDetailsTitle"></h2>
+    <button type="button" class="action-btn" onclick="closeNoteDetails()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="note-detail-grid">
+      <div class="note-detail-card">
+        <span class="note-detail-label">{{ 'note.index.board.table.status'|trans }}</span>
+        <div class="note-detail-value" id="noteDetailsStatus"></div>
+      </div>
+      <div class="note-detail-card">
+        <span class="note-detail-label">{{ 'note.index.board.table.due_date'|trans }}</span>
+        <div class="note-detail-value" id="noteDetailsDue"></div>
+      </div>
+      <div class="note-detail-card">
+        <span class="note-detail-label">{{ 'note.index.details.content'|trans }}</span>
+        <div class="note-detail-value" id="noteDetailsContentState"></div>
+      </div>
+    </div>
+
+    <div class="note-detail-content" id="noteDetailsContent"></div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" onclick="closeNoteDetails()">
+      {{ 'note.index.details.close'|trans }}
+    </button>
+  </div>
+</dialog>
 
 {% if canCreateNote %}
   <!-- Create Note Modal -->
@@ -943,4 +1124,48 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
     </div>
   </dialog>
   {% endif %}
+<script>
+  const noteDetailsModal = document.getElementById('noteDetailsModal');
+  const noteDetailsTitle = document.getElementById('noteDetailsTitle');
+  const noteDetailsStatus = document.getElementById('noteDetailsStatus');
+  const noteDetailsDue = document.getElementById('noteDetailsDue');
+  const noteDetailsContent = document.getElementById('noteDetailsContent');
+  const noteDetailsContentState = document.getElementById('noteDetailsContentState');
+
+  function escapeHtml(value) {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function openNoteDetails(button) {
+    const title = button.dataset.noteTitle || '';
+    const content = button.dataset.noteContent || '';
+    const status = button.dataset.noteStatus || '';
+    const due = button.dataset.noteDue || '-';
+
+    noteDetailsTitle.textContent = title;
+    noteDetailsStatus.textContent = status;
+    noteDetailsDue.textContent = due;
+
+    if (content.trim()) {
+      noteDetailsContent.innerHTML = escapeHtml(content).replace(/\n/g, '<br>');
+      noteDetailsContent.classList.remove('note-detail-empty');
+      noteDetailsContentState.textContent = '{{ "note.index.details.available"|trans|e("js") }}';
+    } else {
+      noteDetailsContent.textContent = '{{ "note.index.details.no_content"|trans|e("js") }}';
+      noteDetailsContent.classList.add('note-detail-empty');
+      noteDetailsContentState.textContent = '{{ "note.index.details.empty"|trans|e("js") }}';
+    }
+
+    noteDetailsModal.showModal();
+  }
+
+  function closeNoteDetails() {
+    noteDetailsModal.close();
+  }
+</script>
 {% endblock %}

@@ -667,6 +667,14 @@
         "title": "Create New Note",
         "cancel": "Cancel",
         "create": "Create Note"
+      },
+      "details": {
+        "open": "View content",
+        "content": "Content",
+        "available": "Available",
+        "empty": "Empty",
+        "no_content": "No content for this note.",
+        "close": "Close"
       }
     }
   },
