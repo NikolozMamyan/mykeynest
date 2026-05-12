@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:#f6f7fb;font-family:Arial, sans-serif;">
+    <div style="max-width:640px;margin:0 auto;padding:24px;">
+      <div style="background:#ffffff;border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(0,0,0,.06);">
+        <h2 style="margin:0 0 10px;font-size:18px;color:#111827;">
+          Nouveau message chat
+        </h2>
+
+        <p style="margin:0 0 14px;color:#374151;line-height:1.6;">
+          Un visiteur a envoye un message depuis le widget MYKEYNEST.
+        </p>
+
+        <table style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Email</td>
+            <td style="padding:8px 0;color:#111827;"><strong>{{ conversation.email }}</strong></td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Conversation</td>
+            <td style="padding:8px 0;color:#111827;">#{{ conversation.id ?: '-' }}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Date</td>
+            <td style="padding:8px 0;color:#111827;">{{ receivedAt|date('Y-m-d H:i:s') }}</td>
+          </tr>
+        </table>
+
+        <div style="margin:0 0 18px;padding:14px 16px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;color:#111827;line-height:1.6;white-space:pre-wrap;">{{ message }}</div>
+
+        <p style="margin:18px 0 0;">
+          <a
+            href="{{ adminUrl }}"
+            style="display:inline-block;padding:12px 16px;background:#059669;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;"
+          >
+            Ouvrir la conversation
+          </a>
+        </p>
+      </div>
+
+      <p style="text-align:center;color:#9ca3af;font-size:12px;margin:14px 0 0;">
+        MyKeyNest - Notification automatique
+      </p>
+    </div>
+  </body>
+</html>

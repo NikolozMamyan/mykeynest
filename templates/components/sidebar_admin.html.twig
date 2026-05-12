@@ -49,9 +49,13 @@
       </a>
 
       <a href="{{ path('admin_chat') }}"
-         class="nav-item {{ app.request.attributes.get('_route') in ['admin_chat', 'admin_chat_reply'] ? 'active' : '' }}">
+         class="nav-item {{ app.request.attributes.get('_route') in ['admin_chat', 'admin_chat_reply', 'admin_chat_close', 'admin_chat_delete'] ? 'active' : '' }}">
         <i class="fas fa-comments"></i>
         <span>Chat</span>
+        {% set supportChatUnreadCount = support_chat_unread_count() %}
+        {% if supportChatUnreadCount > 0 %}
+          <span class="nav-item-badge">{{ supportChatUnreadCount > 99 ? '99+' : supportChatUnreadCount }}</span>
+        {% endif %}
       </a>
 
       <a href="{{ path('admin_teams') }}"

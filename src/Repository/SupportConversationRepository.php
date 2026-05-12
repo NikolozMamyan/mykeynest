@@ -46,4 +46,14 @@ class SupportConversationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function countUnreadForAdmin(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.unreadForAdmin = :unread')
+            ->setParameter('unread', true)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

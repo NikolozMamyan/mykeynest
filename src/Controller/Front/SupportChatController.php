@@ -3,6 +3,7 @@
 namespace App\Controller\Front;
 
 use App\Service\SupportChatService;
+use App\Service\AdminNotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,6 +17,7 @@ final class SupportChatController extends AbstractController
     public function __construct(
         private readonly SupportChatService $supportChatService,
         private readonly RateLimiterFactory $supportChatLimiter,
+        private readonly AdminNotificationService $adminNotificationService,
     ) {
     }
 
@@ -96,6 +98,7 @@ final class SupportChatController extends AbstractController
         ]);
 
         $response->headers->setCookie($this->buildConversationCookie($request, $conversation->getPublicToken()));
+        $this->adminNotificationService->notifySupportChatMessage($conversation, $message);
 
         return $response;
     }
