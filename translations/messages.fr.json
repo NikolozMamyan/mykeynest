@@ -13,6 +13,36 @@
     "settings": "Paramètres",
     "subscription": "Abonnements"
   },
+  "support_chat": {
+    "title": "MYKEYNEST",
+    "status": "En ligne - reponse sous 24h",
+    "intro": "Bonjour. Je suis Nikoloz, votre conseiller. Dites-moi ce que vous souhaitez construire ou ameliorer.",
+    "project_question": "Quel type de demande avez-vous en tete ?",
+    "email_placeholder": "Votre email",
+    "message_placeholder": "Decrivez votre besoin en quelques mots...",
+    "hint": "Votre email sert uniquement a suivre cette conversation.",
+    "open_aria": "Ouvrir le chat",
+    "close_aria": "Fermer le chat",
+    "send_aria": "Envoyer le message",
+    "visitor_label": "Vous",
+    "admin_label": "MYKEYNEST",
+    "auto_reply": "Merci pour votre message. Nikoloz, votre conseiller, va vous repondre rapidement.",
+    "quick": {
+      "crm": "Question sur l'extension",
+      "crm_message": "Bonjour, j'ai une question sur l'extension MYKEYNEST.",
+      "automation": "Question sur l'abonnement",
+      "automation_message": "Bonjour, j'ai une question sur mon abonnement MYKEYNEST.",
+      "webapp": "Question sur une demo",
+      "webapp_message": "Bonjour, je souhaite obtenir une demo de MYKEYNEST.",
+      "other": "Autre",
+      "other_message": "Bonjour, j'ai une autre question a vous poser."
+    },
+    "errors": {
+      "required": "Renseignez votre email et votre message.",
+      "send": "Erreur lors de l'envoi du message.",
+      "network": "Erreur reseau. Reessayez."
+    }
+  },
   "user": {
     "field": {
       "firstname": "Prénom",

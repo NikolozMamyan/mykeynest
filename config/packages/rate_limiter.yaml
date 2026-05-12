@@ -20,6 +20,10 @@ framework:
       policy: sliding_window
       limit: 5
       interval: '1 hour'
+    support_chat:
+      policy: sliding_window
+      limit: 30
+      interval: '1 hour'
     share_invitation:
       policy: sliding_window
       limit: 20

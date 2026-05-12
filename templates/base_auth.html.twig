@@ -168,6 +168,7 @@
     {% endif %}
 
     {% block body %}{% endblock %}
+    {{ render(path('app_support_chat_widget')) }}
     {% include './components/parts/_toasts.html.twig' %}
     {% include './components/parts/_pwa_install_banner.html.twig' %}
   </body>

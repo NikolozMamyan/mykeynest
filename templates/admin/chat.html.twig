@@ -1,0 +1,390 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Chat{% endblock %}
+{% block admin_page_title %}Support Chat{% endblock %}
+{% block admin_page_intro %}Tous les messages envoyes depuis le widget public arrivent ici. Ouvre une conversation pour lire l'historique et repondre au visiteur.{% endblock %}
+
+{% block admin_content %}
+  <style>
+    .admin-chat-layout {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 20px;
+      min-height: 70vh;
+    }
+
+    .admin-chat-card {
+      background: var(--color-white, #fff);
+      border: 1px solid var(--color-border, #dbe4ee);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 14px 38px rgba(15, 23, 42, 0.05);
+    }
+
+    .admin-chat-list {
+      display: flex;
+      flex-direction: column;
+      max-height: 72vh;
+      overflow: auto;
+    }
+
+    .admin-chat-list-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+      padding: 16px 18px;
+      color: inherit;
+      border-bottom: 1px solid var(--color-border, #dbe4ee);
+      background: #fff;
+    }
+
+    .admin-chat-list-item.active {
+      background: rgba(5, 150, 105, 0.08);
+    }
+
+    .admin-chat-list-item:last-child {
+      border-bottom: 0;
+    }
+
+    .admin-chat-list-link {
+      min-width: 0;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .admin-chat-list-actions,
+    .admin-chat-head-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .admin-chat-icon-btn {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--color-border, #dbe4ee);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--color-text-muted, #64748b);
+      cursor: pointer;
+      display: inline-grid;
+      place-items: center;
+      transition: background .15s ease, border-color .15s ease, color .15s ease;
+    }
+
+    .admin-chat-icon-btn:hover {
+      background: #f8fafc;
+      color: var(--color-text-dark, #0f172a);
+    }
+
+    .admin-chat-icon-btn--danger {
+      color: #dc2626;
+      border-color: rgba(220, 38, 38, .24);
+    }
+
+    .admin-chat-icon-btn--danger:hover {
+      background: #fee2e2;
+      border-color: rgba(220, 38, 38, .38);
+      color: #b91c1c;
+    }
+
+    .admin-chat-icon-btn--block {
+      color: #b45309;
+      border-color: rgba(180, 83, 9, .24);
+    }
+
+    .admin-chat-icon-btn--block:hover {
+      background: #fef3c7;
+      border-color: rgba(180, 83, 9, .38);
+      color: #92400e;
+    }
+
+    .admin-chat-list-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .admin-chat-email {
+      font-weight: 700;
+      color: var(--color-text-dark, #0f172a);
+    }
+
+    .admin-chat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(5, 150, 105, 0.12);
+      color: #047857;
+    }
+
+    .admin-chat-badge--closed {
+      background: rgba(100, 116, 139, .13);
+      color: #475569;
+    }
+
+    .admin-chat-preview,
+    .admin-chat-date,
+    .admin-chat-empty {
+      color: var(--color-text-muted, #64748b);
+      font-size: 13px;
+    }
+
+    .admin-chat-thread {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      min-height: 70vh;
+    }
+
+    .admin-chat-thread-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--color-border, #dbe4ee);
+      background: linear-gradient(135deg, #f8fafc, #ffffff);
+    }
+
+    .admin-chat-thread-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .admin-chat-thread-head h2 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--color-text-dark, #0f172a);
+    }
+
+    .admin-chat-thread-head p {
+      margin: 6px 0 0;
+      color: var(--color-text-muted, #64748b);
+    }
+
+    .admin-chat-thread-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto;
+      background: radial-gradient(circle at top, rgba(255,255,255,.95), rgba(241,245,249,.88));
+    }
+
+    .admin-chat-bubble {
+      width: fit-content;
+      min-width: 0;
+      max-width: min(68%, 620px);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .admin-chat-bubble--visitor {
+      margin-right: auto;
+      background: #fff;
+      color: var(--color-text-dark, #0f172a);
+      border: 1px solid var(--color-border, #dbe4ee);
+      border-bottom-left-radius: 5px;
+    }
+
+    .admin-chat-bubble--admin {
+      margin-left: auto;
+      background: linear-gradient(135deg, var(--color-primary, #059669), #047857);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+    }
+
+    .admin-chat-meta {
+      margin-top: 6px;
+      font-size: 11px;
+      opacity: 0.78;
+    }
+
+    .admin-chat-reply {
+      padding: 18px 22px 22px;
+      border-top: 1px solid var(--color-border, #dbe4ee);
+      background: #fff;
+    }
+
+    .admin-chat-reply textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1.5px solid var(--color-border, #dbe4ee);
+      font: inherit;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+    .admin-chat-reply textarea:focus {
+      outline: none;
+      border-color: var(--color-primary, #059669);
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12);
+    }
+
+    .admin-chat-reply-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .admin-chat-reply-hint {
+      color: var(--color-text-muted, #64748b);
+      font-size: 13px;
+    }
+
+    .admin-chat-closed-note {
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--color-border, #dbe4ee);
+      color: var(--color-text-muted, #64748b);
+      font-size: 13px;
+    }
+
+    .admin-chat-empty-thread {
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+      padding: 30px;
+      color: var(--color-text-muted, #64748b);
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .admin-chat-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-chat-list {
+        max-height: 320px;
+      }
+
+      .admin-chat-thread {
+        min-height: auto;
+      }
+    }
+  </style>
+
+  <div class="admin-chat-layout">
+    <aside class="admin-chat-card">
+      <div class="admin-chat-list">
+        {% for conversation in conversations %}
+          {% set lastMessage = conversation.messages|last %}
+          <div class="admin-chat-list-item {{ selectedConversation and selectedConversation.id == conversation.id ? 'active' : '' }}">
+            <a href="{{ path('admin_chat', { conversation: conversation.id }) }}" class="admin-chat-list-link">
+              <div class="admin-chat-list-head">
+                <span class="admin-chat-email">{{ conversation.email }}</span>
+                {% if conversation.unreadForAdmin %}
+                  <span class="admin-chat-badge">Nouveau</span>
+                {% endif %}
+                {% if conversation.status == constant('App\\Entity\\SupportConversation::STATUS_CLOSED') %}
+                  <span class="admin-chat-badge admin-chat-badge--closed">Fermee</span>
+                {% endif %}
+              </div>
+              <div class="admin-chat-preview">{{ lastMessage ? lastMessage.body|u.truncate(72, '...') : 'Aucun message' }}</div>
+              <div class="admin-chat-date">{{ conversation.lastMessageAt|date('d/m/Y H:i') }}</div>
+            </a>
+            <div class="admin-chat-list-actions">
+              {% if conversation.status != constant('App\\Entity\\SupportConversation::STATUS_CLOSED') %}
+                <form method="post" action="{{ path('admin_chat_close', { id: conversation.id }) }}">
+                  <input type="hidden" name="_token" value="{{ csrf_token('admin_chat_close_' ~ conversation.id) }}">
+                  <button type="submit" class="admin-chat-icon-btn admin-chat-icon-btn--block" title="Fermer / bloquer cette session" aria-label="Fermer / bloquer cette session">
+                    <i class="fas fa-ban" aria-hidden="true"></i>
+                  </button>
+                </form>
+              {% endif %}
+              <form method="post" action="{{ path('admin_chat_delete', { id: conversation.id }) }}" onsubmit="return confirm('Supprimer definitivement cette conversation ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin_chat_delete_' ~ conversation.id) }}">
+                <button type="submit" class="admin-chat-icon-btn admin-chat-icon-btn--danger" title="Supprimer la conversation" aria-label="Supprimer la conversation">
+                  <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <div class="admin-chat-list-item admin-chat-empty">Aucune conversation pour le moment.</div>
+        {% endfor %}
+      </div>
+    </aside>
+
+    <section class="admin-chat-card">
+      {% if selectedConversation %}
+        <div class="admin-chat-thread">
+          <div class="admin-chat-thread-head">
+            <div class="admin-chat-thread-top">
+              <div>
+                <h2>{{ selectedConversation.email }}</h2>
+                <p>Conversation #{{ selectedConversation.id }} - Derniere activite {{ selectedConversation.lastMessageAt|date('d/m/Y H:i') }}</p>
+                {% if selectedConversation.status == constant('App\\Entity\\SupportConversation::STATUS_CLOSED') %}
+                  <span class="admin-chat-badge admin-chat-badge--closed">Session fermee / bloquee</span>
+                {% endif %}
+              </div>
+              <div class="admin-chat-head-actions">
+                {% if selectedConversation.status != constant('App\\Entity\\SupportConversation::STATUS_CLOSED') %}
+                  <form method="post" action="{{ path('admin_chat_close', { id: selectedConversation.id }) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_chat_close_' ~ selectedConversation.id) }}">
+                    <button type="submit" class="admin-chat-icon-btn admin-chat-icon-btn--block" title="Fermer / bloquer cette session" aria-label="Fermer / bloquer cette session">
+                      <i class="fas fa-ban" aria-hidden="true"></i>
+                    </button>
+                  </form>
+                {% endif %}
+                <form method="post" action="{{ path('admin_chat_delete', { id: selectedConversation.id }) }}" onsubmit="return confirm('Supprimer definitivement cette conversation ?');">
+                  <input type="hidden" name="_token" value="{{ csrf_token('admin_chat_delete_' ~ selectedConversation.id) }}">
+                  <button type="submit" class="admin-chat-icon-btn admin-chat-icon-btn--danger" title="Supprimer la conversation" aria-label="Supprimer la conversation">
+                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-chat-thread-body">
+            {% for message in selectedConversation.messages %}
+              <div class="admin-chat-bubble {{ message.authorType == 'admin' ? 'admin-chat-bubble--admin' : 'admin-chat-bubble--visitor' }}">
+                {{ message.body }}
+                <div class="admin-chat-meta">
+                  {{ message.authorType == 'admin' ? 'Admin' : selectedConversation.email }} - {{ message.createdAt|date('d/m/Y H:i') }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {% if selectedConversation.status == constant('App\\Entity\\SupportConversation::STATUS_CLOSED') %}
+            <div class="admin-chat-reply">
+              <div class="admin-chat-closed-note">
+                Cette session est fermee. Le visiteur ne peut plus envoyer de message depuis cette conversation.
+              </div>
+            </div>
+          {% else %}
+            <form method="post" action="{{ path('admin_chat_reply', { id: selectedConversation.id }) }}" class="admin-chat-reply">
+              <input type="hidden" name="_token" value="{{ csrf_token('admin_chat_reply_' ~ selectedConversation.id) }}">
+              <textarea name="message" placeholder="Ecris ta reponse ici..." required></textarea>
+              <div class="admin-chat-reply-actions">
+                <div class="admin-chat-reply-hint">La reponse sera visible dans le widget public du visiteur.</div>
+                <button type="submit" class="ds-btn ds-btn--primary">Envoyer la reponse</button>
+              </div>
+            </form>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="admin-chat-empty-thread">
+          Aucune conversation selectionnee.
+        </div>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
