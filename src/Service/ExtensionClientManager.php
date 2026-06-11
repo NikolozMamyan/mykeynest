@@ -7,17 +7,24 @@ use App\Entity\ExtensionInstallationChallenge;
 use App\Entity\User;
 use App\Repository\ExtensionClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ExtensionClientManager
 {
+    private const CHALLENGE_RESEND_AFTER = '2 minutes';
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ExtensionClientRepository $extensionClientRepository,
         private ExtensionInstallationChallengeManager $extensionInstallationChallengeManager,
         private MailerService $mailerService,
-        private UrlGeneratorInterface $urlGenerator
+        private UrlGeneratorInterface $urlGenerator,
+        private LoggerInterface $logger,
+        #[Autowire('%kernel.environment%')]
+        private string $environment
     ) {
     }
 
@@ -30,7 +37,12 @@ final class ExtensionClientManager
      * }|array{
      *     status: 'approval_required',
      *     message: string,
-     *     challenge: ExtensionInstallationChallenge
+     *     challenge: ExtensionInstallationChallenge,
+     *     delivery: 'email'|'development_url',
+     *     developmentApproveUrl?: string
+     * }|array{
+     *     status: 'delivery_failed',
+     *     message: string
      * }
      */
     public function resolveFromRequest(User $user, Request $request): array
@@ -95,40 +107,74 @@ final class ExtensionClientManager
             throw new \RuntimeException('Nouvelle installation refusée. Une seule installation extension est autorisée pour ce compte.');
         }
 
-        if ($existingCount >= 2) {
-            return $this->createClient($user, $clientId, $deviceLabel, $browserName, $browserVersion, $osName, $osVersion, $extensionVersion, $manifestVersion, $originType, $ipAddress, $userAgent);
-        }
-
         $challenge = $this->extensionInstallationChallengeManager->findLatestByUserAndClientId($user, $clientId);
 
         if ($challenge instanceof ExtensionInstallationChallenge) {
             if ($challenge->isExpired() && $challenge->getStatus() === ExtensionInstallationChallenge::STATUS_PENDING) {
-                $challenge->setStatus(ExtensionInstallationChallenge::STATUS_EXPIRED);
-                $this->entityManager->flush();
+                $this->extensionInstallationChallengeManager->expire($challenge);
             } elseif ($challenge->isApproved() && !$challenge->isCompleted() && !$challenge->isExpired()) {
                 $resolved = $this->createClient($user, $clientId, $deviceLabel, $browserName, $browserVersion, $osName, $osVersion, $extensionVersion, $manifestVersion, $originType, $ipAddress, $userAgent);
                 $this->extensionInstallationChallengeManager->complete($challenge);
 
                 return $resolved;
             } elseif ($challenge->isPending() && !$challenge->isExpired()) {
-                return [
-                    'status' => 'approval_required',
-                    'message' => 'Un e-mail de confirmation a déjà été envoyé pour autoriser cette deuxième installation.',
-                    'challenge' => $challenge,
-                ];
+                if (!$this->shouldRenewPendingChallenge($challenge)) {
+                    return [
+                        'status' => 'approval_required',
+                        'message' => 'Un e-mail de confirmation a déjà été envoyé pour autoriser cette installation.',
+                        'challenge' => $challenge,
+                        'delivery' => 'email',
+                    ];
+                }
+
+                $this->extensionInstallationChallengeManager->expire($challenge);
             } elseif ($challenge->isRejected() && !$challenge->isExpired()) {
-                throw new \RuntimeException('Cette deuxième installation a été refusée par e-mail.');
+                throw new \RuntimeException('Cette installation a été refusée par e-mail.');
             }
         }
 
         [$challenge, $plainToken] = $this->extensionInstallationChallengeManager->createChallenge($user, $request, $clientId);
-        $this->sendApprovalEmail($user, $challenge, $plainToken);
+        [$approveUrl, $rejectUrl] = $this->buildChallengeUrls($plainToken);
 
-        return [
+        try {
+            $this->sendApprovalEmail($user, $challenge, $approveUrl, $rejectUrl);
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to send extension installation challenge email', [
+                'userId' => $user->getId(),
+                'challengeId' => $challenge->getPublicId(),
+                'error' => $exception->getMessage(),
+            ]);
+
+            if ($this->environment === 'dev') {
+                return [
+                    'status' => 'approval_required',
+                    'message' => 'L’e-mail n’a pas pu être envoyé. Utilisez le lien de validation de développement.',
+                    'challenge' => $challenge,
+                    'delivery' => 'development_url',
+                    'developmentApproveUrl' => $approveUrl,
+                ];
+            }
+
+            $this->extensionInstallationChallengeManager->expire($challenge);
+
+            return [
+                'status' => 'delivery_failed',
+                'message' => 'L’e-mail de validation de l’installation n’a pas pu être envoyé. Veuillez réessayer dans quelques minutes.',
+            ];
+        }
+
+        $result = [
             'status' => 'approval_required',
-            'message' => 'Nous avons envoyé un e-mail pour autoriser cette deuxième installation.',
+            'message' => 'Nous avons envoyé un e-mail pour autoriser cette installation.',
             'challenge' => $challenge,
+            'delivery' => 'email',
         ];
+
+        if ($this->environment === 'dev') {
+            $result['developmentApproveUrl'] = $approveUrl;
+        }
+
+        return $result;
     }
 
     public function assertAllowed(ExtensionClient $client): void
@@ -232,11 +278,19 @@ final class ExtensionClientManager
         ];
     }
 
-    private function sendApprovalEmail(User $user, ExtensionInstallationChallenge $challenge, string $plainToken): void
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function buildChallengeUrls(string $plainToken): array
     {
         $approveUrl = $this->urlGenerator->generate('api_extension_installation_challenge_approve', ['token' => $plainToken], UrlGeneratorInterface::ABSOLUTE_URL);
         $rejectUrl = $this->urlGenerator->generate('api_extension_installation_challenge_reject', ['token' => $plainToken], UrlGeneratorInterface::ABSOLUTE_URL);
 
+        return [$approveUrl, $rejectUrl];
+    }
+
+    private function sendApprovalEmail(User $user, ExtensionInstallationChallenge $challenge, string $approveUrl, string $rejectUrl): void
+    {
         $this->mailerService->send(
             (string) $user->getEmail(),
             'Autorisez cette installation de l’extension',
@@ -260,8 +314,16 @@ final class ExtensionClientManager
     private function hasTeamPlan(User $user): bool
     {
         $subscription = $user->getUserSubscription();
+        $planCode = mb_strtolower(trim((string) $subscription?->getPlanCode()));
 
-        return $subscription?->isActive() === true && $subscription->getPlanCode() === 'team';
+        return $subscription?->isActive() === true && $planCode === 'team';
+    }
+
+    private function shouldRenewPendingChallenge(ExtensionInstallationChallenge $challenge): bool
+    {
+        $createdAt = $challenge->getCreatedAt();
+
+        return $createdAt === null || $createdAt <= new \DateTimeImmutable('-' . self::CHALLENGE_RESEND_AFTER);
     }
 
     private function hydrateClient(ExtensionClient $client, ?string $deviceLabel, ?string $browserName, ?string $browserVersion, ?string $osName, ?string $osVersion, ?string $extensionVersion, ?string $manifestVersion, ?string $originType, ?string $ipAddress, ?string $userAgent): void

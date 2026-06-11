@@ -18,6 +18,14 @@ class ExtensionInstallationChallengeManager
 
     public function createChallenge(User $user, Request $request, string $clientId): array
     {
+        foreach ($this->repository->findBy([
+            'user' => $user,
+            'requestedClientId' => $clientId,
+            'status' => ExtensionInstallationChallenge::STATUS_PENDING,
+        ]) as $pendingChallenge) {
+            $pendingChallenge->setStatus(ExtensionInstallationChallenge::STATUS_EXPIRED);
+        }
+
         $plainToken = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $plainToken);
 
@@ -114,6 +122,16 @@ class ExtensionInstallationChallengeManager
     {
         $challenge->setStatus(ExtensionInstallationChallenge::STATUS_COMPLETED);
         $challenge->setCompletedAt(new \DateTimeImmutable());
+        $this->em->flush();
+    }
+
+    public function expire(ExtensionInstallationChallenge $challenge): void
+    {
+        if ($challenge->isCompleted() || $challenge->isRejected()) {
+            return;
+        }
+
+        $challenge->setStatus(ExtensionInstallationChallenge::STATUS_EXPIRED);
         $this->em->flush();
     }
 

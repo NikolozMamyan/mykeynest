@@ -70,6 +70,14 @@ final class ApiSharedController extends AbstractController
         return $this->cors($this->json(['error' => $message], Response::HTTP_FORBIDDEN));
     }
 
+    private function serviceUnavailable(string $message): JsonResponse
+    {
+        return $this->cors($this->json([
+            'error' => 'Validation temporairement indisponible',
+            'message' => $message,
+        ], Response::HTTP_SERVICE_UNAVAILABLE));
+    }
+
     private function withInstallationToken(JsonResponse $response, ?string $installationToken): JsonResponse
     {
         if ($installationToken) {
@@ -225,16 +233,29 @@ final class ApiSharedController extends AbstractController
             } else {
                 $resolved = $this->extensionClientManager->resolveFromRequest($user, $request);
 
-                if ($resolved['status'] === 'approval_required') {
+                if ($resolved['status'] === 'delivery_failed') {
                     return [
-                        'response' => $this->cors($this->json([
-                            'status' => 'email_verification_required',
-                            'message' => $resolved['message'],
-                            'challenge' => [
-                                'publicId' => $resolved['challenge']->getPublicId(),
-                                'expiresAt' => $resolved['challenge']->getExpiresAt()?->format(DATE_ATOM),
-                            ],
-                        ], Response::HTTP_ACCEPTED)),
+                        'response' => $this->serviceUnavailable($resolved['message']),
+                    ];
+                }
+
+                if ($resolved['status'] === 'approval_required') {
+                    $payload = [
+                        'status' => 'email_verification_required',
+                        'message' => $resolved['message'],
+                        'delivery' => $resolved['delivery'],
+                        'challenge' => [
+                            'publicId' => $resolved['challenge']->getPublicId(),
+                            'expiresAt' => $resolved['challenge']->getExpiresAt()?->format(DATE_ATOM),
+                        ],
+                    ];
+
+                    if (isset($resolved['developmentApproveUrl'])) {
+                        $payload['developmentApproveUrl'] = $resolved['developmentApproveUrl'];
+                    }
+
+                    return [
+                        'response' => $this->cors($this->json($payload, Response::HTTP_ACCEPTED)),
                     ];
                 }
 
