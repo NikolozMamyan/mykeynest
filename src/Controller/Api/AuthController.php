@@ -12,6 +12,7 @@ use App\Service\LoginChallengeManager;
 use App\Service\MailerService;
 use App\Service\NotificationService;
 use App\Service\SessionManager;
+use App\Service\UserDeviceManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -139,7 +140,9 @@ final class AuthController extends AbstractController
         $em->flush();
 
         $isFirstLogin = $sessionManager->isFirstSessionForUser($user);
-        [$session, $plainToken, $deviceId] = $sessionManager->createSession($user);
+        $deviceId = $sessionManager->getOrCreateCurrentDeviceId();
+        $sessionManager->trustDevice($user, $deviceId);
+        [$session, $plainToken] = $sessionManager->createSession($user, deviceId: $deviceId);
 
         try {
             $notificationService->createEntityNotification(
@@ -219,8 +222,8 @@ final class AuthController extends AbstractController
         SessionManager $sessionManager,
         LoginChallengeManager $loginChallengeManager,
         MailerService $mailerService,
-        EntityManagerInterface $em,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        LoggerInterface $logger
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $email = is_array($data) && isset($data['email']) && is_string($data['email']) ? $data['email'] : null;
@@ -244,18 +247,24 @@ final class AuthController extends AbstractController
         if (!$user || !$passwordHasher->isPasswordValid($user, $data['password'])) {
             return new JsonResponse(['error' => 'Invalid credentials'], 401);
         }
-        // $token = bin2hex(random_bytes(32));
-        // $expiresAt = (new \DateTime())->modify('+1 hour');
-        // $user->setApiToken($token);
-        // $user->setTokenExpiresAt($expiresAt);
-        // $em->flush();
-        $deviceId = $sessionManager->getCurrentDeviceId() ?? bin2hex(random_bytes(32));
+        $deviceId = $sessionManager->getOrCreateCurrentDeviceId();
+        $deviceAccessState = $sessionManager->getDeviceAccessState($user, $deviceId);
+
+        if ($deviceAccessState === UserDeviceManager::STATE_BLOCKED) {
+            return new JsonResponse([
+                'error' => 'Connexion bloquée',
+                'message' => 'Cet appareil a été bloqué. Utilisez un autre appareil ou débloquez-le depuis vos paramètres de sécurité.',
+            ], 403);
+        }
 
         // Appareil connu => login direct
-        if ($sessionManager->isKnownDevice($user, $deviceId)) {
+        if ($deviceAccessState === UserDeviceManager::STATE_TRUSTED) {
             try {
                 $isFirstLogin = $sessionManager->isFirstSessionForUser($user);
-                [$session, $plainToken, $finalDeviceId] = $sessionManager->createSession($user);
+                [$session, $plainToken, $finalDeviceId] = $sessionManager->createSession(
+                    $user,
+                    deviceId: $deviceId
+                );
             } catch (\RuntimeException $e) {
                 return new JsonResponse([
                     'error' => 'Connexion bloquée',
@@ -294,19 +303,36 @@ final class AuthController extends AbstractController
             'token' => $plainChallengeToken,
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $mailerService->send(
-            $user->getEmail(),
-            'Validez cette connexion',
-            'emails/security/login_challenge.html.twig',
-            [
-                'user' => $user,
-                'approveUrl' => $approveUrl,
-                'rejectUrl' => $rejectUrl,
-                'ip' => $request->getClientIp(),
-                'userAgent' => $request->headers->get('User-Agent'),
-                'requestedAt' => new \DateTimeImmutable(),
-            ]
-        );
+        try {
+            $mailerService->send(
+                $user->getEmail(),
+                'Validez cette connexion',
+                'emails/security/login_challenge.html.twig',
+                [
+                    'user' => $user,
+                    'approveUrl' => $approveUrl,
+                    'rejectUrl' => $rejectUrl,
+                    'ip' => $request->getClientIp(),
+                    'userAgent' => $request->headers->get('User-Agent'),
+                    'requestedAt' => new \DateTimeImmutable(),
+                ]
+            );
+        } catch (\Throwable $e) {
+            $loginChallengeManager->expire($challenge);
+            $logger->error('Failed to send login challenge email', [
+                'userId' => $user->getId(),
+                'challengeId' => $challenge->getPublicId(),
+                'error' => $e->getMessage(),
+            ]);
+
+            $response = new JsonResponse([
+                'error' => 'Validation temporairement indisponible',
+                'message' => 'L’e-mail de validation n’a pas pu être envoyé. Veuillez réessayer dans quelques minutes.',
+            ], 503);
+            $response->headers->setCookie($this->buildDeviceCookie($request, $deviceId));
+
+            return $response;
+        }
 
         $response = new JsonResponse([
             'status' => 'email_verification_required',
@@ -344,9 +370,7 @@ final class AuthController extends AbstractController
             ], 404);
         }
 
-        if ($challenge->isExpired() && $challenge->getStatus() === LoginChallenge::STATUS_PENDING) {
-            $challenge->setStatus(LoginChallenge::STATUS_EXPIRED);
-        }
+        $loginChallengeManager->markExpiredIfNeeded($challenge);
 
         return new JsonResponse([
             'status' => $challenge->getStatus(),
@@ -377,6 +401,12 @@ final class AuthController extends AbstractController
             return $response;
         }
 
+        if ($challenge->isCompleted()) {
+            return new JsonResponse([
+                'error' => 'Cette tentative a déjà été finalisée.',
+            ], 409);
+        }
+
         if (!$challenge->isApproved()) {
             return new JsonResponse([
                 'error' => 'Cette tentative n’a pas encore été approuvée.',
@@ -384,17 +414,40 @@ final class AuthController extends AbstractController
             ], 409);
         }
 
-        if ($challenge->isCompleted()) {
+        $currentDeviceId = $sessionManager->getCurrentDeviceId();
+        $challengeDeviceId = $challenge->getDeviceId();
+
+        if (
+            $currentDeviceId === null
+            || $challengeDeviceId === null
+            || !hash_equals($challengeDeviceId, $currentDeviceId)
+        ) {
+            $response = new JsonResponse([
+                'error' => 'Appareil de validation différent',
+                'message' => 'Finalisez la connexion depuis le navigateur qui a demandé le challenge.',
+            ], 409);
+            $response->headers->clearCookie(LoginChallengeManager::COOKIE_NAME, '/');
+
+            return $response;
+        }
+
+        if (!$loginChallengeManager->claimForCompletion($challenge)) {
             return new JsonResponse([
-                'error' => 'Cette tentative a déjà été finalisée.',
+                'error' => 'Cette tentative a déjà été utilisée ou a expiré.',
             ], 409);
         }
 
         try {
             $isFirstLogin = $sessionManager->isFirstSessionForUser($challenge->getUser());
+            $sessionManager->trustDevice(
+                $challenge->getUser(),
+                $challengeDeviceId,
+                $challenge->getDeviceName()
+            );
             [$session, $plainAuthToken, $deviceId] = $sessionManager->createSession(
                 $challenge->getUser(),
-                $challenge->getDeviceName()
+                $challenge->getDeviceName(),
+                $challengeDeviceId
             );
         } catch (\RuntimeException $e) {
             return new JsonResponse([
@@ -402,8 +455,6 @@ final class AuthController extends AbstractController
                 'message' => $e->getMessage(),
             ], 403);
         }
-
-        $loginChallengeManager->complete($challenge);
 
         $response = new JsonResponse([
             'message' => 'Connexion validée et finalisée.',

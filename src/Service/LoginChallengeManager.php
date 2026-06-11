@@ -15,13 +15,28 @@ class LoginChallengeManager
     public function __construct(
         private EntityManagerInterface $em,
         private LoginChallengeRepository $repository,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private UserDeviceManager $userDeviceManager
     ) {
     }
 
     public function createChallenge(User $user, string $deviceId, ?string $deviceName = null): array
     {
+        if (!DeviceIdentifier::isValid($deviceId)) {
+            throw new \InvalidArgumentException('Identifiant appareil invalide.');
+        }
+
         $request = $this->requestStack->getCurrentRequest();
+
+        foreach ($this->repository->findBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+            'status' => LoginChallenge::STATUS_PENDING,
+        ]) as $pendingChallenge) {
+            $pendingChallenge->setStatus(LoginChallenge::STATUS_EXPIRED);
+        }
+
+        $this->userDeviceManager->remember($user, $deviceId, $deviceName);
 
         $plainToken = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $plainToken);
@@ -55,10 +70,7 @@ class LoginChallengeManager
             return null;
         }
 
-        if ($challenge->isExpired() && $challenge->getStatus() === LoginChallenge::STATUS_PENDING) {
-            $challenge->setStatus(LoginChallenge::STATUS_EXPIRED);
-            $this->em->flush();
-        }
+        $this->markExpiredIfNeeded($challenge);
 
         if ($challenge->isExpired()) {
             return null;
@@ -101,10 +113,41 @@ class LoginChallengeManager
         $this->em->flush();
     }
 
-    public function complete(LoginChallenge $challenge): void
+    public function claimForCompletion(LoginChallenge $challenge): bool
     {
-        $challenge->setStatus(LoginChallenge::STATUS_COMPLETED);
-        $challenge->setCompletedAt(new \DateTimeImmutable());
+        if (!$challenge->isApproved() || $challenge->isExpired()) {
+            return false;
+        }
+
+        $completedAt = new \DateTimeImmutable();
+        if (!$this->repository->claimApproved($challenge, $completedAt)) {
+            return false;
+        }
+
+        $challenge
+            ->setStatus(LoginChallenge::STATUS_COMPLETED)
+            ->setCompletedAt($completedAt);
+
+        return true;
+    }
+
+    public function markExpiredIfNeeded(LoginChallenge $challenge): void
+    {
+        if (!$challenge->isExpired() || !$challenge->isPending()) {
+            return;
+        }
+
+        $challenge->setStatus(LoginChallenge::STATUS_EXPIRED);
+        $this->em->flush();
+    }
+
+    public function expire(LoginChallenge $challenge): void
+    {
+        if ($challenge->isCompleted() || $challenge->isRejected()) {
+            return;
+        }
+
+        $challenge->setStatus(LoginChallenge::STATUS_EXPIRED);
         $this->em->flush();
     }
 }

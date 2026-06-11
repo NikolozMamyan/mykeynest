@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
+use App\Repository\UserDeviceRepository;
 use App\Repository\UserSessionRepository;
 use App\Service\SessionManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +18,7 @@ final class SessionController extends AbstractController
     public function list(
         Request $request,
         UserSessionRepository $userSessionRepository,
+        UserDeviceRepository $userDeviceRepository,
         SessionManager $sessionManager
     ): JsonResponse {
         $user = $this->getUser();
@@ -105,6 +107,43 @@ final class SessionController extends AbstractController
             }
         }
 
+        foreach ($userDeviceRepository->findBy(['user' => $user], ['lastSeenAt' => 'DESC']) as $userDevice) {
+            $deviceId = $userDevice->getDeviceId();
+            if ($deviceId === null) {
+                continue;
+            }
+
+            if (!isset($devices[$deviceId])) {
+                $devices[$deviceId] = [
+                    'deviceId' => $deviceId,
+                    'deviceName' => $userDevice->getDeviceName(),
+                    'userAgent' => $userDevice->getUserAgent(),
+                    'deviceType' => $sessionManager->getDeviceType($userDevice->getUserAgent()),
+                    'sessionLifetimeLabel' => 'Confiance 90 jours',
+                    'ipAddress' => $userDevice->getIpAddress(),
+                    'createdAt' => $userDevice->getCreatedAt()->format(DATE_ATOM),
+                    'lastActivityAt' => $userDevice->getLastSeenAt()->format(DATE_ATOM),
+                    'expiresAt' => $userDevice->getTrustExpiresAt()?->format(DATE_ATOM),
+                    'isRevoked' => !$userDevice->isTrusted(),
+                    'isBlocked' => $userDevice->isBlocked(),
+                    'blockedReason' => $userDevice->getBlockedReason(),
+                    'isCurrent' => $currentDeviceId !== null && hash_equals($currentDeviceId, $deviceId),
+                    'sessionCount' => 0,
+                    'sessions' => [],
+                ];
+
+                continue;
+            }
+
+            $devices[$deviceId]['deviceName'] ??= $userDevice->getDeviceName();
+            $devices[$deviceId]['userAgent'] ??= $userDevice->getUserAgent();
+            $devices[$deviceId]['ipAddress'] ??= $userDevice->getIpAddress();
+            $devices[$deviceId]['isBlocked'] = $userDevice->isBlocked();
+            $devices[$deviceId]['blockedReason'] = $userDevice->getBlockedReason();
+            $devices[$deviceId]['isCurrent'] = $devices[$deviceId]['isCurrent']
+                || ($currentDeviceId !== null && hash_equals($currentDeviceId, $deviceId));
+        }
+
         return new JsonResponse(array_values($devices));
     }
 
@@ -147,6 +186,7 @@ final class SessionController extends AbstractController
         string $deviceId,
         Request $request,
         UserSessionRepository $userSessionRepository,
+        UserDeviceRepository $userDeviceRepository,
         SessionManager $sessionManager
     ): JsonResponse {
         $user = $this->getUser();
@@ -168,7 +208,12 @@ final class SessionController extends AbstractController
             'deviceId' => $deviceId,
         ]);
 
-        if (!$targetSession) {
+        $targetDevice = $userDeviceRepository->findOneBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+        ]);
+
+        if (!$targetSession && !$targetDevice) {
             return new JsonResponse(['error' => 'Appareil introuvable'], 404);
         }
 
@@ -187,6 +232,7 @@ final class SessionController extends AbstractController
     public function unblockDevice(
         string $deviceId,
         UserSessionRepository $userSessionRepository,
+        UserDeviceRepository $userDeviceRepository,
         SessionManager $sessionManager
     ): JsonResponse {
         $user = $this->getUser();
@@ -200,7 +246,12 @@ final class SessionController extends AbstractController
             'deviceId' => $deviceId,
         ]);
 
-        if (!$targetSession) {
+        $targetDevice = $userDeviceRepository->findOneBy([
+            'user' => $user,
+            'deviceId' => $deviceId,
+        ]);
+
+        if (!$targetSession && !$targetDevice) {
             return new JsonResponse(['error' => 'Appareil introuvable'], 404);
         }
 

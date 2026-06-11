@@ -25,13 +25,14 @@ class TokenCleaner
             return;
         }
 
+        $response->headers->clearCookie('AUTH_TOKEN', '/');
+
         $user = $this->userRepository->findOneBy(['apiToken' => $token]);
 
         if ($user) {
             $user->setApiToken(null);
             $user->setTokenExpiresAt(null);
             $this->em->flush();
-            $response->headers->clearCookie('AUTH_TOKEN');
         }
     }
 }

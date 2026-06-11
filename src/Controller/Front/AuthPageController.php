@@ -197,7 +197,9 @@ class AuthPageController extends AbstractController
             $em->flush();
 
             try {
-                [$session, $plainToken, $deviceId] = $sessionManager->createSession($user);
+                $deviceId = $sessionManager->getOrCreateCurrentDeviceId();
+                $sessionManager->trustDevice($user, $deviceId);
+                [$session, $plainToken] = $sessionManager->createSession($user, deviceId: $deviceId);
             } catch (\RuntimeException $e) {
                 $this->addFlash('error', $e->getMessage());
 

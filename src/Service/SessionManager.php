@@ -17,64 +17,69 @@ class SessionManager
         private EntityManagerInterface $em,
         private UserSessionRepository $userSessionRepository,
         private RequestStack $requestStack,
-        private DeviceIdentifier $deviceIdentifier
+        private DeviceIdentifier $deviceIdentifier,
+        private UserDeviceManager $userDeviceManager
     ) {
     }
 
- public function createSession(User $user, ?string $deviceName = null): array
-{
-    $request = $this->requestStack->getCurrentRequest();
-    $ipAddress = $request?->getClientIp();
-    $userAgent = $request?->headers->get('User-Agent');
-    $deviceId = $this->deviceIdentifier->getOrCreateCurrentDeviceId();
+    public function createSession(User $user, ?string $deviceName = null, ?string $deviceId = null): array
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $ipAddress = $request?->getClientIp();
+        $userAgent = $request?->headers->get('User-Agent');
+        $deviceId ??= $this->deviceIdentifier->getOrCreateCurrentDeviceId();
 
-    $blockedSession = $this->findBlockedSessionByDeviceId($user, $deviceId);
-    if ($blockedSession) {
-        throw new \RuntimeException(
-            'Cet appareil a été bloqué. Raison : ' . ($blockedSession->getBlockedReason() ?? 'Non spécifiée')
-        );
+        if (!DeviceIdentifier::isValid($deviceId)) {
+            throw new \InvalidArgumentException('Identifiant appareil invalide.');
+        }
+
+        $deviceAccessState = $this->getDeviceAccessState($user, $deviceId);
+
+        if ($deviceAccessState === UserDeviceManager::STATE_BLOCKED) {
+            $blockedDevice = $this->userDeviceManager->find($user, $deviceId);
+
+            throw new \RuntimeException(
+                'Cet appareil a été bloqué. Raison : ' . ($blockedDevice?->getBlockedReason() ?? 'Non spécifiée')
+            );
+        }
+
+        if ($deviceAccessState !== UserDeviceManager::STATE_TRUSTED) {
+            throw new \RuntimeException('La validation de cet appareil est requise.');
+        }
+
+        $this->userDeviceManager->remember($user, $deviceId, $deviceName);
+
+        $plainToken = bin2hex(random_bytes(32));
+        $tokenHash = hash('sha256', $plainToken);
+
+        $session = new UserSession();
+        $session->setUser($user);
+        $session->setTokenHash($tokenHash);
+        $session->setDeviceId($deviceId);
+        $session->setDeviceName($deviceName);
+        $session->setUserAgent($userAgent);
+        $session->setIpAddress($ipAddress);
+        $session->setExpiresAt($this->buildSessionExpiryDate($userAgent));
+        $session->setLastActivityAt(new \DateTimeImmutable());
+
+        $this->em->persist($session);
+        $this->em->flush();
+
+        return [$session, $plainToken, $deviceId];
     }
-
-    $plainToken = bin2hex(random_bytes(32));
-    $tokenHash = hash('sha256', $plainToken);
-
-    $session = new UserSession();
-    $session->setUser($user);
-    $session->setTokenHash($tokenHash);
-    $session->setDeviceId($deviceId);
-    $session->setDeviceName($deviceName);
-    $session->setUserAgent($userAgent);
-    $session->setIpAddress($ipAddress);
-    $session->setExpiresAt($this->buildSessionExpiryDate($userAgent));
-    $session->setLastActivityAt(new \DateTimeImmutable());
-
-    $this->em->persist($session);
-    $this->em->flush();
-
-    return [$session, $plainToken, $deviceId];
-}
 
     public function findActiveSessionByPlainToken(string $plainToken): ?UserSession
     {
-        $tokenHash = hash('sha256', $plainToken);
-
         $session = $this->userSessionRepository->findOneBy([
-            'tokenHash' => $tokenHash,
+            'tokenHash' => hash('sha256', $plainToken),
         ]);
 
-        if (!$session) {
-            return null;
-        }
-
-        if ($session->isBlocked()) {
-            return null;
-        }
-
-        if ($session->isRevoked()) {
-            return null;
-        }
-
-        if ($session->getExpiresAt() <= new \DateTimeImmutable()) {
+        if (
+            $session === null
+            || $session->isBlocked()
+            || $session->isRevoked()
+            || $session->getExpiresAt() <= new \DateTimeImmutable()
+        ) {
             return null;
         }
 
@@ -94,16 +99,37 @@ class SessionManager
         $session->setRevokedAt(new \DateTimeImmutable());
         $session->setRevokedReason($reason);
         $this->em->flush();
+
+        $deviceId = $session->getDeviceId();
+        $user = $session->getUser();
+
+        if (
+            $reason !== 'logout'
+            && $user instanceof User
+            && is_string($deviceId)
+            && DeviceIdentifier::isValid($deviceId)
+        ) {
+            $this->userDeviceManager->revokeTrust($user, $deviceId, $reason ?? 'session_revoked');
+        }
     }
 
-    public function revokeDeviceSessions(User $user, string $deviceId, ?int $exceptSessionId = null, ?string $reason = null): int
-    {
+    public function revokeDeviceSessions(
+        User $user,
+        string $deviceId,
+        ?int $exceptSessionId = null,
+        ?string $reason = null
+    ): int {
+        if (!DeviceIdentifier::isValid($deviceId)) {
+            throw new \InvalidArgumentException('Identifiant appareil invalide.');
+        }
+
         $sessions = $this->userSessionRepository->findBy([
             'user' => $user,
             'deviceId' => $deviceId,
         ]);
 
         $count = 0;
+        $reason ??= 'revoked_by_user';
 
         foreach ($sessions as $session) {
             if ($exceptSessionId !== null && $session->getId() === $exceptSessionId) {
@@ -116,17 +142,25 @@ class SessionManager
 
             $session->setIsRevoked(true);
             $session->setRevokedAt(new \DateTimeImmutable());
-            $session->setRevokedReason($reason ?? 'revoked_by_user');
+            $session->setRevokedReason($reason);
             $count++;
         }
 
         $this->em->flush();
+        $this->userDeviceManager->revokeTrust($user, $deviceId, $reason);
 
         return $count;
     }
 
     public function blockDevice(User $user, string $deviceId, ?string $reason = null): int
     {
+        if (!DeviceIdentifier::isValid($deviceId)) {
+            throw new \InvalidArgumentException('Identifiant appareil invalide.');
+        }
+
+        $reason ??= 'blocked_by_user';
+        $this->userDeviceManager->block($user, $deviceId, $reason);
+
         $sessions = $this->userSessionRepository->findBy([
             'user' => $user,
             'deviceId' => $deviceId,
@@ -138,12 +172,10 @@ class SessionManager
         foreach ($sessions as $session) {
             $session->setIsRevoked(true);
             $session->setRevokedAt($now);
-            $session->setRevokedReason($reason ?? 'blocked_by_user');
-
+            $session->setRevokedReason($reason);
             $session->setIsBlocked(true);
             $session->setBlockedAt($now);
             $session->setBlockedReason($reason);
-
             $count++;
         }
 
@@ -154,6 +186,12 @@ class SessionManager
 
     public function unblockDevice(User $user, string $deviceId): int
     {
+        if (!DeviceIdentifier::isValid($deviceId)) {
+            throw new \InvalidArgumentException('Identifiant appareil invalide.');
+        }
+
+        $this->userDeviceManager->unblock($user, $deviceId);
+
         $sessions = $this->userSessionRepository->findBy([
             'user' => $user,
             'deviceId' => $deviceId,
@@ -185,6 +223,12 @@ class SessionManager
         ]);
 
         $count = 0;
+        $exceptDeviceId = null;
+
+        if ($exceptSessionId !== null) {
+            $exceptSession = $this->userSessionRepository->find($exceptSessionId);
+            $exceptDeviceId = $exceptSession?->getDeviceId();
+        }
 
         foreach ($sessions as $session) {
             if ($exceptSessionId !== null && $session->getId() === $exceptSessionId) {
@@ -202,36 +246,35 @@ class SessionManager
         }
 
         $this->em->flush();
+        $this->userDeviceManager->revokeAllTrust($user, $exceptDeviceId);
 
         return $count;
-    }
-
-    public function findBlockedSessionByDeviceId(User $user, string $deviceId): ?UserSession
-    {
-        return $this->userSessionRepository->findOneBy([
-            'user' => $user,
-            'deviceId' => $deviceId,
-            'isBlocked' => true,
-        ]);
     }
 
     public function getCurrentDeviceId(): ?string
     {
         return $this->deviceIdentifier->getCurrentDeviceId();
     }
-    public function isKnownDevice(User $user, string $deviceId): bool
-{
-    return $this->userSessionRepository->findOneBy([
-        'user' => $user,
-        'deviceId' => $deviceId,
-    ]) !== null;
-}
+
+    public function getOrCreateCurrentDeviceId(): string
+    {
+        return $this->deviceIdentifier->getOrCreateCurrentDeviceId();
+    }
+
+    public function getDeviceAccessState(User $user, string $deviceId): string
+    {
+        return $this->userDeviceManager->getAccessState($user, $deviceId);
+    }
+
+    public function trustDevice(User $user, string $deviceId, ?string $deviceName = null): void
+    {
+        $this->userDeviceManager->trust($user, $deviceId, $deviceName);
+    }
 
     public function isFirstSessionForUser(User $user): bool
     {
-        return $this->userSessionRepository->count([
-            'user' => $user,
-        ]) === 0;
+        return !$this->userDeviceManager->hasAnyDevice($user)
+            && $this->userSessionRepository->count(['user' => $user]) === 0;
     }
 
     private function buildSessionExpiryDate(?string $userAgent): \DateTimeImmutable

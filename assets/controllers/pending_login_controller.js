@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = ['status', 'message']
 
   connect() {
+    this.completing = false
     this.interval = setInterval(() => this.checkStatus(), 3000)
     this.checkStatus()
   }
@@ -41,7 +42,9 @@ export default class extends Controller {
 
       if (data.status === 'approved') {
         this.messageTarget.textContent = 'Connexion approuvée. Finalisation en cours...'
-        await this.completeLogin()
+        if (!this.completing) {
+          await this.completeLogin()
+        }
         return
       }
 
@@ -66,6 +69,9 @@ export default class extends Controller {
   }
 
   async completeLogin() {
+    this.completing = true
+    clearInterval(this.interval)
+
     const response = await fetch('/api/login-challenge/complete', {
       method: 'POST',
       credentials: 'include',

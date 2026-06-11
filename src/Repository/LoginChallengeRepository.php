@@ -16,6 +16,25 @@ class LoginChallengeRepository extends ServiceEntityRepository
         parent::__construct($registry, LoginChallenge::class);
     }
 
+    public function claimApproved(LoginChallenge $challenge, \DateTimeImmutable $completedAt): bool
+    {
+        $updatedRows = $this->createQueryBuilder('challenge')
+            ->update()
+            ->set('challenge.status', ':completed')
+            ->set('challenge.completedAt', ':completedAt')
+            ->where('challenge.id = :id')
+            ->andWhere('challenge.status = :approved')
+            ->andWhere('challenge.expiresAt > :completedAt')
+            ->setParameter('completed', LoginChallenge::STATUS_COMPLETED)
+            ->setParameter('completedAt', $completedAt)
+            ->setParameter('id', $challenge->getId())
+            ->setParameter('approved', LoginChallenge::STATUS_APPROVED)
+            ->getQuery()
+            ->execute();
+
+        return $updatedRows === 1;
+    }
+
     //    /**
     //     * @return LoginChallenge[] Returns an array of LoginChallenge objects
     //     */
