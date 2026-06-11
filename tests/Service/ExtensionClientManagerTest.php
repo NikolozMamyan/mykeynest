@@ -18,6 +18,25 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ExtensionClientManagerTest extends TestCase
 {
+    public function testDeleteRemovesInstallationAndFlushesImmediately(): void
+    {
+        $user = $this->createTeamUser();
+        $client = $this->createClient($user, 'browser-to-delete');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('remove')->with($client);
+        $entityManager->expects(self::once())->method('flush');
+
+        $manager = $this->createManager(
+            $entityManager,
+            $this->createMock(ExtensionClientRepository::class),
+            $this->createMock(ExtensionInstallationChallengeManager::class),
+            $this->createMock(MailerService::class),
+            'prod'
+        );
+
+        $manager->delete($client);
+    }
+
     public function testThirdTeamInstallationRequiresEmailApproval(): void
     {
         $user = $this->createTeamUser();

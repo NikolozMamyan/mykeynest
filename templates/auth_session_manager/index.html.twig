@@ -32,6 +32,43 @@
     justify-content: flex-end;
 }
 
+.sessions-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sessions-tab {
+    appearance: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    padding: 0.875rem 1rem;
+    margin-bottom: -1px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.sessions-tab:hover {
+    color: var(--color-text-dark);
+}
+
+.sessions-tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+.session-panel[hidden] {
+    display: none;
+}
+
 .btn-danger-outline {
     padding: 0.625rem 1.25rem;
     border: 2px solid var(--color-danger-start);
@@ -175,6 +212,16 @@
     color: white;
 }
 
+.badge-active {
+    background: rgba(5, 150, 105, 0.12);
+    color: var(--color-primary);
+}
+
+.badge-revoked {
+    background: rgba(148, 163, 184, 0.18);
+    color: var(--color-text-medium);
+}
+
 .badge-device {
     text-transform: none;
     letter-spacing: 0;
@@ -278,6 +325,16 @@
 }
 
 .btn-block:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, var(--color-danger-start) 0%, var(--color-danger-end) 100%);
+    color: white;
+}
+
+.btn-delete:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
@@ -402,6 +459,14 @@
         flex-direction: column;
     }
 
+    .sessions-tabs {
+        overflow-x: auto;
+    }
+
+    .sessions-tab {
+        flex: 0 0 auto;
+    }
+
     .btn-session {
         width: 100%;
         justify-content: center;
@@ -415,29 +480,90 @@
 }
 </style>
 
-<div class="sessions-container" data-controller="session-manager">
+<div
+    class="sessions-container"
+    data-controller="session-manager"
+    {% if hasTeamPlan %}
+        data-session-manager-delete-installation-token-value="{{ csrf_token('delete_extension_installation') }}"
+    {% endif %}
+>
     <div class="sessions-header">
         <h1>Mes appareils connectés</h1>
         <p class="sessions-subtitle">Gérez les appareils qui ont accès à votre compte</p>
     </div>
 
-    <div class="sessions-actions">
-        <button 
-            class="btn-danger-outline"
-            data-action="click->session-manager#logoutAll"
-            data-session-manager-target="logoutAllBtn"
-        >
-            <i class="fas fa-sign-out-alt"></i>
-            Déconnecter tous les appareils
-        </button>
-    </div>
+    {% if hasTeamPlan %}
+        <nav class="sessions-tabs" aria-label="Gestion des accès" role="tablist">
+            <button
+                type="button"
+                class="sessions-tab active"
+                role="tab"
+                aria-selected="true"
+                aria-controls="sessions-panel"
+                data-tab="sessions"
+                data-action="click->session-manager#switchTab"
+                data-session-manager-target="sessionsTab"
+            >
+                <i class="fas fa-desktop"></i>
+                Sessions
+            </button>
+            <button
+                type="button"
+                class="sessions-tab"
+                role="tab"
+                aria-selected="false"
+                aria-controls="installations-panel"
+                data-tab="installations"
+                data-action="click->session-manager#switchTab"
+                data-session-manager-target="installationsTab"
+            >
+                <i class="fas fa-puzzle-piece"></i>
+                Installations extension
+            </button>
+        </nav>
+    {% endif %}
 
-    <div class="sessions-list" data-session-manager-target="sessionsList">
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Chargement des sessions...</p>
+    <section
+        id="sessions-panel"
+        class="session-panel"
+        role="tabpanel"
+        data-session-manager-target="sessionsPanel"
+    >
+        <div class="sessions-actions">
+            <button
+                class="btn-danger-outline"
+                data-action="click->session-manager#logoutAll"
+                data-session-manager-target="logoutAllBtn"
+            >
+                <i class="fas fa-sign-out-alt"></i>
+                Déconnecter tous les appareils
+            </button>
         </div>
-    </div>
+
+        <div class="sessions-list" data-session-manager-target="sessionsList">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Chargement des sessions...</p>
+            </div>
+        </div>
+    </section>
+
+    {% if hasTeamPlan %}
+        <section
+            id="installations-panel"
+            class="session-panel"
+            role="tabpanel"
+            data-session-manager-target="installationsPanel"
+            hidden
+        >
+            <div class="sessions-list" data-session-manager-target="installationsList">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Chargement des installations...</p>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 
     <!-- Toast pour les notifications -->
     <div class="toast" data-session-manager-target="toast">

@@ -246,6 +246,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->userSubscription?->isActive() ?? false;
     }
 
+    public function hasActivePlan(string $planCode): bool
+    {
+        $subscriptionPlan = mb_strtolower(trim((string) $this->userSubscription?->getPlanCode()));
+
+        return $this->userSubscription?->isActive() === true
+            && $subscriptionPlan === mb_strtolower(trim($planCode));
+    }
+
     public function getStripeCustomerId(): ?string
     {
         return $this->userSubscription?->getStripeCustomerId();

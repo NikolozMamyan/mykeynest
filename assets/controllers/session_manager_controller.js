@@ -1,11 +1,57 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['sessionsList', 'toast', 'toastMessage', 'logoutAllBtn']
+  static targets = [
+    'sessionsList',
+    'installationsList',
+    'sessionsPanel',
+    'installationsPanel',
+    'sessionsTab',
+    'installationsTab',
+    'toast',
+    'toastMessage',
+    'logoutAllBtn'
+  ]
+
+  static values = {
+    deleteInstallationToken: String
+  }
 
   connect() {
     this.toastTimeout = null
+    this.installationsLoaded = false
     this.loadSessions()
+
+    if (window.location.hash === '#extension-installations' && this.hasInstallationsPanelTarget) {
+      this.activateTab('installations')
+    }
+  }
+
+  switchTab(event) {
+    this.activateTab(event.currentTarget.dataset.tab)
+  }
+
+  activateTab(tab) {
+    const showInstallations = tab === 'installations' && this.hasInstallationsPanelTarget
+
+    this.sessionsPanelTarget.hidden = showInstallations
+
+    if (this.hasInstallationsPanelTarget) {
+      this.installationsPanelTarget.hidden = !showInstallations
+      this.sessionsTabTarget.classList.toggle('active', !showInstallations)
+      this.sessionsTabTarget.setAttribute('aria-selected', String(!showInstallations))
+      this.installationsTabTarget.classList.toggle('active', showInstallations)
+      this.installationsTabTarget.setAttribute('aria-selected', String(showInstallations))
+    }
+
+    const url = showInstallations
+      ? `${window.location.pathname}${window.location.search}#extension-installations`
+      : `${window.location.pathname}${window.location.search}`
+    window.history.replaceState(null, '', url)
+
+    if (showInstallations && !this.installationsLoaded) {
+      this.loadInstallations()
+    }
   }
 
   async loadSessions() {
@@ -43,6 +89,151 @@ export default class extends Controller {
     this.sessionsListTarget.innerHTML = devices
       .map(device => this.getSessionCard(device))
       .join('')
+  }
+
+  async loadInstallations() {
+    if (!this.hasInstallationsListTarget) return
+
+    try {
+      const response = await fetch('/api/extension-clients', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
+        cache: 'no-store'
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(data.error || `Erreur lors du chargement des installations (${response.status})`)
+      }
+
+      this.installationsLoaded = true
+      this.renderInstallations(data)
+    } catch (error) {
+      console.error('Erreur loadInstallations:', error)
+      this.showToast(error.message || 'Erreur lors du chargement des installations', 'error')
+      this.installationsListTarget.innerHTML = this.getInstallationsEmptyState()
+    }
+  }
+
+  renderInstallations(installations) {
+    if (!Array.isArray(installations) || installations.length === 0) {
+      this.installationsListTarget.innerHTML = this.getInstallationsEmptyState()
+      return
+    }
+
+    this.installationsListTarget.innerHTML = installations
+      .map(installation => this.getInstallationCard(installation))
+      .join('')
+  }
+
+  getInstallationCard(installation) {
+    const browser = [installation.browserName, installation.browserVersion].filter(Boolean).join(' ')
+    const os = [installation.osName, installation.osVersion].filter(Boolean).join(' ')
+    const title = installation.deviceLabel || browser || 'Installation extension'
+    const isBlocked = installation.isBlocked
+    const isRevoked = installation.isRevoked
+    const statusBadge = isBlocked
+      ? '<span class="session-badge badge-blocked">Bloquée</span>'
+      : isRevoked
+        ? '<span class="session-badge badge-revoked">Révoquée</span>'
+        : '<span class="session-badge badge-active">Active</span>'
+
+    return `
+      <div class="session-card ${isBlocked ? 'blocked' : ''}">
+        <div class="session-header">
+          <div class="session-info">
+            <div class="session-device">
+              <div class="device-icon">
+                <i class="fas fa-puzzle-piece"></i>
+              </div>
+              <div class="device-details">
+                <h3>${this.escapeHtml(title)}</h3>
+                <p>${this.escapeHtml(browser || 'Navigateur inconnu')}</p>
+              </div>
+            </div>
+          </div>
+          ${statusBadge}
+        </div>
+
+        <div class="session-meta">
+          <div class="meta-item">
+            <i class="fas fa-desktop"></i>
+            <span>${this.escapeHtml(os || 'Système inconnu')}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-code-branch"></i>
+            <span>Extension: ${this.escapeHtml(installation.extensionVersion || 'Version inconnue')}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-clock"></i>
+            <span>Dernière activité: ${this.formatDate(installation.lastSeenAt)}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-calendar-plus"></i>
+            <span>Installée: ${this.formatDate(installation.firstSeenAt || installation.createdAt)}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-network-wired"></i>
+            <span>${this.escapeHtml(installation.lastIpAddress || 'IP inconnue')}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-fingerprint"></i>
+            <span>ID: ${this.escapeHtml(installation.clientId || 'Inconnu')}</span>
+          </div>
+        </div>
+
+        <div class="session-actions">
+          <button
+            class="btn-session btn-delete"
+            data-action="click->session-manager#deleteInstallation"
+            data-installation-id="${Number(installation.id)}"
+          >
+            <i class="fas fa-trash-alt"></i>
+            Supprimer l’installation
+          </button>
+        </div>
+      </div>
+    `
+  }
+
+  async deleteInstallation(event) {
+    const button = event.currentTarget
+    const installationId = button.dataset.installationId
+
+    if (!confirm('Supprimer cette installation ? L’extension perdra immédiatement son accès et devra être validée à nouveau.')) {
+      return
+    }
+
+    button.disabled = true
+
+    try {
+      const response = await fetch(`/api/extension-clients/${installationId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': this.deleteInstallationTokenValue
+        }
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(data.error || `Erreur lors de la suppression (${response.status})`)
+      }
+
+      await this.loadInstallations()
+      this.showToast(data.message || 'Installation supprimée', 'success')
+    } catch (error) {
+      console.error('Erreur deleteInstallation:', error)
+      button.disabled = false
+      this.showToast(error.message || 'Erreur lors de la suppression', 'error')
+    }
   }
 
   getSessionCard(device) {
@@ -355,6 +546,15 @@ export default class extends Controller {
       <div class="empty-state">
         <i class="fas fa-inbox"></i>
         <p>Aucun appareil connu</p>
+      </div>
+    `
+  }
+
+  getInstallationsEmptyState() {
+    return `
+      <div class="empty-state">
+        <i class="fas fa-puzzle-piece"></i>
+        <p>Aucune installation extension enregistrée</p>
       </div>
     `
   }

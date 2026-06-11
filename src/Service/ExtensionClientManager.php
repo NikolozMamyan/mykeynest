@@ -222,6 +222,12 @@ final class ExtensionClientManager
         $this->entityManager->flush();
     }
 
+    public function delete(ExtensionClient $client): void
+    {
+        $this->entityManager->remove($client);
+        $this->entityManager->flush();
+    }
+
     public function rotateInstallationToken(ExtensionClient $client): string
     {
         $plainInstallationToken = bin2hex(random_bytes(32));
@@ -313,10 +319,7 @@ final class ExtensionClientManager
 
     private function hasTeamPlan(User $user): bool
     {
-        $subscription = $user->getUserSubscription();
-        $planCode = mb_strtolower(trim((string) $subscription?->getPlanCode()));
-
-        return $subscription?->isActive() === true && $planCode === 'team';
+        return $user->hasActivePlan('team');
     }
 
     private function shouldRenewPendingChallenge(ExtensionInstallationChallenge $challenge): bool

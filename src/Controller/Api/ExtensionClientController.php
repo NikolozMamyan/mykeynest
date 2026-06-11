@@ -8,6 +8,7 @@ use App\Service\ExtensionClientManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/extension-clients')]
@@ -140,6 +141,39 @@ final class ExtensionClientController extends AbstractController
 
         return new JsonResponse([
             'message' => 'Installation révoquée.',
+        ]);
+    }
+
+    #[Route('/{id}', name: 'api_extension_clients_delete', methods: ['DELETE'])]
+    public function delete(
+        int $id,
+        Request $request,
+        ExtensionClientRepository $extensionClientRepository,
+        ExtensionClientManager $extensionClientManager
+    ): JsonResponse {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            return new JsonResponse(['error' => 'Non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$this->isCsrfTokenValid(
+            'delete_extension_installation',
+            (string) $request->headers->get('X-CSRF-TOKEN')
+        )) {
+            return new JsonResponse(['error' => 'Jeton de sécurité invalide'], Response::HTTP_FORBIDDEN);
+        }
+
+        $client = $extensionClientRepository->find($id);
+
+        if (!$client || $client->getUser()?->getId() !== $user->getId()) {
+            return new JsonResponse(['error' => 'Installation introuvable'], Response::HTTP_NOT_FOUND);
+        }
+
+        $extensionClientManager->delete($client);
+
+        return new JsonResponse([
+            'message' => 'Installation supprimée. Son accès à l’API a été invalidé.',
         ]);
     }
 
