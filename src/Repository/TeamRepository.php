@@ -68,5 +68,21 @@ public function userHasTeamAccessToCredential(User $user, Credential $cred): boo
         ->getOneOrNullResult();
 }
 
+/**
+ * @return Team[]
+ */
+public function findTeamsForUserAndCredential(User $user, Credential $credential): array
+{
+    return $this->createQueryBuilder('t')
+        ->join('t.members', 'tm')
+        ->join('t.credentials', 'c')
+        ->andWhere('tm.user = :user')
+        ->andWhere('c = :credential')
+        ->setParameter('user', $user)
+        ->setParameter('credential', $credential)
+        ->getQuery()
+        ->getResult();
+}
+
 
 }

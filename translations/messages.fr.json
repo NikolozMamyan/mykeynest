@@ -77,6 +77,11 @@
     "cancel": "Annuler",
     "save_changes": "Enregistrer les modifications"
   },
+  "priority": {
+    "high": "Élevée",
+    "medium": "Moyenne",
+    "low": "Faible"
+  },
   "header": {
     "burger_aria": "Menu",
     "notifications": {
@@ -84,6 +89,12 @@
       "title": "Notifications",
       "mark_all_read": "Marquer lu",
       "loading": "Chargement...",
+      "loading_list": "Chargement des notifications...",
+      "load_error": "Erreur de chargement",
+      "empty": "Aucune notification pour le moment",
+      "marking": "Marquage...",
+      "marked": "Marqué !",
+      "error": "Erreur",
       "delete": "Supprimer",
       "deleting": "Suppression...",
       "deleted": "Supprimee",
@@ -110,7 +121,8 @@
     },
     "upgrade": {
       "label": "Mise à niveau",
-      "text": "Passez à PRO"
+      "text": "Passez à PRO",
+      "aria": "Découvrir l’offre PRO"
     }
   },
   "sidebar": {
@@ -527,6 +539,13 @@
       }
     }
   },
+  "credential_access": {
+    "reveal_label": "Autoriser aussi l’affichage et la copie du mot de passe",
+    "reveal_help": "Décochez pour permettre uniquement la connexion automatique via l’extension MYKEYNEST.",
+    "reveal_label_short": "Autoriser aussi l’affichage et la copie",
+    "reveal_help_short": "Sinon, seule la connexion via l’extension MYKEYNEST sera possible.",
+    "restricted_message": "Vous n’avez pas l’autorisation d’afficher ce mot de passe. Connexion possible via l’extension MYKEYNEST."
+  },
   "credential": {
     "index": {
       "meta": {
@@ -541,22 +560,45 @@
       },
       "actions": {
         "add": "Ajouter un identifiant",
-        "add_first": "Ajouter mon premier identifiant"
+        "add_first": "Ajouter mon premier identifiant",
+        "add_short": "Ajouter",
+        "import_csv": "Import CSV"
       },
       "filters": {
         "all": "Tous",
+        "mine": "Mes identifiants",
+        "shared": "Partagés avec moi",
+        "team": "Équipes",
         "web": "Sites web",
         "recent": "Récents"
       },
+      "sections": {
+        "mine": "Mes identifiants",
+        "shared": "Partagés avec moi",
+        "team": "Via mes équipes"
+      },
+      "badges": {
+        "shared": "Partagé",
+        "team": "Équipe"
+      },
       "labels": {
         "username": "Identifiant",
-        "password": "Mot de passe"
+        "password": "Mot de passe",
+        "owner": "Propriétaire",
+        "team": "Équipe",
+        "teams": "Équipes"
       },
       "card_actions": {
         "view": "Voir les détails",
         "share": "Partager",
         "edit": "Modifier",
-        "delete": "Supprimer"
+        "delete": "Supprimer",
+        "unavailable_shared": "Non disponible pour un accès partagé",
+        "unavailable_team": "Non disponible pour un accès d’équipe"
+      },
+      "pin": {
+        "pin": "Épingler en haut",
+        "unpin": "Retirer des éléments épinglés"
       },
       "empty": {
         "title": "Aucun identifiant enregistré",
@@ -564,7 +606,8 @@
       },
       "no_results": {
         "title": "Aucun résultat trouvé",
-        "text": "Essayez avec d'autres mots-clés"
+        "text": "Essayez avec d'autres mots-clés",
+        "search_text": "Aucun identifiant ne correspond à votre recherche."
       },
       "confirm": {
         "delete": "Êtes-vous sûr de vouloir supprimer cet identifiant ?"
@@ -587,6 +630,29 @@
     }
   },
   "shared_access": {
+    "new": {
+      "title": "Partager des identifiants",
+      "subtitle": "Donnez accès à vos identifiants en toute sécurité",
+      "back": "Retour",
+      "close": "Fermer",
+      "empty_title": "Aucun identifiant à partager",
+      "empty_text": "Créez d’abord des identifiants pour pouvoir les partager.",
+      "add_credential": "Ajouter un identifiant",
+      "recipient": "Destinataire",
+      "email_label": "Email du destinataire",
+      "email_placeholder": "exemple@domaine.com",
+      "email_hint": "Le destinataire doit avoir un compte MYKEYNEST.",
+      "none_selected": "Aucun identifiant sélectionné",
+      "one_selected": "1 identifiant sélectionné",
+      "many_selected": "%count% identifiants sélectionnés",
+      "cancel": "Annuler",
+      "submit": "Partager",
+      "credentials": "Identifiants à partager",
+      "search_placeholder": "Rechercher…",
+      "select_all": "Tout sélectionner",
+      "deselect_all": "Tout désélectionner",
+      "no_results": "Aucun résultat"
+    },
     "index": {
       "hero": {
         "title": "Gestion des accès partagés",
@@ -630,6 +696,48 @@
       "title": "Limite de partage atteinte !",
       "description": "Vous avez atteint la limite de 3 partages d'accès. Passez à PRO pour des partages illimités et collaborez sans restriction.",
       "action": "Passer à PRO"
+    }
+  },
+  "extension_onboarding": {
+    "title": "Installer l’extension MYKEYNEST",
+    "step": "Dernière étape · Extension",
+    "eyebrow": "Protection du navigateur",
+    "heading": "L’extension de navigateur",
+    "heading_accent": "est requise",
+    "lead": "Installez MYKEYNEST pour accéder à votre coffre en toute sécurité et profiter de vos identifiants directement pendant votre navigation.",
+    "benefit_autofill": "Remplissage rapide et sécurisé de vos identifiants",
+    "benefit_pairing": "Connexion automatique à votre compte, sans copier de clé",
+    "mobile_title": "Installation à terminer sur ordinateur",
+    "mobile_text": "Les extensions Chrome ne sont pas disponibles sur ce mobile. Vous pourrez terminer cette étape plus tard.",
+    "mobile_continue": "Continuer sur mobile",
+    "install": "Installer l’extension",
+    "already_installed": "Je l’ai déjà installée",
+    "install_status": "L’association démarrera automatiquement après l’installation.",
+    "privacy": "Votre cookie de session reste privé. Seul un code temporaire à usage unique est envoyé à l’extension officielle.",
+    "checking": {
+      "title": "Vérification de l’extension…",
+      "message": "Nous recherchons MYKEYNEST dans votre navigateur.",
+      "retry": "Réessayer",
+      "back": "Revenir à l’installation",
+      "continue": "Ouvrir mon tableau de bord",
+      "progress_aria": "Progression de l’association",
+      "detected_title": "Extension détectée",
+      "detected_message": "Création de votre connexion sécurisée…",
+      "connecting_title": "Connexion de votre compte…",
+      "connecting_message": "Votre clé d’accès est transférée de manière sécurisée.",
+      "success_title": "Extension connectée !",
+      "success_message": "Tout est prêt. Redirection vers votre tableau de bord…",
+      "store_message": "Terminez l’installation dans le Chrome Web Store, puis revenez sur cet onglet.",
+      "waiting_install": "Extension en attente d’installation.",
+      "interrupted": "Connexion interrompue"
+    },
+    "errors": {
+      "not_detected": "Extension non détectée",
+      "timeout": "Délai de réponse dépassé",
+      "no_response": "Aucune réponse de l’extension",
+      "connection_failed": "La connexion a échoué",
+      "pairing_failed": "L’extension n’a pas pu enregistrer la connexion",
+      "retry": "Réessayez dans quelques instants."
     }
   },
   "extension": {
@@ -1164,6 +1272,19 @@
         "title": "Langue",
         "description": "Choisissez la langue utilisée pour l’interface de l’application."
       },
+      "theme": {
+        "title": "Apparence",
+        "description": "Choisissez le thème visuel de l’application.",
+        "aria": "Choisir le thème de l’application",
+        "light": {
+          "label": "Clair",
+          "description": "Interface lumineuse"
+        },
+        "dark": {
+          "label": "Sombre",
+          "description": "Luminosité visuelle réduite"
+        }
+      },
       "engagement": {
         "title": "Notifications et engagement",
         "description": "Gérez vos préférences de communication et d’interaction."
@@ -1189,6 +1310,11 @@
   },
   "teams": {
     "page_title": "Mes équipes",
+    "form": {
+      "name_label": "Nom de l’équipe",
+      "credentials_label": "Partager des identifiants existants (optionnel)",
+      "select_credentials_label": "Sélectionner des identifiants"
+    },
     "header": {
       "title": "Mes équipes",
       "subtitle": "Gérez vos équipes et collaborez efficacement",
@@ -1203,6 +1329,8 @@
       "members": "membre",
       "members_plural": "membres",
       "view": "Voir l'équipe",
+      "leave": "Quitter",
+      "leave_confirm": "Voulez-vous vraiment quitter cette équipe ?",
       "owner_fallback": "N/A"
     },
     "show": {

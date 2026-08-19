@@ -76,21 +76,21 @@
 
 /* Sections (cartes) */
 .settings-section{
-  border-radius: 18px;
+  border-radius: var(--border-radius);
   overflow: hidden;
-  background: rgba(255,255,255,.72);
-  backdrop-filter: var(--blur-background);
-  -webkit-backdrop-filter: var(--blur-background);
-  border: 1px solid rgba(226,232,240,.85);
-  box-shadow: var(--shadow-md);
+  background: var(--glass-card-bg);
+  backdrop-filter: var(--glass-card-blur);
+  -webkit-backdrop-filter: var(--glass-card-blur);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: var(--glass-card-shadow);
   margin: 14px 0;
 }
 
 /* Mode dark: carte glassy */
 [data-theme="dark"] .settings-section{
-  background: rgba(15,23,42,.55);
-  border: 1px solid rgba(51,65,85,.75);
-  box-shadow: 0 10px 25px rgba(0,0,0,.35);
+  background: var(--glass-card-bg);
+  border-color: var(--glass-card-border);
+  box-shadow: var(--glass-card-shadow);
 }
 
 /* Profil */
@@ -428,7 +428,7 @@
 
 /* Responsive */
 @media (max-width: 520px){
-  .settings-section{ border-radius: 16px; }
+  .settings-section{ border-radius: var(--border-radius); }
   .settings-link{ padding: 13px 14px; }
   .settings-profile{ padding: 14px 14px; }
   .avatar-upload-panel{

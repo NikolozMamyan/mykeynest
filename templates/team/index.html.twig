@@ -145,10 +145,10 @@
                             <form method="post"
                                   action="{{ path('app_team_leave', {id: team.id}) }}"
                                   class="team-card-leave-form"
-                                  onsubmit="return confirm('Voulez-vous vraiment quitter cette equipe ?');">
+                                  onsubmit="return confirm('{{ 'teams.card.leave_confirm'|trans|e('js') }}');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('leave_team_' ~ team.id) }}">
                                 <button type="submit" class="btn-leave-team-card">
-                                    Quitter
+                                    {{ 'teams.card.leave'|trans }}
                                 </button>
                             </form>
                         {% endif %}
@@ -345,9 +345,12 @@
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    background: var(--color-white);
+    background: var(--glass-card-bg);
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--glass-card-border);
+    box-shadow: var(--glass-card-shadow);
+    -webkit-backdrop-filter: var(--glass-card-blur);
+    backdrop-filter: var(--glass-card-blur);
 }
 
 .empty-state-icon {
@@ -383,17 +386,19 @@
 }
 
 .team-card {
-    background: var(--color-white);
+    background: var(--glass-card-bg);
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--glass-card-shadow);
     transition: all 0.3s ease;
     overflow: hidden;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--glass-card-border);
+    -webkit-backdrop-filter: var(--glass-card-blur);
+    backdrop-filter: var(--glass-card-blur);
 }
 
 .team-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-4px);
+    transform: translateY(-2px);
 }
 
 .team-card-header {
@@ -551,7 +556,7 @@
 
 [data-theme="dark"] .empty-state,
 [data-theme="dark"] .team-card {
-    background: var(--color-white);
+    background: var(--glass-card-bg);
 }
 
 [data-theme="dark"] .btn-leave-team-card {

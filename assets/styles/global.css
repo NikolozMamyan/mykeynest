@@ -31,17 +31,20 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --glass-card-bg: rgba(255, 255, 255, 0.92);
+  --glass-card-border: rgba(226, 232, 240, 0.92);
+  --glass-card-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  --glass-card-blur: blur(12px) saturate(120%);
 
   /* Divers */
   --blur-background: blur(10px);
-  --border-radius: 12px;
-  --border-radius-sm: 8px;
+  --border-radius: 4px;
+  --border-radius-sm: 2px;
 
 }
         
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: var(--color-bg-light);
   color: var(--color-text-dark);
 }
 
@@ -85,7 +88,7 @@ body.is-sidebar-open {
   max-width: 1200px;
   padding: 10px;
   background: var(--color-white);
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
 }
 
@@ -143,6 +146,9 @@ body.is-sidebar-open {
     /* Ombres et effets */
     --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5);
     --shadow-green: 0 4px 14px rgba(16, 185, 129, 0.35);
+    --glass-card-bg: rgba(15, 23, 42, 0.9);
+    --glass-card-border: rgba(51, 65, 85, 0.9);
+    --glass-card-shadow: 0 14px 34px rgba(2, 6, 23, 0.3);
 
     /* Arrière-plan flouté */
     --blur-background: blur(10px);
@@ -150,7 +156,7 @@ body.is-sidebar-open {
 
   /* Ajustements visuels spécifiques */
   body{
-     background: var(--color-white);
+    background: var(--color-white);
   }
 .main-content {
 
@@ -186,7 +192,7 @@ body.is-sidebar-open {
   }
 
   .nav-item.active {
-    color: var(--color-white);
+    color: #ffffff;
   }
 
   .sidebar-footer {
@@ -262,7 +268,7 @@ body.is-sidebar-open {
   gap: 1rem;
   padding: 1rem 1.1rem;
   border: 1px solid rgba(5, 150, 105, 0.18);
-  border-radius: 18px;
+  border-radius: var(--border-radius);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 22px 40px rgba(15, 23, 42, 0.16);
   backdrop-filter: blur(14px);
@@ -282,7 +288,7 @@ body.is-sidebar-open {
 .pwa-install-banner__icon {
   width: 2.8rem;
   height: 2.8rem;
-  border-radius: 15px;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -375,7 +381,7 @@ body.is-sidebar-open {
 .is-standalone-app .settings-card,
 .is-standalone-app .metric-card,
 .is-standalone-app .stat-card {
-  border-radius: 16px;
+  border-radius: var(--border-radius);
 }
 
 @media (min-width: 769px) {

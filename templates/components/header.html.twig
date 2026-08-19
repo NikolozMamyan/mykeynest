@@ -1,20 +1,20 @@
 {% set headerTranslations = {
   notifications: {
-    loading_list: 'header.notifications.loading_list'|trans|default('Chargement des notifications...'),
-    load_error: 'header.notifications.load_error'|trans|default('Erreur de chargement'),
-    empty: 'header.notifications.empty'|trans|default('Aucune notification pour le moment'),
-    marking: 'header.notifications.marking'|trans|default('Marquage...'),
-    marked: 'header.notifications.marked'|trans|default('Marque !'),
-    error: 'header.notifications.error'|trans|default('Erreur'),
-    delete: 'header.notifications.delete'|trans|default('Supprimer'),
-    deleting: 'header.notifications.deleting'|trans|default('Suppression...'),
-    deleted: 'header.notifications.deleted'|trans|default('Supprimee'),
-    delete_error: 'header.notifications.delete_error'|trans|default('Suppression impossible')
+    loading_list: 'header.notifications.loading_list'|trans,
+    load_error: 'header.notifications.load_error'|trans,
+    empty: 'header.notifications.empty'|trans,
+    marking: 'header.notifications.marking'|trans,
+    marked: 'header.notifications.marked'|trans,
+    error: 'header.notifications.error'|trans,
+    delete: 'header.notifications.delete'|trans,
+    deleting: 'header.notifications.deleting'|trans,
+    deleted: 'header.notifications.deleted'|trans,
+    delete_error: 'header.notifications.delete_error'|trans
   },
   priority: {
-    high: 'priority.high'|trans|default('High'),
-    medium: 'priority.medium'|trans|default('Medium'),
-    low: 'priority.low'|trans|default('Low')
+    high: 'priority.high'|trans,
+    medium: 'priority.medium'|trans,
+    low: 'priority.low'|trans
   },
   security_checker: {
     notifications: {
@@ -42,28 +42,13 @@
   </div>
 
   <div class="header_right">
-    {% if not app.user.hasActiveSubscription %}
-      <a href="{{ path('app_subscription') }}" class="header-upgrade-badge">
-        <div class="upgrade-badge-icon">
-          <i class="fas fa-crown"></i>
-        </div>
-        <div class="upgrade-badge-content">
-          <span class="upgrade-badge-label">{{ 'header.upgrade.label'|trans|default('Upgrade') }}</span>
-          <span class="upgrade-badge-text">{{ 'header.upgrade.text'|trans|default('Passez à PRO') }}</span>
-        </div>
-        <i class="fas fa-arrow-right upgrade-badge-arrow"></i>
-      </a>
-    {% endif %}
-
-    {% include 'components/parts/theme_mode_btn.html.twig' %}
-
     <div class="notification-wrapper">
       <button class="notification-btn"
               type="button"
               aria-label="{{ 'header.notifications.aria'|trans }}"
               data-header-target="notificationButton"
               data-action="click->header#toggleNotifications">
-        <i class="fas fa-bell"></i>
+        <i class="far fa-bell"></i>
         <span class="notification-badge" data-header-target="notificationBadge"></span>
       </button>
 
@@ -111,6 +96,15 @@
         <span class="company-name">{{ fullName ?: app.user.company }}</span>
       </button>
 
+      {% if not app.user.hasActiveSubscription %}
+        <a href="{{ path('app_subscription') }}"
+           class="profile-upgrade-crown"
+           aria-label="{{ 'header.upgrade.aria'|trans }}"
+           title="{{ 'header.upgrade.text'|trans }}">
+          <i class="fas fa-crown" aria-hidden="true"></i>
+        </a>
+      {% endif %}
+
       <div class="user-dropdown" data-header-target="profileDropdown">
         <div class="user-dropdown-header">
           <div class="user-dropdown-info">
@@ -125,7 +119,7 @@
         </div>
 
         <div class="user-dropdown-content">
-          <div class="user-dropdown-section">
+          <div class="user-dropdown-section user-dropdown-section--language">
             <div class="user-dropdown-section-title">
               <i class="fas fa-globe"></i> {{ 'header.profile.language'|trans }}
             </div>
@@ -177,7 +171,7 @@
 
           <div class="user-dropdown-divider"></div>
 
-          <div class="user-dropdown-section">
+          <div class="user-dropdown-section user-dropdown-section--actions">
             <a href="{{ path('app_install_app') }}" class="user-dropdown-item user-dropdown-item--install-app">
               <div class="user-dropdown-item-icon">
                 <i class="fas fa-mobile-alt"></i>

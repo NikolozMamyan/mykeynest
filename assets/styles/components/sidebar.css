@@ -81,7 +81,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   color: var(--color-text-muted);
   text-decoration: none;
   font-size: 14px;
@@ -115,7 +115,7 @@
 
 .nav-item.active {
   background: linear-gradient(135deg, #10b981 0%, var(--color-primary) 100%);
-  color: var(--color-white);
+  color: #ffffff;
   box-shadow: var(--shadow-green);
   transform: translateX(4px);
 }
@@ -154,7 +154,7 @@
 
 .nav-item.active .nav-item-badge {
   background: rgba(255, 255, 255, 0.25);
-  color: var(--color-white);
+  color: #ffffff;
   border-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -173,7 +173,7 @@
 .nav-item-badge-pro {
   margin-left: auto;
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: var(--color-white);
+  color: #ffffff;
   font-size: 10px;
   font-weight: 700;
   padding: 3px 10px;
@@ -198,7 +198,7 @@
   padding: 12px 16px;
   background: var(--color-white);
   border: 1.5px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   color: var(--color-danger-end);
   text-decoration: none;
   font-weight: 600;
@@ -235,7 +235,7 @@
 
 .logout-btn:hover::before { transform: translateY(0); }
 .logout-btn:hover span,
-.logout-btn:hover i { color: var(--color-white); }
+.logout-btn:hover i { color: #ffffff; }
 .logout-btn:active { transform: translateY(0); }
 
 .sidebar-nav::-webkit-scrollbar { width: 6px; }

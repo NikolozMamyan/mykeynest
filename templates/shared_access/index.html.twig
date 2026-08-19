@@ -116,9 +116,9 @@
                   <div class="info-row">
                     <span class="info-label">{{ 'shared_access.index.labels.shared_with'|trans }}</span>
                     <div class="user-badge">
-                      <div class="user-avatar-sm color-{{ (loop.index * 3) % 5 }}">
-                        {{ access.guest.email|first|upper }}
-                      </div>
+<img class="avatar-img"
+               src="{{ access.guest.avatar ? asset('uploads/avatars/' ~ access.guest.avatar) : asset('images/avatar-default.png') }}"
+               alt="{{ 'header.profile.avatar_alt'|trans }}">
                       <div class="user-details">
                         <span class="user-name">{{ access.guest.company }}</span>
                         <span class="user-email">{{ access.guest.email }}</span>
@@ -191,9 +191,10 @@
                   <div class="info-row">
                     <span class="info-label">{{ 'shared_access.index.labels.shared_by'|trans }}</span>
                     <div class="user-badge">
-                      <div class="user-avatar-sm color-{{ (loop.index * 3) % 5 }}">
-                        {{ access.owner.email|first|upper }}
-                      </div>
+
+<img class="avatar-img"
+               src="{{ access.owner.avatar ? asset('uploads/avatars/' ~ access.owner.avatar) : asset('images/avatar-default.png') }}"
+               alt="{{ 'header.profile.avatar_alt'|trans }}">
                       <div class="user-details">
                         <span class="user-name">{{ access.owner.company }}</span>
                         <span class="user-email">{{ access.owner.email }}</span>

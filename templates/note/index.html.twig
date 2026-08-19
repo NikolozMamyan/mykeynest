@@ -931,9 +931,10 @@ grid-template-columns: 2fr 1fr 1fr 1.2fr;
                       {% if note.assignments|length > 0 %}
                         <div class="assignee-avatars">
                           {% for assignment in note.assignments|slice(0, 3) %}
-                            {% set email = assignment.assignee.email %}
-                            {% set initial = email|slice(0, 1)|upper %}
-                            <div class="avatar" title="{{ email }}">{{ initial }}</div>
+                            <img class="avatar-img"
+               src="{{ assignment.assignee.avatar ? asset('uploads/avatars/' ~ assignment.assignee.avatar) : asset('images/avatar-default.png') }}"
+               alt="{{ 'header.profile.avatar_alt'|trans }}">
+               {# {{assignment.assignee.email }} #}
                           {% endfor %}
                           {% if note.assignments|length > 3 %}
                             <div class="avatar avatar-more">+{{ note.assignments|length - 3 }}</div>

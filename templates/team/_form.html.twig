@@ -91,6 +91,19 @@
             
             {{ form_errors(form.credentials) }}
         </div>
+
+        {% if form.canRevealPassword is defined %}
+            <div class="form-group share-permission-option">
+                <label class="share-permission-label">
+                    {{ form_widget(form.canRevealPassword, {'attr': {'class': 'share-permission-checkbox'}}) }}
+                    <span>
+                        <strong>{{ form.canRevealPassword.vars.label }}</strong>
+                        <small>{{ form.canRevealPassword.vars.help }}</small>
+                    </span>
+                </label>
+                {{ form_errors(form.canRevealPassword) }}
+            </div>
+        {% endif %}
     {% endif %}
 
     <div class="form-actions">
@@ -489,6 +502,35 @@
     background: var(--color-primary);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+.share-permission-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    background: var(--color-bg-light);
+    cursor: pointer;
+}
+
+.share-permission-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--color-primary);
+}
+
+.share-permission-label strong,
+.share-permission-label small {
+    display: block;
+}
+
+.share-permission-label small {
+    margin-top: 0.3rem;
+    color: var(--color-text-medium);
+    line-height: 1.4;
 }
 
 [data-theme="dark"] .credentials-trigger:hover {

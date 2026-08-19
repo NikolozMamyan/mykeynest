@@ -77,6 +77,11 @@
     "cancel": "Cancel",
     "save_changes": "Save changes"
   },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
   "header": {
     "burger_aria": "Menu",
     "notifications": {
@@ -84,6 +89,12 @@
       "title": "Notifications",
       "mark_all_read": "Mark as read",
       "loading": "Loading...",
+      "loading_list": "Loading notifications...",
+      "load_error": "Loading failed",
+      "empty": "No notifications yet",
+      "marking": "Marking...",
+      "marked": "Marked!",
+      "error": "Error",
       "delete": "Delete",
       "deleting": "Deleting...",
       "deleted": "Deleted",
@@ -110,7 +121,8 @@
     },
     "upgrade": {
       "label": "Upgrade",
-      "text": "Go PRO"
+      "text": "Go PRO",
+      "aria": "Discover the PRO plan"
     }
   },
   "sidebar": {
@@ -479,6 +491,13 @@
       "later": "Later"
     }
   },
+  "credential_access": {
+    "reveal_label": "Also allow viewing and copying the password",
+    "reveal_help": "Uncheck this option to allow automatic sign-in through the MYKEYNEST extension only.",
+    "reveal_label_short": "Also allow viewing and copying",
+    "reveal_help_short": "Otherwise, sign-in will only be available through the MYKEYNEST extension.",
+    "restricted_message": "You are not allowed to view this password. You can still sign in through the MYKEYNEST extension."
+  },
   "credential": {
     "index": {
       "meta": {
@@ -493,22 +512,45 @@
       },
       "actions": {
         "add": "Add a credential",
-        "add_first": "Add my first credential"
+        "add_first": "Add my first credential",
+        "add_short": "Add",
+        "import_csv": "Import CSV"
       },
       "filters": {
         "all": "All",
+        "mine": "My credentials",
+        "shared": "Shared with me",
+        "team": "Teams",
         "web": "Websites",
         "recent": "Recent"
       },
+      "sections": {
+        "mine": "My credentials",
+        "shared": "Shared with me",
+        "team": "Through my teams"
+      },
+      "badges": {
+        "shared": "Shared",
+        "team": "Team"
+      },
       "labels": {
         "username": "Username",
-        "password": "Password"
+        "password": "Password",
+        "owner": "Owner",
+        "team": "Team",
+        "teams": "Teams"
       },
       "card_actions": {
         "view": "View details",
         "share": "Share",
         "edit": "Edit",
-        "delete": "Delete"
+        "delete": "Delete",
+        "unavailable_shared": "Unavailable for shared access",
+        "unavailable_team": "Unavailable for team access"
+      },
+      "pin": {
+        "pin": "Pin to top",
+        "unpin": "Remove from pinned items"
       },
       "empty": {
         "title": "No credentials saved",
@@ -516,7 +558,8 @@
       },
       "no_results": {
         "title": "No results found",
-        "text": "Try using different keywords"
+        "text": "Try using different keywords",
+        "search_text": "No credentials match your search."
       },
       "confirm": {
         "delete": "Are you sure you want to delete this credential?"
@@ -539,6 +582,29 @@
     }
   },
   "shared_access": {
+    "new": {
+      "title": "Share credentials",
+      "subtitle": "Grant secure access to your credentials",
+      "back": "Back",
+      "close": "Close",
+      "empty_title": "No credentials to share",
+      "empty_text": "Create a credential before sharing access.",
+      "add_credential": "Add a credential",
+      "recipient": "Recipient",
+      "email_label": "Recipient email",
+      "email_placeholder": "example@domain.com",
+      "email_hint": "The recipient must have a MYKEYNEST account.",
+      "none_selected": "No credentials selected",
+      "one_selected": "1 credential selected",
+      "many_selected": "%count% credentials selected",
+      "cancel": "Cancel",
+      "submit": "Share",
+      "credentials": "Credentials to share",
+      "search_placeholder": "Search…",
+      "select_all": "Select all",
+      "deselect_all": "Deselect all",
+      "no_results": "No results"
+    },
     "index": {
       "hero": {
         "title": "Shared Access Management",
@@ -582,6 +648,48 @@
       "title": "Sharing limit reached!",
       "description": "You’ve reached the limit of 3 shared accesses. Upgrade to PRO for unlimited sharing and seamless collaboration.",
       "action": "Upgrade to PRO"
+    }
+  },
+  "extension_onboarding": {
+    "title": "Install the MYKEYNEST extension",
+    "step": "Final step · Extension",
+    "eyebrow": "Browser protection",
+    "heading": "The browser extension",
+    "heading_accent": "is required",
+    "lead": "Install MYKEYNEST to access your vault securely and use your credentials while you browse.",
+    "benefit_autofill": "Fast, secure credential autofill",
+    "benefit_pairing": "Automatic account connection without copying a key",
+    "mobile_title": "Complete the installation on a computer",
+    "mobile_text": "Chrome extensions are not available on this mobile device. You can complete this step later.",
+    "mobile_continue": "Continue on mobile",
+    "install": "Install the extension",
+    "already_installed": "I already installed it",
+    "install_status": "Pairing will start automatically after installation.",
+    "privacy": "Your session cookie remains private. Only a temporary, single-use code is sent to the official extension.",
+    "checking": {
+      "title": "Checking the extension…",
+      "message": "We are looking for MYKEYNEST in your browser.",
+      "retry": "Try again",
+      "back": "Back to installation",
+      "continue": "Open my dashboard",
+      "progress_aria": "Pairing progress",
+      "detected_title": "Extension detected",
+      "detected_message": "Creating your secure connection…",
+      "connecting_title": "Connecting your account…",
+      "connecting_message": "Your access key is being transferred securely.",
+      "success_title": "Extension connected!",
+      "success_message": "Everything is ready. Redirecting to your dashboard…",
+      "store_message": "Finish installing from the Chrome Web Store, then return to this tab.",
+      "waiting_install": "Waiting for the extension to be installed.",
+      "interrupted": "Connection interrupted"
+    },
+    "errors": {
+      "not_detected": "Extension not detected",
+      "timeout": "Response timed out",
+      "no_response": "No response from the extension",
+      "connection_failed": "Connection failed",
+      "pairing_failed": "The extension could not save the connection",
+      "retry": "Please try again in a moment."
     }
   },
   "extension": {
@@ -1155,6 +1263,19 @@
         "title": "Language",
         "description": "Choose the language used for the application interface."
       },
+      "theme": {
+        "title": "Appearance",
+        "description": "Choose the application's visual theme.",
+        "aria": "Choose the application theme",
+        "light": {
+          "label": "Light",
+          "description": "Bright interface"
+        },
+        "dark": {
+          "label": "Dark",
+          "description": "Reduced visual brightness"
+        }
+      },
       "engagement": {
         "title": "Notifications and engagement",
         "description": "Manage your communication and interaction preferences."
@@ -1180,6 +1301,11 @@
   },
   "teams": {
     "page_title": "My teams",
+    "form": {
+      "name_label": "Team name",
+      "credentials_label": "Share existing credentials (optional)",
+      "select_credentials_label": "Select credentials"
+    },
     "header": {
       "title": "My teams",
       "subtitle": "Manage your teams and collaborate efficiently",
@@ -1194,6 +1320,8 @@
       "members": "member",
       "members_plural": "members",
       "view": "View team",
+      "leave": "Leave",
+      "leave_confirm": "Are you sure you want to leave this team?",
       "owner_fallback": "N/A"
     },
     "show": {

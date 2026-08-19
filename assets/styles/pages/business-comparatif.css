@@ -105,6 +105,7 @@
         font-size: 0.9375rem; font-weight: 800; color: var(--color-text-dark);
         display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
     }
+    .cmp-th-brand-mark { width: 2rem; height: 2rem; border-radius: 0.55rem; }
     .cmp-th-logo .cmp-badge-winner {
         font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
         background: linear-gradient(135deg, var(--color-primary), #10b981);

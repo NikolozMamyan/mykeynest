@@ -14,6 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const EXTENSION_ONBOARDING_PENDING = 'pending';
+    public const EXTENSION_ONBOARDING_COMPLETED = 'completed';
+    public const EXTENSION_ONBOARDING_DEFERRED = 'deferred';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -51,6 +55,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $credentialEncryptionKey = null;
+
+    #[ORM\Column(length: 20, options: ['default' => self::EXTENSION_ONBOARDING_COMPLETED])]
+    private string $extensionOnboardingStatus = self::EXTENSION_ONBOARDING_PENDING;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $extensionOnboardedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
@@ -239,6 +249,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->apiExtensionToken = bin2hex(random_bytes(32));
 
         return $this;
+    }
+
+    public function getExtensionOnboardingStatus(): string
+    {
+        return $this->extensionOnboardingStatus;
+    }
+
+    public function requireExtensionOnboarding(): static
+    {
+        $this->extensionOnboardingStatus = self::EXTENSION_ONBOARDING_PENDING;
+        $this->extensionOnboardedAt = null;
+
+        return $this;
+    }
+
+    public function requiresExtensionOnboarding(): bool
+    {
+        return $this->extensionOnboardingStatus === self::EXTENSION_ONBOARDING_PENDING;
+    }
+
+    public function completeExtensionOnboarding(): static
+    {
+        $this->extensionOnboardingStatus = self::EXTENSION_ONBOARDING_COMPLETED;
+        $this->extensionOnboardedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function deferExtensionOnboarding(): static
+    {
+        $this->extensionOnboardingStatus = self::EXTENSION_ONBOARDING_DEFERRED;
+        $this->extensionOnboardedAt = null;
+
+        return $this;
+    }
+
+    public function getExtensionOnboardedAt(): ?\DateTimeImmutable
+    {
+        return $this->extensionOnboardedAt;
     }
 
     public function hasActiveSubscription(): bool

@@ -36,7 +36,37 @@
         <span><strong>Locale:</strong> {{ user.locale }}</span>
         <span><strong>Telephone:</strong> {{ user.phone ?: '-' }}</span>
         <span><strong>Extension token:</strong> {{ user.apiExtensionToken ? 'present' : 'absent' }}</span>
+        <span>
+          <strong>Onboarding extension:</strong>
+          {% if 'ROLE_ADMIN' in user.roles %}
+            {% include 'components/ui/status_badge.html.twig' with { label: 'non applicable', tone: 'muted' } only %}
+          {% elseif user.extensionOnboardingStatus == 'completed' %}
+            {% include 'components/ui/status_badge.html.twig' with { label: 'termine', tone: 'success' } only %}
+          {% elseif user.extensionOnboardingStatus == 'pending' %}
+            {% include 'components/ui/status_badge.html.twig' with { label: 'requis', tone: 'warning' } only %}
+          {% else %}
+            {% include 'components/ui/status_badge.html.twig' with { label: 'reporte', tone: 'muted' } only %}
+          {% endif %}
+        </span>
+        <span><strong>Termine le:</strong> {{ user.extensionOnboardedAt ? user.extensionOnboardedAt|date('d/m/Y H:i') : '-' }}</span>
       </div>
+
+      {% if 'ROLE_ADMIN' not in user.roles %}
+        <form method="post"
+              action="{{ path('admin_user_extension_onboarding_update', {id: user.id}) }}"
+              class="ds-actions-stack"
+              style="margin-top:1rem;"
+              onsubmit="return confirm('Modifier le parcours d installation ? Pour Free et Pro, recommencer remplacera l installation actuelle.');">
+          <input type="hidden" name="_token" value="{{ csrf_token('admin_extension_onboarding_' ~ user.id) }}">
+          <input type="hidden" name="_redirect" value="show">
+          <select name="status" class="ds-input" style="min-width:0; width:100%;" required>
+            <option value="">Gerer l’installation…</option>
+            <option value="completed">Marquer comme terminee</option>
+            <option value="pending">Annuler et recommencer</option>
+          </select>
+          <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Appliquer</button>
+        </form>
+      {% endif %}
     </div>
 
     <div class="ds-surface">

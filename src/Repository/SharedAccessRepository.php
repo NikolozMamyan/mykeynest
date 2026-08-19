@@ -38,16 +38,30 @@ class SharedAccessRepository extends ServiceEntityRepository
             ->getResult();
     }
     public function userHasAccessToCredential(User $user, Credential $cred): bool
-{
-    return (bool) $this->createQueryBuilder('sa')
-        ->select('1')
-        ->andWhere('sa.guest = :user')
-        ->andWhere('sa.credential = :cred')
-        ->setParameter('user', $user)
-        ->setParameter('cred', $cred)
-        ->setMaxResults(1)
-        ->getQuery()
-        ->getOneOrNullResult();
-}
+    {
+        return (bool) $this->createQueryBuilder('sa')
+            ->select('1')
+            ->andWhere('sa.guest = :user')
+            ->andWhere('sa.credential = :cred')
+            ->setParameter('user', $user)
+            ->setParameter('cred', $cred)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function userCanRevealPassword(User $user, Credential $credential): bool
+    {
+        return (bool) $this->createQueryBuilder('sa')
+            ->select('1')
+            ->andWhere('sa.guest = :user')
+            ->andWhere('sa.credential = :credential')
+            ->andWhere('sa.canRevealPassword = true')
+            ->setParameter('user', $user)
+            ->setParameter('credential', $credential)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
 }

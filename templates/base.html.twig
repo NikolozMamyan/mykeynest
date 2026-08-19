@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
-    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}" />
+    <link rel="icon" href="{{ asset('favicon.ico') }}?v=4" sizes="any" />
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}?v=4" />
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}?v=4" />
 
     <link
       rel="stylesheet"
@@ -61,9 +61,9 @@
     {% endblock %}
   </head>
 
-  <body data-controller="layout pwa-install">
-    {% set currentRoute = app.request.attributes.get('_route') %}
-    {% set hideAppChrome = currentRoute in ['app_pending_login'] %}
+  {% set currentRoute = app.request.attributes.get('_route') %}
+  {% set hideAppChrome = hideAppChrome|default(false) or currentRoute in ['app_pending_login'] %}
+  <body class="{{ hideAppChrome ? 'app-chrome-hidden' : '' }}" data-controller="layout pwa-install">
 
     {# ===== Layout wrapper ===== #}
     <div class="app-shell">

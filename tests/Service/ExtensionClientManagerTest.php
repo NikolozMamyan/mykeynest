@@ -153,6 +153,55 @@ final class ExtensionClientManagerTest extends TestCase
         self::assertSame(ExtensionInstallationChallenge::STATUS_PENDING, $challenge->getStatus());
     }
 
+    public function testAuthenticatedPairingReplacesTheSingleFreeOrProInstallation(): void
+    {
+        $user = $this->createUserWithPlan('PRO');
+        $existingClient = $this->createClient($user, 'existing-browser');
+        $repository = $this->createRepository($user, [$existingClient]);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist')->with(self::isInstanceOf(ExtensionClient::class));
+        $entityManager->expects(self::once())->method('flush');
+
+        $manager = $this->createManager(
+            $entityManager,
+            $repository,
+            $this->createMock(ExtensionInstallationChallengeManager::class),
+            $this->createMock(MailerService::class),
+            'prod'
+        );
+
+        $result = $manager->resolvePairingFromRequest($user, $this->createRequest('replacement-browser'));
+
+        self::assertTrue($existingClient->isRevoked());
+        self::assertSame('Remplacee lors d une nouvelle installation', $existingClient->getRevokedReason());
+        self::assertTrue($result['isNew']);
+        self::assertSame('replacement-browser', $result['client']->getClientId());
+    }
+
+    public function testAuthenticatedPairingAddsAnotherInstallationForTeamPlan(): void
+    {
+        $user = $this->createTeamUser();
+        $existingClient = $this->createClient($user, 'existing-browser');
+        $repository = $this->createRepository($user, [$existingClient]);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist')->with(self::isInstanceOf(ExtensionClient::class));
+        $entityManager->expects(self::once())->method('flush');
+
+        $manager = $this->createManager(
+            $entityManager,
+            $repository,
+            $this->createMock(ExtensionInstallationChallengeManager::class),
+            $this->createMock(MailerService::class),
+            'prod'
+        );
+
+        $result = $manager->resolvePairingFromRequest($user, $this->createRequest('additional-browser'));
+
+        self::assertFalse($existingClient->isRevoked());
+        self::assertTrue($result['isNew']);
+        self::assertSame('additional-browser', $result['client']->getClientId());
+    }
+
     private function createManager(
         EntityManagerInterface $entityManager,
         ExtensionClientRepository $repository,
@@ -214,13 +263,18 @@ final class ExtensionClientManagerTest extends TestCase
 
     private function createTeamUser(): User
     {
+        return $this->createUserWithPlan('TEAM');
+    }
+
+    private function createUserWithPlan(string $planCode): User
+    {
         $user = (new User())
-            ->setEmail('team@example.com')
+            ->setEmail(strtolower($planCode) . '@example.com')
             ->setPassword('hashed')
             ->setCompany('Acme');
 
         $subscription = (new UserSubscription())
-            ->setPlanCode('TEAM')
+            ->setPlanCode($planCode)
             ->setStatus('active')
             ->setIsActive(true);
 

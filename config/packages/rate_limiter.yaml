@@ -4,6 +4,10 @@ framework:
       policy: fixed_window
       limit: 60
       interval: '1 minute'
+    extension_pairing:
+      policy: sliding_window
+      limit: 12
+      interval: '10 minutes'
     auth_login:
       policy: sliding_window
       limit: 8

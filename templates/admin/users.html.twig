@@ -46,6 +46,7 @@
       <tbody>
         {% for user in users %}
           {% set subscription = user.userSubscription %}
+          {% set onboardingStatus = user.extensionOnboardingStatus %}
           <tr>
             <td>
               <div class="ds-cell-stack">
@@ -68,9 +69,38 @@
               </div>
             </td>
             <td>{{ sessionCounts[user.id] ?? 0 }}</td>
-            <td>{{ extensionCounts[user.id] ?? 0 }}</td>
             <td>
-              <a href="{{ path('admin_user_show', {id: user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Ouvrir la fiche</a>
+              <div class="ds-cell-stack">
+                <span>{{ extensionCounts[user.id] ?? 0 }} installation(s)</span>
+                {% if 'ROLE_ADMIN' in user.roles %}
+                  {% include 'components/ui/status_badge.html.twig' with { label: 'non applicable', tone: 'muted' } only %}
+                {% elseif onboardingStatus == 'completed' %}
+                  {% include 'components/ui/status_badge.html.twig' with { label: 'onboarding termine', tone: 'success' } only %}
+                {% elseif onboardingStatus == 'pending' %}
+                  {% include 'components/ui/status_badge.html.twig' with { label: 'installation requise', tone: 'warning' } only %}
+                {% else %}
+                  {% include 'components/ui/status_badge.html.twig' with { label: 'reporte', tone: 'muted' } only %}
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              <div class="ds-actions-stack">
+                <a href="{{ path('admin_user_show', {id: user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Ouvrir la fiche</a>
+                {% if 'ROLE_ADMIN' not in user.roles %}
+                  <form method="post"
+                        action="{{ path('admin_user_extension_onboarding_update', {id: user.id}) }}"
+                        class="ds-actions-stack"
+                        onsubmit="return confirm('Modifier le parcours d installation ? Pour Free et Pro, recommencer remplacera l installation actuelle.');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_extension_onboarding_' ~ user.id) }}">
+                    <select name="status" class="ds-input" style="min-width:170px; width:100%;" required aria-label="Action onboarding pour {{ user.email }}">
+                      <option value="">Gerer l’installation…</option>
+                      <option value="completed">Marquer comme terminee</option>
+                      <option value="pending">Annuler et recommencer</option>
+                    </select>
+                    <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Appliquer</button>
+                  </form>
+                {% endif %}
+              </div>
             </td>
           </tr>
         {% else %}

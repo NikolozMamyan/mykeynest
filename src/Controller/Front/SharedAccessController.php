@@ -7,7 +7,8 @@ use App\Entity\User;
 use App\Repository\CredentialRepository;
 use App\Repository\SharedAccessRepository;
 use App\Repository\UserRepository;
-use App\Service\EncryptionService;
+use App\Service\CredentialAccessPolicy;
+use App\Service\CredentialManager;
 use App\Service\MailerService;
 use App\Service\SharedAccessNotifier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -190,7 +191,8 @@ class SharedAccessController extends AbstractController
     #[Route('/app/shared-access/view/{id}', name: 'shared_access_view_credential', methods: ['GET'])]
     public function viewSharedCredential(
         SharedAccess $sharedAccess,
-        EncryptionService $encryptionService
+        CredentialAccessPolicy $accessPolicy,
+        CredentialManager $credentialManager,
     ): Response {
         $user = $this->getUser();
 
@@ -201,24 +203,17 @@ class SharedAccessController extends AbstractController
         $credential = $sharedAccess->getCredential();
         $owner = $sharedAccess->getOwner();
 
-        $decryptedPassword = '';
-        if ($owner) {
-            $primaryKey = $owner->getCredentialEncryptionKey();
-            if (is_string($primaryKey) && $primaryKey !== '') {
-                $encryptionService->setKeyFromUserSecret($primaryKey);
-                $decryptedPassword = $encryptionService->decrypt((string) $credential?->getPassword());
-            }
-
-            $legacyKey = $owner->getApiExtensionToken();
-            if ($decryptedPassword === '' && is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
-                $encryptionService->setKeyFromUserSecret($legacyKey);
-                $decryptedPassword = $encryptionService->decrypt((string) $credential?->getPassword());
-            }
-        }
+        $canRevealPassword = $user instanceof User
+            && $credential !== null
+            && $accessPolicy->canRevealPassword($user, $credential);
+        $decryptedPassword = $canRevealPassword && $credential !== null
+            ? $credentialManager->decryptPassword($credential)
+            : '';
 
         return $this->render('shared_access/view_credential.html.twig', [
             'credential' => $credential,
             'decryptedPassword' => $decryptedPassword,
+            'canRevealPassword' => $canRevealPassword,
             'owner' => $owner,
             'heading' => 'Partages',
         ]);
@@ -240,6 +235,7 @@ class SharedAccessController extends AbstractController
     ): RedirectResponse {
         $email = strtolower(trim((string) $request->request->get('email')));
         $credentialIds = $request->request->all('credentials') ?? [];
+        $canRevealPassword = $request->request->getBoolean('can_reveal_password');
         $limitKey = sprintf('%s|%s', $owner->getId() ?? 0, $email);
         $limit = $this->shareInvitationLimiter->create($limitKey)->consume(1);
 
@@ -337,6 +333,7 @@ class SharedAccessController extends AbstractController
         }
 
         $createdCount = 0;
+        $updatedCount = 0;
         $sharedCredentials = [];
 
         foreach ($credentialIds as $credentialId) {
@@ -353,6 +350,10 @@ class SharedAccessController extends AbstractController
             ]);
 
             if ($existingAccess) {
+                if ($existingAccess->canRevealPassword() !== $canRevealPassword) {
+                    $existingAccess->setCanRevealPassword($canRevealPassword);
+                    $updatedCount++;
+                }
                 continue;
             }
 
@@ -361,26 +362,37 @@ class SharedAccessController extends AbstractController
             $sharedAccess->setGuest($guest);
             $sharedAccess->setCredential($credential);
             $sharedAccess->setCreatedAt(new \DateTimeImmutable());
+            $sharedAccess->setCanRevealPassword($canRevealPassword);
 
             $entityManager->persist($sharedAccess);
             $sharedCredentials[] = $credential;
             $createdCount++;
         }
 
-        if ($createdCount === 0) {
+        if ($createdCount === 0 && $updatedCount === 0) {
             $this->addFlash('info', 'Aucun nouvel identifiant n\'a ete partage.');
 
             return $this->redirectToRoute($redirectRoute);
         }
 
         $entityManager->flush();
-        $notifier->notifyCredentialsShared($guest, $owner, $sharedCredentials);
-        $this->addFlash('success', $createdCount . ' identifiant(s) partage(s) avec succes.');
+        if ($createdCount > 0) {
+            $notifier->notifyCredentialsShared($guest, $owner, $sharedCredentials);
+        }
+
+        $messageParts = [];
+        if ($createdCount > 0) {
+            $messageParts[] = $createdCount . ' identifiant(s) partage(s)';
+        }
+        if ($updatedCount > 0) {
+            $messageParts[] = $updatedCount . ' permission(s) mise(s) a jour';
+        }
+        $this->addFlash('success', implode(' et ', $messageParts) . ' avec succes.');
 
         $isActiveUser = in_array('ROLE_USER', $guest->getRoles(), true)
             && !in_array('ROLE_GUEST', $guest->getRoles(), true);
 
-        if ($isActiveUser) {
+        if ($isActiveUser && $createdCount > 0) {
             try {
                 $mailer->send(
                     $guest->getEmail(),

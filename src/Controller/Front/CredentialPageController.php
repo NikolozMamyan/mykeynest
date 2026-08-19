@@ -9,6 +9,7 @@ use App\Repository\CredentialRepository;
 use App\Repository\SharedAccessRepository;
 use App\Repository\TeamRepository;
 use App\Service\CredentialManager;
+use App\Service\CredentialAccessPolicy;
 use App\Service\SecurityCheckerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -171,14 +172,19 @@ final class CredentialPageController extends AbstractController
     }
 
     #[Route('/app/credential/{id}', name: 'credential_show', methods: ['GET'])]
-    public function show(Credential $credential): Response
+    public function show(Credential $credential, CredentialAccessPolicy $accessPolicy): Response
     {
         $this->denyAccessUnlessGranted('CREDENTIAL_VIEW', $credential);
-        $decryptedPassword = $this->credentialManager->decryptPassword($credential);
+        $user = $this->getAuthenticatedUser();
+        $canRevealPassword = $accessPolicy->canRevealPassword($user, $credential);
+        $decryptedPassword = $canRevealPassword
+            ? $this->credentialManager->decryptPassword($credential)
+            : '';
 
         return $this->render('credential/show.html.twig', [
             'credential' => $credential,
             'decryptedPassword' => $decryptedPassword,
+            'canRevealPassword' => $canRevealPassword,
             'heading' => 'Mes acces',
         ]);
     }

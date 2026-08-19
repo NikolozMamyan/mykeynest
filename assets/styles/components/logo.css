@@ -1,7 +1,6 @@
 .nav-logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   text-decoration: none;
   font-weight: 800;
   font-size: 1.4rem;
@@ -14,16 +13,23 @@
 }
 
 .nav-logo-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
-  border-radius: 10px;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 1.2rem;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+
+}
+
+.nav-logo-mark {
+  display: block;
+  width: 30px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .nav-logo-text {

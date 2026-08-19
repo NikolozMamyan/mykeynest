@@ -26,6 +26,7 @@ class ApiTokenAuthenticator extends AbstractAuthenticator
         '/api/reset-password/verify',
         '/api/login-challenge/status',
         '/api/login-challenge/complete',
+        '/api/extension-pairing/exchange',
         '/stripe/webhook',
 
         '/',

@@ -1,16 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Partager des identifiants{% endblock %}
+{% block title %}{{ 'shared_access.new.title'|trans }}{% endblock %}
 
 {% block body %}
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<div class="share-page">
+{% set sharePageTranslations = {
+  none_selected: 'shared_access.new.none_selected'|trans,
+  one_selected: 'shared_access.new.one_selected'|trans,
+  many_selected: 'shared_access.new.many_selected'|trans,
+  select_all: 'shared_access.new.select_all'|trans,
+  deselect_all: 'shared_access.new.deselect_all'|trans
+} %}
+<div class="share-page" data-translations="{{ sharePageTranslations|json_encode|e('html_attr') }}">
 
   {# Back button #}
   <a href="{{ path('shared_access_index') }}" class="back-link">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-    Retour
+    {{ 'shared_access.new.back'|trans }}
   </a>
 
   {# Flash errors #}
@@ -18,7 +25,7 @@
     <div class="toast toast-error" role="alert">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       <span>{{ message }}</span>
-      <button onclick="this.parentElement.remove()" aria-label="Fermer">
+      <button onclick="this.parentElement.remove()" aria-label="{{ 'shared_access.new.close'|trans }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
@@ -30,11 +37,11 @@
       <div class="empty-icon">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
       </div>
-      <h2>Aucun identifiant à partager</h2>
-      <p>Créez d'abord des identifiants pour pouvoir les partager.</p>
+      <h2>{{ 'shared_access.new.empty_title'|trans }}</h2>
+      <p>{{ 'shared_access.new.empty_text'|trans }}</p>
       <a href="{{ path('credential_new') }}" class="btn-primary">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        Ajouter un identifiant
+        {{ 'shared_access.new.add_credential'|trans }}
       </a>
     </div>
 
@@ -47,8 +54,8 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
         </div>
         <div>
-          <h1>Partager des identifiants</h1>
-          <p>Donnez accès à vos identifiants en toute sécurité</p>
+          <h1>{{ 'shared_access.new.title'|trans }}</h1>
+          <p>{{ 'shared_access.new.subtitle'|trans }}</p>
         </div>
       </div>
 
@@ -59,33 +66,41 @@
         <div class="panel panel-left">
           <div class="panel-label">
             <span class="step-dot">1</span>
-            <span>Destinataire</span>
+            <span>{{ 'shared_access.new.recipient'|trans }}</span>
           </div>
 
           <div class="recipient-block">
-            <label for="email" class="field-label">Email du destinataire</label>
+            <label for="email" class="field-label">{{ 'shared_access.new.email_label'|trans }}</label>
             <div class="input-wrapper">
               <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              <input type="email" id="email" name="email" required placeholder="exemple@domaine.com" class="field-input" autocomplete="email">
+              <input type="email" id="email" name="email" required placeholder="{{ 'shared_access.new.email_placeholder'|trans }}" class="field-input" autocomplete="email">
             </div>
-            <p class="field-hint">Le destinataire doit avoir un compte MYKEYNEST.</p>
+            <p class="field-hint">{{ 'shared_access.new.email_hint'|trans }}</p>
           </div>
+
+          <label class="share-permission-option">
+            <input type="checkbox" name="can_reveal_password" value="1" checked>
+            <span>
+              <strong>{{ 'credential_access.reveal_label'|trans }}</strong>
+              <small>{{ 'credential_access.reveal_help'|trans }}</small>
+            </span>
+          </label>
 
           {# Summary card #}
           <div class="summary-card" id="summaryCard">
             <div class="summary-row">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-              <span id="summaryText">Aucun identifiant sélectionné</span>
+              <span id="summaryText">{{ 'shared_access.new.none_selected'|trans }}</span>
             </div>
             <div class="summary-chips" id="summaryChips"></div>
           </div>
 
           {# Actions #}
           <div class="panel-actions">
-            <a href="{{ path('shared_access_index') }}" class="btn-ghost">Annuler</a>
+            <a href="{{ path('shared_access_index') }}" class="btn-ghost">{{ 'shared_access.new.cancel'|trans }}</a>
             <button type="submit" id="shareButton" class="btn-primary" disabled>
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-              Partager
+              {{ 'shared_access.new.submit'|trans }}
             </button>
           </div>
         </div>
@@ -94,15 +109,15 @@
         <div class="panel panel-right">
           <div class="panel-label">
             <span class="step-dot">2</span>
-            <span>Identifiants à partager</span>
+            <span>{{ 'shared_access.new.credentials'|trans }}</span>
           </div>
 
           <div class="creds-toolbar">
             <div class="search-box">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <input type="text" id="credSearch" placeholder="Rechercher…" class="search-input" autocomplete="off">
+              <input type="text" id="credSearch" placeholder="{{ 'shared_access.new.search_placeholder'|trans }}" class="search-input" autocomplete="off">
             </div>
-            <button type="button" id="toggleAll" class="btn-outline-sm">Tout sélectionner</button>
+            <button type="button" id="toggleAll" class="btn-outline-sm">{{ 'shared_access.new.select_all'|trans }}</button>
           </div>
 
           <div class="creds-list" id="credsList">
@@ -140,7 +155,7 @@
 
           <div class="no-results" id="noResults" style="display:none;">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <p>Aucun résultat</p>
+            <p>{{ 'shared_access.new.no_results'|trans }}</p>
           </div>
         </div>
 
@@ -205,10 +220,12 @@
 .empty-state {
   text-align: center;
   padding: 5rem 2rem;
-  background: var(--color-white);
-  border-radius: 16px;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  background: var(--glass-card-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: var(--glass-card-shadow);
+  -webkit-backdrop-filter: var(--glass-card-blur);
+  backdrop-filter: var(--glass-card-blur);
 }
 .empty-icon {
   width: 72px; height: 72px;
@@ -231,7 +248,7 @@
 .title-icon {
   width: 48px; height: 48px;
   background: linear-gradient(135deg, var(--color-primary), #047857);
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 12px rgba(5,150,105,0.3);
   flex-shrink: 0;
@@ -256,9 +273,12 @@
 
 /* ── Panels ── */
 .panel {
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
+  background: var(--glass-card-bg);
+  border: 1px solid var(--glass-card-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--glass-card-shadow);
+  -webkit-backdrop-filter: var(--glass-card-blur);
+  backdrop-filter: var(--glass-card-blur);
   overflow: hidden;
 }
 .panel-label {
@@ -303,7 +323,7 @@
   width: 100%;
   padding: 0.75rem 0.875rem 0.75rem 2.5rem;
   border: 1.5px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   font-size: 0.9375rem;
   font-family: inherit;
   color: var(--color-text-dark);
@@ -372,7 +392,7 @@
   background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -384,6 +404,31 @@
   background: var(--color-primary);
   box-shadow: 0 4px 16px rgba(5,150,105,0.35);
   transform: translateY(-1px);
+}
+
+.share-permission-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-bg-light);
+  cursor: pointer;
+}
+.share-permission-option input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+}
+.share-permission-option strong,
+.share-permission-option small { display: block; }
+.share-permission-option small {
+  margin-top: 0.3rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
 }
 .btn-primary:disabled {
   background: var(--color-text-light);
@@ -399,7 +444,7 @@
   background: transparent;
   color: var(--color-text-muted);
   border: 1.5px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
@@ -430,7 +475,7 @@
   width: 100%;
   padding: 0.625rem 0.875rem 0.625rem 2.25rem;
   border: 1.5px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--border-radius-sm);
   font-size: 0.875rem;
   font-family: inherit;
   color: var(--color-text-dark);
@@ -453,7 +498,7 @@
   color: var(--color-primary);
   border: 1.5px solid var(--color-primary);
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -610,6 +655,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const page          = document.querySelector('.share-page');
+  const translations  = JSON.parse(page?.dataset.translations || '{}');
   const checkboxes   = document.querySelectorAll('.cred-checkbox');
   const shareBtn     = document.getElementById('shareButton');
   const summaryText  = document.getElementById('summaryText');
@@ -619,6 +666,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const noResults    = document.getElementById('noResults');
   const items        = document.querySelectorAll('.cred-item');
 
+  if (!shareBtn || !summaryText || !summaryChips || !searchInput || !toggleAllBtn || !noResults) {
+    return;
+  }
+
   function updateSummary() {
     const checked = [...checkboxes].filter(cb => cb.checked);
     const n = checked.length;
@@ -626,9 +677,10 @@ document.addEventListener('DOMContentLoaded', () => {
     shareBtn.disabled = n === 0;
 
     summaryText.textContent = n === 0
-      ? 'Aucun identifiant sélectionné'
-      : n === 1 ? '1 identifiant sélectionné'
-      : `${n} identifiants sélectionnés`;
+      ? translations.none_selected
+      : n === 1
+        ? translations.one_selected
+        : translations.many_selected.replace('%count%', n);
 
     summaryChips.innerHTML = '';
     checked.forEach(cb => {
@@ -662,7 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const visible = [...checkboxes].filter(cb => cb.closest('.cred-item').style.display !== 'none');
     const allChecked = visible.every(cb => cb.checked);
     visible.forEach(cb => cb.checked = !allChecked);
-    toggleAllBtn.textContent = allChecked ? 'Tout sélectionner' : 'Tout désélectionner';
+    toggleAllBtn.textContent = allChecked ? translations.select_all : translations.deselect_all;
     updateSummary();
   });
 

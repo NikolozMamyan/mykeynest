@@ -143,11 +143,13 @@
     }
 
     .pricing-card {
-      background: var(--color-white);
-      border-radius: 24px;
+      background: var(--glass-card-bg);
+      border-radius: var(--border-radius);
       padding: 0;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-      border: 3px solid transparent;
+      box-shadow: var(--glass-card-shadow);
+      border: 1px solid var(--glass-card-border);
+      -webkit-backdrop-filter: var(--glass-card-blur);
+      backdrop-filter: var(--glass-card-blur);
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
@@ -167,7 +169,7 @@
     }
 
     .pricing-card:hover {
-      transform: translateY(-15px) scale(1.02);
+      transform: translateY(-3px);
       box-shadow: 0 25px 60px rgba(5, 150, 105, 0.15);
       border-color: var(--color-primary);
     }
@@ -176,7 +178,7 @@
 
     .pricing-card.featured {
       border-color: var(--color-primary);
-      transform: scale(1.05);
+      transform: scale(1.01);
       animation: pulse-glow 3s infinite;
     }
 
@@ -312,7 +314,7 @@
       background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
       color: var(--color-white);
       border: none;
-      border-radius: 14px;
+      border-radius: var(--border-radius);
       font-size: 1.05rem;
       font-weight: 700;
       cursor: pointer;
@@ -333,11 +335,14 @@
 
     /* ===== SECTION COMPARAISON ===== */
     .comparison-section {
-      background: var(--color-white);
-      border-radius: 24px;
+      background: var(--glass-card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--glass-card-border);
       padding: 70px 50px;
       margin-bottom: 100px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--glass-card-shadow);
+      -webkit-backdrop-filter: var(--glass-card-blur);
+      backdrop-filter: var(--glass-card-blur);
       animation: slideInRight 1s ease;
     }
 
@@ -365,7 +370,7 @@
     .tool-card {
       background: var(--color-bg-light);
       padding: 40px 30px;
-      border-radius: 20px;
+      border-radius: var(--border-radius);
       border: 2px solid var(--color-border);
     }
 
@@ -390,7 +395,7 @@
     .contact-section {
       position: relative;
       background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      border-radius: 24px;
+      border-radius: var(--border-radius);
       padding: 80px 60px;
       color: var(--color-white);
       margin-bottom: 100px;
@@ -408,7 +413,7 @@
     .form-group input, .form-group select, .form-group textarea {
       padding: 16px 20px;
       border: 3px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
+      border-radius: var(--border-radius);
       font-size: 1rem;
       background: rgba(255, 255, 255, 0.95);
       color: var(--color-text-dark);
@@ -420,7 +425,7 @@
       background: var(--color-white);
       color: var(--color-primary);
       border: none;
-      border-radius: 14px;
+      border-radius: var(--border-radius);
       font-size: 1.1rem;
       font-weight: 800;
       cursor: pointer;
@@ -447,8 +452,11 @@
     .faq-subtitle { color: var(--color-text-medium); font-size: 1.1rem; }
 
     .faq-item {
-      background: var(--color-white);
-      border-radius: 16px;
+      background: var(--glass-card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--glass-card-border);
+      -webkit-backdrop-filter: var(--glass-card-blur);
+      backdrop-filter: var(--glass-card-blur);
       margin-bottom: 20px;
       overflow: hidden;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
@@ -505,7 +513,7 @@
       text-align: center;
       padding: 80px 20px;
       background: var(--color-bg-light);
-      border-radius: 24px;
+      border-radius: var(--border-radius);
       margin-bottom: 80px;
     }
 
@@ -554,7 +562,7 @@
   background: var(--color-white);
   color: var(--color-primary);
   border: none;
-  border-radius: 14px;
+  border-radius: var(--border-radius);
   font-size: 1.05rem;
   font-weight: 900;
   cursor: pointer;

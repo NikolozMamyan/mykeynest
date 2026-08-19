@@ -16,6 +16,7 @@ use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\MailerService;
 use App\Service\TeamNotifier;
+use App\Service\TeamCredentialPermissionManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -68,7 +69,12 @@ class TeamPageController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, Security $security): Response
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        Security $security,
+        TeamCredentialPermissionManager $permissionManager,
+    ): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -100,6 +106,7 @@ class TeamPageController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $team->setOwner($user);
+            $canRevealPassword = (bool) $form->get('canRevealPassword')->getData();
 
             $member = new TeamMember();
             $member->setTeam($team);
@@ -108,6 +115,11 @@ class TeamPageController extends AbstractController
 
             $em->persist($team);
             $em->persist($member);
+
+            foreach ($team->getCredentials() as $credential) {
+                $permissionManager->setPasswordReveal($team, $credential, $canRevealPassword);
+            }
+
             $em->flush();
 
             $this->addFlash('success', 'Equipe creee avec succes.');
@@ -131,7 +143,8 @@ class TeamPageController extends AbstractController
         MailerService $mailer,
         LoggerInterface $logger,
         UrlGeneratorInterface $urlGenerator,
-        TeamNotifier $teamNotifier
+        TeamNotifier $teamNotifier,
+        TeamCredentialPermissionManager $permissionManager,
     ): Response {
         $this->denyAccessUnlessGranted('TEAM_VIEW', $team);
 
@@ -231,11 +244,13 @@ class TeamPageController extends AbstractController
             if ($credentialsForm->isSubmitted() && $credentialsForm->isValid()) {
                 $data = $credentialsForm->getData();
                 $credentials = $data['credentials'];
+                $canRevealPassword = (bool) $credentialsForm->get('canRevealPassword')->getData();
                 $addedCredentials = [];
 
                 foreach ($credentials as $credential) {
                     if (!$team->getCredentials()->contains($credential)) {
                         $team->addCredential($credential);
+                        $permissionManager->setPasswordReveal($team, $credential, $canRevealPassword);
                         $addedCredentials[] = $credential;
                     }
                 }
@@ -393,7 +408,8 @@ class TeamPageController extends AbstractController
         int $credentialId,
         Request $request,
         CredentialRepository $credentialRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        TeamCredentialPermissionManager $permissionManager,
     ): Response {
         $this->denyAccessUnlessGranted('TEAM_MANAGE', $team);
 
@@ -418,6 +434,7 @@ class TeamPageController extends AbstractController
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
+        $permissionManager->remove($team, $credential);
         $team->removeCredential($credential);
         $em->flush();
 

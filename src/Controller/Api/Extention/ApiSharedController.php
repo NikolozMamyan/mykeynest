@@ -10,6 +10,8 @@ use App\Repository\SharedAccessRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\EncryptionService;
+use App\Service\CredentialAccessPolicy;
+use App\Service\CredentialManager;
 use App\Service\ExtensionClientManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,6 +28,8 @@ final class ApiSharedController extends AbstractController
         private UserRepository $userRepository,
         private RateLimiterFactory $extensionApiLimiter,
         private ExtensionClientManager $extensionClientManager,
+        private CredentialAccessPolicy $credentialAccessPolicy,
+        private CredentialManager $credentialManager,
     ) {
     }
 
@@ -156,36 +160,18 @@ final class ApiSharedController extends AbstractController
     {
         $domain = preg_replace('#^https?://#', '', $domain);
         $domain = preg_replace('#^www\.#', '', $domain);
+        $domain = explode('/', $domain, 2)[0];
 
-        return strtolower(trim($domain));
+        return strtolower(trim($domain, " \t\n\r\0\x0B."));
     }
 
     private function credentialMatchesDomain(Credential $credential, string $domain): bool
     {
         $credentialDomain = $this->normalizeDomain((string) $credential->getDomain());
 
-        return $credentialDomain === $domain || str_ends_with($credentialDomain, '.' . $domain);
-    }
-
-    private function decryptWithUserKeys(User $user, string $encrypted): string
-    {
-        $primaryKey = $user->getCredentialEncryptionKey();
-        if (is_string($primaryKey) && $primaryKey !== '') {
-            $this->encryptionService->setKeyFromUserSecret($primaryKey);
-            $plaintext = $this->encryptionService->decrypt($encrypted);
-            if ($plaintext !== '') {
-                return $plaintext;
-            }
-        }
-
-        $legacyKey = $user->getApiExtensionToken();
-        if (is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
-            $this->encryptionService->setKeyFromUserSecret($legacyKey);
-
-            return $this->encryptionService->decrypt($encrypted);
-        }
-
-        return '';
+        return $credentialDomain === $domain
+            || str_ends_with($domain, '.' . $credentialDomain)
+            || str_ends_with($credentialDomain, '.' . $domain);
     }
 
     /**
@@ -324,11 +310,13 @@ final class ApiSharedController extends AbstractController
 
         $credentials = array_values($credentialsById);
         $result = array_map(
-            static fn(Credential $credential) => [
+            fn(Credential $credential) => [
                 'id' => $credential->getId(),
                 'domain' => $credential->getDomain(),
                 'username' => $credential->getUsername(),
                 'name' => $credential->getName(),
+                'canRevealPassword' => $this->credentialAccessPolicy->canRevealPassword($user, $credential),
+                'canEdit' => $this->credentialAccessPolicy->canEdit($user, $credential),
             ],
             $credentials
         );
@@ -360,7 +348,14 @@ final class ApiSharedController extends AbstractController
         $teams = $teamRepo->findTeamWithCredentialsByUser($user);
 
         $userPayload = static fn(User $u) => ['id' => $u->getId(), 'email' => $u->getEmail()];
-        $credentialPayload = static fn(Credential $c) => ['id' => $c->getId(), 'domain' => $c->getDomain(), 'username' => $c->getUsername(), 'name' => $c->getName()];
+        $credentialPayload = fn(Credential $credential) => [
+            'id' => $credential->getId(),
+            'domain' => $credential->getDomain(),
+            'username' => $credential->getUsername(),
+            'name' => $credential->getName(),
+            'canRevealPassword' => $this->credentialAccessPolicy->canRevealPassword($user, $credential),
+            'canEdit' => $this->credentialAccessPolicy->canEdit($user, $credential),
+        ];
 
         $resultCredentials = array_map(static fn(Credential $credential) => $credentialPayload($credential), $credentials);
         $resultSharedAccess = array_map(
@@ -410,7 +405,7 @@ final class ApiSharedController extends AbstractController
     }
 
     #[Route('/extention/api/credentials/{id}/reveal', name: 'api_credential_reveal', methods: ['POST', 'OPTIONS'])]
-    public function reveal(Request $request, int $id, CredentialRepository $credentialRepository, SharedAccessRepository $sharedAccessRepo, TeamRepository $teamRepo): JsonResponse
+    public function reveal(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
     {
         if ($pf = $this->preflight($request)) {
             return $pf;
@@ -427,32 +422,114 @@ final class ApiSharedController extends AbstractController
             return $auth['response'];
         }
 
-        $cred = $credentialRepository->find($id);
-        if (!$cred instanceof Credential) {
+        return $this->credentialSecretResponse($id, $credentialRepository, $auth, true);
+    }
+
+    #[Route('/extention/api/credentials/{id}/autofill', name: 'api_credential_autofill', methods: ['POST', 'OPTIONS'])]
+    public function autofill(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
+    {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
+
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized('Token manquant ou invalide');
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
+
+        try {
+            $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $this->badRequest('Corps JSON invalide');
+        }
+
+        $domain = isset($payload['domain']) && is_string($payload['domain'])
+            ? $this->normalizeDomain($payload['domain'])
+            : '';
+        if ($domain === '') {
+            return $this->badRequest('Domaine manquant ou invalide');
+        }
+
+        return $this->credentialSecretResponse($id, $credentialRepository, $auth, false, $domain);
+    }
+
+    #[Route('/extention/api/credentials/{id}/update', name: 'api_credential_update', methods: ['POST', 'OPTIONS'])]
+    public function updateCredential(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
+    {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
+
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized('Token manquant ou invalide');
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
+
+        $credential = $credentialRepository->find($id);
+        if (!$credential instanceof Credential) {
             return $this->withInstallationToken($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
         }
 
-        $user = $auth['user'];
-        $isOwner = ($cred->getUser()?->getId() === $user->getId());
-        $hasDirectShare = $sharedAccessRepo->userHasAccessToCredential($user, $cred);
-        $hasTeamShare = $teamRepo->userHasTeamAccessToCredential($user, $cred);
-
-        if (!$isOwner && !$hasDirectShare && !$hasTeamShare) {
-            return $this->withInstallationToken($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
+        if (!$this->credentialAccessPolicy->canEdit($auth['user'], $credential)) {
+            return $this->withInstallationToken($this->json([
+                'error' => 'Seul le proprietaire peut modifier cet identifiant.',
+                'code' => 'credential_edit_forbidden',
+            ], Response::HTTP_FORBIDDEN), $auth['issuedInstallationToken']);
         }
 
-        $owner = $cred->getUser();
-        if (!$owner) {
-            return $this->withInstallationToken($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
+        try {
+            $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $this->badRequest('Corps JSON invalide');
         }
 
-        $password = $this->decryptWithUserKeys($owner, (string) $cred->getPassword());
+        $username = isset($payload['username']) && is_string($payload['username'])
+            ? trim($payload['username'])
+            : '';
+        $password = isset($payload['password']) && is_string($payload['password'])
+            ? $payload['password']
+            : '';
 
+        if ($username === '' || mb_strlen($username) > 255) {
+            return $this->badRequest('Nom d\'utilisateur manquant ou invalide');
+        }
         if ($password === '') {
+            return $this->badRequest('Mot de passe manquant ou invalide');
+        }
+
+        $originalEncryptedPassword = (string) $credential->getPassword();
+        $currentPassword = $this->credentialManager->decryptPassword($credential);
+        if ($currentPassword === '') {
             return $this->withInstallationToken($this->json(['error' => 'Unable to decrypt credential'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 
-        return $this->withInstallationToken($this->json(['id' => $cred->getId(), 'password' => $password]), $auth['issuedInstallationToken']);
+        $credential->setUsername($username);
+        $credential->setPassword($password);
+        $this->credentialManager->update($credential, $currentPassword, $originalEncryptedPassword);
+
+        return $this->withInstallationToken($this->json([
+            'success' => true,
+            'credential' => [
+                'id' => $credential->getId(),
+                'name' => $credential->getName(),
+                'domain' => $credential->getDomain(),
+                'username' => $credential->getUsername(),
+                'canRevealPassword' => true,
+                'canEdit' => true,
+            ],
+        ]), $auth['issuedInstallationToken']);
     }
 
     #[Route('/extention/api/credentials/create', name: 'api_credential_create', methods: ['POST', 'OPTIONS'])]
@@ -538,5 +615,55 @@ final class ApiSharedController extends AbstractController
                 'createdAt' => $credential->getCreatedAt()?->format(DATE_ATOM),
             ],
         ], Response::HTTP_CREATED), $auth['issuedInstallationToken']);
+    }
+
+    /**
+     * @param array{user: User, client: ExtensionClient, issuedInstallationToken: ?string} $auth
+     */
+    private function credentialSecretResponse(
+        int $id,
+        CredentialRepository $credentialRepository,
+        array $auth,
+        bool $requireRevealPermission,
+        ?string $autofillDomain = null,
+    ): JsonResponse {
+        $credential = $credentialRepository->find($id);
+        if (!$credential instanceof Credential) {
+            return $this->withInstallationToken($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
+        }
+
+        $user = $auth['user'];
+        if (!$this->credentialAccessPolicy->canAccess($user, $credential)) {
+            return $this->withInstallationToken($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
+        }
+
+        if ($autofillDomain !== null && !$this->credentialMatchesDomain($credential, $autofillDomain)) {
+            return $this->withInstallationToken($this->json([
+                'error' => 'Cet identifiant ne correspond pas au site actuellement ouvert.',
+                'code' => 'credential_domain_mismatch',
+            ], Response::HTTP_FORBIDDEN), $auth['issuedInstallationToken']);
+        }
+
+        if ($requireRevealPermission && !$this->credentialAccessPolicy->canRevealPassword($user, $credential)) {
+            return $this->withInstallationToken($this->json([
+                'error' => 'Vous n\'avez pas l\'autorisation d\'afficher ce mot de passe.',
+                'code' => 'password_reveal_forbidden',
+            ], Response::HTTP_FORBIDDEN), $auth['issuedInstallationToken']);
+        }
+
+        $owner = $credential->getUser();
+        if (!$owner instanceof User) {
+            return $this->withInstallationToken($this->json(['error' => 'Owner key missing'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
+        }
+
+        $password = $this->credentialManager->decryptPassword($credential);
+        if ($password === '') {
+            return $this->withInstallationToken($this->json(['error' => 'Unable to decrypt credential'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
+        }
+
+        return $this->withInstallationToken($this->json([
+            'id' => $credential->getId(),
+            'password' => $password,
+        ]), $auth['issuedInstallationToken']);
     }
 }

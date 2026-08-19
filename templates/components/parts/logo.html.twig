@@ -1,6 +1,6 @@
 <a href="{{ path('app_landing') }}" class="nav-logo">
   <div class="nav-logo-icon">
-    <i class="fas fa-key"></i>
+    {% include 'components/parts/_dot_mark.html.twig' with { extraClass: 'nav-logo-mark' } only %}
   </div>
   <span class="nav-logo-text">
     <span class="logo-my">MY</span><span class="logo-key">KEY</span><span class="logo-nest">NEST</span>

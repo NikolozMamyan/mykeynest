@@ -8,6 +8,7 @@ use App\Repository\CredentialRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TeamAddCredentialsType extends AbstractType
@@ -22,7 +23,7 @@ class TeamAddCredentialsType extends AbstractType
         $builder->add('credentials', EntityType::class, [
             'class'         => Credential::class,
             'choice_label'  => 'name',
-            'label'         => 'Sélectionner des credentials',
+            'label'         => 'teams.form.select_credentials_label',
             'multiple'      => true,
             'expanded'      => true,
             'required'      => false,
@@ -47,6 +48,13 @@ class TeamAddCredentialsType extends AbstractType
 
                 return $qb;
             },
+        ])
+        ->add('canRevealPassword', CheckboxType::class, [
+            'label' => 'credential_access.reveal_label',
+            'help' => 'credential_access.reveal_help',
+            'mapped' => false,
+            'required' => false,
+            'data' => true,
         ]);
     }
 

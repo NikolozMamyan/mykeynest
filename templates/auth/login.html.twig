@@ -74,20 +74,21 @@ body {
 .hero-icon {
   width: 72px;
   height: 72px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: var(--blur-background);
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 12px 28px rgba(6, 78, 59, 0.2);
 }
 
-.hero-icon svg {
-  width: 40px;
-  height: 40px;
-  stroke: var(--color-white);
+.hero-icon img {
+  width: 38px;
+  height: 52px;
+  object-fit: contain;
 }
 
 .login-hero h1 {
@@ -338,9 +339,7 @@ body {
     <div class="login-hero">
       <div class="hero-content">
         <div class="hero-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-          </svg>
+          <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt="" aria-hidden="true">
         </div>
 
         <h1>{{ 'auth.login.hero.title'|trans }}</h1>

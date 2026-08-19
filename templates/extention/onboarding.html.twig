@@ -1,0 +1,1126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'extension_onboarding.title'|trans }}{% endblock %}
+{% block breadcrumb %}{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    body.app-chrome-hidden {
+      margin: 0;
+      overflow-x: hidden;
+      background: #041b16;
+    }
+
+    body.app-chrome-hidden .app-shell,
+    body.app-chrome-hidden .wrapper-layout,
+    body.app-chrome-hidden .main-content {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      max-width: none;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    body.app-chrome-hidden .pwa-install-banner {
+      display: none !important;
+    }
+
+    .extension-onboarding {
+      --onboarding-accent: #10b981;
+      --onboarding-accent-dark: #047857;
+      --onboarding-ink: #071f1a;
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      color: #f8fffc;
+      background:
+        radial-gradient(circle at 18% 76%, rgba(16, 185, 129, .18), transparent 32%),
+        radial-gradient(circle at 90% 12%, rgba(52, 211, 153, .08), transparent 30%),
+        linear-gradient(135deg, #031813 0%, #08241d 48%, #03130f 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .extension-onboarding::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .2;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+    }
+
+    .onboarding-install,
+    .onboarding-checking {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .onboarding-install {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .onboarding-topbar {
+      width: min(1320px, calc(100% - 64px));
+      min-height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin: 0 auto;
+    }
+
+    .onboarding-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      font-size: 1.14rem;
+      font-weight: 850;
+      letter-spacing: -.035em;
+    }
+
+    .onboarding-brand__mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(16, 185, 129, .22);
+      border-radius: 11px;
+      color: #fff;
+      background: linear-gradient(145deg, #fff, #e5faf2);
+      box-shadow: 0 10px 28px rgba(4, 120, 87, .2);
+    }
+
+    .mkn-dotmark {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+    }
+
+    .mkn-dotmark--brand {
+      width: 19px;
+      height: 28px;
+    }
+
+    .onboarding-brand__accent { color: #6ee7b7; }
+
+    .onboarding-topbar__step {
+      color: rgba(236, 253, 245, .66);
+      font-size: .8rem;
+      font-weight: 750;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .onboarding-layout {
+      width: min(1240px, calc(100% - 64px));
+      display: grid;
+      flex: 1;
+      grid-template-columns: minmax(440px, 1fr) minmax(440px, .92fr);
+      align-items: center;
+      gap: clamp(56px, 7vw, 116px);
+      margin: 0 auto;
+      padding: 48px 0 74px;
+    }
+
+    .onboarding-visual {
+      position: relative;
+      min-height: 550px;
+      display: grid;
+      place-items: center;
+    }
+
+    .onboarding-visual__frame {
+      position: relative;
+      width: min(490px, 92%);
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(167, 243, 208, .14);
+      background:
+        linear-gradient(rgba(110, 231, 183, .08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(110, 231, 183, .08) 1px, transparent 1px);
+      background-size: 66px 66px;
+      box-shadow: inset 0 0 80px rgba(16, 185, 129, .05);
+    }
+
+    .onboarding-visual__frame::before,
+    .onboarding-visual__frame::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+      background:
+        linear-gradient(#a7f3d0, #a7f3d0) left top / 135px 2px no-repeat,
+        linear-gradient(#a7f3d0, #a7f3d0) left top / 2px 135px no-repeat,
+        linear-gradient(#a7f3d0, #a7f3d0) right bottom / 135px 2px no-repeat,
+        linear-gradient(#a7f3d0, #a7f3d0) right bottom / 2px 135px no-repeat;
+      opacity: .42;
+    }
+
+    .onboarding-visual__frame::after {
+      transform: rotate(90deg);
+      opacity: .14;
+    }
+
+    .onboarding-dot-visual {
+      position: relative;
+      width: min(285px, 68%);
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .onboarding-dot-visual::before {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, .22), rgba(16, 185, 129, .04) 45%, transparent 70%);
+      filter: blur(18px);
+    }
+
+    .onboarding-extension-visual {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 0 20px rgba(52, 211, 153, .32));
+    }
+
+    .onboarding-copy { max-width: 570px; }
+
+    .onboarding-copy__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      color: #6ee7b7;
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .onboarding-copy h1 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(2.7rem, 4.5vw, 4.65rem);
+      font-weight: 620;
+      line-height: .99;
+      letter-spacing: -.058em;
+    }
+
+    .onboarding-copy h1 span {
+      display: block;
+      color: #6ee7b7;
+    }
+
+    .onboarding-copy__lead {
+      max-width: 540px;
+      margin: 28px 0 0;
+      color: #d8e9e3;
+      font-size: 1.04rem;
+      line-height: 1.72;
+    }
+
+    .onboarding-benefits {
+      display: grid;
+      gap: 17px;
+      margin: 28px 0 34px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .onboarding-benefits li {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      align-items: start;
+      gap: 13px;
+      color: #f0fdf7;
+      font-weight: 650;
+      line-height: 1.5;
+    }
+
+    .onboarding-benefits i {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      margin-top: 1px;
+      border: 1px solid rgba(110, 231, 183, .68);
+      border-radius: 50%;
+      color: #6ee7b7;
+      font-size: .68rem;
+    }
+
+    .onboarding-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 13px;
+    }
+
+    .onboarding-button {
+      min-height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 23px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: #03261d;
+      background: #6ee7b7;
+      box-shadow: 0 12px 34px rgba(16, 185, 129, .19);
+      font: inherit;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .onboarding-button:hover {
+      color: #03261d;
+      background: #a7f3d0;
+      box-shadow: 0 16px 42px rgba(16, 185, 129, .27);
+      transform: translateY(-2px);
+    }
+
+    .onboarding-button--secondary {
+      color: #ecfdf5;
+      border-color: rgba(167, 243, 208, .48);
+      background: rgba(255, 255, 255, .025);
+      box-shadow: none;
+    }
+
+    .onboarding-button--secondary:hover {
+      color: #fff;
+      border-color: #6ee7b7;
+      background: rgba(16, 185, 129, .1);
+      box-shadow: none;
+    }
+
+    .onboarding-install-status {
+      min-height: 24px;
+      margin: 18px 0 0;
+      color: rgba(216, 233, 227, .68);
+      font-size: .84rem;
+    }
+
+    .onboarding-install-status i {
+      margin-right: 7px;
+      color: #6ee7b7;
+    }
+
+    .onboarding-privacy {
+      max-width: 540px;
+      margin: 18px 0 0;
+      color: rgba(216, 233, 227, .5);
+      font-size: .76rem;
+      line-height: 1.55;
+    }
+
+    .onboarding-privacy i {
+      margin-right: 6px;
+      color: #6ee7b7;
+    }
+
+    .onboarding-mobile-notice {
+      margin: 28px 0;
+      padding: 18px 20px;
+      border: 1px solid rgba(110, 231, 183, .24);
+      border-radius: 12px;
+      color: #d8e9e3;
+      background: rgba(16, 185, 129, .08);
+      line-height: 1.55;
+    }
+
+    .onboarding-mobile-notice strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #fff;
+    }
+
+    .onboarding-checking {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 92px 24px 46px;
+      color: #0b2a22;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(16, 185, 129, .11), transparent 30%),
+        linear-gradient(180deg, #fbfffd 0%, #f1fbf6 100%);
+    }
+
+    .onboarding-checking::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .52;
+      background-image: radial-gradient(rgba(5, 150, 105, .12) .7px, transparent .7px);
+      background-size: 23px 23px;
+      mask-image: radial-gradient(circle at center, #000, transparent 68%);
+    }
+
+    .extension-onboarding.is-checking .onboarding-install { display: none; }
+    .extension-onboarding.is-checking .onboarding-checking { display: flex; }
+
+    .onboarding-checking__brand {
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      color: #0b2a22;
+      transform: translateX(-50%);
+    }
+
+    .onboarding-checking__brand .onboarding-brand__accent { color: #059669; }
+
+    .onboarding-checking__content {
+      position: relative;
+      z-index: 1;
+      width: min(620px, 100%);
+      text-align: center;
+    }
+
+    .spinner-stage {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 24px;
+    }
+
+    .bound {
+      position: absolute;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: 1px solid rgba(5, 150, 105, .08);
+      border-radius: 50%;
+    }
+
+    .main_spinner {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      transform-origin: 50% 50%;
+      will-change: transform;
+      -webkit-animation: onboardingSpin 2s linear infinite !important;
+      animation: onboardingSpin 2s linear infinite !important;
+    }
+
+    .main_spinner::before,
+    .main_spinner::after {
+      content: "";
+      position: absolute;
+      inset: -48px;
+      border: 1px solid rgba(16, 185, 129, .12);
+      border-radius: 50%;
+    }
+
+    .main_spinner::after {
+      inset: 22px;
+      border-color: rgba(5, 150, 105, .18);
+    }
+
+    .main_spinner .dot {
+      position: absolute;
+      top: 50%;
+      width: 36px;
+      height: 36px;
+      margin-top: -18px;
+      border-radius: 100px;
+      box-shadow:
+        0 82px #10b981,
+        0 -82px #10b981,
+        82px 0 #34d399,
+        -82px 0 #34d399;
+      transform-origin: 18px 18px;
+      will-change: transform;
+      -webkit-animation: onboardingBackspin 1s linear infinite !important;
+      animation: onboardingBackspin 1s linear infinite !important;
+    }
+
+    .main_spinner .dot_1 { left: 0; }
+    .main_spinner .dot_2 { right: 0; }
+
+    .main_spinner .center_mass {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      left: 50%;
+      top: 50%;
+      margin: -12.5px 0 0 -12.5px;
+      border-radius: 50%;
+      background: rgba(5, 150, 105, .55);
+      box-shadow: 42px 0 rgba(5, 150, 105, .2), -42px 0 rgba(5, 150, 105, .2);
+    }
+
+    .spinner-result {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: 118px;
+      height: 118px;
+      display: none;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 3rem;
+      background: linear-gradient(135deg, #10b981, #047857);
+      box-shadow: 0 22px 54px rgba(5, 150, 105, .25);
+      transform: translate(-50%, -50%);
+      animation: onboardingResultIn .35s ease-out both;
+    }
+
+    .extension-onboarding.has-error .spinner-result {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      box-shadow: 0 22px 54px rgba(220, 38, 38, .2);
+    }
+
+    .extension-onboarding.has-success .main_spinner,
+    .extension-onboarding.has-error .main_spinner,
+    .extension-onboarding.has-success .bound,
+    .extension-onboarding.has-error .bound { display: none; }
+
+    .extension-onboarding.has-success .spinner-result--success,
+    .extension-onboarding.has-error .spinner-result--error { display: grid; }
+
+    .onboarding-checking h2 {
+      margin: 0;
+      color: #08241d;
+      font-size: clamp(1.8rem, 4vw, 2.55rem);
+      letter-spacing: -.04em;
+    }
+
+    .onboarding-checking__message {
+      max-width: 520px;
+      min-height: 52px;
+      margin: 14px auto 24px;
+      color: #5d746d;
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    .onboarding-checking__actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .onboarding-checking .onboarding-button--secondary {
+      color: #0b2a22;
+      border-color: rgba(5, 150, 105, .32);
+      background: transparent;
+    }
+
+    .onboarding-checking .onboarding-button--secondary:hover {
+      color: #065f46;
+      background: rgba(16, 185, 129, .08);
+    }
+
+    .onboarding-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 34px;
+    }
+
+    .onboarding-progress__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d1e2dc;
+      transition: width .25s ease, background .25s ease;
+    }
+
+    .onboarding-progress__dot.is-active {
+      width: 28px;
+      border-radius: 999px;
+      background: #10b981;
+    }
+
+    .onboarding-progress__dot.is-complete { background: #059669; }
+    [hidden] { display: none !important; }
+
+    @keyframes onboardingSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(.9); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    @-webkit-keyframes onboardingSpin {
+      0% { -webkit-transform: rotate(0deg) scale(1); }
+      50% { -webkit-transform: rotate(180deg) scale(.9); }
+      100% { -webkit-transform: rotate(360deg) scale(1); }
+    }
+
+    @keyframes onboardingBackspin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(-180deg) scale(.9); }
+      100% { transform: rotate(-360deg) scale(1); }
+    }
+
+    @-webkit-keyframes onboardingBackspin {
+      0% { -webkit-transform: rotate(0deg) scale(1); }
+      50% { -webkit-transform: rotate(-180deg) scale(.9); }
+      100% { -webkit-transform: rotate(-360deg) scale(1); }
+    }
+
+    @keyframes onboardingResultIn {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(.72); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    @media (max-width: 980px) {
+      .onboarding-layout {
+        grid-template-columns: minmax(280px, .76fr) minmax(390px, 1fr);
+        gap: 42px;
+      }
+
+      .onboarding-visual { min-height: 430px; }
+      .onboarding-dot-visual { width: min(230px, 68%); }
+    }
+
+    @media (max-width: 760px) {
+      .onboarding-topbar {
+        width: calc(100% - 40px);
+        min-height: 72px;
+      }
+
+      .onboarding-topbar__step { display: none; }
+
+      .onboarding-layout {
+        width: calc(100% - 40px);
+        display: block;
+        padding: 38px 0 48px;
+      }
+
+      .onboarding-visual {
+        min-height: 250px;
+        margin-bottom: 34px;
+      }
+
+      .onboarding-visual__frame { width: 245px; }
+      .onboarding-dot-visual { width: 135px; }
+
+      .onboarding-copy {
+        max-width: none;
+        text-align: center;
+      }
+
+      .onboarding-copy h1 { font-size: clamp(2.45rem, 12vw, 3.5rem); }
+
+      .onboarding-copy__lead,
+      .onboarding-privacy {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .onboarding-benefits {
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+      }
+
+      .onboarding-actions { justify-content: center; }
+      .onboarding-install-status { text-align: center; }
+    }
+
+    @media (max-width: 520px) {
+      .onboarding-visual { min-height: 210px; }
+      .onboarding-visual__frame { width: 205px; }
+      .onboarding-actions { display: grid; }
+      .onboarding-button { width: 100%; }
+      .spinner-stage { width: 230px; height: 230px; transform: scale(.84); margin-block: -12px 4px; }
+      .onboarding-checking { padding-inline: 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .spinner-result {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+      }
+
+      .main_spinner { animation-duration: 6s !important; }
+      .main_spinner .dot { animation-duration: 3s !important; }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  {% set onboardingClientTranslations = {
+    checking_title: 'extension_onboarding.checking.title'|trans,
+    checking_message: 'extension_onboarding.checking.message'|trans,
+    detected_title: 'extension_onboarding.checking.detected_title'|trans,
+    detected_message: 'extension_onboarding.checking.detected_message'|trans,
+    connecting_title: 'extension_onboarding.checking.connecting_title'|trans,
+    connecting_message: 'extension_onboarding.checking.connecting_message'|trans,
+    success_title: 'extension_onboarding.checking.success_title'|trans,
+    success_message: 'extension_onboarding.checking.success_message'|trans,
+    store_message: 'extension_onboarding.checking.store_message'|trans,
+    waiting_install: 'extension_onboarding.checking.waiting_install'|trans,
+    interrupted: 'extension_onboarding.checking.interrupted'|trans,
+    not_detected: 'extension_onboarding.errors.not_detected'|trans,
+    timeout: 'extension_onboarding.errors.timeout'|trans,
+    no_response: 'extension_onboarding.errors.no_response'|trans,
+    connection_failed: 'extension_onboarding.errors.connection_failed'|trans,
+    pairing_failed: 'extension_onboarding.errors.pairing_failed'|trans,
+    retry: 'extension_onboarding.errors.retry'|trans
+  } %}
+  <section class="extension-onboarding{{ isReconnect ? ' is-checking' : '' }}"
+           id="extensionOnboarding"
+           data-extension-id="{{ extensionId|e('html_attr') }}"
+           data-reconnect="{{ isReconnect ? '1' : '0' }}"
+           data-status-url="{{ path('api_extension_pairing_status') }}"
+           data-start-url="{{ path('api_extension_pairing_start') }}"
+           data-complete-url="{{ path('api_extension_pairing_complete') }}"
+           data-start-csrf="{{ csrf_token('extension_pairing_start') }}"
+           data-complete-csrf="{{ csrf_token('extension_pairing_complete') }}"
+           data-translations="{{ onboardingClientTranslations|json_encode|e('html_attr') }}">
+    <div class="onboarding-install" id="installView">
+      <header class="onboarding-topbar">
+        <div class="onboarding-brand" aria-label="MYKEYNEST">
+          <span class="onboarding-brand__mark">{% include 'components/parts/_dot_mark.html.twig' with { extraClass: 'mkn-dotmark--brand' } only %}</span>
+          <span>MY<span class="onboarding-brand__accent">KEY</span>NEST</span>
+        </div>
+        <span class="onboarding-topbar__step">{{ 'extension_onboarding.step'|trans }}</span>
+      </header>
+
+      <div class="onboarding-layout">
+        <div class="onboarding-visual" aria-hidden="true">
+          <div class="onboarding-visual__frame">
+            <div class="onboarding-dot-visual">
+              <img
+                src="{{ asset('images/mykeynest-extension-puzzle.svg') }}"
+                class="onboarding-extension-visual"
+                alt=""
+                aria-hidden="true"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="onboarding-copy">
+          <span class="onboarding-copy__eyebrow"><i class="fa-solid fa-shield-halved"></i> {{ 'extension_onboarding.eyebrow'|trans }}</span>
+          <h1>{{ 'extension_onboarding.heading'|trans }} <span>{{ 'extension_onboarding.heading_accent'|trans }}</span></h1>
+          <p class="onboarding-copy__lead">
+            {{ 'extension_onboarding.lead'|trans }}
+          </p>
+
+          <ul class="onboarding-benefits">
+            <li><i class="fa-solid fa-check"></i><span>{{ 'extension_onboarding.benefit_autofill'|trans }}</span></li>
+            <li><i class="fa-solid fa-check"></i><span>{{ 'extension_onboarding.benefit_pairing'|trans }}</span></li>
+          </ul>
+
+          {% if isMobileDevice %}
+            <div class="onboarding-mobile-notice">
+              <strong><i class="fa-solid fa-desktop"></i> {{ 'extension_onboarding.mobile_title'|trans }}</strong>
+              {{ 'extension_onboarding.mobile_text'|trans }}
+            </div>
+
+            <form method="post" action="{{ path('app_extension_onboarding_defer') }}" class="onboarding-actions">
+              <input type="hidden" name="_token" value="{{ csrf_token('extension_onboarding_defer') }}">
+              <button class="onboarding-button" type="submit">{{ 'extension_onboarding.mobile_continue'|trans }} <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+          {% else %}
+            <div class="onboarding-actions">
+              <a href="{{ chromeWebStoreUrl }}" target="_blank" rel="noopener" class="onboarding-button" id="installExtensionButton">
+                <i class="fa-brands fa-chrome"></i> {{ 'extension_onboarding.install'|trans }}
+              </a>
+              <button type="button" class="onboarding-button onboarding-button--secondary" id="retryPairingButton">
+                {{ 'extension_onboarding.already_installed'|trans }}
+              </button>
+            </div>
+
+            <p class="onboarding-install-status" id="installStatus" aria-live="polite">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> {{ 'extension_onboarding.install_status'|trans }}
+            </p>
+            <p class="onboarding-privacy">
+              <i class="fa-solid fa-lock"></i> {{ 'extension_onboarding.privacy'|trans }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if not isMobileDevice %}
+      <div class="onboarding-checking" id="checkingView" aria-hidden="true">
+        <div class="onboarding-brand onboarding-checking__brand" aria-label="MYKEYNEST">
+          <span class="onboarding-brand__mark">{% include 'components/parts/_dot_mark.html.twig' with { extraClass: 'mkn-dotmark--brand' } only %}</span>
+          <span>MY<span class="onboarding-brand__accent">KEY</span>NEST</span>
+        </div>
+
+        <div class="onboarding-checking__content" role="status" aria-live="polite">
+          <div class="spinner-stage" aria-hidden="true">
+            <div class="bound"></div>
+            <div class="main_spinner">
+              <div class="center_mass"></div>
+              <div class="dot dot_1"></div>
+              <div class="dot dot_2"></div>
+            </div>
+            <div class="spinner-result spinner-result--success"><i class="fa-solid fa-check"></i></div>
+            <div class="spinner-result spinner-result--error"><i class="fa-solid fa-xmark"></i></div>
+          </div>
+
+          <h2 id="pairingStatusTitle">{{ 'extension_onboarding.checking.title'|trans }}</h2>
+          <p class="onboarding-checking__message" id="pairingStatusMessage">{{ 'extension_onboarding.checking.message'|trans }}</p>
+
+          <div class="onboarding-checking__actions">
+            <button type="button" class="onboarding-button" id="checkingRetryButton" hidden>
+              <i class="fa-solid fa-rotate"></i> {{ 'extension_onboarding.checking.retry'|trans }}
+            </button>
+            <button type="button" class="onboarding-button onboarding-button--secondary" id="backToInstallButton">
+              {{ 'extension_onboarding.checking.back'|trans }}
+            </button>
+            <a href="{{ path('app_dashboard') }}" class="onboarding-button" id="continueButton" hidden>
+              {{ 'extension_onboarding.checking.continue'|trans }} <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="onboarding-progress" aria-label="{{ 'extension_onboarding.checking.progress_aria'|trans }}">
+            <span class="onboarding-progress__dot is-active" data-step="install"></span>
+            <span class="onboarding-progress__dot" data-step="detect"></span>
+            <span class="onboarding-progress__dot" data-step="connect"></span>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+
+  {% if not isMobileDevice %}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const root = document.getElementById('extensionOnboarding');
+        const installView = document.getElementById('installView');
+        const checkingView = document.getElementById('checkingView');
+        const statusTitle = document.getElementById('pairingStatusTitle');
+        const statusMessage = document.getElementById('pairingStatusMessage');
+        const installStatus = document.getElementById('installStatus');
+        const retryButton = document.getElementById('retryPairingButton');
+        const checkingRetryButton = document.getElementById('checkingRetryButton');
+        const backButton = document.getElementById('backToInstallButton');
+        const installButton = document.getElementById('installExtensionButton');
+        const continueButton = document.getElementById('continueButton');
+        const extensionId = root.dataset.extensionId;
+        const isReconnect = root.dataset.reconnect === '1';
+        const translations = JSON.parse(root.dataset.translations || '{}');
+        const installReloadKey = 'mykeynest.extension-install-reload';
+        const verificationReloadDelay = 1500;
+        let pairingInProgress = false;
+        let pairingCompleted = false;
+        let verificationReloadTimer = null;
+        let completionPollTimer = null;
+
+        const setStep = (name) => {
+          const order = ['install', 'detect', 'connect'];
+          const currentIndex = order.indexOf(name);
+          root.querySelectorAll('[data-step]').forEach((step) => {
+            const index = order.indexOf(step.dataset.step);
+            step.classList.toggle('is-active', index === currentIndex);
+            step.classList.toggle('is-complete', index < currentIndex || pairingCompleted);
+          });
+        };
+
+        const showChecking = () => {
+          root.classList.add('is-checking');
+          installView.setAttribute('aria-hidden', 'true');
+          checkingView.setAttribute('aria-hidden', 'false');
+        };
+
+        const showInstall = () => {
+          window.sessionStorage.removeItem(installReloadKey);
+          window.clearTimeout(verificationReloadTimer);
+          verificationReloadTimer = null;
+          root.classList.remove('is-checking', 'has-error', 'has-success');
+          installView.setAttribute('aria-hidden', 'false');
+          checkingView.setAttribute('aria-hidden', 'true');
+          checkingRetryButton.hidden = true;
+          backButton.hidden = false;
+          continueButton.hidden = true;
+          setStep('install');
+        };
+
+        const setStatus = (title, message, type = 'info') => {
+          statusTitle.textContent = title;
+          statusMessage.textContent = message;
+          root.classList.toggle('has-success', type === 'success');
+          root.classList.toggle('has-error', type === 'error');
+          checkingRetryButton.hidden = type !== 'error';
+          backButton.hidden = type === 'success';
+          continueButton.hidden = type !== 'success';
+        };
+
+        const beginChecking = () => {
+          showChecking();
+          setStep('detect');
+          setStatus(translations.checking_title, translations.checking_message);
+        };
+
+        const finishPairing = (redirectUrl = continueButton.href) => {
+          if (pairingCompleted) return;
+
+          pairingCompleted = true;
+          window.sessionStorage.removeItem(installReloadKey);
+          window.clearTimeout(verificationReloadTimer);
+          window.clearInterval(completionPollTimer);
+          verificationReloadTimer = null;
+          completionPollTimer = null;
+          setStep('connect');
+          setStatus(translations.success_title, translations.success_message, 'success');
+          window.setTimeout(() => window.location.replace(redirectUrl || continueButton.href), 250);
+        };
+
+        const scheduleVerificationReload = () => {
+          if (pairingCompleted || !root.classList.contains('is-checking')) return;
+
+          window.clearTimeout(verificationReloadTimer);
+          verificationReloadTimer = window.setTimeout(() => {
+            if (pairingCompleted || root.classList.contains('has-error')) return;
+            const reloadUrl = new URL(window.location.href);
+            reloadUrl.searchParams.set('_extension_check', Date.now().toString());
+            window.location.replace(reloadUrl.toString());
+          }, verificationReloadDelay);
+        };
+
+        const pollCompletionState = async () => {
+          if (pairingCompleted) return;
+
+          try {
+            const response = await fetch(root.dataset.statusUrl, {
+              method: 'GET',
+              credentials: 'include',
+              cache: 'no-store',
+              headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
+              }
+            });
+            if (!response.ok) return;
+
+            const data = await response.json();
+            if (data.completed) {
+              showChecking();
+              finishPairing(data.redirectUrl);
+            }
+          } catch (error) {
+            // Le pairing actif reste la source principale ; le polling est un filet de sécurité.
+          }
+        };
+
+        const sendDirectToExtension = (message, timeoutMs) => new Promise((resolve, reject) => {
+          if (!window.chrome?.runtime?.sendMessage) {
+            reject(new Error(translations.not_detected));
+            return;
+          }
+
+          const timeout = window.setTimeout(() => reject(new Error(translations.timeout)), timeoutMs);
+
+          try {
+            window.chrome.runtime.sendMessage(extensionId, message, (response) => {
+              window.clearTimeout(timeout);
+              if (window.chrome.runtime.lastError) {
+                reject(new Error(window.chrome.runtime.lastError.message));
+                return;
+              }
+              if (!response) {
+                reject(new Error(translations.no_response));
+                return;
+              }
+              resolve(response);
+            });
+          } catch (error) {
+            window.clearTimeout(timeout);
+            reject(error);
+          }
+        });
+
+        const sendViaContentScript = (message, timeoutMs) => new Promise((resolve, reject) => {
+          const requestId = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          const timeout = window.setTimeout(() => {
+            window.removeEventListener('message', handleResponse);
+            reject(new Error(translations.not_detected));
+          }, timeoutMs);
+
+          const handleResponse = (event) => {
+            if (
+              event.source !== window ||
+              event.origin !== window.location.origin ||
+              event.data?.source !== 'MYKEYNEST_EXTENSION' ||
+              event.data?.type !== 'MYKEYNEST_EXTENSION_RESPONSE' ||
+              event.data?.requestId !== requestId
+            ) return;
+
+            window.clearTimeout(timeout);
+            window.removeEventListener('message', handleResponse);
+            if (!event.data.response) {
+              reject(new Error(translations.no_response));
+              return;
+            }
+            resolve(event.data.response);
+          };
+
+          window.addEventListener('message', handleResponse);
+          window.postMessage({
+            source: 'MYKEYNEST_WEB',
+            type: 'MYKEYNEST_EXTENSION_REQUEST',
+            requestId,
+            payload: message
+          }, window.location.origin);
+        });
+
+        const sendToExtension = async (message, timeoutMs = 8000) => {
+          try {
+            return await sendDirectToExtension(message, timeoutMs);
+          } catch (directError) {
+            return sendViaContentScript(message, timeoutMs);
+          }
+        };
+
+        const jsonRequest = async (url, csrf, payload) => {
+          const response = await fetch(url, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': csrf
+            },
+            body: JSON.stringify(payload)
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error || translations.connection_failed);
+          return data;
+        };
+
+        const detectAndPair = async (displayProgress = false) => {
+          if (pairingInProgress || pairingCompleted) return;
+          pairingInProgress = true;
+          let extensionDetected = false;
+
+          window.clearTimeout(verificationReloadTimer);
+          verificationReloadTimer = null;
+
+          if (displayProgress) beginChecking();
+
+          try {
+            const ping = await sendToExtension({ type: 'MYKEYNEST_EXTENSION_PING' }, 1200);
+            if (!ping.ok || !ping.clientId) throw new Error(translations.not_detected);
+            extensionDetected = true;
+
+            showChecking();
+            setStep('detect');
+            setStatus(translations.detected_title, translations.detected_message);
+
+            const start = await jsonRequest(root.dataset.startUrl, root.dataset.startCsrf, {
+              clientId: ping.clientId,
+              reconnect: isReconnect
+            });
+            if (start.completed) {
+              finishPairing(start.redirectUrl);
+              return;
+            }
+
+            setStep('connect');
+            setStatus(translations.connecting_title, translations.connecting_message);
+
+            const paired = await sendToExtension({
+              type: 'MYKEYNEST_EXTENSION_PAIR',
+              pairingToken: start.pairingToken
+            }, 15000);
+
+            if (!paired.ok) throw new Error(paired.error || translations.pairing_failed);
+
+            const completed = await jsonRequest(root.dataset.completeUrl, root.dataset.completeCsrf, {
+              publicId: start.challenge.publicId,
+              clientId: ping.clientId
+            });
+
+            finishPairing(completed.redirectUrl);
+          } catch (error) {
+            if (!extensionDetected) {
+              if (root.classList.contains('is-checking')) {
+                setStep('detect');
+                setStatus(translations.checking_title, '');
+                window.sessionStorage.setItem(installReloadKey, 'checking');
+                scheduleVerificationReload();
+              } else {
+                installStatus.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${translations.waiting_install}`;
+              }
+            } else {
+              window.sessionStorage.removeItem(installReloadKey);
+              window.clearTimeout(verificationReloadTimer);
+              showChecking();
+              setStatus(translations.interrupted, error.message || translations.retry, 'error');
+            }
+          } finally {
+            pairingInProgress = false;
+          }
+        };
+
+        retryButton.addEventListener('click', () => {
+          window.sessionStorage.setItem(installReloadKey, 'checking');
+          detectAndPair(true);
+        });
+        checkingRetryButton.addEventListener('click', () => {
+          window.sessionStorage.setItem(installReloadKey, 'checking');
+          detectAndPair(true);
+        });
+        backButton.addEventListener('click', showInstall);
+        installButton.addEventListener('click', () => {
+          window.sessionStorage.setItem(installReloadKey, 'pending');
+          beginChecking();
+          statusMessage.textContent = translations.store_message;
+        });
+
+        const resumePairing = () => {
+          if (window.sessionStorage.getItem(installReloadKey) === 'pending') {
+            window.sessionStorage.setItem(installReloadKey, 'checking');
+            detectAndPair(true);
+            return;
+          }
+
+          detectAndPair(root.classList.contains('is-checking'));
+        };
+
+        if (window.sessionStorage.getItem(installReloadKey) === 'checking') {
+          detectAndPair(true);
+        } else {
+          detectAndPair(false);
+        }
+        if (!isReconnect) {
+          completionPollTimer = window.setInterval(pollCompletionState, 500);
+          pollCompletionState();
+        }
+        window.setInterval(() => {
+          if (!root.classList.contains('has-error')) detectAndPair(false);
+        }, 1500);
+        window.addEventListener('focus', resumePairing);
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') resumePairing();
+        });
+      });
+    </script>
+  {% endif %}
+{% endblock %}

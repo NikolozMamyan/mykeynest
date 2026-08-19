@@ -11,6 +11,7 @@ use App\Service\AdminNotificationService;
 use App\Service\LoginChallengeManager;
 use App\Service\MailerService;
 use App\Service\NotificationService;
+use App\Service\ExtensionOnboardingPolicy;
 use App\Service\SessionManager;
 use App\Service\UserDeviceManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,20 +31,20 @@ final class AuthController extends AbstractController
 {
     public function __construct(
         private RateLimiterFactory $authLoginLimiter,
-        private RateLimiterFactory $authRegisterLimiter
+        private RateLimiterFactory $authRegisterLimiter,
+        private ExtensionOnboardingPolicy $extensionOnboardingPolicy
     ) {
     }
 
-    private function getPostAuthRedirectUrl(UrlGeneratorInterface $urlGenerator, User $user, bool $isFirstLogin): string
+    private function getPostAuthRedirectUrl(UrlGeneratorInterface $urlGenerator, User $user): string
     {
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
             return $urlGenerator->generate('app_admin');
         }
 
-        if ($isFirstLogin) {
+        if ($this->extensionOnboardingPolicy->isRequiredFor($user)) {
             return $urlGenerator->generate('app_extention', [
                 'onboarding' => 1,
-                'autocopy' => 1,
             ]);
         }
 
@@ -130,6 +131,7 @@ final class AuthController extends AbstractController
         $user->setEmail($data['email']);
         $user->setRoles(['ROLE_USER']);
         $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        $this->extensionOnboardingPolicy->initializeNewRegistration($user);
         // $token = bin2hex(random_bytes(32));
         // $expiresAt = (new \DateTime())->modify('+1 hour');
         // $user->setApiToken($token);
@@ -139,7 +141,6 @@ final class AuthController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        $isFirstLogin = $sessionManager->isFirstSessionForUser($user);
         $deviceId = $sessionManager->getOrCreateCurrentDeviceId();
         $sessionManager->trustDevice($user, $deviceId);
         [$session, $plainToken] = $sessionManager->createSession($user, deviceId: $deviceId);
@@ -205,7 +206,7 @@ final class AuthController extends AbstractController
                 'id' => $session->getId(),
                 'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
             ],
-            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user, $isFirstLogin),
+            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user),
         ], 201);
 
         $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
@@ -260,7 +261,6 @@ final class AuthController extends AbstractController
         // Appareil connu => login direct
         if ($deviceAccessState === UserDeviceManager::STATE_TRUSTED) {
             try {
-                $isFirstLogin = $sessionManager->isFirstSessionForUser($user);
                 [$session, $plainToken, $finalDeviceId] = $sessionManager->createSession(
                     $user,
                     deviceId: $deviceId
@@ -283,7 +283,7 @@ final class AuthController extends AbstractController
                     'id' => $session->getId(),
                     'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
                 ],
-                'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user, $isFirstLogin),
+                'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user),
             ]);
 
             $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
@@ -438,7 +438,6 @@ final class AuthController extends AbstractController
         }
 
         try {
-            $isFirstLogin = $sessionManager->isFirstSessionForUser($challenge->getUser());
             $sessionManager->trustDevice(
                 $challenge->getUser(),
                 $challengeDeviceId,
@@ -467,7 +466,7 @@ final class AuthController extends AbstractController
                 'id' => $session->getId(),
                 'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
             ],
-            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $challenge->getUser(), $isFirstLogin),
+            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $challenge->getUser()),
         ]);
 
         $response->headers->setCookie($this->buildAuthCookie($request, $plainAuthToken, $session->getExpiresAt()));

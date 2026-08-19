@@ -167,9 +167,9 @@
             <div class="members-list">
                 {% for member in team.members %}
                     <div class="member-item">
-                        <div class="member-avatar">
-                            {{ member.user.email|slice(0, 2)|upper }}
-                        </div>
+<img class="avatar-img"
+               src="{{ member.user.avatar ? asset('uploads/avatars/' ~ member.user.avatar) : asset('images/avatar-default.png') }}"
+               alt="{{ 'header.profile.avatar_alt'|trans }}">
                         <div class="member-info">
                             <div class="member-email">{{ member.user.email }}</div>
                             <div class="member-meta">
@@ -346,6 +346,17 @@
             </div>
 
             {{ form_errors(add_credentials_form.credentials) }}
+
+            <label class="credential-option" style="margin-top: 1rem; align-items: flex-start;">
+                {{ form_widget(add_credentials_form.canRevealPassword, {'attr': {'class': 'share-permission-checkbox'}}) }}
+                <span class="credential-text">
+                    <span class="credential-title">{{ add_credentials_form.canRevealPassword.vars.label }}</span>
+                    <small style="display:block; margin-top:.3rem; color:var(--color-text-medium); line-height:1.4;">
+                        {{ add_credentials_form.canRevealPassword.vars.help }}
+                    </small>
+                </span>
+            </label>
+            {{ form_errors(add_credentials_form.canRevealPassword) }}
 
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" data-action="click->team-show#closeCredentialsModal">

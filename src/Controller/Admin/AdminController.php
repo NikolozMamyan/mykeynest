@@ -197,6 +197,52 @@ final class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/users/{id}/extension-onboarding', name: 'admin_user_extension_onboarding_update', methods: ['POST'])]
+    public function updateUserExtensionOnboarding(
+        User $user,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $redirectToShow = $request->request->getString('_redirect') === 'show';
+        $redirect = fn(): Response => $this->redirectToRoute(
+            $redirectToShow ? 'admin_user_show' : 'admin_users',
+            $redirectToShow ? ['id' => $user->getId()] : []
+        );
+
+        if (!$this->isCsrfTokenValid('admin_extension_onboarding_' . $user->getId(), $request->request->getString('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $redirect();
+        }
+
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            $this->addFlash('warning', 'L onboarding extension ne s applique pas aux administrateurs.');
+
+            return $redirect();
+        }
+
+        $status = $request->request->getString('status');
+        if ($status === User::EXTENSION_ONBOARDING_COMPLETED) {
+            $user->completeExtensionOnboarding();
+            $message = 'Installation marquee comme terminee pour ' . $user->getEmail() . '.';
+        } elseif ($status === User::EXTENSION_ONBOARDING_PENDING) {
+            $user->requireExtensionOnboarding();
+            if (!$user->hasActivePlan('team')) {
+                $user->regenerateApiExtensionToken();
+            }
+            $message = 'Installation annulee : ' . $user->getEmail() . ' devra recommencer.';
+        } else {
+            $this->addFlash('error', 'Action d onboarding invalide.');
+
+            return $redirect();
+        }
+
+        $entityManager->flush();
+        $this->addFlash('success', $message);
+
+        return $redirect();
+    }
+
     #[Route('/extensions', name: 'admin_extensions', methods: ['GET'])]
     public function extensions(
         ExtensionClientRepository $extensionClientRepository,

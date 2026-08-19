@@ -21,9 +21,11 @@
 
 .app-ui-empty {
   padding: 1.4rem;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   border: 1px dashed var(--color-border);
-  background: linear-gradient(135deg, rgba(16,185,129,0.04), rgba(148,163,184,0.06));
+  background: var(--glass-card-bg);
+  -webkit-backdrop-filter: var(--glass-card-blur);
+  backdrop-filter: var(--glass-card-blur);
   text-align: center;
 }
 
@@ -33,7 +35,7 @@
   margin: 0 auto 0.85rem;
   display: grid;
   place-items: center;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   background: rgba(5,150,105,0.12);
   color: var(--color-primary);
   font-size: 1.2rem;
@@ -57,40 +59,27 @@
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-  background: linear-gradient(135deg, var(--color-white) 0%, rgba(16,185,129,0.02) 100%);
-  border: 1px solid var(--color-border);
+  background: var(--glass-card-bg);
+  border: 1px solid var(--glass-card-border);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-card-shadow);
+  -webkit-backdrop-filter: var(--glass-card-blur);
+  backdrop-filter: var(--glass-card-blur);
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.app-ui-stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  transition: left 0.5s;
-}
-
-.app-ui-stat-card:hover::before {
-  left: 100%;
-}
-
 .app-ui-stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -10px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px -18px rgba(15, 23, 42, 0.3);
   border-color: rgba(16,185,129,0.3);
 }
 
 .app-ui-stat-card__icon {
   width: 52px;
   height: 52px;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,7 +92,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   background: inherit;
   opacity: 0.3;
   filter: blur(10px);

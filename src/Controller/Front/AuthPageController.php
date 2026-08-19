@@ -5,7 +5,9 @@ namespace App\Controller\Front;
 use App\Repository\UserRepository;
 use App\Repository\SharedAccessRepository;
 use App\Service\DeviceIdentifier;
-use App\Service\EncryptionService;
+use App\Service\CredentialAccessPolicy;
+use App\Service\CredentialManager;
+use App\Service\ExtensionOnboardingPolicy;
 use App\Service\SessionManager;
 use App\Service\TokenCleaner;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +21,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AuthPageController extends AbstractController
 {
+    public function __construct(
+        private ExtensionOnboardingPolicy $extensionOnboardingPolicy
+    ) {
+    }
+
     private function redirectIfAuthenticatedBySessionCookie(Request $request, SessionManager $sessionManager): ?RedirectResponse
     {
         $plainToken = $request->cookies->get('AUTH_TOKEN');
@@ -33,6 +40,13 @@ class AuthPageController extends AbstractController
         }
 
         $sessionManager->touch($session);
+
+        if (!in_array('ROLE_ADMIN', $user->getRoles(), true) && $this->extensionOnboardingPolicy->isRequiredFor($user)) {
+            $response = $this->redirectToRoute('app_extention', ['onboarding' => 1]);
+            $response->headers->setCookie($this->buildAuthCookie($request, trim($plainToken), $session->getExpiresAt()));
+
+            return $response;
+        }
 
         $next = $request->query->get('next');
         $response = null;
@@ -193,6 +207,7 @@ class AuthPageController extends AbstractController
             $user->setApiToken(null);
             $user->setTokenExpiresAt(null);
             $user->setRoles(['ROLE_USER']);
+            $this->extensionOnboardingPolicy->initializeNewRegistration($user);
 
             $em->flush();
 
@@ -208,7 +223,6 @@ class AuthPageController extends AbstractController
 
             $response = $this->redirectToRoute('app_extention', [
                 'onboarding' => 1,
-                'autocopy' => 1,
             ]);
             $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
             $response->headers->setCookie($this->buildDeviceCookie($request, $deviceId));
@@ -233,7 +247,8 @@ class AuthPageController extends AbstractController
         Request $request,
         UserRepository $userRepository,
         SharedAccessRepository $sharedAccessRepository,
-        EncryptionService $encryptionService
+        CredentialAccessPolicy $accessPolicy,
+        CredentialManager $credentialManager,
     ): Response {
         $token = $request->query->get('token');
         $email = $request->query->get('email');
@@ -275,24 +290,17 @@ class AuthPageController extends AbstractController
                 continue;
             }
 
-            $decryptedPassword = '';
-            $primaryKey = $owner->getCredentialEncryptionKey();
-            if (is_string($primaryKey) && $primaryKey !== '') {
-                $encryptionService->setKeyFromUserSecret($primaryKey);
-                $decryptedPassword = $encryptionService->decrypt((string) $credential->getPassword());
-            }
-
-            $legacyKey = $owner->getApiExtensionToken();
-            if ($decryptedPassword === '' && is_string($legacyKey) && $legacyKey !== '' && $legacyKey !== $primaryKey) {
-                $encryptionService->setKeyFromUserSecret($legacyKey);
-                $decryptedPassword = $encryptionService->decrypt((string) $credential->getPassword());
-            }
+            $canRevealPassword = $accessPolicy->canRevealPassword($user, $credential);
+            $decryptedPassword = $canRevealPassword
+                ? $credentialManager->decryptPassword($credential)
+                : '';
 
             $sharedCredentials[] = [
                 'sharedAccess' => $sharedAccess,
                 'credential' => $credential,
                 'owner' => $owner,
                 'decryptedPassword' => $decryptedPassword,
+                'canRevealPassword' => $canRevealPassword,
             ];
         }
 

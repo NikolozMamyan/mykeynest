@@ -104,10 +104,13 @@
    Team Info Card
    ========================= */
 .team-info-card {
-  background: var(--background-gradient);
+  background: var(--glass-card-bg);
+  border: 1px solid var(--glass-card-border);
   border-radius: var(--border-radius);
   padding: 2rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-card-shadow);
+  -webkit-backdrop-filter: var(--glass-card-blur);
+  backdrop-filter: var(--glass-card-blur);
 }
 
 .team-info-header {
@@ -166,9 +169,12 @@
    Section Card
    ========================= */
 .section-card {
-  background: var(--color-white);
+  background: var(--glass-card-bg);
+  border: 1px solid var(--glass-card-border);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-card-shadow);
+  -webkit-backdrop-filter: var(--glass-card-blur);
+  backdrop-filter: var(--glass-card-blur);
   overflow: hidden;
 }
 

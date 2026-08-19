@@ -177,6 +177,81 @@ final class ExtensionClientManager
         return $result;
     }
 
+    /**
+     * Resolve the first installation authorized by an authenticated web pairing.
+     * A retry for the same client rotates only that client's installation token.
+     *
+     * @return array{
+     *     status: 'resolved',
+     *     client: ExtensionClient,
+     *     installationToken: string,
+     *     isNew: bool
+     * }
+     */
+    public function resolvePairingFromRequest(User $user, Request $request): array
+    {
+        $clientId = $this->extractRequiredHeader($request, 'X-Extension-Client-Id');
+        $existingClient = $this->extensionClientRepository->findOneByUserAndClientId($user, $clientId);
+
+        if ($existingClient instanceof ExtensionClient) {
+            $this->assertAllowed($existingClient);
+
+            $plainInstallationToken = bin2hex(random_bytes(32));
+            $existingClient->setClientSecretHash($this->hashInstallationToken($plainInstallationToken));
+            $this->hydrateClient(
+                $existingClient,
+                $this->cleanNullable($request->headers->get('X-Device-Label')),
+                $this->cleanNullable($request->headers->get('X-Browser-Name')),
+                $this->cleanNullable($request->headers->get('X-Browser-Version')),
+                $this->cleanNullable($request->headers->get('X-OS-Name')),
+                $this->cleanNullable($request->headers->get('X-OS-Version')),
+                $this->cleanNullable($request->headers->get('X-Extension-Version')),
+                $this->cleanNullable($request->headers->get('X-Extension-Manifest-Version')),
+                $this->cleanNullable($request->headers->get('X-Extension-Origin')),
+                $request->getClientIp(),
+                $request->headers->get('User-Agent')
+            );
+            $this->entityManager->flush();
+
+            return [
+                'status' => 'resolved',
+                'client' => $existingClient,
+                'installationToken' => $plainInstallationToken,
+                'isNew' => false,
+            ];
+        }
+
+        $existingClients = $this->extensionClientRepository->findByUserOrderByLastSeen($user);
+        if ($existingClients !== [] && !$this->hasTeamPlan($user)) {
+            $now = new \DateTimeImmutable();
+            foreach ($existingClients as $installedClient) {
+                if ($installedClient->isRevoked()) {
+                    continue;
+                }
+
+                $installedClient->setIsRevoked(true);
+                $installedClient->setRevokedAt($now);
+                $installedClient->setRevokedReason('Remplacee lors d une nouvelle installation');
+                $installedClient->touch();
+            }
+        }
+
+        return $this->createClient(
+            $user,
+            $clientId,
+            $this->cleanNullable($request->headers->get('X-Device-Label')),
+            $this->cleanNullable($request->headers->get('X-Browser-Name')),
+            $this->cleanNullable($request->headers->get('X-Browser-Version')),
+            $this->cleanNullable($request->headers->get('X-OS-Name')),
+            $this->cleanNullable($request->headers->get('X-OS-Version')),
+            $this->cleanNullable($request->headers->get('X-Extension-Version')),
+            $this->cleanNullable($request->headers->get('X-Extension-Manifest-Version')),
+            $this->cleanNullable($request->headers->get('X-Extension-Origin')),
+            $request->getClientIp(),
+            $request->headers->get('User-Agent')
+        );
+    }
+
     public function assertAllowed(ExtensionClient $client): void
     {
         if ($client->isBlocked()) {

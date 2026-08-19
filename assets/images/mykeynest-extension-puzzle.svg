@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 620" fill="none">
+  <title>Extension de navigateur MYKEYNEST</title>
+  <defs>
+    <linearGradient id="puzzleStroke" x1="150" y1="112" x2="522" y2="526" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0FDF4"/>
+      <stop offset="0.52" stop-color="#6EE7B7"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <radialGradient id="puzzleFill" cx="0" cy="0" r="1" gradientTransform="translate(330 292) rotate(64) scale(310)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34D399" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#064E3B" stop-opacity="0.04"/>
+    </radialGradient>
+    <filter id="puzzleGlow" x="103" y="23" width="489" height="569" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g opacity="0.16" stroke="#A7F3D0" stroke-width="1">
+    <path d="M70 156H550M70 260H550M70 364H550M70 468H550"/>
+    <path d="M154 70V550M258 70V550M362 70V550M466 70V550"/>
+  </g>
+
+  <circle cx="492" cy="116" r="33" stroke="#6EE7B7" stroke-opacity="0.36"/>
+  <circle cx="492" cy="116" r="20" stroke="#ECFDF5" stroke-opacity="0.62"/>
+  <circle cx="492" cy="116" r="7" fill="#6EE7B7"/>
+  <circle cx="112" cy="494" r="5" fill="#34D399"/>
+  <circle cx="132" cy="516" r="3" fill="#ECFDF5" fill-opacity="0.72"/>
+
+  <path
+    d="M168 168H273C273 121 311 83 358 83C405 83 443 121 443 168H532V264C484 264 445 303 445 351C445 399 484 438 532 438V532H430C430 484 391 445 343 445C295 445 256 484 256 532H163V435C211 435 250 396 250 348C250 300 211 261 163 261V168H168Z"
+    fill="url(#puzzleFill)"
+    stroke="url(#puzzleStroke)"
+    stroke-width="7"
+    stroke-linejoin="round"
+    filter="url(#puzzleGlow)"
+  />
+  <path
+    d="M187 188H291C291 153 319 125 354 125"
+    stroke="#FFFFFF"
+    stroke-opacity="0.58"
+    stroke-width="3"
+    stroke-linecap="round"
+  />
+  <path
+    d="M291 268L331 308L402 237"
+    stroke="#ECFDF5"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

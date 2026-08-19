@@ -1,10 +1,13 @@
 ﻿/* Hero Section */
   .hero-section {
-    background: var(--color-white);
+    background: var(--glass-card-bg);
+    border: 1px solid var(--glass-card-border);
     border-radius: var(--border-radius);
     padding: 2.5rem;
     margin-bottom: 2rem;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--glass-card-shadow);
+    -webkit-backdrop-filter: var(--glass-card-blur);
+    backdrop-filter: var(--glass-card-blur);
   }
 
   .hero-content {
@@ -161,9 +164,12 @@
   }
   /* Tabs */
   .tabs-wrapper {
-    background: var(--color-white);
+    background: var(--glass-card-bg);
     border-radius: var(--border-radius);
-    box-shadow: var(--shadow-md);
+    border: 1px solid var(--glass-card-border);
+    box-shadow: var(--glass-card-shadow);
+    -webkit-backdrop-filter: var(--glass-card-blur);
+    backdrop-filter: var(--glass-card-blur);
     overflow: hidden;
   }
 
@@ -289,15 +295,18 @@
 
   /* Access Card */
   .access-card {
-    background: var(--color-white);
+    background: var(--glass-card-bg);
     border-radius: var(--border-radius);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--glass-card-border);
+    box-shadow: var(--glass-card-shadow);
+    -webkit-backdrop-filter: var(--glass-card-blur);
+    backdrop-filter: var(--glass-card-blur);
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .access-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
     border-color: var(--color-primary);
   }
@@ -449,11 +458,25 @@
   }
 
   /* Colors */
-  .color-0 { background-color: var(--color-0); }
-  .color-1 { background-color: var(--color-1); }
-  .color-2 { background-color: var(--color-2); }
-  .color-3 { background-color: var(--color-3); }
-  .color-4 { background-color: var(--color-4); }
+.color-0 {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+}
+
+.color-1 {
+  background: linear-gradient(135deg, #059669 0%, #10b981 45%, var(--color-primary) 100%);
+}
+
+.color-2 {
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 45%, #3b82f6 100%);
+}
+
+.color-3 {
+  background: linear-gradient(135deg, #eab308 0%, #f59e0b 45%, #f97316 100%);
+}
+
+.color-4 {
+  background: linear-gradient(135deg, #db2777 0%, #ec4899 45%, #8b5cf6 100%);
+}
 
   /* Modal */
   .modal {

@@ -28,6 +28,9 @@ class SharedAccess
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(options: ['default' => true])]
+    private bool $canRevealPassword = true;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +77,18 @@ class SharedAccess
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function canRevealPassword(): bool
+    {
+        return $this->canRevealPassword;
+    }
+
+    public function setCanRevealPassword(bool $canRevealPassword): self
+    {
+        $this->canRevealPassword = $canRevealPassword;
+
         return $this;
     }
 }

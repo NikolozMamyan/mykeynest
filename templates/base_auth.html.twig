@@ -86,13 +86,13 @@
       <meta property="og:url" content="{{ canonicalUrl }}" />
       <meta property="og:title" content="{% block og_title %}MYKEYNEST - Gestionnaire de mots de passe securise{% endblock %}" />
       <meta property="og:description" content="{% block og_description %}Centralisez vos mots de passe, partagez vos acces en securite et documentez vos pratiques de cybersecurite.{% endblock %}" />
-      <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('apple-touch-icon.png')) }}{% endblock %}" />
+      <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('apple-touch-icon.png')) }}?v=4{% endblock %}" />
 
       <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
       <meta name="twitter:url" content="{{ canonicalUrl }}" />
       <meta name="twitter:title" content="{% block twitter_title %}MYKEYNEST - Gestionnaire de mots de passe securise{% endblock %}" />
       <meta name="twitter:description" content="{% block twitter_description %}Securisez vos mots de passe, vos acces et vos workflows avec MYKEYNEST.{% endblock %}" />
-      <meta name="twitter:image" content="{% block twitter_image %}{{ absolute_url(asset('apple-touch-icon.png')) }}{% endblock %}" />
+      <meta name="twitter:image" content="{% block twitter_image %}{{ absolute_url(asset('apple-touch-icon.png')) }}?v=4{% endblock %}" />
     {% endif %}
 
     <link rel="canonical" href="{{ canonicalUrl }}" />
@@ -115,9 +115,9 @@
       <link rel="alternate" hreflang="x-default" href="{{ defaultUrl }}" />
     {% endif %}
 
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}" />
-    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}" />
+    <link rel="icon" href="{{ asset('favicon.ico') }}?v=4" sizes="any" />
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}?v=4" />
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}?v=4" />
     <link rel="alternate" type="text/markdown" title="LLMs" href="{{ absolute_url(asset('llms.txt')) }}" />
 
     {% if not isSensitiveAuthRoute %}
@@ -146,7 +146,7 @@
             "@type": "Organization",
             "name": "MYKEYNEST",
             "url": "{{ absolute_url(path('app_landing')) }}",
-            "logo": "{{ absolute_url(asset('apple-touch-icon.png')) }}"
+            "logo": "{{ absolute_url(asset('apple-touch-icon.png')) }}?v=4"
           },
           {
             "@type": "WebSite",

@@ -232,6 +232,77 @@
   box-shadow: 0 0 0 2px rgba(255,255,255,.5);
 }
 
+/* ===== Theme Switcher ===== */
+.theme-switcher{
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.theme-option{
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.85);
+  border: 2px solid rgba(226,232,240,.9);
+  color: var(--color-text-dark);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.theme-option:hover{
+  background: rgba(241,245,249,.95);
+  border-color: rgba(203,213,225,.95);
+}
+
+.theme-option.is-active{
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-green);
+}
+
+.theme-option:focus-visible{
+  outline: 3px solid var(--color-primary-hover);
+  outline-offset: 2px;
+}
+
+.theme-option-icon{
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  font-size: 18px;
+}
+
+.theme-option-copy{
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.theme-option-label{
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.theme-option-desc{
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.theme-option.is-active .theme-option-desc{
+  color: rgba(255,255,255,.82);
+}
+
 
 [data-theme="dark"] .lang-label{
   background: rgba(30,41,59,.55);
@@ -241,6 +312,22 @@
 
 [data-theme="dark"] .lang-label:hover{
   background: rgba(30,41,59,.75);
+}
+
+[data-theme="dark"] .theme-option{
+  background: rgba(30,41,59,.55);
+  border-color: rgba(51,65,85,.9);
+  color: var(--color-text-light);
+}
+
+[data-theme="dark"] .theme-option:hover{
+  background: rgba(30,41,59,.75);
+}
+
+[data-theme="dark"] .theme-option.is-active{
+  background: linear-gradient(135deg, var(--color-primary), #10b981);
+  border-color: var(--color-primary);
+  color: #fff;
 }
 
 /* ===== iOS-Style Toggle Switch ===== */
@@ -436,6 +523,9 @@
     padding: 16px;
     flex-direction: column;
   }
+  .theme-switcher{
+    flex-direction: column;
+  }
   .btn{ 
     width: 100%; 
     justify-content: center;
@@ -493,6 +583,50 @@
               <span>English</span>
             </label>
           </div>
+        </div>
+      </section>
+
+      {# Apparence #}
+      <section class="pref-section">
+        <div class="pref-section-header">
+          <span class="pref-icon icon-language">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+          </span>
+          <div>
+            <h2 class="pref-section-title">{{ 'settings.preferences.theme.title'|trans }}</h2>
+            <p class="pref-section-desc">{{ 'settings.preferences.theme.description'|trans }}</p>
+          </div>
+        </div>
+
+        <div class="theme-switcher"
+             role="group"
+             aria-label="{{ 'settings.preferences.theme.aria'|trans }}"
+             data-controller="theme">
+          <button type="button"
+                  class="theme-option"
+                  data-theme-target="option"
+                  data-theme-value="light"
+                  data-action="click->theme#select"
+                  aria-pressed="false">
+            <span class="theme-option-icon" aria-hidden="true"><i class="far fa-sun"></i></span>
+            <span class="theme-option-copy">
+              <span class="theme-option-label">{{ 'settings.preferences.theme.light.label'|trans }}</span>
+              <span class="theme-option-desc">{{ 'settings.preferences.theme.light.description'|trans }}</span>
+            </span>
+          </button>
+
+          <button type="button"
+                  class="theme-option"
+                  data-theme-target="option"
+                  data-theme-value="dark"
+                  data-action="click->theme#select"
+                  aria-pressed="false">
+            <span class="theme-option-icon" aria-hidden="true"><i class="far fa-moon"></i></span>
+            <span class="theme-option-copy">
+              <span class="theme-option-label">{{ 'settings.preferences.theme.dark.label'|trans }}</span>
+              <span class="theme-option-desc">{{ 'settings.preferences.theme.dark.description'|trans }}</span>
+            </span>
+          </button>
         </div>
       </section>
 
