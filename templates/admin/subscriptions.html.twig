@@ -4,6 +4,10 @@
 {% block admin_page_title %}Subscriptions{% endblock %}
 {% block admin_page_intro %}Vue rapide des 100 derniers comptes avec leur statut d abonnement.{% endblock %}
 
+{% block admin_subnav %}
+  {% include 'admin/_subscription_subnav.html.twig' %}
+{% endblock %}
+
 {% block admin_toolbar %}
   <form method="get" action="{{ path('admin_subscriptions') }}" class="ds-search-form ds-toolbar-grow">
     <input class="ds-input" type="search" name="q" value="{{ filters.q }}" placeholder="Email, entreprise ou ID">

@@ -1,0 +1,14 @@
+{% set currentRoute = app.request.attributes.get('_route') %}
+<nav class="admin-subnav" aria-label="Navigation des abonnements">
+  <span class="admin-subnav__root">Subscriptions</span>
+  <i class="fas fa-chevron-right admin-subnav__separator" aria-hidden="true"></i>
+  <a href="{{ path('admin_subscriptions') }}"
+     class="admin-subnav__link {{ currentRoute == 'admin_subscriptions' ? 'is-active' : '' }}">
+    Gestion
+  </a>
+  <i class="fas fa-chevron-right admin-subnav__separator" aria-hidden="true"></i>
+  <a href="{{ path('admin_subscription_plans') }}"
+     class="admin-subnav__link {{ currentRoute == 'admin_subscription_plans' ? 'is-active' : '' }}">
+    Plans
+  </a>
+</nav>

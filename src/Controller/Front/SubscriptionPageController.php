@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use App\Repository\UserSubscriptionRepository;
 use App\Service\AdminNotificationService;
 use App\Service\MailerService;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Stripe\BillingPortal\Session as PortalSession;
@@ -22,6 +23,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class SubscriptionPageController extends AbstractController
 {
+    public function __construct(private readonly SubscriptionPlanService $subscriptionPlans)
+    {
+    }
+
     private function createCheckoutRedirect(?User $user, string $successUrl, string $cancelUrl): RedirectResponse
     {
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
@@ -59,25 +64,33 @@ final class SubscriptionPageController extends AbstractController
     #[Route('/app/subscription', name: 'app_subscription')]
     public function index(): Response
     {
-        return $this->render('subscription/index.html.twig', [
-            'controller_name' => 'TestController',
-        ]);
+        return $this->render('subscription/index.html.twig', $this->getPlanPageData());
     }
 
     #[Route('/app/subscription/pro', name: 'app_subscription_pro')]
     public function pro(): Response
     {
-        return $this->render('subscription/index.html.twig', [
-            'controller_name' => 'TestController',
-        ]);
+        return $this->render('subscription/index.html.twig', $this->getPlanPageData());
     }
 
     #[Route('/app/contact', name: 'app_contact')]
     public function contact(): Response
     {
-        return $this->render('subscription/index.html.twig', [
-            'controller_name' => 'TestController',
-        ]);
+        return $this->render('subscription/index.html.twig', $this->getPlanPageData());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getPlanPageData(): array
+    {
+        $user = $this->getUser();
+
+        return [
+            'freePlan' => $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_FREE),
+            'proPlan' => $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_PRO),
+            'currentPlan' => $user instanceof User ? $this->subscriptionPlans->getPlanForUser($user) : null,
+        ];
     }
 
     #[Route('/app/subscription/checkout/pro', name: 'app_subscription_checkout_pro')]

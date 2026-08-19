@@ -57,13 +57,21 @@
         {{ 'sidebar.sections.tools'|trans }}
       </div>
 
-      <a href="{{ path('app_generator') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
-        <i class="fas fa-wand-magic-sparkles"></i>
-        <span>{{ 'sidebar.items.generator'|trans }}</span>
-      </a>
+      {% if plan_has_feature(app.user, 'password_generator') %}
+        <a href="{{ path('app_generator') }}"
+           class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
+          <i class="fas fa-wand-magic-sparkles"></i>
+          <span>{{ 'sidebar.items.generator'|trans }}</span>
+        </a>
+      {% else %}
+        <div class="nav-item nav-item-disabled">
+          <i class="fas fa-wand-magic-sparkles"></i>
+          <span>{{ 'sidebar.items.generator'|trans }}</span>
+          <span class="nav-item-badge-pro">PRO</span>
+        </div>
+      {% endif %}
 
-      {% if app.user.hasActiveSubscription %}
+      {% if plan_has_feature(app.user, 'secure_notes') %}
         <a href="{{ path('app_note') }}"
            class="nav-item {{ app.request.attributes.get('_route') == 'app_note' ? 'active' : '' }}">
           <i class="fas fa-note-sticky"></i>
@@ -77,7 +85,7 @@
         </div>
       {% endif %}
 
-      {% if app.user.hasActiveSubscription %}
+      {% if plan_has_feature(app.user, 'security_checker') %}
         <a href="{{ path('app_security_checker') }}"
            class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
           <i class="fas fa-shield-heart"></i>

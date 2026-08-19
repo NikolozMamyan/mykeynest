@@ -184,10 +184,25 @@
         <p class="p-tag">{{ 'landing.pricing.plan.basic_tagline'|trans }}</p>
         <p class="p-price">0€ <small>{{ 'landing.pricing.plan.per_month'|trans }}</small></p>
         <ul class="p-feats">
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_1'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_2'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_3'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.basic_4'|trans }}</li>
+          {% set landingFreePlan = subscription_plan('free') %}
+          <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.credentials is null ? 'subscription.plans.limits.credentials_unlimited' : 'subscription.plans.limits.credentials')|trans({'%limit%': landingFreePlan.limits.credentials}) }}</li>
+          <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.shares is null ? 'subscription.plans.limits.shares_unlimited' : 'subscription.plans.limits.shares')|trans({'%limit%': landingFreePlan.limits.shares}) }}</li>
+          <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.teams is null ? 'subscription.plans.limits.teams_unlimited' : 'subscription.plans.limits.teams')|trans({'%limit%': landingFreePlan.limits.teams}) }}</li>
+          {% if landingFreePlan.features.password_generator %}
+            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.password_generator'|trans }}</li>
+          {% endif %}
+          {% if landingFreePlan.limits.extension_installations != 0 %}
+            <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.extension_installations is null ? 'subscription.plans.limits.extension_installations_unlimited' : 'subscription.plans.limits.extension_installations')|trans({'%limit%': landingFreePlan.limits.extension_installations}) }}</li>
+          {% endif %}
+          {% if landingFreePlan.features.secure_notes %}
+            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.secure_notes'|trans }}</li>
+          {% endif %}
+          {% if landingFreePlan.features.security_checker %}
+            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.security_checker'|trans }}</li>
+          {% endif %}
+          {% if landingFreePlan.features.credential_import %}
+            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.credential_import'|trans }}</li>
+          {% endif %}
         </ul>
         <a href="{{ path('show_register') }}" class="btn btn-outline" style="width:100%" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">{{ 'landing.pricing.plan.basic_try'|trans }}</a>
       </div>

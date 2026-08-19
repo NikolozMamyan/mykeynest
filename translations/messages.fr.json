@@ -625,7 +625,7 @@
     },
     "pro_banner": {
       "title": "Limite atteinte !",
-      "description": "Vous avez atteint la limite de 5 credentials. Passez à PRO pour stocker des identifiants illimités et profiter de toutes les fonctionnalités premium.",
+      "description": "Vous avez atteint la limite de %limit% identifiants. Passez à PRO pour stocker des identifiants illimités et profiter de toutes les fonctionnalités premium.",
       "action": "Passer à PRO"
     }
   },
@@ -694,7 +694,8 @@
     },
     "pro_banner": {
       "title": "Limite de partage atteinte !",
-      "description": "Vous avez atteint la limite de 3 partages d'accès. Passez à PRO pour des partages illimités et collaborez sans restriction.",
+      "description": "Vous avez atteint la limite de %limit% partages d'accès. Passez à PRO pour des partages illimités et collaborez sans restriction.",
+      "usage": "%used%/%limit% partages utilisés",
       "action": "Passer à PRO"
     }
   },
@@ -1083,6 +1084,23 @@
       "cta_manage": "Gérer mon abonnement"
     },
     "plans": {
+      "limits": {
+        "credentials": "%limit% identifiants maximum",
+        "credentials_unlimited": "Identifiants illimités",
+        "shares": "%limit% partages maximum",
+        "shares_unlimited": "Partages illimités",
+        "teams": "%limit% équipes créées maximum",
+        "teams_unlimited": "Équipes illimitées",
+        "extension_installations": "Installations d’extension : %limit%",
+        "extension_installations_unlimited": "Installations d’extension illimitées"
+      },
+      "features": {
+        "password_generator": "Générateur de mots de passe",
+        "secure_notes": "Notes sécurisées",
+        "security_checker": "Audit de sécurité",
+        "credential_import": "Import CSV",
+        "all_tools": "Tous les outils avancés"
+      },
       "free": {
         "name": "Free",
         "price_suffix": "/mois",
@@ -1112,9 +1130,11 @@
       "title_before": "Nos",
       "title_highlight": "outils intégrés",
       "subtitle": "Des fonctionnalités puissantes pour simplifier votre sécurité.",
+      "badge_free": "Free",
+      "badge_pro": "Pro",
       "password_generator": {
         "title": "Générateur de mots de passe",
-        "desc": "Créez des mots de passe forts et uniques en un clic, gratuitement.",
+        "desc": "Créez des mots de passe forts et uniques en un clic.",
         "badge": "Free"
       },
       "security_checker": {
@@ -1149,7 +1169,8 @@
       "q2": "Mes données sont-elles sécurisées ?",
       "a2": "Oui, vos identifiants sont chiffrés avec AES-256 et stockés de manière sécurisée sur nos serveurs européens.",
       "q3": "Puis-je partager mes mots de passe ?",
-      "a3": "Bien sûr ! Le plan Free permet 3 partages, tandis que Pro et Entreprise offrent un partage illimité."
+      "a3": "Bien sûr ! Le plan Free permet %limit% partages, tandis que Pro et Team offrent un partage illimité.",
+      "a3_unlimited": "Bien sûr ! Le partage est actuellement illimité sur tous les plans."
     },
     "trust": {
       "title": "Ils nous font confiance",
@@ -1381,7 +1402,7 @@
     },
     "pro_banner": {
       "title": "Limite atteinte !",
-      "description": "Vous avez atteint la limite de teams disponibles. Passez à PRO pour créer des équipes illimitées et collaborer sans restriction.",
+      "description": "Vous avez atteint la limite de %limit% équipes créées. Passez à PRO pour créer des équipes illimitées et collaborer sans restriction.",
       "action": "Passer à PRO"
     }
   },

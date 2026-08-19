@@ -7,10 +7,12 @@ use App\Entity\ExtensionPairingChallenge;
 use App\Entity\User;
 use App\Repository\ExtensionClientRepository;
 use App\Repository\ExtensionPairingChallengeRepository;
+use App\Repository\SubscriptionPlanConfigurationRepository;
 use App\Service\ExtensionClientManager;
 use App\Service\ExtensionInstallationChallengeManager;
 use App\Service\ExtensionPairingManager;
 use App\Service\MailerService;
+use App\Service\SubscriptionPlanService;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -229,7 +231,16 @@ final class ExtensionPairingManagerTest extends TestCase
             $this->createMock(MailerService::class),
             $this->createMock(UrlGeneratorInterface::class),
             $this->createMock(LoggerInterface::class),
+            $this->createSubscriptionPlans($entityManager),
             'test'
         );
+    }
+
+    private function createSubscriptionPlans(EntityManagerInterface $entityManager): SubscriptionPlanService
+    {
+        $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
+        $repository->method('findByPlanCode')->willReturn(null);
+
+        return new SubscriptionPlanService($repository, $entityManager);
     }
 }

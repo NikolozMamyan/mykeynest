@@ -640,7 +640,7 @@
 
           <p class="plan-description" style="margin-bottom: 18px;">
             {{ 'subscription.status_card.subtitle'|trans }}
-            <strong>{{ 'subscription.status_card.plan'|trans }}</strong>.
+            <strong>{{ currentPlan.label }}</strong>.
           </p>
 
           <div class="card-divider" style="margin: 0 30px 20px;"></div>
@@ -694,10 +694,32 @@
 
         <div class="card-body">
           <ul class="features-list">
-            <li><span class="feature-icon"><i class="fa-solid fa-check"></i></span> {{ 'subscription.plans.free.features.f1'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-check"></i></span> {{ 'subscription.plans.free.features.f2'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span> {{ 'subscription.plans.free.features.f3'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> {{ 'subscription.plans.free.features.f4'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span>
+              {{ (freePlan.limits.credentials is null ? 'subscription.plans.limits.credentials_unlimited' : 'subscription.plans.limits.credentials')|trans({'%limit%': freePlan.limits.credentials}) }}
+            </li>
+            <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span>
+              {{ (freePlan.limits.shares is null ? 'subscription.plans.limits.shares_unlimited' : 'subscription.plans.limits.shares')|trans({'%limit%': freePlan.limits.shares}) }}
+            </li>
+            <li><span class="feature-icon"><i class="fa-solid fa-users"></i></span>
+              {{ (freePlan.limits.teams is null ? 'subscription.plans.limits.teams_unlimited' : 'subscription.plans.limits.teams')|trans({'%limit%': freePlan.limits.teams}) }}
+            </li>
+            {% if freePlan.limits.extension_installations != 0 %}
+              <li><span class="feature-icon"><i class="fa-solid fa-puzzle-piece"></i></span>
+                {{ (freePlan.limits.extension_installations is null ? 'subscription.plans.limits.extension_installations_unlimited' : 'subscription.plans.limits.extension_installations')|trans({'%limit%': freePlan.limits.extension_installations}) }}
+              </li>
+            {% endif %}
+            {% if freePlan.features.password_generator %}
+              <li><span class="feature-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span> {{ 'subscription.plans.features.password_generator'|trans }}</li>
+            {% endif %}
+            {% if freePlan.features.secure_notes %}
+              <li><span class="feature-icon"><i class="fa-solid fa-note-sticky"></i></span> {{ 'subscription.plans.features.secure_notes'|trans }}</li>
+            {% endif %}
+            {% if freePlan.features.security_checker %}
+              <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> {{ 'subscription.plans.features.security_checker'|trans }}</li>
+            {% endif %}
+            {% if freePlan.features.credential_import %}
+              <li><span class="feature-icon"><i class="fa-solid fa-file-import"></i></span> {{ 'subscription.plans.features.credential_import'|trans }}</li>
+            {% endif %}
           </ul>
         </div>
       </div>
@@ -722,10 +744,15 @@
 
         <div class="card-body">
           <ul class="features-list">
-            <li><span class="feature-icon"><i class="fa-solid fa-check"></i></span> {{ 'subscription.plans.pro.features.f1'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span> {{ 'subscription.plans.pro.features.f2'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-users"></i></span> {{ 'subscription.plans.pro.features.f3'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> {{ 'subscription.plans.pro.features.f4'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span> {{ 'subscription.plans.limits.credentials_unlimited'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span> {{ 'subscription.plans.limits.shares_unlimited'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-users"></i></span> {{ 'subscription.plans.limits.teams_unlimited'|trans }}</li>
+            {% if proPlan.limits.extension_installations != 0 %}
+              <li><span class="feature-icon"><i class="fa-solid fa-puzzle-piece"></i></span>
+                {{ (proPlan.limits.extension_installations is null ? 'subscription.plans.limits.extension_installations_unlimited' : 'subscription.plans.limits.extension_installations')|trans({'%limit%': proPlan.limits.extension_installations}) }}
+              </li>
+            {% endif %}
+            <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> {{ 'subscription.plans.features.all_tools'|trans }}</li>
           </ul>
 
           {% if not hasActiveSubscription %}
@@ -762,7 +789,7 @@
             <div class="tool-icon"><i class="fa-solid fa-key"></i></div>
             <div class="tool-title">{{ 'subscription.tools.password_generator.title'|trans }}</div>
           </div>
-          <span class="tool-badge free">{{ 'subscription.tools.password_generator.badge'|trans }}</span>
+          <span class="tool-badge free">{{ (freePlan.features.password_generator ? 'subscription.tools.badge_free' : 'subscription.tools.badge_pro')|trans }}</span>
         </div>
         <p class="tool-description">{{ 'subscription.tools.password_generator.desc'|trans }}</p>
       </div>
@@ -773,7 +800,7 @@
             <div class="tool-icon"><i class="fa-solid fa-shield-halved"></i></div>
             <div class="tool-title">{{ 'subscription.tools.security_checker.title'|trans }}</div>
           </div>
-          <span class="tool-badge free">{{ 'subscription.tools.security_checker.badge'|trans }}</span>
+          <span class="tool-badge free">{{ (freePlan.features.security_checker ? 'subscription.tools.badge_free' : 'subscription.tools.badge_pro')|trans }}</span>
         </div>
         <p class="tool-description">{{ 'subscription.tools.security_checker.desc'|trans }}</p>
       </div>
@@ -784,6 +811,7 @@
             <div class="tool-icon"><i class="fa-solid fa-users-gear"></i></div>
             <div class="tool-title">{{ 'subscription.tools.team_management.title'|trans }}</div>
           </div>
+          <span class="tool-badge free">{{ (freePlan.limits.teams != 0 ? 'subscription.tools.badge_free' : 'subscription.tools.badge_pro')|trans }}</span>
         </div>
         <p class="tool-description">{{ 'subscription.tools.team_management.desc'|trans }}</p>
       </div>
@@ -834,7 +862,9 @@
         <span>{{ 'subscription.faq.q3'|trans }}</span>
         <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
       </div>
-      <div class="faq-answer">{{ 'subscription.faq.a3'|trans }}</div>
+      <div class="faq-answer">
+        {{ (freePlan.limits.shares is null ? 'subscription.faq.a3_unlimited' : 'subscription.faq.a3')|trans({'%limit%': freePlan.limits.shares}) }}
+      </div>
     </div>
   </section>
 

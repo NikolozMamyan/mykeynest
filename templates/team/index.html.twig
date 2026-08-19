@@ -18,7 +18,7 @@
             </p>
         </div>
 
-        {% if app.user.hasActiveSubscription or teams|length < 1 %}
+        {% if canCreateTeam %}
             <a href="{{ path('app_team_new') }}" class="btn-primary-action">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -37,8 +37,8 @@
         {% endif %}
     </div>
 
-    {# PRO Upgrade Banner - Affiché seulement si non abonné et a déjà 1 équipe #}
-    {% if not app.user.hasActiveSubscription and teams|length >= 1 %}
+    {# Upgrade banner shown when the active plan limit is reached. #}
+    {% if teamLimit is not null and ownedTeamsCount >= teamLimit %}
         <div class="pro-upgrade-banner">
             <div class="pro-banner-content">
                 <div class="pro-banner-icon">
@@ -49,7 +49,7 @@
                 </div>
                 <div class="pro-banner-text">
                     <h3>{{ 'teams.pro_banner.title'|trans|default('Limite atteinte !') }}</h3>
-                    <p>{{ 'teams.pro_banner.description'|trans|default('Vous avez atteint la limite de 1 équipe. Passez à PRO pour créer des équipes illimitées et débloquer toutes les fonctionnalités.') }}</p>
+                    <p>{{ 'teams.pro_banner.description'|trans({'%limit%': teamLimit}) }}</p>
                 </div>
             </div>
             <a href="{{ path('app_subscription') }}" class="btn-upgrade-pro">
@@ -74,9 +74,11 @@
             <h2>{{ 'teams.empty.title'|trans }}</h2>
             <p>{{ 'teams.empty.description'|trans }}</p>
 
-            <a href="{{ path('app_team_new') }}" class="btn-primary-action">
-                {{ 'teams.empty.action'|trans }}
-            </a>
+            {% if canCreateTeam %}
+                <a href="{{ path('app_team_new') }}" class="btn-primary-action">
+                    {{ 'teams.empty.action'|trans }}
+                </a>
+            {% endif %}
         </div>
     {% else %}
         <div class="teams-grid">

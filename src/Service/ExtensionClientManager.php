@@ -23,6 +23,7 @@ final class ExtensionClientManager
         private MailerService $mailerService,
         private UrlGeneratorInterface $urlGenerator,
         private LoggerInterface $logger,
+        private SubscriptionPlanService $subscriptionPlans,
         #[Autowire('%kernel.environment%')]
         private string $environment
     ) {
@@ -97,14 +98,22 @@ final class ExtensionClientManager
         }
 
         $this->assertNoBlockedFingerprintReuse($user, $deviceLabel, $browserName, $osName, $userAgent, $ipAddress);
-        $existingCount = count($existingClients);
+        $existingCount = $this->countActiveClients($existingClients);
+        $installationLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS);
+
+        if ($installationLimit === 0) {
+            throw new \RuntimeException('L’extension navigateur n’est pas disponible avec ce plan.');
+        }
 
         if ($existingCount === 0) {
             return $this->createClient($user, $clientId, $deviceLabel, $browserName, $browserVersion, $osName, $osVersion, $extensionVersion, $manifestVersion, $originType, $ipAddress, $userAgent);
         }
 
-        if (!$this->hasTeamPlan($user)) {
-            throw new \RuntimeException('Nouvelle installation refusée. Une seule installation extension est autorisée pour ce compte.');
+        if ($installationLimit !== null && $existingCount >= $installationLimit) {
+            throw new \RuntimeException(sprintf(
+                'Nouvelle installation refusée. Votre plan autorise %d installation(s) extension.',
+                $installationLimit
+            ));
         }
 
         $challenge = $this->extensionInstallationChallengeManager->findLatestByUserAndClientId($user, $clientId);
@@ -222,7 +231,12 @@ final class ExtensionClientManager
         }
 
         $existingClients = $this->extensionClientRepository->findByUserOrderByLastSeen($user);
-        if ($existingClients !== [] && !$this->hasTeamPlan($user)) {
+        $installationLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS);
+        if ($installationLimit === 0) {
+            throw new \RuntimeException('L’extension navigateur n’est pas disponible avec ce plan.');
+        }
+
+        if ($installationLimit !== null && $this->countActiveClients($existingClients) >= $installationLimit) {
             $now = new \DateTimeImmutable();
             foreach ($existingClients as $installedClient) {
                 if ($installedClient->isRevoked()) {
@@ -286,6 +300,19 @@ final class ExtensionClientManager
         $client->setRevokedReason(null);
         $client->touch();
         $this->entityManager->flush();
+    }
+
+    /**
+     * Revoked installations remain in the audit trail but no longer consume a plan slot.
+     *
+     * @param ExtensionClient[] $clients
+     */
+    private function countActiveClients(array $clients): int
+    {
+        return count(array_filter(
+            $clients,
+            static fn (ExtensionClient $client): bool => !$client->isRevoked(),
+        ));
     }
 
     public function revoke(ExtensionClient $client, ?string $reason = null): void
@@ -390,11 +417,6 @@ final class ExtensionClientManager
                 'requestedAt' => $challenge->getCreatedAt(),
             ]
         );
-    }
-
-    private function hasTeamPlan(User $user): bool
-    {
-        return $user->hasActivePlan('team');
     }
 
     private function shouldRenewPendingChallenge(ExtensionInstallationChallenge $challenge): bool

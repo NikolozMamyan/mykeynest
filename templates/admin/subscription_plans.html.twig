@@ -1,0 +1,169 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin Plans{% endblock %}
+{% block admin_page_title %}Plans d’abonnement{% endblock %}
+{% block admin_page_intro %}Vue centralisée des droits actuels et configuration du plan Free.{% endblock %}
+
+{% block admin_subnav %}
+  {% include 'admin/_subscription_subnav.html.twig' %}
+{% endblock %}
+
+{% block admin_content %}
+  <section class="admin-plan-grid" aria-label="Récapitulatif des plans">
+    {% for plan in plans %}
+      <article class="admin-plan-card {{ plan.editable ? 'admin-plan-card--editable' : '' }}">
+        <header class="admin-plan-card__header">
+          <div>
+            <span class="admin-plan-card__eyebrow">Plan actuel</span>
+            <h2>{{ plan.label }}</h2>
+          </div>
+          {% include 'components/ui/status_badge.html.twig' with {
+            label: plan.editable ? 'Configurable' : 'Lecture seule',
+            tone: plan.editable ? 'success' : 'muted'
+          } only %}
+        </header>
+
+        <div class="admin-plan-card__section">
+          <h3>Limites</h3>
+          <dl class="admin-plan-list">
+            <div><dt>Identifiants</dt><dd>{{ plan.limits.credentials is null ? 'Illimité' : plan.limits.credentials }}</dd></div>
+            <div><dt>Partages</dt><dd>{{ plan.limits.shares is null ? 'Illimité' : plan.limits.shares }}</dd></div>
+            <div><dt>Équipes créées</dt><dd>{{ plan.limits.teams is null ? 'Illimité' : plan.limits.teams }}</dd></div>
+            <div><dt>Installations extension</dt><dd>{{ plan.limits.extension_installations is null ? 'Illimité' : plan.limits.extension_installations }}</dd></div>
+          </dl>
+        </div>
+
+        <div class="admin-plan-card__section">
+          <h3>Fonctionnalités</h3>
+          <ul class="admin-plan-features">
+            {% set featureLabels = {
+              password_generator: 'Générateur de mots de passe',
+              secure_notes: 'Notes sécurisées',
+              security_checker: 'Audit de sécurité',
+              credential_import: 'Import CSV'
+            } %}
+            {% for feature, label in featureLabels %}
+              {% set enabled = plan.features[feature] ?? false %}
+              <li class="{{ enabled ? 'is-enabled' : 'is-disabled' }}">
+                <i class="fas {{ enabled ? 'fa-check' : 'fa-minus' }}" aria-hidden="true"></i>
+                <span>{{ label }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <footer class="admin-plan-card__footer">
+          {% if plan.updatedAt %}
+            Mis à jour le {{ plan.updatedAt|date('d/m/Y à H:i') }}
+          {% else %}
+            Configuration système par défaut
+          {% endif %}
+        </footer>
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="ds-surface admin-plan-editor">
+    <div class="ds-section-head">
+      <div>
+        <span class="admin-plan-card__eyebrow">Configuration active</span>
+        <h2 class="ds-section-title">Modifier le plan Free</h2>
+        <p class="ds-section-text">Les changements sont appliqués immédiatement aux contrôles serveur et aux interfaces utilisateurs.</p>
+      </div>
+      {% include 'components/ui/status_badge.html.twig' with { label: 'Production', tone: 'success' } only %}
+    </div>
+
+    {{ form_start(form, { attr: { class: 'admin-plan-form', 'data-plan-form': '' } }) }}
+      {{ form_errors(form) }}
+
+      <div class="admin-plan-editor__group">
+        <div class="admin-plan-editor__heading">
+          <i class="fas fa-sliders" aria-hidden="true"></i>
+          <div>
+            <h3>Limites d’utilisation</h3>
+            <p>Une valeur à zéro bloque toute nouvelle création. Cochez « Illimité » pour supprimer la limite.</p>
+          </div>
+        </div>
+
+        <div class="admin-limit-grid">
+          {% set limits = [
+            { field: form.credentialLimit, unlimited: form.credentialsUnlimited, icon: 'fa-key', title: 'Identifiants' },
+            { field: form.shareLimit, unlimited: form.sharesUnlimited, icon: 'fa-share-nodes', title: 'Partages' },
+            { field: form.teamLimit, unlimited: form.teamsUnlimited, icon: 'fa-users', title: 'Équipes créées' },
+            { field: form.extensionInstallationLimit, unlimited: form.extensionInstallationsUnlimited, icon: 'fa-puzzle-piece', title: 'Installations extension' }
+          ] %}
+
+          {% for item in limits %}
+            <div class="admin-limit-card" data-plan-limit>
+              <div class="admin-limit-card__title">
+                <i class="fas {{ item.icon }}" aria-hidden="true"></i>
+                <span>{{ item.title }}</span>
+              </div>
+              {{ form_widget(item.field, { attr: { class: 'ds-input admin-limit-input', 'data-limit-input': '' } }) }}
+              {{ form_errors(item.field) }}
+              <label class="admin-unlimited-toggle">
+                {{ form_widget(item.unlimited, { attr: { 'data-unlimited-toggle': '' } }) }}
+                <span>Illimité</span>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="admin-plan-editor__group">
+        <div class="admin-plan-editor__heading">
+          <i class="fas fa-toggle-on" aria-hidden="true"></i>
+          <div>
+            <h3>Fonctionnalités accessibles</h3>
+            <p>Ces options commandent les liens visibles et les autorisations serveur du plan Free.</p>
+          </div>
+        </div>
+
+        <div class="admin-feature-grid">
+          {% set features = [
+            { field: form.passwordGenerator, icon: 'fa-wand-magic-sparkles', title: 'Générateur', text: 'Créer et enregistrer des brouillons de mots de passe.' },
+            { field: form.secureNotes, icon: 'fa-note-sticky', title: 'Notes sécurisées', text: 'Accéder aux notes personnelles et collaboratives.' },
+            { field: form.securityChecker, icon: 'fa-shield-heart', title: 'Audit de sécurité', text: 'Analyser la robustesse et la réutilisation des mots de passe.' },
+            { field: form.credentialImport, icon: 'fa-file-import', title: 'Import CSV', text: 'Importer plusieurs identifiants depuis un fichier.' }
+          ] %}
+
+          {% for item in features %}
+            <label class="admin-feature-card">
+              {{ form_widget(item.field) }}
+              <span class="admin-feature-card__icon"><i class="fas {{ item.icon }}" aria-hidden="true"></i></span>
+              <span class="admin-feature-card__copy">
+                <strong>{{ item.title }}</strong>
+                <small>{{ item.text }}</small>
+              </span>
+              <span class="admin-feature-card__control" aria-hidden="true"></span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="admin-plan-form__actions">
+        <p><i class="fas fa-circle-info" aria-hidden="true"></i> Les utilisateurs déjà au-dessus d’une nouvelle limite conservent leurs données, mais ne peuvent plus en créer.</p>
+        <button type="submit" class="ds-btn ds-btn--primary">
+          <i class="fas fa-check" aria-hidden="true"></i>
+          Enregistrer le plan Free
+        </button>
+      </div>
+    {{ form_end(form) }}
+  </section>
+
+  <script>
+    document.querySelectorAll('[data-plan-limit]').forEach((row) => {
+      const input = row.querySelector('[data-limit-input]');
+      const toggle = row.querySelector('[data-unlimited-toggle]');
+      if (!input || !toggle) return;
+
+      const sync = () => {
+        input.disabled = toggle.checked;
+        row.classList.toggle('is-unlimited', toggle.checked);
+      };
+
+      toggle.addEventListener('change', sync);
+      sync();
+    });
+  </script>
+{% endblock %}

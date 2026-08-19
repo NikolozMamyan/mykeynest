@@ -577,7 +577,7 @@
     },
     "pro_banner": {
       "title": "Limit reached!",
-      "description": "You’ve reached the limit of 5 credentials. Upgrade to PRO to store unlimited credentials and unlock all premium features.",
+      "description": "You’ve reached the limit of %limit% credentials. Upgrade to PRO to store unlimited credentials and unlock all premium features.",
       "action": "Upgrade to PRO"
     }
   },
@@ -646,7 +646,8 @@
     },
     "pro_banner": {
       "title": "Sharing limit reached!",
-      "description": "You’ve reached the limit of 3 shared accesses. Upgrade to PRO for unlimited sharing and seamless collaboration.",
+      "description": "You’ve reached the limit of %limit% shared accesses. Upgrade to PRO for unlimited sharing and seamless collaboration.",
+      "usage": "%used%/%limit% shared accesses used",
       "action": "Upgrade to PRO"
     }
   },
@@ -1112,6 +1113,23 @@
       "cta_manage": "Manage my subscription"
     },
     "plans": {
+      "limits": {
+        "credentials": "Up to %limit% credentials",
+        "credentials_unlimited": "Unlimited credentials",
+        "shares": "Up to %limit% shared accesses",
+        "shares_unlimited": "Unlimited sharing",
+        "teams": "Up to %limit% created teams",
+        "teams_unlimited": "Unlimited teams",
+        "extension_installations": "Browser extension installations: %limit%",
+        "extension_installations_unlimited": "Unlimited browser extension installations"
+      },
+      "features": {
+        "password_generator": "Password generator",
+        "secure_notes": "Secure notes",
+        "security_checker": "Security audit",
+        "credential_import": "CSV import",
+        "all_tools": "All advanced tools"
+      },
       "free": {
         "name": "Free",
         "price_suffix": "/month",
@@ -1141,9 +1159,11 @@
       "title_before": "Our",
       "title_highlight": "built-in tools",
       "subtitle": "Powerful features to simplify your security.",
+      "badge_free": "Free",
+      "badge_pro": "Pro",
       "password_generator": {
         "title": "Password generator",
-        "desc": "Create strong and unique passwords in one click — for free.",
+        "desc": "Create strong and unique passwords in one click.",
         "badge": "Free"
       },
       "security_checker": {
@@ -1178,7 +1198,8 @@
       "q2": "Is my data really secure?",
       "a2": "Yes. Your credentials are encrypted with AES-256 and stored securely on our European servers.",
       "q3": "Can I share my passwords?",
-      "a3": "Yes! The Free plan allows limited sharing, while Pro offers unlimited sharing."
+      "a3": "Yes! The Free plan allows %limit% shared accesses, while Pro and Team offer unlimited sharing.",
+      "a3_unlimited": "Yes! Sharing is currently unlimited across all plans."
     },
     "trust": {
       "title": "They trust us",
@@ -1372,7 +1393,7 @@
     },
     "pro_banner": {
       "title": "Limit reached!",
-      "description": "You’ve reached the limit for available teams. Upgrade to PRO to create unlimited teams and collaborate without limits.",
+      "description": "You’ve reached the limit of %limit% created teams. Upgrade to PRO to create unlimited teams and collaborate without limits.",
       "action": "Upgrade to PRO"
     }
   },

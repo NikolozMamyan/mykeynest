@@ -2,6 +2,7 @@
 
 namespace App\Controller\Front\Resources;
 
+use App\Service\SubscriptionPlanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -9,6 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class HelpCenterController extends AbstractController
 {
+    public function __construct(private readonly SubscriptionPlanService $subscriptionPlans)
+    {
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // i18n helpers
     // ─────────────────────────────────────────────────────────────────────────
@@ -154,6 +159,61 @@ final class HelpCenterController extends AbstractController
 
     private function getAllArticles(): array
     {
+        $freePlan = $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_FREE);
+        $freeCredentialLimit = $freePlan['limits'][SubscriptionPlanService::LIMIT_CREDENTIALS];
+        $freeShareLimit = $freePlan['limits'][SubscriptionPlanService::LIMIT_SHARES];
+
+        $shareExcerptFr = $freeShareLimit === null
+            ? 'L’offre gratuite permet actuellement des partages actifs illimités.'
+            : sprintf('L’offre gratuite permet jusqu’à %d partages actifs. Le plan Pro donne accès aux partages illimités.', $freeShareLimit);
+        $shareExcerptEn = $freeShareLimit === null
+            ? 'The Free plan currently includes unlimited active sharing.'
+            : sprintf('The Free plan allows up to %d active shares. The Pro plan unlocks unlimited sharing.', $freeShareLimit);
+        $shareContentFr = $freeShareLimit === null
+            ? '<p>Le plan Free autorise actuellement des <strong>partages actifs illimités</strong>.</p>'
+            : sprintf('<p>Le plan Free autorise <strong>%d partages actifs</strong> en simultané. Si vous atteignez cette limite, révoquez un partage existant avant d’en créer un nouveau, ou passez au plan Pro pour des partages illimités.</p>', $freeShareLimit);
+        $shareContentEn = $freeShareLimit === null
+            ? '<p>The Free plan currently includes <strong>unlimited active sharing</strong>.</p>'
+            : sprintf('<p>The Free plan allows <strong>%d active shares</strong> at the same time. If you reach this limit, revoke an existing share before creating a new one, or upgrade to Pro for unlimited sharing.</p>', $freeShareLimit);
+        $credentialComparisonFr = $freeCredentialLimit === null ? 'illimités en Free' : sprintf('%d en Free', $freeCredentialLimit);
+        $credentialComparisonEn = $freeCredentialLimit === null ? 'unlimited on Free' : sprintf('%d on Free', $freeCredentialLimit);
+        $shareComparisonFr = $freeShareLimit === null ? 'illimités en Free' : sprintf('%d en Free', $freeShareLimit);
+        $shareComparisonEn = $freeShareLimit === null ? 'unlimited on Free' : sprintf('%d on Free', $freeShareLimit);
+        $freeHasSecurityChecker = $freePlan['features'][SubscriptionPlanService::FEATURE_SECURITY_CHECKER];
+        $securityAccessFr = $freeHasSecurityChecker ? 'inclus au plan Free' : 'plan Pro requis';
+        $securityAccessEn = $freeHasSecurityChecker ? 'included in the Free plan' : 'Pro plan required';
+
+        $proAdvantagesFr = ['Authentification 2FA', 'Support prioritaire &lt;2h'];
+        $proAdvantagesEn = ['2FA authentication', 'Priority support (&lt;2h)'];
+        if ($freeCredentialLimit !== null) {
+            array_unshift($proAdvantagesFr, sprintf('Mots de passe <strong>illimités</strong> (vs %s)', $credentialComparisonFr));
+            array_unshift($proAdvantagesEn, sprintf('<strong>Unlimited</strong> passwords (vs %s)', $credentialComparisonEn));
+        }
+        if ($freeShareLimit !== null) {
+            array_splice($proAdvantagesFr, 1, 0, [sprintf('Partages <strong>illimités</strong> (vs %s)', $shareComparisonFr)]);
+            array_splice($proAdvantagesEn, 1, 0, [sprintf('<strong>Unlimited</strong> sharing (vs %s)', $shareComparisonEn)]);
+        }
+
+        $featureAdvantages = [
+            SubscriptionPlanService::FEATURE_PASSWORD_GENERATOR => ['Générateur de mots de passe', 'Password generator'],
+            SubscriptionPlanService::FEATURE_SECURE_NOTES => ['Notes sécurisées', 'Secure notes'],
+            SubscriptionPlanService::FEATURE_SECURITY_CHECKER => ['Audit de sécurité', 'Security audit'],
+            SubscriptionPlanService::FEATURE_CREDENTIAL_IMPORT => ['Import CSV', 'CSV import'],
+        ];
+        foreach ($featureAdvantages as $feature => [$labelFr, $labelEn]) {
+            if (($freePlan['features'][$feature] ?? false) === false) {
+                $proAdvantagesFr[] = $labelFr;
+                $proAdvantagesEn[] = $labelEn;
+            }
+        }
+
+        $planComparisonContentFr = '<p>Tous les plans incluent le chiffrement AES-256 et la synchronisation. Le plan Pro propose :</p><ul><li>'
+            . implode('</li><li>', $proAdvantagesFr)
+            . '</li></ul>';
+        $planComparisonContentEn = '<p>All plans include AES-256 encryption and synchronization. The Pro plan provides:</p><ul><li>'
+            . implode('</li><li>', $proAdvantagesEn)
+            . '</li></ul>';
+
         return [
             'demarrer' => [
                 'creer-son-compte' => [
@@ -588,8 +648,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Run an audit',
                             ],
                             'content' => [
-                                'fr' => '<p>Depuis le tableau de bord, cliquez sur <strong>Audit de sécurité</strong> (plan Pro requis). L\'analyse génère un rapport en quelques secondes.</p>',
-                                'en' => '<p>From the dashboard, click <strong>Security audit</strong> (Pro plan required). The analysis generates a report in a few seconds.</p>',
+                                'fr' => sprintf('<p>Depuis le tableau de bord, cliquez sur <strong>Audit de sécurité</strong> (%s). L\'analyse génère un rapport en quelques secondes.</p>', $securityAccessFr),
+                                'en' => sprintf('<p>From the dashboard, click <strong>Security audit</strong> (%s). The analysis generates a report in a few seconds.</p>', $securityAccessEn),
                             ],
                         ],
                         [
@@ -814,8 +874,8 @@ final class HelpCenterController extends AbstractController
                         'en' => 'How many shares are included in the Free plan?',
                     ],
                     'excerpt' => [
-                        'fr' => 'L\'offre gratuite permet jusqu\'à 5 partages actifs. Le plan Pro donne accès aux partages illimités.',
-                        'en' => 'The Free plan allows up to 5 active shares. The Pro plan unlocks unlimited sharing.',
+                        'fr' => $shareExcerptFr,
+                        'en' => $shareExcerptEn,
                     ],
                     'readTime' => 2,
                     'popular' => false,
@@ -835,8 +895,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Free plan limits',
                             ],
                             'content' => [
-                                'fr' => '<p>Le plan Free autorise <strong>5 partages actifs</strong> en simultané. Si vous atteignez cette limite, révoquez un partage existant avant d\'en créer un nouveau, ou passez au plan Pro pour des partages illimités.</p>',
-                                'en' => '<p>The Free plan allows <strong>5 active shares</strong> at the same time. If you reach the limit, revoke an existing share before creating a new one, or upgrade to Pro for unlimited sharing.</p>',
+                                'fr' => $shareContentFr,
+                                'en' => $shareContentEn,
                             ],
                         ],
                     ],
@@ -1060,8 +1120,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Comparison table',
                             ],
                             'content' => [
-                                'fr' => '<p>Les deux plans incluent le chiffrement AES-256, la synchro multi-appareils et le générateur. Le plan Pro débloque :</p><ul><li>Mots de passe <strong>illimités</strong> (vs 5 en Free)</li><li>Partages <strong>illimités</strong> (vs 5 en Free)</li><li>Authentification 2FA</li><li>Audit de sécurité</li><li>Notes sécurisées</li><li>Support prioritaire &lt;2h</li></ul>',
-                                'en' => '<p>Both plans include AES-256 encryption, multi-device sync, and the generator. The Pro plan unlocks:</p><ul><li><strong>Unlimited</strong> passwords (vs 5 on Free)</li><li><strong>Unlimited</strong> sharing (vs 5 on Free)</li><li>2FA authentication</li><li>Security audit</li><li>Secure notes</li><li>Priority support (&lt;2h)</li></ul>',
+                                'fr' => $planComparisonContentFr,
+                                'en' => $planComparisonContentEn,
                             ],
                         ],
                         [

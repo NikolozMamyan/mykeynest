@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Notification;
 use App\Service\NotificationService;
 use App\Service\SecurityCheckerService;
+use App\Service\SubscriptionPlanService;
 use App\Repository\CredentialRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\NotificationRepository;
@@ -24,6 +25,7 @@ final class SecurityCheckerController extends AbstractController
         private EntityManagerInterface $em,
         private NotificationService $notificationService,
         private NotificationRepository $notificationRepository,
+        private SubscriptionPlanService $subscriptionPlans,
     ) {}
 
     #[Route('/app/security/checker', name: 'app_security_checker', methods: ['GET'])]
@@ -90,10 +92,10 @@ if ($score < 40) {
 
     private function denyUnlessSubscribed(User $user): void
     {
-        if ($user->hasActiveSubscription()) {
+        if ($this->subscriptionPlans->hasFeature($user, SubscriptionPlanService::FEATURE_SECURITY_CHECKER)) {
             return;
         }
 
-        throw $this->createAccessDeniedException('Active subscription required.');
+        throw $this->createAccessDeniedException('L’audit de sécurité n’est pas disponible avec votre plan.');
     }
 }

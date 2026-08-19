@@ -9,13 +9,14 @@ final class ExtensionOnboardingPolicy
 {
     public function __construct(
         #[Autowire('%env(bool:EXTENSION_ONBOARDING_REQUIRED)%')]
-        private bool $enabled
+        private bool $enabled,
+        private SubscriptionPlanService $subscriptionPlans,
     ) {
     }
 
     public function initializeNewRegistration(User $user): void
     {
-        if ($this->enabled) {
+        if ($this->enabled && $this->isExtensionAvailableFor($user)) {
             $user->requireExtensionOnboarding();
 
             return;
@@ -26,11 +27,21 @@ final class ExtensionOnboardingPolicy
 
     public function isRequiredFor(User $user): bool
     {
-        return $this->enabled && $user->requiresExtensionOnboarding();
+        return $this->enabled
+            && $this->isExtensionAvailableFor($user)
+            && $user->requiresExtensionOnboarding();
     }
 
     public function isEnabled(): bool
     {
         return $this->enabled;
+    }
+
+    private function isExtensionAvailableFor(User $user): bool
+    {
+        return $this->subscriptionPlans->getLimit(
+            $user,
+            SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS
+        ) !== 0;
     }
 }

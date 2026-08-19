@@ -11,6 +11,7 @@ use App\Repository\TeamRepository;
 use App\Service\CredentialManager;
 use App\Service\CredentialAccessPolicy;
 use App\Service\SecurityCheckerService;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,7 +26,8 @@ final class CredentialPageController extends AbstractController
         private CredentialManager $credentialManager,
         private SecurityCheckerService $checker,
         private EntityManagerInterface $entityManager,
-        private CredentialRepository $credentialRepository
+        private CredentialRepository $credentialRepository,
+        private SubscriptionPlanService $subscriptionPlans,
     ) {}
 
     private function getAuthenticatedUser(): User
@@ -78,6 +80,7 @@ final class CredentialPageController extends AbstractController
         $credentials = $credentialRepository->findByUser($user);
         $sharedAccesses = $sharedAccessRepository->findBy(['guest' => $user]);
         $teams = $teamRepository->findTeamWithCredentialsByUser($user);
+        $credentialLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS);
 
         $excludedCredentialIds = [];
         foreach ($credentials as $credential) {
@@ -130,6 +133,9 @@ final class CredentialPageController extends AbstractController
                 $teamSharedCredentials
             )),
             'heading' => 'Mes acces',
+            'credentialLimit' => $credentialLimit,
+            'canCreateCredential' => $credentialLimit === null || count($credentials) < $credentialLimit,
+            'canImportCredentials' => $this->subscriptionPlans->hasFeature($user, SubscriptionPlanService::FEATURE_CREDENTIAL_IMPORT),
         ]);
     }
 
@@ -137,16 +143,13 @@ final class CredentialPageController extends AbstractController
     public function new(Request $request): Response
     {
         $user = $this->getAuthenticatedUser();
-        $hasSubscription = $user->hasActiveSubscription();
+        $limit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS);
+        $count = $this->credentialRepository->count(['user' => $user]);
 
-        if (!$hasSubscription) {
-            $count = $this->credentialRepository->count(['user' => $user]);
+        if ($limit !== null && $count >= $limit) {
+            $this->addFlash('warning', sprintf('Limite atteinte : %d identifiants maximum avec votre plan.', $limit));
 
-            if ($count >= 5) {
-                $this->addFlash('warning', 'Limite atteinte : 5 identifiants maximum sans abonnement.');
-
-                return $this->redirectToRoute('app_credential');
-            }
+            return $this->redirectToRoute('app_credential');
         }
 
         $credential = new Credential();
@@ -346,8 +349,17 @@ final class CredentialPageController extends AbstractController
         $results = [];
         $user = $this->getAuthenticatedUser();
 
-        if (!$user->hasActiveSubscription()) {
-            $this->addFlash('warning', 'Fonction reservee aux abonnes.');
+        if (!$this->subscriptionPlans->hasFeature($user, SubscriptionPlanService::FEATURE_CREDENTIAL_IMPORT)) {
+            $this->addFlash('warning', 'L’import CSV n’est pas disponible avec votre plan.');
+
+            return $this->redirectToRoute('app_credential');
+        }
+
+        $credentialLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS);
+        $existingCredentialCount = $this->credentialRepository->count(['user' => $user]);
+
+        if ($request->isMethod('POST') && $credentialLimit !== null && $existingCredentialCount >= $credentialLimit) {
+            $this->addFlash('warning', sprintf('Limite atteinte : %d identifiants maximum avec votre plan.', $credentialLimit));
 
             return $this->redirectToRoute('app_credential');
         }
@@ -412,6 +424,11 @@ final class CredentialPageController extends AbstractController
 
             while (($data = fgetcsv($handle, 0, $separator)) !== false) {
                 $lineNumber++;
+
+                if ($credentialLimit !== null && ($existingCredentialCount + $imported) >= $credentialLimit) {
+                    $results[] = sprintf('Import arrêté : limite de %d identifiants atteinte.', $credentialLimit);
+                    break;
+                }
 
                 if (count($data) === 1 && trim((string) $data[0]) === '') {
                     continue;

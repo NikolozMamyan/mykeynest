@@ -17,3 +17,4 @@ import './styles/components/app-ui.css';
 import './styles/components/ui-system.css';
 import './styles/pages/blog-index.css';
 import './styles/pages/admin-emailing.css';
+import './styles/pages/admin-plans.css';

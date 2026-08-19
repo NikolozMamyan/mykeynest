@@ -5,6 +5,7 @@
   {% set adminTitle = block('admin_page_title')|trim %}
   {% set adminIntro = block('admin_page_intro')|trim %}
   {% set adminToolbar = block('admin_toolbar')|trim %}
+  {% set adminSubnav = block('admin_subnav')|trim %}
 
   <div class="ds-page {{ adminPageClass }}">
     <div class="ds-stack-lg">
@@ -16,6 +17,10 @@
       {% endif %}
 
       {% include 'components/ui/flash_messages.html.twig' %}
+
+      {% if adminSubnav %}
+        {{ adminSubnav|raw }}
+      {% endif %}
 
       {% if adminToolbar %}
         <div class="ds-toolbar">
@@ -31,4 +36,5 @@
 {% block admin_page_class %}{% endblock %}
 {% block admin_page_title %}{% endblock %}
 {% block admin_page_intro %}{% endblock %}
+{% block admin_subnav %}{% endblock %}
 {% block admin_toolbar %}{% endblock %}

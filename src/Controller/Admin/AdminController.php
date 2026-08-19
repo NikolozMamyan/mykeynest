@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Entity\UserSubscription;
 use App\Enum\TeamRole;
 use App\Form\Admin\ArticleType;
+use App\Form\Admin\SubscriptionPlanType;
 use App\Repository\ExtensionClientRepository;
 use App\Repository\ExtensionInstallationChallengeRepository;
 use App\Repository\EmailCampaignRepository;
@@ -28,6 +29,7 @@ use App\Service\ExtensionClientManager;
 use App\Service\ExtensionInstallationChallengeManager;
 use App\Service\MailerService;
 use App\Service\SessionManager;
+use App\Service\SubscriptionPlanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -194,6 +196,30 @@ final class AdminController extends AbstractController
             'sessions' => $sessions,
             'extensionClients' => $extensionClients,
             'extensionChallenges' => $extensionChallenges,
+        ]);
+    }
+
+    #[Route('/subscriptions/plans', name: 'admin_subscription_plans', methods: ['GET', 'POST'])]
+    public function subscriptionPlans(Request $request, SubscriptionPlanService $plans): Response
+    {
+        $form = $this->createForm(SubscriptionPlanType::class, $plans->getFreePlanFormData(), [
+            'method' => 'POST',
+            'action' => $this->generateUrl('admin_subscription_plans'),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var array<string, mixed> $data */
+            $data = $form->getData();
+            $plans->updateFreePlan($data);
+            $this->addFlash('success', 'Le plan Free a été mis à jour. Les nouvelles règles sont actives immédiatement.');
+
+            return $this->redirectToRoute('admin_subscription_plans');
+        }
+
+        return $this->render('admin/subscription_plans.html.twig', [
+            'plans' => $plans->getPlans(),
+            'form' => $form,
         ]);
     }
 

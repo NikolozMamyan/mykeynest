@@ -17,7 +17,7 @@
         <p class="hero-subtitle">{{ 'shared_access.index.hero.subtitle'|trans }}</p>
       </div>
 
-{% if app.user.hasActiveSubscription or sharedByMe|length < 3 %}
+{% if canCreateShare %}
   <a href="{{ path('shared_access_new') }}" class="btn-primary">
     <i class="fas fa-share-alt"></i>
     <span>{{ 'shared_access.index.hero.new'|trans }}</span>
@@ -30,8 +30,8 @@
 {% endif %}
     </div>
   </div>
-{# PRO Upgrade Banner - Affich? seulement si non abonn? et a d?j? 3 partages #}
-{% if not app.user.hasActiveSubscription and sharedByMe|length >= 3 %}
+{# Upgrade banner when the active plan limit is reached. #}
+{% if shareLimit is not null and sharedByMe|length >= shareLimit %}
   <div class="pro-upgrade-banner">
     <div class="pro-banner-content">
       <div class="pro-banner-icon">
@@ -42,10 +42,10 @@
       </div>
       <div class="pro-banner-text">
         <h3>{{ 'shared_access.pro_banner.title'|trans|default('Limite de partage atteinte !') }}</h3>
-        <p>{{ 'shared_access.pro_banner.description'|trans|default('Vous avez atteint la limite de 3 partages d&apos;acc&egrave;s. Passez &agrave; PRO pour des partages illimit&eacute;s et collaborez sans restriction.')|raw }}</p>
+        <p>{{ 'shared_access.pro_banner.description'|trans({'%limit%': shareLimit}) }}</p>
         <div class="limit-info">
           <i class="fas fa-users"></i>
-          <span>{{ sharedByMe|length }}/3 partages utilis&eacute;s</span>
+          <span>{{ 'shared_access.pro_banner.usage'|trans({'%used%': sharedByMe|length, '%limit%': shareLimit}) }}</span>
         </div>
       </div>
     </div>

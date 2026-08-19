@@ -11,6 +11,7 @@ use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialManager;
 use App\Service\MailerService;
 use App\Service\SharedAccessNotifier;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +25,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class SharedAccessController extends AbstractController
 {
     public function __construct(
-        private RateLimiterFactory $shareInvitationLimiter
+        private RateLimiterFactory $shareInvitationLimiter,
+        private SubscriptionPlanService $subscriptionPlans,
     ) {
     }
 
@@ -63,14 +65,20 @@ class SharedAccessController extends AbstractController
     public function index(SharedAccessRepository $sharedAccessRepository): Response
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
 
         $sharedByMe = $sharedAccessRepository->findBy(['owner' => $user]);
         $sharedWithMe = $sharedAccessRepository->findBy(['guest' => $user]);
+        $shareLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_SHARES);
 
         return $this->render('shared_access/index.html.twig', [
             'sharedByMe' => $sharedByMe,
             'sharedWithMe' => $sharedWithMe,
             'heading' => 'Partages',
+            'shareLimit' => $shareLimit,
+            'canCreateShare' => $shareLimit === null || count($sharedByMe) < $shareLimit,
         ]);
     }
 
@@ -93,8 +101,7 @@ class SharedAccessController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $hasSubscription = $owner->hasActiveSubscription();
-        $limit = 3;
+        $planLimit = $this->subscriptionPlans->getLimit($owner, SubscriptionPlanService::LIMIT_SHARES);
 
         if ($request->isMethod('POST')) {
             return $this->handleShareSubmission(
@@ -107,8 +114,7 @@ class SharedAccessController extends AbstractController
                 $urlGenerator,
                 $credentialRepository,
                 $notifier,
-                $hasSubscription,
-                $limit,
+                $planLimit,
                 'shared_access_index'
             );
         }
@@ -153,8 +159,7 @@ class SharedAccessController extends AbstractController
             $urlGenerator,
             $credentialRepository,
             $notifier,
-            $owner->hasActiveSubscription(),
-            3,
+            $this->subscriptionPlans->getLimit($owner, SubscriptionPlanService::LIMIT_SHARES),
             'app_credential'
         );
     }
@@ -229,17 +234,16 @@ class SharedAccessController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         CredentialRepository $credentialRepository,
         SharedAccessNotifier $notifier,
-        bool $hasSubscription,
-        int $limit,
+        ?int $planLimit,
         string $redirectRoute
     ): RedirectResponse {
         $email = strtolower(trim((string) $request->request->get('email')));
         $credentialIds = $request->request->all('credentials') ?? [];
         $canRevealPassword = $request->request->getBoolean('can_reveal_password');
         $limitKey = sprintf('%s|%s', $owner->getId() ?? 0, $email);
-        $limit = $this->shareInvitationLimiter->create($limitKey)->consume(1);
+        $rateLimit = $this->shareInvitationLimiter->create($limitKey)->consume(1);
 
-        if (!$limit->isAccepted()) {
+        if (!$rateLimit->isAccepted()) {
             $this->addFlash('warning', 'Trop de tentatives de partage. Reessayez plus tard.');
 
             return $this->redirectToRoute($redirectRoute);
@@ -295,7 +299,7 @@ class SharedAccessController extends AbstractController
             return $this->redirectToRoute($redirectRoute);
         }
 
-        if (!$hasSubscription) {
+        if ($planLimit !== null) {
             $existingCount = $entityManager->getRepository(SharedAccess::class)->count(['owner' => $owner]);
             $newToCreate = 0;
 
@@ -317,13 +321,13 @@ class SharedAccessController extends AbstractController
                 }
             }
 
-            if (($existingCount + $newToCreate) > $limit) {
-                $remaining = max(0, $limit - $existingCount);
+            if (($existingCount + $newToCreate) > $planLimit) {
+                $remaining = max(0, $planLimit - $existingCount);
                 $this->addFlash(
                     'warning',
                     sprintf(
-                        'Limite atteinte : %d partages maximum sans abonnement. Il vous reste %d partage(s) possible(s).',
-                        $limit,
+                        'Limite atteinte : %d partages maximum avec votre plan. Il vous reste %d partage(s) possible(s).',
+                        $planLimit,
                         $remaining
                     )
                 );

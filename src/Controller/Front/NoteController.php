@@ -12,6 +12,7 @@ use App\Repository\NoteRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\NoteNotifier;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class NoteController extends AbstractController
 {
+    public function __construct(private readonly SubscriptionPlanService $subscriptionPlans)
+    {
+    }
+
     #[Route('/app/notes/{teamId?}', name: 'app_note', requirements: ['teamId' => '\d+'], methods: ['GET', 'POST'])]
     public function index(
         ?int $teamId,
@@ -403,10 +408,10 @@ final class NoteController extends AbstractController
 
     private function denyUnlessSubscribed(User $user): void
     {
-        if ($user->hasActiveSubscription()) {
+        if ($this->subscriptionPlans->hasFeature($user, SubscriptionPlanService::FEATURE_SECURE_NOTES)) {
             return;
         }
 
-        throw $this->createAccessDeniedException('Active subscription required.');
+        throw $this->createAccessDeniedException('Les notes sécurisées ne sont pas disponibles avec votre plan.');
     }
 }

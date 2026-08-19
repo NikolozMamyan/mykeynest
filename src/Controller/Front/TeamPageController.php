@@ -17,6 +17,7 @@ use App\Repository\UserRepository;
 use App\Service\MailerService;
 use App\Service\TeamNotifier;
 use App\Service\TeamCredentialPermissionManager;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,6 +30,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[Route('/app/teams', name: 'app_team_')]
 class TeamPageController extends AbstractController
 {
+    public function __construct(private readonly SubscriptionPlanService $subscriptionPlans)
+    {
+    }
+
     private function sendTeamGuestInvitationEmail(
         MailerService $mailer,
         UrlGeneratorInterface $urlGenerator,
@@ -60,11 +65,19 @@ class TeamPageController extends AbstractController
     {
         $user = $security->getUser();
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
 
         $teams = $teamRepository->findByUser($user);
+        $ownedTeamsCount = $teamRepository->count(['owner' => $user]);
+        $teamLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS);
 
         return $this->render('team/index.html.twig', [
             'teams' => $teams,
+            'ownedTeamsCount' => $ownedTeamsCount,
+            'teamLimit' => $teamLimit,
+            'canCreateTeam' => $teamLimit === null || $ownedTeamsCount < $teamLimit,
         ]);
     }
 
@@ -84,16 +97,13 @@ class TeamPageController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $hasSubscription = $user->hasActiveSubscription();
+        $teamLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS);
+        $countTeams = $em->getRepository(Team::class)->count(['owner' => $user]);
 
-        if (!$hasSubscription) {
-            $countTeams = $em->getRepository(Team::class)->count(['owner' => $user]);
+        if ($teamLimit !== null && $countTeams >= $teamLimit) {
+            $this->addFlash('warning', sprintf('Limite atteinte : %d équipes maximum avec votre plan.', $teamLimit));
 
-            if ($countTeams >= 1) {
-                $this->addFlash('warning', 'Limite atteinte : 1 equipes maximum sans abonnement.');
-
-                return $this->redirectToRoute('app_team_index');
-            }
+            return $this->redirectToRoute('app_team_index');
         }
 
         $team = new Team();

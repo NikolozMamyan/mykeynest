@@ -13,6 +13,7 @@ use App\Service\EncryptionService;
 use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialManager;
 use App\Service\ExtensionClientManager;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,6 +31,7 @@ final class ApiSharedController extends AbstractController
         private ExtensionClientManager $extensionClientManager,
         private CredentialAccessPolicy $credentialAccessPolicy,
         private CredentialManager $credentialManager,
+        private SubscriptionPlanService $subscriptionPlans,
     ) {
     }
 
@@ -589,6 +591,18 @@ final class ApiSharedController extends AbstractController
             return $this->withInstallationToken($this->json([
                 'error' => 'Un credential existe déjà pour ce domaine et cet utilisateur',
                 'credentialId' => $existingCredential->getId(),
+            ], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
+        }
+
+        $credentialLimit = $this->subscriptionPlans->getLimit(
+            $auth['user'],
+            SubscriptionPlanService::LIMIT_CREDENTIALS,
+        );
+        $credentialCount = $credentialRepository->count(['user' => $auth['user']]);
+        if ($credentialLimit !== null && $credentialCount >= $credentialLimit) {
+            return $this->withInstallationToken($this->json([
+                'error' => sprintf('Limite de %d identifiants atteinte avec votre plan', $credentialLimit),
+                'code' => 'credential_limit_reached',
             ], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 

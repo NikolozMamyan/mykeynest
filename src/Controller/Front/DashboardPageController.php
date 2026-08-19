@@ -8,6 +8,7 @@ use App\Entity\Credential;
 use App\Entity\DraftPassword;
 use App\Entity\SharedAccess;
 use App\Service\SecurityCheckerService;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,8 @@ final class DashboardPageController extends AbstractController
 {
     public function __construct(
         private readonly SecurityCheckerService $securityCheckerService,
-        private readonly CacheInterface $cache
+        private readonly CacheInterface $cache,
+        private readonly SubscriptionPlanService $subscriptionPlans,
     ) {}
 
     #[Route('/app/dashboard', name: 'app_dashboard')]
@@ -41,6 +43,9 @@ final class DashboardPageController extends AbstractController
         $teamsCount = \count($ownedTeams);
 
         $sharedCount = (int) $em->getRepository(SharedAccess::class)->count(['owner' => $user]);
+        $credentialLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS);
+        $teamLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS);
+        $shareLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_SHARES);
 
         $teamsCards = [];
         foreach ($ownedTeams as $team) {
@@ -158,6 +163,13 @@ final class DashboardPageController extends AbstractController
                 'drafts' => $draftsCount,
             ],
             'deltas' => $deltas,
+            'planAccess' => [
+                'canCreateCredential' => $credentialLimit === null || $credentialsCount < $credentialLimit,
+                'canCreateTeam' => $teamLimit === null || $teamsCount < $teamLimit,
+                'canCreateShare' => $shareLimit === null || $sharedCount < $shareLimit,
+                'passwordGenerator' => $this->subscriptionPlans->hasFeature($user, SubscriptionPlanService::FEATURE_PASSWORD_GENERATOR),
+                'securityChecker' => $this->subscriptionPlans->hasFeature($user, SubscriptionPlanService::FEATURE_SECURITY_CHECKER),
+            ],
             'teams' => $teamsCards,
             'drafts' => $drafts,
             'activity' => $activity,

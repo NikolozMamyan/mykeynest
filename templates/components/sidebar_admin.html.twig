@@ -24,11 +24,25 @@
         <span>Blog</span>
       </a>
 
+      {% set subscriptionAdminRoutes = ['admin_subscriptions', 'admin_subscription_plans', 'admin_user_subscription_assign_pro', 'admin_user_subscription_deactivate'] %}
       <a href="{{ path('admin_subscriptions') }}"
-         class="nav-item {{ app.request.attributes.get('_route') in ['admin_subscriptions', 'admin_user_subscription_assign_pro', 'admin_user_subscription_deactivate'] ? 'active' : '' }}">
+         class="nav-item nav-item--parent {{ app.request.attributes.get('_route') in subscriptionAdminRoutes ? 'active' : '' }}">
         <i class="fas fa-credit-card"></i>
         <span>Subscriptions</span>
+        <i class="fas fa-chevron-down nav-item-chevron" aria-hidden="true"></i>
       </a>
+      <div class="nav-submenu" aria-label="Sous-menu subscriptions">
+        <a href="{{ path('admin_subscriptions') }}"
+           class="nav-subitem {{ app.request.attributes.get('_route') == 'admin_subscriptions' ? 'active' : '' }}">
+          <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          <span>Gestion</span>
+        </a>
+        <a href="{{ path('admin_subscription_plans') }}"
+           class="nav-subitem {{ app.request.attributes.get('_route') == 'admin_subscription_plans' ? 'active' : '' }}">
+          <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          <span>Plans</span>
+        </a>
+      </div>
 
       <a href="{{ path('admin_sessions') }}"
          class="nav-item {{ app.request.attributes.get('_route') in ['admin_sessions', 'admin_session_revoke', 'admin_session_block_device', 'admin_session_unblock_device'] ? 'active' : '' }}">

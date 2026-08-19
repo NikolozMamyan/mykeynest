@@ -7,9 +7,11 @@ use App\Entity\ExtensionInstallationChallenge;
 use App\Entity\User;
 use App\Entity\UserSubscription;
 use App\Repository\ExtensionClientRepository;
+use App\Repository\SubscriptionPlanConfigurationRepository;
 use App\Service\ExtensionClientManager;
 use App\Service\ExtensionInstallationChallengeManager;
 use App\Service\MailerService;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -202,6 +204,39 @@ final class ExtensionClientManagerTest extends TestCase
         self::assertSame('additional-browser', $result['client']->getClientId());
     }
 
+    public function testRevokedInstallationDoesNotConsumeTheFreePlanSlot(): void
+    {
+        $user = (new User())
+            ->setEmail('free@example.com')
+            ->setPassword('hashed')
+            ->setCompany('Acme');
+        $revokedClient = $this->createClient($user, 'revoked-browser')
+            ->setIsRevoked(true)
+            ->setRevokedAt(new \DateTimeImmutable());
+        $repository = $this->createRepository($user, [$revokedClient]);
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist')->with(self::isInstanceOf(ExtensionClient::class));
+        $entityManager->expects(self::once())->method('flush');
+
+        $challengeManager = $this->createMock(ExtensionInstallationChallengeManager::class);
+        $challengeManager->expects(self::never())->method('createChallenge');
+
+        $manager = $this->createManager(
+            $entityManager,
+            $repository,
+            $challengeManager,
+            $this->createMock(MailerService::class),
+            'prod'
+        );
+
+        $result = $manager->resolveFromRequest($user, $this->createRequest('replacement-browser'));
+
+        self::assertSame('resolved', $result['status']);
+        self::assertTrue($result['isNew']);
+        self::assertSame('replacement-browser', $result['client']->getClientId());
+    }
+
     private function createManager(
         EntityManagerInterface $entityManager,
         ExtensionClientRepository $repository,
@@ -235,8 +270,17 @@ final class ExtensionClientManagerTest extends TestCase
             $mailer,
             $urlGenerator,
             $logger ?? $this->createMock(LoggerInterface::class),
+            $this->createSubscriptionPlans($entityManager),
             $environment
         );
+    }
+
+    private function createSubscriptionPlans(EntityManagerInterface $entityManager): SubscriptionPlanService
+    {
+        $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
+        $repository->method('findByPlanCode')->willReturn(null);
+
+        return new SubscriptionPlanService($repository, $entityManager);
     }
 
     /**
