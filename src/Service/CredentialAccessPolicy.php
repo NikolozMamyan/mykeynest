@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\Credential;
 use App\Entity\User;
+use App\Enum\OrganizationRole;
+use App\Repository\OrganizationMemberRepository;
 use App\Repository\SharedAccessRepository;
 use App\Repository\TeamCredentialPermissionRepository;
 use App\Repository\TeamRepository;
@@ -14,6 +16,7 @@ final class CredentialAccessPolicy
         private readonly SharedAccessRepository $sharedAccessRepository,
         private readonly TeamRepository $teamRepository,
         private readonly TeamCredentialPermissionRepository $teamCredentialPermissionRepository,
+        private readonly OrganizationMemberRepository $organizationMemberRepository,
     ) {
     }
 
@@ -35,6 +38,14 @@ final class CredentialAccessPolicy
         }
 
         foreach ($this->teamRepository->findTeamsForUserAndCredential($user, $credential) as $team) {
+            $organization = $team->getOrganization();
+            if (
+                $organization !== null
+                && $this->organizationMemberRepository->findMembership($organization, $user)?->getRole() === OrganizationRole::GUEST
+            ) {
+                continue;
+            }
+
             if ($this->teamCredentialPermissionRepository->allowsPasswordReveal($team, $credential)) {
                 return true;
             }

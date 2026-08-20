@@ -1,921 +1,122 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}{{ 'subscription.page_title'|trans }}{% endblock %}
 
 {% block stylesheets %}
   {{ parent() }}
-  <style>
-    /* ===== ANIMATIONS AVANCÉES ===== */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-
-    @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-50px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(50px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(5, 150, 105, 0.3); }
-      50% { box-shadow: 0 0 40px rgba(5, 150, 105, 0.6); }
-    }
-
-    /* ===== HERO SECTION CRÉATIVE ===== */
-    .pricing-hero {
-      position: relative;
-      text-align: center;
-      padding: 80px 20px 60px;
-      overflow: hidden;
-      margin-bottom: 40px;
-    }
-
-    .pricing-hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 300px;
-      background: linear-gradient(135deg, rgba(5, 150, 105, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
-      clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-      z-index: -1;
-    }
-
-    .hero-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      color: var(--color-white);
-      padding: 8px 24px;
-      border-radius: 50px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 20px;
-      animation: slideInLeft 0.8s ease;
-      box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
-    }
-
-    .pricing-hero h1 {
-      font-size: 3.5rem;
-      font-weight: 900;
-      color: var(--color-text-dark);
-      margin-bottom: 20px;
-      line-height: 1.2;
-      animation: slideInRight 0.8s ease;
-    }
-
-    .pricing-hero h1 .highlight {
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
-    }
-
-    .pricing-hero h1 .highlight::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--color-primary) 0%, #10b981 100%);
-      border-radius: 2px;
-    }
-
-    .pricing-hero p {
-      font-size: 1.3rem;
-      color: var(--color-text-medium);
-      max-width: 700px;
-      margin: 0 auto 30px;
-      line-height: 1.6;
-      animation: slideInLeft 1s ease;
-    }
-
-    .stats-row {
-      display: flex;
-      justify-content: center;
-      gap: 50px;
-      margin-top: 40px;
-      flex-wrap: wrap;
-      animation: slideInRight 1.2s ease;
-    }
-
-    .stat-item { text-align: center; }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: block;
-    }
-
-    .stat-label {
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* ===== CARTES PRICING AMÉLIORÉES ===== */
-    .pricing-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .pricing-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 40px;
-      margin-bottom: 100px;
-      perspective: 1000px;
-    }
-
-    .pricing-card {
-      background: var(--glass-card-bg);
-      border-radius: var(--border-radius);
-      padding: 0;
-      box-shadow: var(--glass-card-shadow);
-      border: 1px solid var(--glass-card-border);
-      -webkit-backdrop-filter: var(--glass-card-blur);
-      backdrop-filter: var(--glass-card-blur);
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      animation: slideInLeft 0.8s ease;
-    }
-
-    .pricing-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(5, 150, 105, 0.03) 0%, rgba(16, 185, 129, 0.03) 100%);
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .pricing-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 25px 60px rgba(5, 150, 105, 0.15);
-      border-color: var(--color-primary);
-    }
-
-    .pricing-card:hover::before { opacity: 1; }
-
-    .pricing-card.featured {
-      border-color: var(--color-primary);
-      transform: scale(1.01);
-      animation: pulse-glow 3s infinite;
-    }
-
-    .pricing-card.featured::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 6px;
-      background: linear-gradient(90deg, var(--color-primary) 0%, #10b981 100%);
-    }
-
-    .card-popular-badge {
-      position: absolute;
-      top: 30px;
-      right: -35px;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      color: var(--color-white);
-      padding: 8px 45px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      transform: rotate(45deg);
-      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
-      letter-spacing: 1px;
-      z-index: 10;
-    }
-
-    .card-header {
-      text-align: center;
-      padding: 50px 40px 30px;
-      position: relative;
-    }
-
-    .card-icon-wrapper {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto 25px;
-      position: relative;
-    }
-
-    .card-icon-bg {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
-      border-radius: 50%;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .card-icon {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      z-index: 1;
-    }
-
-    .plan-name {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--color-text-dark);
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .plan-price-wrapper { margin-bottom: 10px; }
-
-    .plan-price {
-      font-size: 4rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-      display: inline-block;
-    }
-
-    .plan-description {
-      color: var(--color-text-medium);
-      font-size: 1rem;
-      margin-bottom: 30px;
-      line-height: 1.6;
-    }
-
-    .card-divider {
-      height: 2px;
-      background: linear-gradient(90deg, transparent 0%, var(--color-border) 50%, transparent 100%);
-      margin: 0 30px 30px;
-    }
-
-    .card-body { padding: 0 40px 40px; }
-
-    .features-list {
-      list-style: none;
-      margin-bottom: 35px;
-      padding-left: 0;
-    }
-
-    .features-list li {
-      padding: 16px 0;
-      color: var(--color-text-medium);
-      display: flex;
-      align-items: flex-start;
-      gap: 15px;
-      font-size: 1rem;
-      line-height: 1.5;
-      border-bottom: 1px solid var(--color-bg-light);
-    }
-
-    .features-list li:last-child { border-bottom: none; }
-
-    .feature-icon {
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--color-white);
-      font-weight: 900;
-      font-size: 0.85rem;
-    }
-
-    .cta-button {
-      width: 100%;
-      padding: 18px 36px;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      color: var(--color-white);
-      border: none;
-      border-radius: var(--border-radius);
-      font-size: 1.05rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: inline-block;
-      text-align: center;
-      text-decoration: none;
-    }
-
-    .cta-button.outline {
-      background: transparent;
-      color: var(--color-primary);
-      border: 3px solid var(--color-primary);
-      box-shadow: none;
-    }
-
-    /* ===== SECTION COMPARAISON ===== */
-    .comparison-section {
-      background: var(--glass-card-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--glass-card-border);
-      padding: 70px 50px;
-      margin-bottom: 100px;
-      box-shadow: var(--glass-card-shadow);
-      -webkit-backdrop-filter: var(--glass-card-blur);
-      backdrop-filter: var(--glass-card-blur);
-      animation: slideInRight 1s ease;
-    }
-
-    .comparison-section h2 {
-      text-align: center;
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: var(--color-text-dark);
-      margin-bottom: 20px;
-    }
-
-    .comparison-subtitle {
-      text-align: center;
-      color: var(--color-text-medium);
-      font-size: 1.1rem;
-      margin-bottom: 60px;
-    }
-
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 35px;
-    }
-
-    .tool-card {
-      background: var(--color-bg-light);
-      padding: 40px 30px;
-      border-radius: var(--border-radius);
-      border: 2px solid var(--color-border);
-    }
-
-    .tool-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .tool-icon-text {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .tool-icon { font-size: 2.5rem; }
-    .tool-title { font-size: 1.3rem; font-weight: 700; color: var(--color-text-dark); }
-    .tool-description { color: var(--color-text-medium); line-height: 1.7; font-size: 0.98rem; }
-
-    /* ===== CONTACT ===== */
-    .contact-section {
-      position: relative;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      border-radius: var(--border-radius);
-      padding: 80px 60px;
-      color: var(--color-white);
-      margin-bottom: 100px;
-      overflow: hidden;
-    }
-
-    .contact-content { position: relative; z-index: 1; }
-    .contact-header { text-align: center; margin-bottom: 50px; }
-    .contact-section h2 { font-size: 3rem; font-weight: 900; margin-bottom: 15px; }
-    .contact-section .subtitle { font-size: 1.2rem; opacity: 0.95; font-weight: 500; }
-    .contact-form { max-width: 800px; margin: 0 auto; display: grid; gap: 25px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-    .form-group { display: flex; flex-direction: column; }
-    .form-group label { margin-bottom: 10px; font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-group input, .form-group select, .form-group textarea {
-      padding: 16px 20px;
-      border: 3px solid rgba(255, 255, 255, 0.2);
-      border-radius: var(--border-radius);
-      font-size: 1rem;
-      background: rgba(255, 255, 255, 0.95);
-      color: var(--color-text-dark);
-      font-family: inherit;
-    }
-
-    .submit-button {
-      padding: 20px 40px;
-      background: var(--color-white);
-      color: var(--color-primary);
-      border: none;
-      border-radius: var(--border-radius);
-      font-size: 1.1rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 15px;
-    }
-
-    /* ===== FAQ ===== */
-    .faq-section {
-      max-width: 1000px;
-      margin: 0 auto 100px;
-    }
-
-    .faq-header { text-align: center; margin-bottom: 60px; }
-
-    .faq-section h2 {
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--color-text-dark);
-      margin-bottom: 15px;
-    }
-
-    .faq-subtitle { color: var(--color-text-medium); font-size: 1.1rem; }
-
-    .faq-item {
-      background: var(--glass-card-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--glass-card-border);
-      -webkit-backdrop-filter: var(--glass-card-blur);
-      backdrop-filter: var(--glass-card-blur);
-      margin-bottom: 20px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-      border: 2px solid var(--color-border);
-    }
-
-    .faq-question {
-      padding: 28px 35px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 700;
-      font-size: 1.15rem;
-      color: var(--color-text-dark);
-      user-select: none;
-      gap: 20px;
-    }
-
-    .faq-icon {
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--color-primary) 0%, #10b981 100%);
-      color: var(--color-white);
-      border-radius: 50%;
-      font-size: 1.5rem;
-      font-weight: 700;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .faq-item.active .faq-icon { transform: rotate(135deg); }
-
-    .faq-answer {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s ease;
-      padding: 0 35px;
-      color: var(--color-text-medium);
-      line-height: 1.9;
-      font-size: 1.02rem;
-    }
-
-    .faq-item.active .faq-answer {
-      max-height: 600px;
-      padding: 0 35px 30px;
-    }
-
-    /* ===== TRUST ===== */
-    .trust-section {
-      text-align: center;
-      padding: 80px 20px;
-      background: var(--color-bg-light);
-      border-radius: var(--border-radius);
-      margin-bottom: 80px;
-    }
-
-    .trust-section h3 {
-      font-size: 1.2rem;
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 40px;
-      font-weight: 700;
-    }
-
-    .trust-badges {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 60px;
-      flex-wrap: wrap;
-    }
-
-    .trust-badge {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      color: var(--color-text-dark);
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-
-    .trust-icon { font-size: 2.5rem; }
-
-    @media (max-width: 768px) {
-      .pricing-hero h1 { font-size: 2.5rem; }
-      .pricing-hero p { font-size: 1.1rem; }
-      .pricing-cards { grid-template-columns: 1fr; gap: 30px; }
-      .pricing-card.featured { transform: scale(1); }
-      .form-row { grid-template-columns: 1fr; }
-      .contact-section, .comparison-section { padding: 50px 30px; }
-      .tools-grid { grid-template-columns: 1fr; }
-      .faq-section h2, .contact-section h2 { font-size: 2rem; }
-    }
-
-    /* Bouton blanc, texte vert, uppercase */
-.btn-submit{
-  padding: 20px 40px;
-  background: var(--color-white);
-  color: var(--color-primary);
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 1.05rem;
-  font-weight: 900;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 8px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-}
-
-.btn-submit:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
-}
-
-.btn-submit:active{
-  transform: translateY(0px);
-}
-
-.btn-submit:disabled{
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-  </style>
+  <link rel="stylesheet" href="{{ asset('styles/pages/subscription.css') }}">
 {% endblock %}
 
 {% block body %}
-  {% set hasActiveSubscription = app.user and app.user.hasActiveSubscription %}
+{% set currentCode = currentPlan.code|default('free')|lower %}
+{% set ownsSubscription = subscription and subscription.active and subscription.stripeSubscriptionId %}
+{% set ownedPlan = ownsSubscription ? subscription.planCode|lower : null %}
+{% set hasCompanyAccess = currentCode == 'team' and not ownsSubscription %}
 
-  <!-- ===== HERO ===== -->
-  <section class="pricing-hero">
-    <span class="hero-badge">{{ 'subscription.hero.badge'|trans }}</span>
-    <h1>
-      {{ 'subscription.hero.title_before'|trans }}
-      <span class="highlight">{{ 'subscription.hero.title_highlight'|trans }}</span>
-      {{ 'subscription.hero.title_after'|trans }}
-    </h1>
-    <p>{{ 'subscription.hero.subtitle'|trans }}</p>
+<main class="subscription-shell">
+  <header class="subscription-heading">
+    <span class="subscription-eyebrow"><i class="fa-solid fa-sparkles"></i> {{ 'subscription.redesign.eyebrow'|trans }}</span>
+    <h1>{{ 'subscription.redesign.title'|trans }}</h1>
+    <p>{{ 'subscription.redesign.subtitle'|trans }}</p>
+  </header>
 
-    <div class="stats-row">
-      <div class="stat-item">
-        <span class="stat-number">+15K</span>
-        <span class="stat-label">{{ 'subscription.hero.stats.users'|trans }}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">99.99%</span>
-        <span class="stat-label">{{ 'subscription.hero.stats.uptime'|trans }}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number">AES-256</span>
-        <span class="stat-label">{{ 'subscription.hero.stats.encryption'|trans }}</span>
-      </div>
-    </div>
-  </section>
-
-  {# ===== SUBSCRIBED CARD ===== #}
-  {% if hasActiveSubscription %}
-    <section class="pricing-container" style="margin-bottom: 40px;">
-      <div class="pricing-card featured" style="max-width: 920px; margin: 0 auto;">
-        <div class="card-header" style="padding: 40px 40px 25px;">
-          <div class="card-icon-wrapper">
-            <div class="card-icon-bg"></div>
-            <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
-          </div>
-
-          <h3 class="plan-name" style="margin-bottom: 10px;">
-            {{ 'subscription.status_card.title'|trans }}
-          </h3>
-
-          <p class="plan-description" style="margin-bottom: 18px;">
-            {{ 'subscription.status_card.subtitle'|trans }}
-            <strong>{{ currentPlan.label }}</strong>.
-          </p>
-
-          <div class="card-divider" style="margin: 0 30px 20px;"></div>
-
-          <div class="card-body" style="padding: 0 40px 40px;">
-            {# <ul class="features-list" style="margin: 0; padding-left: 0;">
-              <li>
-                <span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span>
-                {{ 'subscription.status_card.benefits.unlimited_shares'|trans }}
-              </li>
-              <li>
-                <span class="feature-icon"><i class="fa-solid fa-users-gear"></i></span>
-                {{ 'subscription.status_card.benefits.team_management'|trans }}
-              </li>
-              <li>
-                <span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span>
-                {{ 'subscription.status_card.benefits.security_tools'|trans }}
-              </li>
-            </ul> #}
-
-            {# Si tu as une route portail, décommente #}
-            {# <a class="cta-button outline" href="{{ path('app_subscription_portal') }}" style="margin-top: 22px; display:block;">
-              <i class="fa-solid fa-gear" style="margin-right: 8px;"></i>
-              {{ 'subscription.status_card.cta_manage'|trans }}
-            </a> #}
-          </div>
-        </div>
-      </div>
-    </section>
-    {% else %}
-        <!-- ===== CARTES PRICING ===== -->
-  <section class="pricing-container">
-    <div class="pricing-cards">
-
-      <!-- FREE -->
-      <div class="pricing-card">
-        <div class="card-header">
-          <div class="card-icon-wrapper">
-            <div class="card-icon-bg"></div>
-            <div class="card-icon"><i class="fa-solid fa-lock"></i></div>
-          </div>
-
-          <h3 class="plan-name">{{ 'subscription.plans.free.name'|trans }}</h3>
-          <div class="plan-price-wrapper">
-            <span class="plan-price">0€</span><small>{{ 'subscription.plans.free.price_suffix'|trans }}</small>
-          </div>
-          <p class="plan-description">{{ 'subscription.plans.free.description'|trans }}</p>
-        </div>
-
-        <div class="card-divider"></div>
-
-        <div class="card-body">
-          <ul class="features-list">
-            <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span>
-              {{ (freePlan.limits.credentials is null ? 'subscription.plans.limits.credentials_unlimited' : 'subscription.plans.limits.credentials')|trans({'%limit%': freePlan.limits.credentials}) }}
-            </li>
-            <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span>
-              {{ (freePlan.limits.shares is null ? 'subscription.plans.limits.shares_unlimited' : 'subscription.plans.limits.shares')|trans({'%limit%': freePlan.limits.shares}) }}
-            </li>
-            <li><span class="feature-icon"><i class="fa-solid fa-users"></i></span>
-              {{ (freePlan.limits.teams is null ? 'subscription.plans.limits.teams_unlimited' : 'subscription.plans.limits.teams')|trans({'%limit%': freePlan.limits.teams}) }}
-            </li>
-            {% if freePlan.limits.extension_installations != 0 %}
-              <li><span class="feature-icon"><i class="fa-solid fa-puzzle-piece"></i></span>
-                {{ (freePlan.limits.extension_installations is null ? 'subscription.plans.limits.extension_installations_unlimited' : 'subscription.plans.limits.extension_installations')|trans({'%limit%': freePlan.limits.extension_installations}) }}
-              </li>
-            {% endif %}
-            {% if freePlan.features.password_generator %}
-              <li><span class="feature-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span> {{ 'subscription.plans.features.password_generator'|trans }}</li>
-            {% endif %}
-            {% if freePlan.features.secure_notes %}
-              <li><span class="feature-icon"><i class="fa-solid fa-note-sticky"></i></span> {{ 'subscription.plans.features.secure_notes'|trans }}</li>
-            {% endif %}
-            {% if freePlan.features.security_checker %}
-              <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> {{ 'subscription.plans.features.security_checker'|trans }}</li>
-            {% endif %}
-            {% if freePlan.features.credential_import %}
-              <li><span class="feature-icon"><i class="fa-solid fa-file-import"></i></span> {{ 'subscription.plans.features.credential_import'|trans }}</li>
-            {% endif %}
-          </ul>
-        </div>
+  {% if currentCode != 'free' %}
+    <section class="subscription-current {{ subscription and subscription.cancelAtPeriodEnd ? 'is-ending' : '' }}">
+      <div class="subscription-current__icon"><i class="fa-solid {{ currentCode == 'team' ? 'fa-building-shield' : 'fa-crown' }}"></i></div>
+      <div class="subscription-current__content">
+        <span class="subscription-current__label">{{ hasCompanyAccess ? 'subscription.redesign.company_access'|trans : 'subscription.redesign.current_plan'|trans }}</span>
+        <h2>MYKEYNEST {{ currentCode|upper }}</h2>
+        {% if hasCompanyAccess %}
+          <p>{{ 'subscription.redesign.company_access_help'|trans }}</p>
+        {% elseif subscription.cancelAtPeriodEnd %}
+          <p class="subscription-ending-message"><i class="fa-solid fa-calendar-xmark"></i> {{ 'subscription.manage.ends_on'|trans({'%date%': subscription.currentPeriodEnd ? subscription.currentPeriodEnd|date('d/m/Y') : '—'}) }}</p>
+        {% else %}
+          <p><i class="fa-regular fa-calendar-check"></i> {{ 'subscription.manage.renews_on'|trans({'%date%': subscription and subscription.currentPeriodEnd ? subscription.currentPeriodEnd|date('d/m/Y') : '—'}) }}</p>
+        {% endif %}
       </div>
 
-      <!-- PRO -->
-      <div class="pricing-card featured">
-        <div class="card-popular-badge">{{ 'subscription.plans.pro.badge_popular'|trans }}</div>
-        <div class="card-header">
-          <div class="card-icon-wrapper">
-            <div class="card-icon-bg"></div>
-            <div class="card-icon"><i class="fa-solid fa-gear"></i></div>
-          </div>
-
-          <h3 class="plan-name">{{ 'subscription.plans.pro.name'|trans }}</h3>
-          <div class="plan-price-wrapper">
-            <span class="plan-price">6,99€</span><small>{{ 'subscription.plans.pro.price_suffix'|trans }}</small>
-          </div>
-          <p class="plan-description">{{ 'subscription.plans.pro.description'|trans }}</p>
-        </div>
-
-        <div class="card-divider"></div>
-
-        <div class="card-body">
-          <ul class="features-list">
-            <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span> {{ 'subscription.plans.limits.credentials_unlimited'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span> {{ 'subscription.plans.limits.shares_unlimited'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-users"></i></span> {{ 'subscription.plans.limits.teams_unlimited'|trans }}</li>
-            {% if proPlan.limits.extension_installations != 0 %}
-              <li><span class="feature-icon"><i class="fa-solid fa-puzzle-piece"></i></span>
-                {{ (proPlan.limits.extension_installations is null ? 'subscription.plans.limits.extension_installations_unlimited' : 'subscription.plans.limits.extension_installations')|trans({'%limit%': proPlan.limits.extension_installations}) }}
-              </li>
-            {% endif %}
-            <li><span class="feature-icon"><i class="fa-solid fa-shield-halved"></i></span> {{ 'subscription.plans.features.all_tools'|trans }}</li>
-          </ul>
-
-          {% if not hasActiveSubscription %}
-            <a class="cta-button" href="{{ path('app_subscription_checkout_pro') }}">
-              {{ 'subscription.plans.pro.cta_upgrade'|trans }}
-            </a>
-          {% else %}
-            <a class="cta-button outline" href="#" onclick="return false;">
-              <i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>
-              {{ 'subscription.status_card.title'|trans }}
-            </a>
+      {% if ownsSubscription %}
+        <div class="subscription-current__actions">
+          <a href="{{ path('app_subscription_portal') }}" class="subscription-action secondary"><i class="fa-solid fa-receipt"></i> {{ 'subscription.manage.billing_portal'|trans }}</a>
+          {% if subscription.cancelAtPeriodEnd %}
+            <form method="post" action="{{ path('app_subscription_resume') }}">
+              <input type="hidden" name="_token" value="{{ csrf_token('subscription_resume') }}">
+              <button class="subscription-action primary" type="submit"><i class="fa-solid fa-rotate-left"></i> {{ 'subscription.manage.resume'|trans }}</button>
+            </form>
           {% endif %}
         </div>
-      </div>
-
-      <!-- TEAM -->
-      <div class="pricing-card">
-        <div class="card-header">
-          <div class="card-icon-wrapper">
-            <div class="card-icon-bg"></div>
-            <div class="card-icon"><i class="fa-solid fa-users-gear"></i></div>
-          </div>
-
-          <h3 class="plan-name">{{ 'subscription.plans.team.name'|trans }}</h3>
-          <div class="plan-price-wrapper">
-            <span class="plan-price">5,49€</span><small>{{ 'subscription.plans.team.price_suffix'|trans }}</small>
-          </div>
-          <p class="plan-description">{{ 'subscription.plans.team.description'|trans }}</p>
-        </div>
-
-        <div class="card-divider"></div>
-
-        <div class="card-body">
-          <ul class="features-list">
-            <li><span class="feature-icon"><i class="fa-solid fa-user-group"></i></span> {{ 'subscription.plans.team.minimum_seats'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span> {{ 'subscription.plans.limits.credentials_unlimited'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span> {{ 'subscription.plans.limits.shares_unlimited'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-puzzle-piece"></i></span> {{ 'subscription.plans.limits.extension_installations_unlimited'|trans }}</li>
-            <li><span class="feature-icon"><i class="fa-solid fa-user-shield"></i></span> {{ 'subscription.plans.team.centralized_admin'|trans }}</li>
-          </ul>
-
-          <a class="cta-button" href="{{ path('app_subscription_checkout_team') }}">
-            {{ 'subscription.plans.team.cta_upgrade'|trans }}
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </section>
+      {% endif %}
+    </section>
   {% endif %}
 
-  
+  <section class="subscription-offers" aria-labelledby="subscriptionOffersTitle">
+    <div class="subscription-offers__heading">
+      <div><span>{{ 'subscription.redesign.offers_eyebrow'|trans }}</span><h2 id="subscriptionOffersTitle">{{ 'subscription.redesign.offers_title'|trans }}</h2></div>
+      <p><i class="fa-solid fa-calendar-days"></i> {{ 'subscription.redesign.monthly_billing'|trans }}</p>
+    </div>
 
-  <!-- ===== OUTILS ===== -->
-  <section class="comparison-section">
-    <h2>
-      {{ 'subscription.tools.title_before'|trans }}
-      <span class="highlight">{{ 'subscription.tools.title_highlight'|trans }}</span>
-    </h2>
-    <p class="comparison-subtitle">{{ 'subscription.tools.subtitle'|trans }}</p>
-
-    <div class="tools-grid">
-      <div class="tool-card">
-        <div class="tool-header">
-          <div class="tool-icon-text">
-            <div class="tool-icon"><i class="fa-solid fa-key"></i></div>
-            <div class="tool-title">{{ 'subscription.tools.password_generator.title'|trans }}</div>
-          </div>
-          <span class="tool-badge free">{{ (freePlan.features.password_generator ? 'subscription.tools.badge_free' : 'subscription.tools.badge_pro')|trans }}</span>
+    <div class="subscription-plan-grid">
+      <article class="subscription-plan-card is-pro {{ ownedPlan == 'pro' ? 'is-current' : '' }}">
+        <div class="subscription-plan-card__top">
+          <span class="subscription-plan-kicker">{{ 'landing.pricing.showcase.pro.eyebrow'|trans }}</span>
+          {% if ownedPlan == 'pro' %}<span class="subscription-plan-state">{{ 'subscription.redesign.active_badge'|trans }}</span>{% endif %}
+          <h3>PRO</h3>
+          <p>{{ 'landing.pricing.showcase.pro.target'|trans }}</p>
+          <div class="subscription-plan-price"><strong>6,99€</strong><span>{{ 'landing.pricing.showcase.per_user_month'|trans }}</span></div>
+          {% if ownedPlan == 'pro' %}
+            <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.redesign.current_offer'|trans }}</button>
+          {% elseif ownedPlan == 'team' %}
+            <a class="subscription-plan-cta is-secondary" href="{{ path('app_subscription_portal') }}">{{ 'subscription.manage.change_to_pro'|trans }}</a>
+            <small class="subscription-plan-note">{{ 'subscription.manage.downgrade_note'|trans }}</small>
+          {% elseif currentCode == 'team' %}
+            <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.redesign.included_in_team'|trans }}</button>
+          {% else %}
+            <a class="subscription-plan-cta" href="{{ path('app_subscription_checkout_pro') }}">{{ 'subscription.plans.pro.cta_upgrade'|trans }}</a>
+          {% endif %}
         </div>
-        <p class="tool-description">{{ 'subscription.tools.password_generator.desc'|trans }}</p>
-      </div>
+        <div class="subscription-plan-included"><i class="fa-regular fa-user"></i> {{ 'landing.pricing.showcase.pro.included'|trans }}</div>
+        <ul>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'subscription.plans.limits.credentials_unlimited'|trans }}</span></li>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'subscription.plans.limits.shares_unlimited'|trans }}</span></li>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'subscription.plans.features.all_tools'|trans }}</span></li>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'landing.pricing.showcase.pro.support'|trans }}</span></li>
+        </ul>
+      </article>
 
-      <div class="tool-card">
-        <div class="tool-header">
-          <div class="tool-icon-text">
-            <div class="tool-icon"><i class="fa-solid fa-shield-halved"></i></div>
-            <div class="tool-title">{{ 'subscription.tools.security_checker.title'|trans }}</div>
-          </div>
-          <span class="tool-badge free">{{ (freePlan.features.security_checker ? 'subscription.tools.badge_free' : 'subscription.tools.badge_pro')|trans }}</span>
+      <article class="subscription-plan-card is-team {{ currentCode == 'team' ? 'is-current' : '' }}">
+        <div class="subscription-plan-card__top">
+          <span class="subscription-plan-kicker">{{ 'landing.pricing.showcase.team.eyebrow'|trans }}</span>
+          {% if currentCode == 'team' %}<span class="subscription-plan-state">{{ hasCompanyAccess ? 'subscription.redesign.company_badge'|trans : 'subscription.redesign.active_badge'|trans }}</span>{% endif %}
+          <h3>TEAM</h3>
+          <p>{{ 'landing.pricing.showcase.team.target'|trans }}</p>
+          <div class="subscription-plan-price"><strong>5,49€</strong><span>{{ 'landing.pricing.showcase.per_user_month'|trans }}</span></div>
+          {% if ownedPlan == 'pro' %}
+            <form class="subscription-upgrade-form" method="post" action="{{ path('app_subscription_upgrade_team') }}" onsubmit="return confirm('{{ 'subscription.manage.upgrade_confirm'|trans|e('js') }}');">
+              <input type="hidden" name="_token" value="{{ csrf_token('subscription_upgrade_team') }}">
+              <label for="teamUpgradeQuantity">{{ 'subscription.manage.team_seats'|trans }}</label>
+              <div>
+                <input id="teamUpgradeQuantity" type="number" name="quantity" min="{{ teamMinimumSeats }}" max="{{ teamMaximumSeats }}" value="{{ teamMinimumSeats }}" required>
+                <button class="subscription-plan-cta" type="submit">{{ 'subscription.manage.upgrade_team'|trans }}</button>
+              </div>
+              <small><i class="fa-solid fa-bolt"></i> {{ 'subscription.manage.upgrade_proration'|trans }}</small>
+            </form>
+          {% elseif currentCode == 'team' %}
+            <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.redesign.current_offer'|trans }}</button>
+          {% else %}
+            <a class="subscription-plan-cta" href="{{ path('app_subscription_checkout_team') }}">{{ 'subscription.plans.team.cta_upgrade'|trans }}</a>
+          {% endif %}
         </div>
-        <p class="tool-description">{{ 'subscription.tools.security_checker.desc'|trans }}</p>
-      </div>
-
-      <div class="tool-card">
-        <div class="tool-header">
-          <div class="tool-icon-text">
-            <div class="tool-icon"><i class="fa-solid fa-users-gear"></i></div>
-            <div class="tool-title">{{ 'subscription.tools.team_management.title'|trans }}</div>
-          </div>
-          <span class="tool-badge free">{{ (freePlan.limits.teams != 0 ? 'subscription.tools.badge_free' : 'subscription.tools.badge_pro')|trans }}</span>
-        </div>
-        <p class="tool-description">{{ 'subscription.tools.team_management.desc'|trans }}</p>
-      </div>
+        <div class="subscription-plan-included"><i class="fa-solid fa-users"></i> {{ 'landing.pricing.showcase.team.included'|trans }}</div>
+        <ul>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'subscription.plans.limits.credentials_unlimited'|trans }}</span></li>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'subscription.plans.limits.shares_unlimited'|trans }}</span></li>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'subscription.plans.team.centralized_admin'|trans }}</span></li>
+          <li><i class="fa-solid fa-check"></i><span>{{ 'subscription.plans.limits.extension_installations_unlimited'|trans }}</span></li>
+        </ul>
+      </article>
     </div>
   </section>
 
-  <!-- ===== CONTACT ===== -->
-  <section class="contact-section" id="subscription_contact">
-    <div class="contact-content">
-      <div class="contact-header">
-        <h2><i class="fa-solid fa-envelope-open-text"></i> {{ 'subscription.contact.title'|trans }}</h2>
-        <p class="subtitle">{{ 'subscription.contact.subtitle'|trans }}</p>
-      </div>
-
-  {% include "auth/contact/_form.html.twig" %}
-    </div>
-  </section>
-
-  <!-- ===== FAQ ===== -->
-  <section class="faq-section">
-    <div class="faq-header">
-      <h2>
-        <i class="fa-solid fa-circle-question"></i>
-        {{ 'subscription.faq.title_before'|trans }}
-        <span class="highlight">{{ 'subscription.faq.title_highlight'|trans }}</span>
-      </h2>
-      <p class="faq-subtitle">{{ 'subscription.faq.subtitle'|trans }}</p>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">
-        <span>{{ 'subscription.faq.q1'|trans }}</span>
-        <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
-      </div>
-      <div class="faq-answer">{{ 'subscription.faq.a1'|trans }}</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">
-        <span>{{ 'subscription.faq.q2'|trans }}</span>
-        <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
-      </div>
-      <div class="faq-answer">{{ 'subscription.faq.a2'|trans }}</div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-question">
-        <span>{{ 'subscription.faq.q3'|trans }}</span>
-        <div class="faq-icon"><i class="fa-solid fa-plus"></i></div>
-      </div>
-      <div class="faq-answer">
-        {{ (freePlan.limits.shares is null ? 'subscription.faq.a3_unlimited' : 'subscription.faq.a3')|trans({'%limit%': freePlan.limits.shares}) }}
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== TRUST SECTION ===== -->
-  <section class="trust-section">
-    <h3>{{ 'subscription.trust.title'|trans }}</h3>
-    <div class="trust-badges">
-      <div class="trust-badge"><span class="trust-icon"><i class="fa-solid fa-briefcase"></i></span> {{ 'subscription.trust.companies'|trans }}</div>
-      <div class="trust-badge"><span class="trust-icon"><i class="fa-solid fa-laptop-code"></i></span> {{ 'subscription.trust.startups'|trans }}</div>
-      <div class="trust-badge"><span class="trust-icon"><i class="fa-solid fa-graduation-cap"></i></span> {{ 'subscription.trust.universities'|trans }}</div>
-    </div>
-  </section>
-
-  <script>
-    document.querySelectorAll('.faq-question').forEach(q => {
-      q.addEventListener('click', () => {
-        const item = q.closest('.faq-item');
-        item.classList.toggle('active');
-      });
-    });
-  </script>
+  <div class="subscription-security-note"><i class="fa-brands fa-stripe"></i><span>{{ 'subscription.redesign.stripe_note'|trans }}</span></div>
+</main>
 {% endblock %}

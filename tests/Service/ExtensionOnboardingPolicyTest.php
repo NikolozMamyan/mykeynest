@@ -5,6 +5,7 @@ namespace App\Tests\Service;
 use App\Entity\User;
 use App\Service\ExtensionOnboardingPolicy;
 use App\Repository\SubscriptionPlanConfigurationRepository;
+use App\Repository\OrganizationMemberRepository;
 use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -38,6 +39,10 @@ final class ExtensionOnboardingPolicyTest extends TestCase
         $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
         $repository->method('findByPlanCode')->willReturn(null);
 
-        return new SubscriptionPlanService($repository, $this->createMock(EntityManagerInterface::class));
+        return new SubscriptionPlanService(
+            $repository,
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(OrganizationMemberRepository::class),
+        );
     }
 }

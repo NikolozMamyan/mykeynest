@@ -1,0 +1,25 @@
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:25px 0;background:#f7faf9;border:1px solid #e1e9e7;border-radius:6px;">
+  <tr><td colspan="2" style="padding:15px 17px 10px;color:#172033;font-size:13px;font-weight:700;">{{ 'email.subscription.summary_title'|trans({}, null, locale|default('fr')) }}</td></tr>
+  <tr>
+    <td style="padding:8px 17px;color:#748079;font-size:12px;">{{ 'email.subscription.plan_label'|trans({}, null, locale|default('fr')) }}</td>
+    <td align="right" style="padding:8px 17px;color:#172033;font-size:13px;font-weight:700;">MYKEYNEST {{ planName|default(subscription.planCode|default('PRO'))|upper }}</td>
+  </tr>
+  {% if planName|default(subscription.planCode|default('pro'))|lower == 'team' %}
+    <tr>
+      <td style="padding:8px 17px;color:#748079;font-size:12px;">{{ 'email.subscription.seats_label'|trans({}, null, locale|default('fr')) }}</td>
+      <td align="right" style="padding:8px 17px;color:#172033;font-size:13px;font-weight:700;">{{ quantity|default(subscription.quantity|default(1)) }}</td>
+    </tr>
+  {% endif %}
+  {% if monthlyAmount is defined %}
+    <tr>
+      <td style="padding:8px 17px;color:#748079;font-size:12px;">{{ 'email.subscription.monthly_total_label'|trans({}, null, locale|default('fr')) }}</td>
+      <td align="right" style="padding:8px 17px;color:#172033;font-size:13px;font-weight:700;">{{ monthlyAmount }}</td>
+    </tr>
+  {% endif %}
+  {% if subscription.currentPeriodEnd|default(null) %}
+    <tr>
+      <td style="padding:8px 17px 15px;color:#748079;font-size:12px;">{{ 'email.subscription.renewal_label'|trans({}, null, locale|default('fr')) }}</td>
+      <td align="right" style="padding:8px 17px 15px;color:#172033;font-size:13px;font-weight:700;">{{ subscription.currentPeriodEnd|date('d/m/Y') }}</td>
+    </tr>
+  {% endif %}
+</table>

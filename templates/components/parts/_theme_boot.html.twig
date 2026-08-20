@@ -1,0 +1,21 @@
+<script>
+  (() => {
+    const root = document.documentElement;
+    let theme = 'light';
+
+    try {
+      const savedTheme = window.localStorage.getItem('theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        theme = savedTheme;
+      }
+    } catch (error) {
+      // localStorage peut etre indisponible en navigation privee stricte.
+    }
+
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', theme === 'dark' ? '#040d0b' : '#f8fafc');
+  })();
+</script>

@@ -1,0 +1,354 @@
+.auth-form-page {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-bg-light) 0%, #e0f2fe 100%);
+}
+
+.auth-form-page .auth-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.auth-form-page :is(.login-wrapper, .register-wrapper) {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background: var(--app-surface);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), var(--shadow-sm);
+  animation: authFadeInUp 0.6s ease-out;
+}
+
+.auth-form-page :is(.login-hero, .register-hero) {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 3rem;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
+  color: var(--color-on-primary);
+}
+
+.auth-form-page :is(.login-hero, .register-hero)::before {
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  content: "";
+  animation: authPulse 8s ease-in-out infinite;
+}
+
+.auth-form-page .hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-form-page .hero-icon {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 28px rgba(6, 78, 59, 0.2);
+  backdrop-filter: var(--blur-background);
+}
+
+.auth-form-page .hero-icon img {
+  width: 38px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.auth-form-page :is(.login-hero, .register-hero) h1 {
+  margin: 0 0 1rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.auth-form-page :is(.login-hero, .register-hero) p {
+  margin: 0 0 2.5rem;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+.auth-form-page .hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-form-page .feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 0.9375rem;
+  opacity: 0.9;
+}
+
+.auth-form-page .feature-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke: var(--color-on-primary);
+  stroke-width: 2.5;
+}
+
+.auth-form-page :is(.login-form-section, .register-form-section) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 3rem;
+  background: var(--app-surface);
+}
+
+.auth-form-page .widgets-toggles {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  display: flex;
+  gap: 10px;
+}
+
+.auth-form-page .form-header {
+  margin-bottom: 2.5rem;
+}
+
+.auth-form-page .form-header h2 {
+  margin: 0 0 0.5rem;
+  color: var(--color-text-dark);
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.auth-form-page .form-header p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.auth-form-page :is(.login-form, .register-form),
+.auth-form-page .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form-page .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-medium);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.auth-form-page .form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  outline: none;
+  background: var(--app-surface);
+  color: var(--color-text-dark);
+  font: inherit;
+  font-size: 0.9375rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.auth-form-page .form-group input:focus {
+  border-color: var(--color-primary);
+  background: var(--app-surface);
+  box-shadow: 0 0 0 3px var(--color-primary-hover);
+}
+
+.auth-form-page .form-group input::placeholder {
+  color: var(--color-text-light);
+}
+
+.auth-form-page .btn-submit {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-green);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-form-page .btn-submit:hover {
+  background: #047857;
+  box-shadow: 0 6px 20px var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.auth-form-page .btn-submit:active {
+  transform: translateY(0);
+}
+
+.auth-form-page .auth-hint {
+  margin-top: 1.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.auth-form-page .auth-hint a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-form-page .auth-hint a:hover {
+  color: #047857;
+  text-decoration: underline;
+}
+
+.auth-form-page [data-auth-target="result"] {
+  display: none;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.auth-form-page [data-auth-target="result"]:not(:empty) {
+  display: block;
+}
+
+.auth-form-page [data-auth-target="result"].error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: var(--color-danger-start);
+}
+
+.auth-form-page [data-auth-target="result"].success {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .auth-form-page {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(16, 185, 129, 0.13), transparent 34%),
+    linear-gradient(145deg, #040d0b, #07110f);
+}
+
+[data-theme="dark"] .auth-form-page :is(.login-wrapper, .register-wrapper) {
+  border-color: rgba(226, 240, 234, 0.12);
+  background: rgba(7, 17, 15, 0.94);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
+}
+
+[data-theme="dark"] .auth-form-page :is(.login-hero, .register-hero) {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(74, 222, 128, 0.16), transparent 35%),
+    linear-gradient(145deg, #064e3b, #042f2e);
+}
+
+[data-theme="dark"] .auth-form-page :is(.login-form-section, .register-form-section) {
+  background: linear-gradient(155deg, rgba(10, 23, 20, 0.96), rgba(4, 13, 11, 0.98));
+}
+
+[data-theme="dark"] .auth-form-page .form-group input {
+  border-color: rgba(226, 240, 234, 0.13);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+[data-theme="dark"] .auth-form-page [data-auth-target="result"].error {
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(127, 29, 29, 0.2);
+}
+
+[data-theme="dark"] .auth-form-page [data-auth-target="result"].success {
+  border-color: rgba(52, 211, 153, 0.26);
+  background: rgba(6, 78, 59, 0.24);
+}
+
+@keyframes authPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+@keyframes authFadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 968px) {
+  .auth-form-page .auth-container {
+    padding: 0;
+  }
+
+  .auth-form-page :is(.login-wrapper, .register-wrapper) {
+    display: flex;
+    flex-direction: column-reverse;
+    border-radius: 0;
+  }
+
+  .auth-form-page :is(.login-hero, .register-hero) {
+    padding: 3rem 2rem;
+  }
+
+  .auth-form-page :is(.login-hero, .register-hero) h1 {
+    font-size: 2rem;
+  }
+
+  .auth-form-page :is(.login-form-section, .register-form-section) {
+    padding: 3rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-form-page :is(.login-hero, .register-hero) {
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-form-page :is(.login-hero, .register-hero) h1 {
+    font-size: 1.75rem;
+  }
+
+  .auth-form-page :is(.login-form-section, .register-form-section) {
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-form-page .form-header h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-form-page :is(.login-wrapper, .register-wrapper),
+  .auth-form-page :is(.login-hero, .register-hero)::before {
+    animation: none;
+  }
+}

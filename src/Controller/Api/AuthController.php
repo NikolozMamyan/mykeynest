@@ -12,6 +12,7 @@ use App\Service\LoginChallengeManager;
 use App\Service\MailerService;
 use App\Service\NotificationService;
 use App\Service\ExtensionOnboardingPolicy;
+use App\Service\EmailTwoFactorPolicy;
 use App\Service\SessionManager;
 use App\Service\UserDeviceManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,7 +33,8 @@ final class AuthController extends AbstractController
     public function __construct(
         private RateLimiterFactory $authLoginLimiter,
         private RateLimiterFactory $authRegisterLimiter,
-        private ExtensionOnboardingPolicy $extensionOnboardingPolicy
+        private ExtensionOnboardingPolicy $extensionOnboardingPolicy,
+        private EmailTwoFactorPolicy $emailTwoFactorPolicy,
     ) {
     }
 
@@ -168,7 +170,7 @@ final class AuthController extends AbstractController
 
             $mailerService->send(
                 $user->getEmail(),
-                'Welcome to MYKEYNEST',
+                'Bienvenue sur MYKEYNEST',
                 'emails/welcome.html.twig',
                 [
                     'user' => $user,
@@ -258,12 +260,16 @@ final class AuthController extends AbstractController
             ], 403);
         }
 
-        // Appareil connu => login direct
-        if ($deviceAccessState === UserDeviceManager::STATE_TRUSTED) {
+        $emailTwoFactorEnabled = $this->emailTwoFactorPolicy->isEnabledFor($user);
+
+        // Appareil connu, ou 2FA email desactivee/non incluse => login direct.
+        if ($deviceAccessState === UserDeviceManager::STATE_TRUSTED
+            || !$emailTwoFactorEnabled) {
             try {
                 [$session, $plainToken, $finalDeviceId] = $sessionManager->createSession(
                     $user,
-                    deviceId: $deviceId
+                    deviceId: $deviceId,
+                    trustUnknownDevice: !$emailTwoFactorEnabled,
                 );
             } catch (\RuntimeException $e) {
                 return new JsonResponse([

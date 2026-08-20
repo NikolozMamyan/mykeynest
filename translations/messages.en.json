@@ -96,6 +96,32 @@
     }
   },
   "email": {
+    "subscription": {
+      "subject": "Your MYKEYNEST %plan% subscription is active",
+      "cancel_subject": "Your MYKEYNEST subscription will end on %date%",
+      "resume_subject": "Your MYKEYNEST subscription renewal is active again",
+      "payment_confirmed": "Payment confirmed",
+      "activated_title": "Your %plan% subscription is active",
+      "activated_intro": "Your payment has been confirmed. All features included in your plan are available now.",
+      "activation_title": "Complete access to your %plan% subscription",
+      "activation_intro": "Your payment is confirmed. Create your account with this email address to link the subscription automatically.",
+      "summary_title": "Subscription summary",
+      "plan_label": "Plan",
+      "seats_label": "Seats",
+      "monthly_total_label": "Monthly total",
+      "renewal_label": "Next renewal",
+      "billing_note": "Your official invoices and payment methods remain available in your secure Stripe billing area.",
+      "open_app": "Open my workspace",
+      "create_account": "Create my account",
+      "cancelled_badge": "Cancellation scheduled",
+      "cancelled_title": "Your subscription will end on %date%",
+      "cancelled_intro": "Your request is saved. You keep all plan features until this date and no further month will be charged afterwards.",
+      "resumed_badge": "Renewal restored",
+      "resumed_title": "Your subscription will continue normally",
+      "resumed_intro": "The cancellation has been removed. Your plan will remain active and renew at the next billing date.",
+      "manage": "Manage my subscription",
+      "security_footer": "This email concerns your MYKEYNEST account billing. Our team will never ask for your password."
+    },
     "welcome": {
       "title": "Welcome to MYKEYNEST",
       "message": "We are delighted to welcome you, <strong>%email%</strong>! Complete your profile to fully enjoy the application.",
@@ -1195,6 +1221,43 @@
   },
   "subscription": {
     "page_title": "Subscriptions - Password Manager",
+    "redesign": {
+      "eyebrow": "Your plan",
+      "title": "A straightforward subscription with no surprises",
+      "subtitle": "Choose the features that fit your business. Payments and invoices are secured by Stripe.",
+      "current_plan": "Active subscription",
+      "company_access": "Access provided by your company",
+      "company_access_help": "Your Team seat is managed by your company administrator.",
+      "offers_eyebrow": "Monthly plans",
+      "offers_title": "Choose PRO or TEAM",
+      "monthly_billing": "Monthly billing · cancel any time",
+      "active_badge": "Active",
+      "company_badge": "Company seat",
+      "current_offer": "Your current plan",
+      "included_in_team": "Included with Team",
+      "stripe_note": "Secure payments, invoices and payment methods managed by Stripe."
+    },
+    "manage": {
+      "renews_on": "Next renewal on %date%",
+      "ends_on": "Access maintained until %date%",
+      "billing_portal": "Manage subscription in Stripe",
+      "cancel": "Cancel at period end",
+      "cancel_confirm": "Confirm cancellation? Your access will remain active until the end of the paid period.",
+      "resume": "Resume renewal",
+      "invalid_csrf": "Your session has expired. Reload the page and try again.",
+      "cancel_scheduled": "Cancellation scheduled. Your access remains active until %date%.",
+      "cancel_error": "Cancellation could not be scheduled right now. Try again or contact support.",
+      "resumed": "Automatic renewal for your subscription is active again.",
+      "resume_error": "Renewal could not be resumed right now.",
+      "team_seats": "Number of Team seats",
+      "upgrade_team": "Upgrade to Team",
+      "upgrade_confirm": "Confirm the upgrade to Team? Stripe will immediately charge the prorated difference.",
+      "upgrade_proration": "Stripe calculates and charges the difference immediately.",
+      "upgrade_success": "Your Team upgrade is confirmed. Your company workspace is ready.",
+      "upgrade_error": "The plan change could not be completed. No change was applied.",
+      "change_to_pro": "Change plan",
+      "downgrade_note": "Switching to PRO is managed in your Stripe billing area."
+    },
     "hero": {
       "badge": "Our plans",
       "title_before": "Choose the",
@@ -1210,6 +1273,8 @@
     "status_card": {
       "title": "You're subscribed 🎉",
       "subtitle": "Thanks for your trust. Your account is currently on",
+      "organization_title": "Team access enabled",
+      "organization_subtitle": "Your company seat currently gives you access to the",
       "plan": "Pro",
       "benefits": {
         "unlimited_shares": "Unlimited sharing",
@@ -1361,6 +1426,87 @@
       "already_used": "This link has already been used."
     }
   },
+  "privacy": {
+    "meta_title": "Privacy Policy | MYKEYNEST",
+    "meta_description": "Privacy policy for MYKEYNEST and its Chrome extension: processed data, purposes, permissions, retention and user rights.",
+    "language_label": "Policy language",
+    "eyebrow": "Privacy and user data",
+    "title": "Privacy Policy",
+    "intro": "This policy transparently explains how the MYKEYNEST service and browser extension process your data to secure, synchronize and fill your credentials.",
+    "updated": "Last updated:",
+    "extension_id": "Chrome extension:",
+    "controller": {
+      "title": "1. Data controller",
+      "text": "%publisher% operates the %brand% service. For questions about your personal data or to exercise your rights, contact us at the address below."
+    },
+    "purpose": {
+      "title": "2. Extension single purpose",
+      "text": "The MYKEYNEST extension lets an authenticated user access their vault, identify credentials matching the website being visited, and fill or submit a login form at their request. It also lets users manage authorized credentials from the extension interface."
+    },
+    "data": {
+      "title": "3. Data collected or processed",
+      "intro": "Depending on the features you use, MYKEYNEST may process the following categories:",
+      "account": "Account data: name, email address, organization, teams and information required for sharing.",
+      "authentication": "Authentication data: extension access token, technical installation identifier and temporary pairing codes. The website session cookie is not sent to the extension.",
+      "vault": "Vault data: service name, domain, username and password for entries your account is authorized to access.",
+      "browser": "Browsing data required for the feature: active tab URL or domain and login-form structure. The extension locally detects login fields and does not read values you type.",
+      "technical": "Technical and security data: browser and version, operating system, extension version, IP address, user-agent, pairing events and technical errors."
+    },
+    "uses": {
+      "title": "4. How data is used",
+      "authentication": "Authenticate the extension, associate an installation with the correct account and maintain the extension session.",
+      "autofill": "Find authorized credentials for the current domain, display them on request and perform autofill.",
+      "sharing": "Apply access rights, sharing rules and subscription-plan limits.",
+      "security": "Prevent unauthorized access, secure the service, investigate errors and detect abuse.",
+      "support": "Provide support, send communications essential to the service and comply with legal obligations."
+    },
+    "permissions": {
+      "title": "5. Extension permissions",
+      "intro": "These permissions are used only for the disclosed MYKEYNEST features.",
+      "permission": "Permission",
+      "reason": "Why it is needed",
+      "storage": "Store the connection token, installation identifier and extension preferences locally.",
+      "tabs": "Identify the active tab, determine its domain and open MYKEYNEST pages requested by the user.",
+      "notifications": "Notify the user when a pairing step requires attention and the extension popup cannot be opened.",
+      "all_urls": "Locally detect login forms and fill credentials on websites where the user chooses to use MYKEYNEST.",
+      "host": "Communicate with the official MYKEYNEST API for authentication, vault access, authorization and extension pairing."
+    },
+    "storage": {
+      "title": "6. Storage and transmission",
+      "local": "The connection token, technical installation identifier and preferences are stored in the Chrome extension's protected local storage. During autofill after navigation, an entry identifier and username may be held in session memory for no more than two minutes.",
+      "server": "Account and vault data are hosted on the service infrastructure. Production communications between the extension and MYKEYNEST use HTTPS.",
+      "passwords": "Vault passwords are encrypted at rest on the server. The extension does not persist passwords: it retrieves them only when an authorized reveal or autofill action requires them."
+    },
+    "sharing": {
+      "title": "7. Recipients and service providers",
+      "no_sale": "We do not sell or rent your data, use it for personalized advertising, or transfer it to data brokers.",
+      "hosting": "%provider% for technical hosting and service storage.",
+      "email": "Brevo for transactional and security emails.",
+      "billing": "Stripe for payments and subscription management; MYKEYNEST does not store full payment-card numbers.",
+      "browser": "Google Chrome and the Chrome Web Store for extension distribution and execution according to browser settings.",
+      "analytics": "The extension itself contains no advertising or audience analytics. The public website may use separate audience measurement; this privacy page does not load it."
+    },
+    "retention": {
+      "title": "8. Data retention",
+      "text": "We retain data only for as long as necessary to operate the account, maintain security and meet legal obligations. The local token is deleted when the extension is disconnected; local installation data can also be removed through Chrome. Account data can be deleted on request, subject to retention required for law, billing or fraud prevention."
+    },
+    "security": {
+      "title": "9. Security",
+      "text": "We apply appropriate technical and organizational safeguards, including encrypted communications, encryption at rest for vault secrets, access controls, installation pairing and restricting local storage to trusted extension contexts. No system can guarantee absolute security."
+    },
+    "limited_use": {
+      "title": "10. Chrome Web Store – Limited Use",
+      "text": "Data obtained by the extension is used solely to provide or improve its user-facing single purpose. It is not sold, used for advertising, transferred for credit assessment, or accessed by humans except with your consent, for security, support, legal compliance, or where the data is aggregated and anonymized."
+    },
+    "rights": {
+      "title": "11. Your rights",
+      "text": "Depending on applicable law, you may request access, correction, deletion, restriction or portability of your data and object to certain processing. You may also lodge a complaint with the competent data-protection authority."
+    },
+    "changes": {
+      "title": "12. Changes to this policy",
+      "text": "This policy may change when the service, extension or legal requirements evolve. The date displayed at the top of the page identifies the version currently in effect."
+    }
+  },
   "settings": {
     "title": "Settings",
     "profile": {
@@ -1389,6 +1535,7 @@
       "preferences": "Preferences",
       "subscription": "Subscription management",
       "contact": "Contact",
+      "privacy": "Privacy",
       "terms_cgu": "Terms of Use",
       "terms_cgv": "Terms of Sale"
     },
@@ -1419,6 +1566,12 @@
         "label": "Feedback requests",
         "description": "Allow feedback requests to help improve your experience."
       },
+      "email_two_factor": {
+        "label": "Email two-factor authentication",
+        "description": "Require email approval when signing in from a new device.",
+        "unavailable": "Available with PRO and TEAM plans.",
+        "upgrade": "View plans"
+      },
       "security": {
         "title": "Cybersecurity",
         "description": "Settings related to security and sensitive communications."
@@ -1436,6 +1589,72 @@
   },
   "teams": {
     "page_title": "My teams",
+    "organization": {
+      "eyebrow": "Company workspace",
+      "title": "%name%",
+      "active": "Active",
+      "suspended": "Suspended",
+      "seats": "Seats",
+      "used": "%used% / %purchased% used",
+      "active_members": "%count% active",
+      "pending_members": "%count% pending",
+      "available_seats": "%count% available",
+      "guests": "%used% / %limit% external guests",
+      "over_capacity": "The number of members exceeds purchased seats. Invitations are blocked.",
+      "members_title": "Company members",
+      "directory_eyebrow": "Directory",
+      "capacity_title": "Seat usage",
+      "metric_active": "Active members",
+      "metric_pending": "Pending",
+      "metric_available": "Available",
+      "invite_card_title": "Add an employee",
+      "member_access_title": "Your company access",
+      "member_access_help": "Your seat enables Team features. Company administrators manage members, roles and billing.",
+      "invite": {
+        "description": "Invite company employees here. Each invitation reserves one seat, then the employee can be added to multiple groups at no extra cost.",
+        "email_label": "Employee email address",
+        "email_placeholder": "employee@company.com",
+        "role_label": "Company role",
+        "role_member": "Member",
+        "role_admin": "Administrator",
+        "submit": "Invite",
+        "invalid": "Check the email address and selected role.",
+        "success_pending": "Invitation sent. The seat is reserved until the account is created.",
+        "success_active": "The employee was added to the company and their seat is active.",
+        "mail_warning": "The employee was added, but the invitation email could not be sent.",
+        "email_subject": "Invitation to join %company% on MYKEYNEST",
+        "email_eyebrow": "Company invitation",
+        "email_title": "Join %company% on MYKEYNEST",
+        "email_body_pending": "Create your account to join your company workspace. A seat has already been reserved for you.",
+        "email_body_active": "Your account has been linked to your company workspace. You can now use the Team features.",
+        "email_role": "Role: %role%",
+        "email_action_pending": "Create my account",
+        "email_action_active": "Open my company workspace",
+        "email_expiry": "This registration link expires on %date%.",
+        "admin_description_company": "An employee must already belong to the company. An external person remains a guest of this group only.",
+        "admin_description_personal": "Add an existing account or send an invitation if the account does not exist yet.",
+        "admin_type_employee": "Active company employee",
+        "admin_type_guest": "External guest without a seat"
+      },
+      "member_status_active": "Active",
+      "member_status_pending": "Invitation pending",
+      "member_status_suspended": "Suspended",
+      "role_owner": "Owner",
+      "role_admin": "Administrator",
+      "role_member": "Member",
+      "role_guest": "External guest",
+      "role_label": "Company role",
+      "role_updated": "The member role has been updated.",
+      "invalid_role": "This role is not valid.",
+      "invalid_csrf": "The security check failed.",
+      "remove": "Remove",
+      "remove_confirm": "Remove this member from the company and all their teams?",
+      "billing_title": "Adjust seats",
+      "billing_help": "The owner counts as one seat. Stripe will apply proration.",
+      "billing_submit": "Update",
+      "billing_error": "Stripe could not update the seats. Please try again in a moment.",
+      "workspace_note": "A seat represents one person. Extension installations never consume seats."
+    },
     "form": {
       "name_label": "Team name",
       "credentials_label": "Share existing credentials (optional)",
@@ -1488,7 +1707,15 @@
         "add": {
           "title": "Add a member",
           "submit": "Add",
-          "email_placeholder": "email@example.com"
+          "email_placeholder": "email@example.com",
+          "email_label": "Email address",
+          "type_label": "Access type",
+          "type_employee": "Company employee · no additional seat",
+          "type_guest": "External guest · limited access",
+          "company_help": "Invite employees from the company workspace, then add them to groups without using another seat",
+          "role_label": "Team role",
+          "role_member": "Member",
+          "role_admin": "Administrator"
         }
       }
     },

@@ -1,0 +1,187 @@
+{% extends 'base_auth.html.twig' %}
+
+{% block title %}{{ 'privacy.meta_title'|trans }}{% endblock %}
+{% block description %}{{ 'privacy.meta_description'|trans }}{% endblock %}
+{% block og_title %}{{ 'privacy.meta_title'|trans }}{% endblock %}
+{% block og_description %}{{ 'privacy.meta_description'|trans }}{% endblock %}
+
+{% block body %}
+  <style>
+    .privacy-page {
+      min-height: 100vh;
+      padding: 44px 18px 70px;
+      color: var(--color-text, #172033);
+      background:
+        radial-gradient(circle at 12% 4%, rgba(16, 185, 129, .12), transparent 32rem),
+        var(--color-bg, #f7f9fc);
+    }
+    .privacy-shell { width: min(980px, 100%); margin: 0 auto; }
+    .privacy-topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+    .privacy-brand { display: inline-flex; align-items: center; gap: 10px; color: inherit; font-weight: 850; text-decoration: none; letter-spacing: -.02em; }
+    .privacy-brand img { width: 38px; height: 38px; object-fit: contain; }
+    .privacy-languages { display: flex; gap: 6px; }
+    .privacy-languages a { padding: 7px 10px; border-radius: 6px; color: var(--color-text-muted, #64748b); font-size: 13px; font-weight: 750; text-decoration: none; }
+    .privacy-languages a[aria-current="page"] { color: #047857; background: rgba(16, 185, 129, .12); }
+    .privacy-hero, .privacy-card {
+      border: 1px solid rgba(100, 116, 139, .18);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .8);
+      box-shadow: 0 18px 48px rgba(15, 23, 42, .06);
+      backdrop-filter: blur(18px);
+    }
+    .privacy-hero { padding: clamp(26px, 5vw, 52px); margin-bottom: 18px; }
+    .privacy-eyebrow { margin: 0 0 10px; color: #059669; font-size: 12px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+    .privacy-hero h1 { max-width: 720px; margin: 0; font-size: clamp(34px, 6vw, 58px); line-height: 1.02; letter-spacing: -.045em; }
+    .privacy-intro { max-width: 760px; margin: 18px 0 0; color: var(--color-text-muted, #526079); font-size: 17px; line-height: 1.7; }
+    .privacy-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 22px; color: var(--color-text-muted, #64748b); font-size: 13px; }
+    .privacy-grid { display: grid; gap: 14px; }
+    .privacy-card { padding: clamp(22px, 4vw, 34px); }
+    .privacy-card h2 { margin: 0 0 13px; font-size: 21px; letter-spacing: -.025em; }
+    .privacy-card h3 { margin: 20px 0 8px; font-size: 16px; }
+    .privacy-card p { margin: 0 0 12px; color: var(--color-text-muted, #526079); line-height: 1.72; }
+    .privacy-card p:last-child { margin-bottom: 0; }
+    .privacy-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .privacy-list li { position: relative; padding-left: 20px; color: var(--color-text-muted, #526079); line-height: 1.65; }
+    .privacy-list li::before { content: ''; position: absolute; top: .68em; left: 2px; width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, .1); }
+    .privacy-table-wrap { overflow-x: auto; }
+    .privacy-table { width: 100%; border-collapse: collapse; }
+    .privacy-table th, .privacy-table td { padding: 13px 12px; border-bottom: 1px solid rgba(100, 116, 139, .16); text-align: left; vertical-align: top; line-height: 1.55; }
+    .privacy-table th { color: var(--color-text, #172033); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+    .privacy-table td { color: var(--color-text-muted, #526079); font-size: 14px; }
+    .privacy-table code { color: #047857; font-weight: 700; white-space: nowrap; }
+    .privacy-callout { padding: 16px; border-left: 3px solid #10b981; border-radius: 6px; background: rgba(16, 185, 129, .08); }
+    .privacy-contact a, .privacy-card a { color: #047857; font-weight: 700; text-underline-offset: 3px; }
+    [data-theme="dark"] .privacy-page { color: #f8fafc; background: radial-gradient(circle at 12% 4%, rgba(16, 185, 129, .13), transparent 32rem), #020b0a; }
+    [data-theme="dark"] .privacy-hero, [data-theme="dark"] .privacy-card { border-color: rgba(148, 163, 184, .16); background: rgba(8, 20, 19, .8); box-shadow: 0 20px 55px rgba(0, 0, 0, .26); }
+    [data-theme="dark"] .privacy-intro, [data-theme="dark"] .privacy-meta, [data-theme="dark"] .privacy-card p, [data-theme="dark"] .privacy-list li, [data-theme="dark"] .privacy-table td { color: #aab8c6; }
+    [data-theme="dark"] .privacy-table th { color: #f8fafc; }
+    [data-theme="dark"] .privacy-table code, [data-theme="dark"] .privacy-card a { color: #5ee6b5; }
+    @media (max-width: 620px) { .privacy-page { padding: 24px 12px 48px; } .privacy-topbar { align-items: flex-start; } .privacy-brand span { display: none; } .privacy-table th, .privacy-table td { padding: 11px 8px; } }
+  </style>
+
+  <main class="privacy-page">
+    <div class="privacy-shell">
+      <div class="privacy-topbar">
+        <a class="privacy-brand" href="{{ path('app_landing') }}">
+          <img src="{{ asset('apple-touch-icon.png') }}?v=4" alt="" />
+          <span>MYKEYNEST</span>
+        </a>
+        <nav class="privacy-languages" aria-label="{{ 'privacy.language_label'|trans }}">
+          <a href="{{ path('legal_privacy') }}" {% if app.request.locale != 'en' %}aria-current="page"{% endif %}>FR</a>
+          <a href="{{ path('legal_privacy', {lang: 'en'}) }}" {% if app.request.locale == 'en' %}aria-current="page"{% endif %}>EN</a>
+        </nav>
+      </div>
+
+      <header class="privacy-hero">
+        <p class="privacy-eyebrow">{{ 'privacy.eyebrow'|trans }}</p>
+        <h1>{{ 'privacy.title'|trans }}</h1>
+        <p class="privacy-intro">{{ 'privacy.intro'|trans }}</p>
+        <div class="privacy-meta">
+          <span>{{ 'privacy.updated'|trans }} {{ updated_at|date('d/m/Y') }}</span>
+          <span>{{ 'privacy.extension_id'|trans }} llckfoodkfccmibgmpfiodjkpincnfid</span>
+        </div>
+      </header>
+
+      <div class="privacy-grid">
+        <section class="privacy-card">
+          <h2>{{ 'privacy.controller.title'|trans }}</h2>
+          <p>{{ 'privacy.controller.text'|trans({'%publisher%': publisher_name, '%brand%': brand_name}) }}</p>
+          <p class="privacy-contact"><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.purpose.title'|trans }}</h2>
+          <p>{{ 'privacy.purpose.text'|trans }}</p>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.data.title'|trans }}</h2>
+          <p>{{ 'privacy.data.intro'|trans }}</p>
+          <ul class="privacy-list">
+            <li>{{ 'privacy.data.account'|trans }}</li>
+            <li>{{ 'privacy.data.authentication'|trans }}</li>
+            <li>{{ 'privacy.data.vault'|trans }}</li>
+            <li>{{ 'privacy.data.browser'|trans }}</li>
+            <li>{{ 'privacy.data.technical'|trans }}</li>
+          </ul>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.uses.title'|trans }}</h2>
+          <ul class="privacy-list">
+            <li>{{ 'privacy.uses.authentication'|trans }}</li>
+            <li>{{ 'privacy.uses.autofill'|trans }}</li>
+            <li>{{ 'privacy.uses.sharing'|trans }}</li>
+            <li>{{ 'privacy.uses.security'|trans }}</li>
+            <li>{{ 'privacy.uses.support'|trans }}</li>
+          </ul>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.permissions.title'|trans }}</h2>
+          <p>{{ 'privacy.permissions.intro'|trans }}</p>
+          <div class="privacy-table-wrap">
+            <table class="privacy-table">
+              <thead><tr><th>{{ 'privacy.permissions.permission'|trans }}</th><th>{{ 'privacy.permissions.reason'|trans }}</th></tr></thead>
+              <tbody>
+                <tr><td><code>storage</code></td><td>{{ 'privacy.permissions.storage'|trans }}</td></tr>
+                <tr><td><code>tabs</code></td><td>{{ 'privacy.permissions.tabs'|trans }}</td></tr>
+                <tr><td><code>notifications</code></td><td>{{ 'privacy.permissions.notifications'|trans }}</td></tr>
+                <tr><td><code>&lt;all_urls&gt;</code></td><td>{{ 'privacy.permissions.all_urls'|trans }}</td></tr>
+                <tr><td><code>key-nest.com</code></td><td>{{ 'privacy.permissions.host'|trans }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.storage.title'|trans }}</h2>
+          <p>{{ 'privacy.storage.local'|trans }}</p>
+          <p>{{ 'privacy.storage.server'|trans }}</p>
+          <p>{{ 'privacy.storage.passwords'|trans }}</p>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.sharing.title'|trans }}</h2>
+          <p>{{ 'privacy.sharing.no_sale'|trans }}</p>
+          <ul class="privacy-list">
+            <li>{{ 'privacy.sharing.hosting'|trans({'%provider%': hosting_provider}) }}</li>
+            <li>{{ 'privacy.sharing.email'|trans }}</li>
+            <li>{{ 'privacy.sharing.billing'|trans }}</li>
+            <li>{{ 'privacy.sharing.browser'|trans }}</li>
+          </ul>
+          <p>{{ 'privacy.sharing.analytics'|trans }}</p>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.retention.title'|trans }}</h2>
+          <p>{{ 'privacy.retention.text'|trans }}</p>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.security.title'|trans }}</h2>
+          <p>{{ 'privacy.security.text'|trans }}</p>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.limited_use.title'|trans }}</h2>
+          <div class="privacy-callout">
+            <p>{{ 'privacy.limited_use.text'|trans }}</p>
+            <p lang="en">The use of information received from Google APIs will adhere to the Chrome Web Store User Data Policy, including the Limited Use requirements.</p>
+          </div>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.rights.title'|trans }}</h2>
+          <p>{{ 'privacy.rights.text'|trans }}</p>
+          <p class="privacy-contact"><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
+        </section>
+
+        <section class="privacy-card">
+          <h2>{{ 'privacy.changes.title'|trans }}</h2>
+          <p>{{ 'privacy.changes.text'|trans }}</p>
+        </section>
+      </div>
+    </div>
+  </main>
+{% endblock %}

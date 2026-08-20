@@ -13,6 +13,16 @@ class PreferencesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $emailTwoFactorOptions = [
+            'label' => 'preferences.email_two_factor.label',
+            'required' => false,
+            'disabled' => !$options['email_two_factor_available'],
+        ];
+
+        if (!$options['email_two_factor_available']) {
+            $emailTwoFactorOptions['data'] = false;
+        }
+
         $builder
             ->add('locale', ChoiceType::class, [
                 'label' => 'preferences.language.label',
@@ -38,6 +48,8 @@ class PreferencesType extends AbstractType
                 'label' => 'preferences.security_emails.label',
                 'required' => false,
             ])
+
+            ->add('emailTwoFactorEnabled', CheckboxType::class, $emailTwoFactorOptions)
         ;
     }
 
@@ -45,6 +57,9 @@ class PreferencesType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'email_two_factor_available' => false,
         ]);
+
+        $resolver->setAllowedTypes('email_two_factor_available', 'bool');
     }
 }

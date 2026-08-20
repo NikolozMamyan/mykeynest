@@ -84,6 +84,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $receiveSecurityEmails = false;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private bool $emailTwoFactorEnabled = true;
+
     /**
      * @var Collection<int, ExtensionClient>
      */
@@ -407,6 +410,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setReceiveSecurityEmails(bool $receiveSecurityEmails): self
     {
         $this->receiveSecurityEmails = $receiveSecurityEmails;
+
+        return $this;
+    }
+
+    public function isEmailTwoFactorEnabled(): bool
+    {
+        return $this->emailTwoFactorEnabled;
+    }
+
+    public function setEmailTwoFactorEnabled(bool $emailTwoFactorEnabled): self
+    {
+        $this->emailTwoFactorEnabled = $emailTwoFactorEnabled;
 
         return $this;
     }

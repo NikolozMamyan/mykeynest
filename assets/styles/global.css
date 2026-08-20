@@ -3,6 +3,10 @@
   --color-primary: #059669;
   --color-primary-hover: rgba(16, 185, 129, 0.3);
   --background-gradient: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  --color-on-primary: #ffffff;
+  --app-page-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-surface-muted: #f8fafc;
 
   /* Couleurs de base */
   --color-white: #ffffff;
@@ -46,6 +50,11 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   color: var(--color-text-dark);
+  background: var(--app-page-bg);
+}
+
+html {
+  color-scheme: light;
 }
 
 html.is-sidebar-open,
@@ -67,6 +76,7 @@ body.is-sidebar-open {
   margin-left: 280px; /* laisse la place à la sidebar */
   min-height: 100vh;
   padding: 30px 0; /* espace en haut/bas */
+  background: var(--app-page-bg);
 }
 
 
@@ -90,6 +100,17 @@ body.is-sidebar-open {
   background: var(--color-white);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--app-page-bg);
+}
+
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] button.btn-primary,
+[data-theme="dark"] .nav-item.active {
+  color: var(--color-on-primary);
 }
 
 @media (max-width: 768px) {
@@ -119,36 +140,41 @@ body.is-sidebar-open {
 
 
 [data-theme="dark"] {
+    color-scheme: dark;
  
     /* Fond général */
-    --color-white: #0f172a; /* Fond sombre global */
-    --color-bg-light: #1e293b;
-    --color-bg-hover: #334155;
+    --color-white: #07110f;
+    --color-bg-light: #0a1714;
+    --color-bg-hover: #10231e;
+    --app-page-bg: #040d0b;
+    --app-surface: #07110f;
+    --app-surface-muted: #0a1714;
+    --color-on-primary: #ffffff;
 
     /* Texte */
-    --color-text-dark: #ffffff;
-    --color-text-medium: #cbd5e1;
-    --color-text-muted: #94a3b8;
-    --color-text-light: #64748b;
+    --color-text-dark: #f1f7f4;
+    --color-text-medium: #b1c0bb;
+    --color-text-muted: #80918b;
+    --color-text-light: #63756f;
 
     /* Bordures */
-    --color-border: #334155;
+    --color-border: rgba(226, 240, 234, 0.11);
 
     /* Couleur principale (inchangée pour conserver la marque) */
     --color-primary: #059669;
     --color-primary-hover: rgba(16, 185, 129, 0.4);
-    --background-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --background-gradient: linear-gradient(135deg, #07110f 0%, #0a1714 100%);
 
     /* Couleurs d’alerte */
     --color-danger-start: #ef4444;
     --color-danger-end: #dc2626;
 
     /* Ombres et effets */
-    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.38);
     --shadow-green: 0 4px 14px rgba(16, 185, 129, 0.35);
-    --glass-card-bg: rgba(15, 23, 42, 0.9);
-    --glass-card-border: rgba(51, 65, 85, 0.9);
-    --glass-card-shadow: 0 14px 34px rgba(2, 6, 23, 0.3);
+    --glass-card-bg: rgba(11, 24, 20, 0.86);
+    --glass-card-border: rgba(226, 240, 234, 0.11);
+    --glass-card-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
 
     /* Arrière-plan flouté */
     --blur-background: blur(10px);
@@ -156,8 +182,13 @@ body.is-sidebar-open {
 
   /* Ajustements visuels spécifiques */
   body{
-    background: var(--color-white);
+    background: var(--app-page-bg);
   }
+
+[data-theme="dark"] body.auth-layout {
+  background: var(--app-page-bg);
+  color: var(--color-text-dark);
+}
 .main-content {
 
   background: var(--color-white);

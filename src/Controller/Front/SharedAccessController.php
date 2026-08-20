@@ -50,7 +50,7 @@ class SharedAccessController extends AbstractController
 
         $mailer->send(
             $guest->getEmail(),
-            'Vous avez ete invite sur MYKEYNEST',
+            'Vous avez été invité sur MYKEYNEST',
             'emails/register_guest.html.twig',
             [
                 'user' => $guest,
@@ -400,7 +400,7 @@ class SharedAccessController extends AbstractController
             try {
                 $mailer->send(
                     $guest->getEmail(),
-                    $owner->getEmail() . ' a partage des identifiants avec vous',
+                    $owner->getEmail() . ' a partagé des identifiants avec vous',
                     'emails/share_notification.html.twig',
                     [
                         'owner' => $owner,

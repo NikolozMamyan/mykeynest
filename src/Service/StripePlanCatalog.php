@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use Stripe\Subscription;
+
 final class StripePlanCatalog
 {
     public function __construct(
@@ -73,8 +75,52 @@ final class StripePlanCatalog
         return max(6, $this->teamMinimumSeats);
     }
 
+    public function getTeamMaximumSeats(): int
+    {
+        return max($this->getTeamMinimumSeats(), $this->teamMaximumSeats);
+    }
+
     public function getExpectedMonthlyAmount(string $planCode): int
     {
         return $this->normalizePaidPlan($planCode) === SubscriptionPlanService::PLAN_TEAM ? 549 : 699;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function buildProToTeamUpdate(
+        string $subscriptionItemId,
+        string $teamPriceId,
+        int $quantity,
+        int $userId,
+        string $stripeMode,
+    ): array {
+        if ($quantity < $this->getTeamMinimumSeats() || $quantity > $this->getTeamMaximumSeats()) {
+            throw new \InvalidArgumentException(sprintf(
+                'La quantité doit être comprise entre %d et %d sièges.',
+                $this->getTeamMinimumSeats(),
+                $this->getTeamMaximumSeats(),
+            ));
+        }
+        if (!str_starts_with(trim($teamPriceId), 'price_')) {
+            throw new \LogicException('Stripe Price is not configured for the team plan.');
+        }
+
+        return [
+            'items' => [[
+                'id' => trim($subscriptionItemId),
+                'price' => trim($teamPriceId),
+                'quantity' => $quantity,
+            ]],
+            'cancel_at_period_end' => false,
+            'payment_behavior' => Subscription::PAYMENT_BEHAVIOR_PENDING_IF_INCOMPLETE,
+            'proration_behavior' => Subscription::PRORATION_BEHAVIOR_ALWAYS_INVOICE,
+            'metadata' => [
+                'plan' => SubscriptionPlanService::PLAN_TEAM,
+                'user_id' => (string) $userId,
+                'stripe_mode' => $stripeMode,
+            ],
+            'expand' => ['customer', 'items.data.price', 'latest_invoice'],
+        ];
     }
 }

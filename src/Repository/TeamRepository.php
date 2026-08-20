@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\Credential;
+use App\Enum\OrganizationStatus;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -27,8 +28,11 @@ class TeamRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('t')
             ->join('t.members', 'm')
+            ->leftJoin('t.organization', 'organization')
             ->andWhere('m.user = :user')
+            ->andWhere('organization.id IS NULL OR organization.status = :activeStatus OR t.owner = :user')
             ->setParameter('user', $user)
+            ->setParameter('activeStatus', OrganizationStatus::ACTIVE->value)
             ->addOrderBy('t.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -45,8 +49,11 @@ public function findTeamWithCredentialsByUser(User $user): array
         ->addSelect('mu')
         ->innerJoin('t.owner', 'o')
         ->addSelect('o')
+        ->leftJoin('t.organization', 'organization')
         ->andWhere('tm.user = :user')
+        ->andWhere('organization.id IS NULL OR organization.status = :activeStatus OR t.owner = :user')
         ->setParameter('user', $user)
+        ->setParameter('activeStatus', OrganizationStatus::ACTIVE->value)
         ->leftJoin('t.credentials', 'c')
         ->addSelect('c')
         ->addOrderBy('t.name', 'ASC')
@@ -59,10 +66,13 @@ public function userHasTeamAccessToCredential(User $user, Credential $cred): boo
         ->select('1')
         ->join('t.members', 'tm')          // TeamMember
         ->join('t.credentials', 'c')       // Credential
+        ->leftJoin('t.organization', 'organization')
         ->andWhere('tm.user = :user')
         ->andWhere('c = :cred')
+        ->andWhere('organization.id IS NULL OR organization.status = :activeStatus')
         ->setParameter('user', $user)
         ->setParameter('cred', $cred)
+        ->setParameter('activeStatus', OrganizationStatus::ACTIVE->value)
         ->setMaxResults(1)
         ->getQuery()
         ->getOneOrNullResult();
@@ -76,10 +86,13 @@ public function findTeamsForUserAndCredential(User $user, Credential $credential
     return $this->createQueryBuilder('t')
         ->join('t.members', 'tm')
         ->join('t.credentials', 'c')
+        ->leftJoin('t.organization', 'organization')
         ->andWhere('tm.user = :user')
         ->andWhere('c = :credential')
+        ->andWhere('organization.id IS NULL OR organization.status = :activeStatus')
         ->setParameter('user', $user)
         ->setParameter('credential', $credential)
+        ->setParameter('activeStatus', OrganizationStatus::ACTIVE->value)
         ->getQuery()
         ->getResult();
 }

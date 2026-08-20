@@ -31,6 +31,14 @@ class TeamVoter extends Voter
         /** @var Team $team */
         $team = $subject;
 
+        if (
+            $team->getOrganization() !== null
+            && !$team->getOrganization()->isActive()
+            && $team->getOwner()?->getId() !== $user->getId()
+        ) {
+            return false;
+        }
+
         return match($attribute) {
             self::VIEW => $this->canView($team, $user),
             self::MANAGE => $this->canManage($team, $user),

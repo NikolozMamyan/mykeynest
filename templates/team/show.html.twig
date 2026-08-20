@@ -229,6 +229,14 @@
             </div>
 
             {{ form_start(add_member_form, {'attr': {'class': 'add-member-form'}}) }}
+                {% if seatSummary %}
+                    <div class="team-seat-inline">
+                        <i class="fa-solid fa-building-shield"></i>
+                        <span>{{ 'teams.show.members.add.company_help'|trans }}</span>
+                        <span>·</span>
+                        <span>{{ 'teams.organization.guests'|trans({'%used%': seatSummary.guests, '%limit%': seatSummary.guestLimit}) }}</span>
+                    </div>
+                {% endif %}
                 <div class="form-row">
                     <div class="form-group-inline">
                         {{ form_label(add_member_form.email, null, {'label_attr': {'class': 'form-label-inline'}}) }}
@@ -236,7 +244,15 @@
                         {{ form_errors(add_member_form.email) }}
                     </div>
 
-                    <div class="form-group-inline">
+                    {% if add_member_form.membershipType is defined %}
+                        <div class="form-group-inline">
+                            {{ form_label(add_member_form.membershipType, null, {'label_attr': {'class': 'form-label-inline'}}) }}
+                            {{ form_widget(add_member_form.membershipType, {'attr': {'class': 'form-select-inline', 'data-action': 'change->team-show#syncMemberAccessType'}}) }}
+                            {{ form_errors(add_member_form.membershipType) }}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group-inline" data-member-role-group>
                         {{ form_label(add_member_form.role, null, {'label_attr': {'class': 'form-label-inline'}}) }}
                         {{ form_widget(add_member_form.role, {'attr': {'class': 'form-select-inline'}}) }}
                         {{ form_errors(add_member_form.role) }}

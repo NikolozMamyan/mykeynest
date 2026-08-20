@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Repository\ExtensionClientRepository;
 use App\Repository\ExtensionPairingChallengeRepository;
 use App\Repository\SubscriptionPlanConfigurationRepository;
+use App\Repository\OrganizationMemberRepository;
 use App\Service\ExtensionClientManager;
 use App\Service\ExtensionInstallationChallengeManager;
 use App\Service\ExtensionPairingManager;
@@ -241,6 +242,10 @@ final class ExtensionPairingManagerTest extends TestCase
         $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
         $repository->method('findByPlanCode')->willReturn(null);
 
-        return new SubscriptionPlanService($repository, $entityManager);
+        return new SubscriptionPlanService(
+            $repository,
+            $entityManager,
+            $this->createMock(OrganizationMemberRepository::class),
+        );
     }
 }

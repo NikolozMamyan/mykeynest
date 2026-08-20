@@ -19,6 +19,23 @@
   margin-bottom: 0.5rem;
 }
 
+.team-seat-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .45rem;
+  margin-bottom: 1rem;
+  padding: .65rem .8rem;
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-medium);
+  font-size: .82rem;
+  background: var(--color-bg-light);
+}
+
+.team-seat-inline i {
+  color: var(--color-primary);
+}
+
 .team-show-header-actions {
   display: flex;
   align-items: center;

@@ -2,14 +2,14 @@
 
 ## Catalogue mensuel
 
-Créer deux produits récurrents en EUR, sans tarif annuel ni trimestriel :
+Créer un produit Stripe **MYKEYNEST** avec deux tarifs récurrents mensuels en EUR, sans tarif annuel ni trimestriel. Ce produit commun permet à Stripe de programmer une baisse Team vers Pro à la prochaine échéance :
 
-| Produit | Tarif mensuel | Quantité Checkout |
+| Offre / Price | Tarif mensuel | Quantité Checkout |
 | --- | ---: | --- |
 | MYKEYNEST Pro | 6,99 € / utilisateur | 1 compte |
 | MYKEYNEST Team | 5,49 € / utilisateur | 6 minimum, ajustable jusqu'à la limite configurée |
 
-Pour un nouvel abonnement Team Stripe, cette quantité devient aussi la limite d'installations d'extension. Les abonnements Team historiques sans Price Stripe associé restent illimités afin de préserver les clients déjà en production.
+Pour un abonnement Team Stripe, la quantité représente le nombre de personnes licenciées dans l’espace entreprise. `OWNER`, `ADMIN` et `MEMBER` consomment chacun un siège et héritent des fonctionnalités Team tant que leur adhésion est active. `GUEST` ne consomme aucun siège et ne reçoit aucun droit Team. La quantité ne correspond jamais au nombre d’extensions installées : chaque membre Team dispose séparément de sa propre limite d’appareils.
 
 Conserver les deux identifiants `price_...` créés par Stripe. Un tarif Stripe ne se modifie pas : lorsqu'un montant change, archiver l'ancien tarif, créer le nouveau, puis remplacer l'identifiant d'environnement.
 
@@ -76,12 +76,18 @@ Si un secret `whsec_...` a été publié dans une capture ou une conversation, u
 
 ## Portail client
 
-Activer au minimum :
+Le bouton **Factures et paiement** de l'application ouvre ce portail. Activer au minimum :
 
 - mise à jour du moyen de paiement ;
 - consultation et téléchargement des factures ;
 - résiliation en fin de période ;
-- modification d'abonnement uniquement si les produits Pro et Team et leurs règles de quantité ont été correctement ajoutés au portail.
+- **Changer de forfait** avec les tarifs Pro et Team autorisés ;
+- la quantité ajustable sur Team ;
+- **Gérer les rétrogradations > À la fin de la période de facturation** pour qu'un passage Team vers Pro conserve les sièges déjà payés jusqu'à l'échéance.
+
+Stripe ne programme actuellement une rétrogradation en fin de période qu'entre deux Prices rattachés au **même produit Stripe**. Pour bénéficier de ce comportement, créer un produit MYKEYNEST unique contenant les Prices mensuels Pro et Team, puis autoriser ces deux Prices dans la configuration du portail Sandbox et dans celle du portail Live. Si les Prices appartiennent déjà à des produits différents, ne pas les déplacer : créer de nouveaux Prices sous un produit commun, tester la migration en Sandbox, puis remplacer les variables `STRIPE_*_PRICE_*` lors d'une release contrôlée.
+
+Le passage Pro vers Team ne dépend pas du portail : l'application facture immédiatement la différence au prorata et n'applique Team qu'après confirmation du paiement. L'annulation depuis la page Abonnement utilise `cancel_at_period_end`, donc les droits restent ouverts jusqu'à l'échéance déjà payée.
 
 ## Ordre de déploiement
 

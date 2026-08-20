@@ -4,6 +4,7 @@ namespace App\Controller\Front;
 
 use App\Entity\User;
 use App\Service\StripeBillingService;
+use App\Service\StripePlanCatalog;
 use App\Service\SubscriptionPlanService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,12 +13,15 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SubscriptionPageController extends AbstractController
 {
     public function __construct(
         private readonly SubscriptionPlanService $subscriptionPlans,
         private readonly StripeBillingService $stripeBilling,
+        private readonly StripePlanCatalog $stripePlans,
+        private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -40,7 +44,104 @@ final class SubscriptionPageController extends AbstractController
             'proPlan' => $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_PRO),
             'teamPlan' => $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_TEAM),
             'currentPlan' => $user instanceof User ? $this->subscriptionPlans->getPlanForUser($user) : null,
+            'subscription' => $user instanceof User ? $user->getUserSubscription() : null,
+            'teamMinimumSeats' => $this->stripePlans->getTeamMinimumSeats(),
+            'teamMaximumSeats' => $this->stripePlans->getTeamMaximumSeats(),
         ];
+    }
+
+    #[Route('/app/subscription/manage/cancel', name: 'app_subscription_cancel_period_end', methods: ['POST'])]
+    public function cancelAtPeriodEnd(Request $request): RedirectResponse
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('show_login');
+        }
+        if (!$this->isCsrfTokenValid('subscription_cancel_period_end', $request->request->getString('_token'))) {
+            $this->addFlash('error', $this->translator->trans('subscription.manage.invalid_csrf'));
+
+            return $this->redirectToRoute('app_subscription');
+        }
+
+        try {
+            $subscription = $this->stripeBilling->setCancellationAtPeriodEnd($user, true);
+            $date = $subscription->getCurrentPeriodEnd()?->format('d/m/Y');
+            $this->addFlash('success', $this->translator->trans('subscription.manage.cancel_scheduled', [
+                '%date%' => $date ?? '—',
+            ]));
+        } catch (\Throwable $exception) {
+            $this->logger->error('Unable to schedule Stripe subscription cancellation.', [
+                'user_id' => $user->getId(),
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash('error', $this->translator->trans('subscription.manage.cancel_error'));
+        }
+
+        return $this->redirectToRoute('app_subscription');
+    }
+
+    #[Route('/app/subscription/manage/resume', name: 'app_subscription_resume', methods: ['POST'])]
+    public function resume(Request $request): RedirectResponse
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('show_login');
+        }
+        if (!$this->isCsrfTokenValid('subscription_resume', $request->request->getString('_token'))) {
+            $this->addFlash('error', $this->translator->trans('subscription.manage.invalid_csrf'));
+
+            return $this->redirectToRoute('app_subscription');
+        }
+
+        try {
+            $this->stripeBilling->setCancellationAtPeriodEnd($user, false);
+            $this->addFlash('success', $this->translator->trans('subscription.manage.resumed'));
+        } catch (\Throwable $exception) {
+            $this->logger->error('Unable to revoke Stripe subscription cancellation.', [
+                'user_id' => $user->getId(),
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash('error', $this->translator->trans('subscription.manage.resume_error'));
+        }
+
+        return $this->redirectToRoute('app_subscription');
+    }
+
+    #[Route('/app/subscription/manage/upgrade-team', name: 'app_subscription_upgrade_team', methods: ['POST'])]
+    public function upgradeTeam(Request $request): RedirectResponse
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('show_login');
+        }
+        if (!$this->isCsrfTokenValid('subscription_upgrade_team', $request->request->getString('_token'))) {
+            $this->addFlash('error', $this->translator->trans('subscription.manage.invalid_csrf'));
+
+            return $this->redirectToRoute('app_subscription');
+        }
+
+        try {
+            $result = $this->stripeBilling->upgradeProToTeam($user, $request->request->getInt('quantity'));
+            if (!$result['completed'] && is_string($result['paymentUrl'])) {
+                return $this->redirect($result['paymentUrl']);
+            }
+
+            $this->addFlash('success', $this->translator->trans('subscription.manage.upgrade_success'));
+        } catch (\InvalidArgumentException|\LogicException $exception) {
+            $this->addFlash('warning', $exception->getMessage());
+        } catch (\Throwable $exception) {
+            $this->logger->error('Unable to upgrade Stripe subscription from PRO to Team.', [
+                'user_id' => $user->getId(),
+                'quantity' => $request->request->getInt('quantity'),
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash('error', $this->translator->trans('subscription.manage.upgrade_error'));
+        }
+
+        return $this->redirectToRoute('app_subscription');
     }
 
     #[Route('/app/subscription/checkout/pro', name: 'app_subscription_checkout_pro', methods: ['GET'])]

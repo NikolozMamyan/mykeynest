@@ -1,49 +1,20 @@
-<!doctype html>
-<html>
-  <body style="margin:0;padding:0;background:#f6f7fb;font-family:Arial, sans-serif;">
-    <div style="max-width:640px;margin:0 auto;padding:24px;">
-      <div style="background:#ffffff;border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(0,0,0,.06);">
-        <h2 style="margin:0 0 10px;font-size:18px;color:#111827;">
-          Nouveau paiement abonnement
-        </h2>
+{% extends 'emails/layout.html.twig' %}
 
-        <p style="margin:0 0 14px;color:#374151;line-height:1.6;">
-          Un abonnement vient d'etre active sur MyKeyNest.
-        </p>
+{% block title %}Nouvel abonnement MYKEYNEST{% endblock %}
+{% block preheader %}Un paiement d’abonnement vient d’être confirmé.{% endblock %}
+{% block eyebrow %}Notification administrateur{% endblock %}
+{% block heading %}Un nouvel abonnement est actif{% endblock %}
 
-        <table style="width:100%;border-collapse:collapse;">
-          <tr>
-            <td style="padding:8px 0;color:#6b7280;">Email</td>
-            <td style="padding:8px 0;color:#111827;"><strong>{{ user.email }}</strong></td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:#6b7280;">Company</td>
-            <td style="padding:8px 0;color:#111827;">{{ user.company ?: '-' }}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:#6b7280;">Plan</td>
-            <td style="padding:8px 0;color:#111827;">{{ subscription.planCode ?: 'pro' }}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:#6b7280;">Status</td>
-            <td style="padding:8px 0;color:#111827;">{{ subscription.status ?: 'active' }}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:#6b7280;">Source</td>
-            <td style="padding:8px 0;color:#111827;">{{ source }}</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 0;color:#6b7280;">Date</td>
-            <td style="padding:8px 0;color:#111827;">{{ paidAt|date('Y-m-d H:i:s') }}</td>
-          </tr>
-        </table>
+{% block content %}
+  <p style="margin:0 0 22px;">Le paiement Stripe a été synchronisé et les droits du compte ont été mis à jour.</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f7faf9;border:1px solid #e1e9e7;border-radius:6px;">
+    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Client</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;font-weight:700;">{{ user.email }}</td></tr>
+    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Entreprise</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;">{{ user.company ?: '—' }}</td></tr>
+    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Offre</td><td align="right" style="padding:9px 15px;color:#059669;font-size:13px;font-weight:800;">{{ subscription.planCode|default('pro')|upper }}</td></tr>
+    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Statut</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;">{{ subscription.status|default('active') }}</td></tr>
+    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Source</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;">{{ source }}</td></tr>
+    <tr><td style="padding:9px 15px 14px;color:#748079;font-size:12px;">Date</td><td align="right" style="padding:9px 15px 14px;color:#172033;font-size:13px;">{{ paidAt|date('d/m/Y H:i') }}</td></tr>
+  </table>
+{% endblock %}
 
-        <p style="margin:22px 0 0;">
-          <a href="{{ adminUrl }}" style="display:inline-block;padding:12px 20px;background:#059669;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">
-            Ouvrir l'administration
-          </a>
-        </p>
-      </div>
-    </div>
-  </body>
-</html>
+{% block action %}<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#172033;border-radius:4px;"><a href="{{ adminUrl }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">Ouvrir l’administration</a></td></tr></table>{% endblock %}

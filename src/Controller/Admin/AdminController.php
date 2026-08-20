@@ -7,7 +7,6 @@ use App\Entity\EmailCampaign;
 use App\Entity\ExtensionClient;
 use App\Entity\ExtensionInstallationChallenge;
 use App\Entity\Team;
-use App\Entity\TeamMember;
 use App\Entity\User;
 use App\Entity\UserSubscription;
 use App\Enum\TeamRole;
@@ -31,6 +30,8 @@ use App\Service\MailerService;
 use App\Service\SessionManager;
 use App\Service\StripeEnvironmentManager;
 use App\Service\SubscriptionPlanService;
+use App\Service\TeamMemberAssignmentManager;
+use App\Service\TeamNotifier;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -506,9 +507,8 @@ final class AdminController extends AbstractController
     public function addTeamMember(
         Team $team,
         Request $request,
-        UserRepository $userRepository,
-        TeamMemberRepository $teamMemberRepository,
-        EntityManagerInterface $em,
+        TeamMemberAssignmentManager $memberAssignments,
+        TeamNotifier $teamNotifier,
         MailerService $mailerService,
         UrlGeneratorInterface $urlGenerator
     ): Response {
@@ -532,57 +532,31 @@ final class AdminController extends AbstractController
             $role = TeamRole::MEMBER;
         }
 
-        $memberUser = $userRepository->findOneBy(['email' => $email]);
-        $isGuestInvitation = false;
-        $guestInvitationExpiresAt = null;
-
-        if (!$memberUser) {
-            $isGuestInvitation = true;
-            $guestInvitationExpiresAt = new DateTimeImmutable('+24 hours');
-
-            $memberUser = new User();
-            $memberUser->setEmail($email);
-            $memberUser->setCompany('');
-            $memberUser->setPassword('');
-            $memberUser->setRoles(['ROLE_GUEST']);
-            $memberUser->setApiToken(bin2hex(random_bytes(32)));
-            $memberUser->setTokenExpiresAt($guestInvitationExpiresAt);
-            $memberUser->regenerateApiExtensionToken();
-
-            $em->persist($memberUser);
-        } elseif (in_array('ROLE_GUEST', $memberUser->getRoles(), true)) {
-            $isGuestInvitation = true;
-            $guestInvitationExpiresAt = new DateTimeImmutable('+24 hours');
-            $memberUser->setApiToken(bin2hex(random_bytes(32)));
-            $memberUser->setTokenExpiresAt($guestInvitationExpiresAt);
+        $actor = $this->getUser();
+        if (!$actor instanceof User) {
+            throw $this->createAccessDeniedException();
         }
 
-        if ($team->getOwner()?->getId() === $memberUser->getId()) {
-            $this->addFlash('warning', 'Le proprietaire est deja membre de cette equipe.');
+        try {
+            $assignment = $memberAssignments->assign(
+                $team,
+                $email,
+                $role,
+                $actor,
+                $team->getOrganization() !== null && $request->request->getString('membership_type') === 'guest',
+            );
+        } catch (\DomainException|\InvalidArgumentException|\LogicException $exception) {
+            $this->addFlash('warning', $exception->getMessage());
 
             return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
         }
 
-        $existing = $teamMemberRepository->findOneBy([
-            'team' => $team,
-            'user' => $memberUser,
-        ]);
+        $member = $assignment['member'];
+        $memberUser = $assignment['user'];
+        $guestInvitationExpiresAt = $assignment['invitationExpiresAt'];
+        $teamNotifier->notifyMemberAdded($team, $memberUser, $actor, $member->getRole());
 
-        if ($existing) {
-            $this->addFlash('warning', 'Cet utilisateur est deja membre de cette equipe.');
-
-            return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
-        }
-
-        $member = new TeamMember();
-        $member->setTeam($team);
-        $member->setUser($memberUser);
-        $member->setRole($role);
-
-        $em->persist($member);
-        $em->flush();
-
-        if ($isGuestInvitation && $guestInvitationExpiresAt instanceof DateTimeImmutable) {
+        if ($guestInvitationExpiresAt instanceof DateTimeImmutable) {
             try {
                 $this->sendTeamGuestInvitationEmail($mailerService, $urlGenerator, $memberUser, $team, $guestInvitationExpiresAt);
                 $this->addFlash('success', 'Invitation envoyee et membre ajoute a l equipe.');
@@ -607,7 +581,8 @@ final class AdminController extends AbstractController
         int $memberId,
         Request $request,
         TeamMemberRepository $teamMemberRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        TeamMemberAssignmentManager $memberAssignments,
     ): Response {
         if (!$this->isCsrfTokenValid('admin_remove_team_member_' . $memberId, (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Token CSRF invalide.');
@@ -628,7 +603,7 @@ final class AdminController extends AbstractController
             return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
         }
 
-        $em->remove($member);
+        $memberAssignments->removeAssignment($member);
         $em->flush();
 
         $this->addFlash('success', 'Membre supprime de l equipe.');
@@ -637,7 +612,12 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/teams/{id}/delete', name: 'admin_team_delete', methods: ['POST'])]
-    public function deleteTeam(Team $team, Request $request, EntityManagerInterface $em): Response
+    public function deleteTeam(
+        Team $team,
+        Request $request,
+        EntityManagerInterface $em,
+        TeamMemberAssignmentManager $memberAssignments,
+    ): Response
     {
         if (!$this->isCsrfTokenValid('admin_delete_team_' . $team->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Token CSRF invalide.');
@@ -648,7 +628,7 @@ final class AdminController extends AbstractController
         $teamName = $team->getName() ?? 'cette equipe';
 
         foreach ($team->getMembers() as $member) {
-            $em->remove($member);
+            $memberAssignments->removeAssignment($member);
         }
 
         $em->remove($team);
@@ -1202,7 +1182,7 @@ final class AdminController extends AbstractController
 
         $mailer->send(
             $guest->getEmail(),
-            'Vous avez ete invite dans une equipe MYKEYNEST',
+            'Vous avez été invité dans une équipe MYKEYNEST',
             'emails/team_invitation.html.twig',
             [
                 'user' => $guest,

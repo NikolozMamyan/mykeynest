@@ -1,0 +1,18 @@
+{% extends 'emails/layout.html.twig' %}
+
+{% block title %}{{ 'teams.organization.invite.email_subject'|trans({'%company%': organization.name}, null, locale) }}{% endblock %}
+{% block preheader %}{{ (requires_registration ? 'teams.organization.invite.email_body_pending' : 'teams.organization.invite.email_body_active')|trans({}, null, locale) }}{% endblock %}
+{% block eyebrow %}{{ 'teams.organization.invite.email_eyebrow'|trans({}, null, locale) }}{% endblock %}
+{% block heading %}{{ 'teams.organization.invite.email_title'|trans({'%company%': organization.name}, null, locale) }}{% endblock %}
+
+{% block content %}
+  <p style="margin:0;">{{ (requires_registration ? 'teams.organization.invite.email_body_pending' : 'teams.organization.invite.email_body_active')|trans({}, null, locale) }}</p>
+  <p style="margin:20px 0 0;padding:13px 15px;background:#eefaf5;border-left:3px solid #10b981;border-radius:4px;color:#436058;font-size:13px;"><strong>{{ 'teams.organization.invite.email_role'|trans({'%role%': ('teams.organization.role_' ~ membership.role.value|lower)|trans({}, null, locale)}, null, locale) }}</strong></p>
+  {% if requires_registration and expiresAt %}<p style="margin:14px 0 0;color:#80601f;font-size:12px;">{{ 'teams.organization.invite.email_expiry'|trans({'%date%': expiresAt|date('d/m/Y H:i')}, null, locale) }}</p>{% endif %}
+{% endblock %}
+
+{% block action %}
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#059669;border-radius:4px;"><a href="{{ action_url }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">{{ (requires_registration ? 'teams.organization.invite.email_action_pending' : 'teams.organization.invite.email_action_active')|trans({}, null, locale) }}</a></td></tr></table>
+{% endblock %}
+
+{% block footer %}<p style="margin:0;">Invitation personnelle envoyée par MYKEYNEST.</p><p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>{% endblock %}

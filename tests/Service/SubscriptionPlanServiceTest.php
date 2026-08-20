@@ -5,7 +5,9 @@ namespace App\Tests\Service;
 use App\Entity\SubscriptionPlanConfiguration;
 use App\Entity\User;
 use App\Entity\UserSubscription;
+use App\Entity\OrganizationMember;
 use App\Repository\SubscriptionPlanConfigurationRepository;
+use App\Repository\OrganizationMemberRepository;
 use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -25,10 +27,10 @@ final class SubscriptionPlanServiceTest extends TestCase
         self::assertFalse($service->hasFeature($freeUser, SubscriptionPlanService::FEATURE_SECURE_NOTES));
         self::assertNull($service->getLimit($proUser, SubscriptionPlanService::LIMIT_CREDENTIALS));
         self::assertSame(1, $service->getLimit($proUser, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
-        self::assertNull($service->getLimit($teamUser, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
+        self::assertSame(5, $service->getLimit($teamUser, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
     }
 
-    public function testStripeTeamInstallationsAreLimitedToPaidSeatsWithoutChangingLegacyTeams(): void
+    public function testStripeSeatQuantityDoesNotChangePerMemberInstallationLimit(): void
     {
         $service = $this->createService();
         $teamUser = $this->createSubscribedUser('team');
@@ -36,10 +38,34 @@ final class SubscriptionPlanServiceTest extends TestCase
             ->setStripePriceId('price_team')
             ->setQuantity(8);
 
-        self::assertSame(8, $service->getLimit(
+        self::assertSame(5, $service->getLimit(
             $teamUser,
             SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS,
         ));
+    }
+
+    public function testActiveCompanyMemberGetsAllEffectiveTeamEntitlements(): void
+    {
+        $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
+        $repository->method('findByPlanCode')->willReturn(null);
+        $organizationMembers = $this->createMock(OrganizationMemberRepository::class);
+        $organizationMembers->method('findActiveTeamMembership')->willReturn(new OrganizationMember());
+        $service = new SubscriptionPlanService(
+            $repository,
+            $this->createMock(EntityManagerInterface::class),
+            $organizationMembers,
+        );
+        $user = new User();
+
+        self::assertSame(SubscriptionPlanService::PLAN_TEAM, $service->getPlanForUser($user)['code']);
+        self::assertSame(5, $service->getLimit($user, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
+        self::assertNull($service->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS));
+        self::assertNull($service->getLimit($user, SubscriptionPlanService::LIMIT_SHARES));
+        self::assertNull($service->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
+        self::assertSame(1, $service->getPersonalLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
+        self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_SECURE_NOTES));
+        self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_SECURITY_CHECKER));
+        self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_CREDENTIAL_IMPORT));
     }
 
     public function testStoredFreeConfigurationOverridesOnlyConfiguredRules(): void
@@ -64,6 +90,24 @@ final class SubscriptionPlanServiceTest extends TestCase
         self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_PASSWORD_GENERATOR));
     }
 
+    public function testCompanyTeamSeatOverridesAPersonalProPlan(): void
+    {
+        $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
+        $repository->method('findByPlanCode')->willReturn(null);
+        $organizationMembers = $this->createMock(OrganizationMemberRepository::class);
+        $organizationMembers->method('findActiveTeamMembership')->willReturn(new OrganizationMember());
+        $service = new SubscriptionPlanService(
+            $repository,
+            $this->createMock(EntityManagerInterface::class),
+            $organizationMembers,
+        );
+
+        self::assertSame(
+            SubscriptionPlanService::PLAN_TEAM,
+            $service->getPlanForUser($this->createSubscribedUser(SubscriptionPlanService::PLAN_PRO))['code'],
+        );
+    }
+
     public function testUpdateFreePlanPersistsValidatedValuesAndUnlimitedLimits(): void
     {
         $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
@@ -82,7 +126,9 @@ final class SubscriptionPlanServiceTest extends TestCase
             }));
         $entityManager->expects(self::once())->method('flush');
 
-        $service = new SubscriptionPlanService($repository, $entityManager);
+        $organizationMembers = $this->createMock(OrganizationMemberRepository::class);
+        $organizationMembers->method('findActiveTeamMembership')->willReturn(null);
+        $service = new SubscriptionPlanService($repository, $entityManager, $organizationMembers);
         $configuration = $service->updateFreePlan([
             'credentialLimit' => null,
             'credentialsUnlimited' => true,
@@ -110,7 +156,14 @@ final class SubscriptionPlanServiceTest extends TestCase
             ->method('findByPlanCode')
             ->willReturnCallback(static fn (string $code): ?SubscriptionPlanConfiguration => $code === 'free' ? $configuration : null);
 
-        return new SubscriptionPlanService($repository, $this->createMock(EntityManagerInterface::class));
+        $organizationMembers = $this->createMock(OrganizationMemberRepository::class);
+        $organizationMembers->method('findActiveTeamMembership')->willReturn(null);
+
+        return new SubscriptionPlanService(
+            $repository,
+            $this->createMock(EntityManagerInterface::class),
+            $organizationMembers,
+        );
     }
 
     private function createSubscribedUser(string $planCode): User

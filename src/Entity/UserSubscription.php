@@ -21,6 +21,10 @@ class UserSubscription
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
+    #[ORM\OneToOne(inversedBy: 'subscription')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Organization $organization = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $stripeCustomerId = null;
 
@@ -84,6 +88,22 @@ class UserSubscription
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    public function setOrganization(?Organization $organization): static
+    {
+        $this->organization = $organization;
+
+        if ($organization?->getSubscription() !== $this) {
+            $organization?->setSubscription($this);
+        }
 
         return $this;
     }

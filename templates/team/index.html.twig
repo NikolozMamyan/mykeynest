@@ -37,6 +37,114 @@
         {% endif %}
     </div>
 
+    {% if organization and seatSummary %}
+        {% set seatPercent = seatSummary.purchased > 0 ? ((seatSummary.used / seatSummary.purchased) * 100)|round : 100 %}
+        <section class="company-hub {{ organization.active ? '' : 'is-suspended' }}">
+            <header class="company-hub__header">
+                <div class="company-workspace-icon"><i class="fa-solid fa-building-shield"></i></div>
+                <div class="company-hub__identity">
+                    <span class="company-workspace-eyebrow">{{ 'teams.organization.eyebrow'|trans }}</span>
+                    <h2>{{ 'teams.organization.title'|trans({'%name%': organization.name}) }}</h2>
+                    <p>{{ 'teams.organization.workspace_note'|trans }}</p>
+                </div>
+                <span class="company-workspace-status {{ organization.active ? 'is-active' : 'is-suspended' }}">
+                    <i class="fa-solid fa-circle"></i> {{ (organization.active ? 'teams.organization.active' : 'teams.organization.suspended')|trans }}
+                </span>
+            </header>
+
+            <div class="company-hub__metrics">
+                <div class="company-metric is-primary"><span>{{ 'teams.organization.seats'|trans }}</span><strong>{{ seatSummary.used }}<small>/{{ seatSummary.purchased }}</small></strong></div>
+                <div class="company-metric"><span>{{ 'teams.organization.metric_active'|trans }}</span><strong>{{ seatSummary.active }}</strong></div>
+                <div class="company-metric"><span>{{ 'teams.organization.metric_pending'|trans }}</span><strong>{{ seatSummary.pending }}</strong></div>
+                <div class="company-metric"><span>{{ 'teams.organization.metric_available'|trans }}</span><strong>{{ seatSummary.available }}</strong></div>
+            </div>
+
+            <div class="company-hub__capacity">
+                <div><strong>{{ 'teams.organization.capacity_title'|trans }}</strong><span>{{ 'teams.organization.used'|trans({'%used%': seatSummary.used, '%purchased%': seatSummary.purchased}) }}</span></div>
+                <div class="company-seat-progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ seatSummary.purchased }}" aria-valuenow="{{ seatSummary.used }}"><span style="width: {{ seatPercent > 100 ? 100 : seatPercent }}%"></span></div>
+                {% if seatSummary.overCapacity %}<p class="company-seat-warning"><i class="fa-solid fa-triangle-exclamation"></i> {{ 'teams.organization.over_capacity'|trans }}</p>{% endif %}
+            </div>
+
+            <div class="company-hub__body {{ canManageOrganization ? '' : 'is-member-view' }}">
+                <section class="company-directory">
+                    <div class="company-panel-heading">
+                        <div><span>{{ 'teams.organization.directory_eyebrow'|trans }}</span><h3>{{ 'teams.organization.members_title'|trans }}</h3></div>
+                        <small>{{ organization.members|length }}</small>
+                    </div>
+                    <div class="company-members-list">
+                        {% for member in organization.members %}
+                            {% set roleKey = 'teams.organization.role_' ~ member.role.value|lower %}
+                            {% set statusKey = 'teams.organization.member_status_' ~ member.status.value|lower %}
+                            <div class="company-member-row">
+                                <span class="company-member-avatar">{{ member.user.email|slice(0, 1)|upper }}</span>
+                                <span class="company-member-identity">
+                                    <strong>{{ member.user.email }}</strong>
+                                    <small><span class="member-status-dot is-{{ member.status.value|lower }}"></span>{{ statusKey|trans }}</small>
+                                </span>
+                                {% if organization.owner and app.user and organization.owner.id == app.user.id and member.role.value in ['ADMIN', 'MEMBER'] %}
+                                    <form class="company-member-role" method="post" action="{{ path('app_team_company_member_role', {id: member.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('update_company_role_' ~ member.id) }}">
+                                        <label class="sr-only" for="company-role-{{ member.id }}">{{ 'teams.organization.role_label'|trans }}</label>
+                                        <select id="company-role-{{ member.id }}" name="role" onchange="this.form.requestSubmit()">
+                                            <option value="MEMBER" {{ member.role.value == 'MEMBER' ? 'selected' : '' }}>{{ 'teams.organization.role_member'|trans }}</option>
+                                            <option value="ADMIN" {{ member.role.value == 'ADMIN' ? 'selected' : '' }}>{{ 'teams.organization.role_admin'|trans }}</option>
+                                        </select>
+                                    </form>
+                                {% else %}
+                                    <span class="company-role-label">{{ roleKey|trans }}</span>
+                                {% endif %}
+                                {% if canManageOrganization and member.role.value != 'OWNER' %}
+                                    <form method="post" action="{{ path('app_team_company_member_remove', {id: member.id}) }}" onsubmit="return confirm('{{ 'teams.organization.remove_confirm'|trans|e('js') }}');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('remove_company_member_' ~ member.id) }}">
+                                        <button class="company-member-remove" type="submit" title="{{ 'teams.organization.remove'|trans }}" aria-label="{{ 'teams.organization.remove'|trans }}"><i class="fa-solid fa-user-minus"></i></button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                {% if canManageOrganization %}
+                    <aside class="company-actions">
+                        {% if organizationInviteForm %}
+                            <div class="company-action-card">
+                                <div class="company-action-card__icon"><i class="fa-solid fa-user-plus"></i></div>
+                                <h3>{{ 'teams.organization.invite_card_title'|trans }}</h3>
+                                <p>{{ 'teams.organization.invite.description'|trans }}</p>
+                                {{ form_start(organizationInviteForm, {'attr': {'class': 'company-invite-form'}}) }}
+                                    <div class="company-invite-field">
+                                        {{ form_label(organizationInviteForm.email, null, {'label_attr': {'class': 'sr-only'}}) }}
+                                        {{ form_widget(organizationInviteForm.email, {'attr': {'placeholder': 'teams.organization.invite.email_placeholder'|trans}}) }}
+                                        {{ form_errors(organizationInviteForm.email) }}
+                                    </div>
+                                    <div class="company-invite-field">
+                                        {{ form_label(organizationInviteForm.role, null, {'label_attr': {'class': 'sr-only'}}) }}
+                                        {{ form_widget(organizationInviteForm.role) }}
+                                        {{ form_errors(organizationInviteForm.role) }}
+                                    </div>
+                                    <button type="submit"><i class="fa-solid fa-arrow-right"></i> {{ 'teams.organization.invite.submit'|trans }}</button>
+                                {{ form_end(organizationInviteForm) }}
+                            </div>
+                        {% endif %}
+
+                        {% if organization.owner and app.user and organization.owner.id == app.user.id and organization.active %}
+                            <form class="company-seat-form" method="post" action="{{ path('app_team_company_seats_update') }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('update_company_seats_' ~ organization.id) }}">
+                                <div><label for="company-seat-quantity">{{ 'teams.organization.billing_title'|trans }}</label><small>{{ 'teams.organization.billing_help'|trans }}</small></div>
+                                <div class="company-seat-form__controls">
+                                    <input id="company-seat-quantity" type="number" name="quantity" min="{{ seatSummary.used > seatMinimum ? seatSummary.used : seatMinimum }}" max="{{ seatMaximum }}" value="{{ seatSummary.purchased }}" required>
+                                    <button type="submit">{{ 'teams.organization.billing_submit'|trans }}</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </aside>
+                {% else %}
+                    <aside class="company-action-card company-member-access-card"><div class="company-action-card__icon"><i class="fa-solid fa-id-badge"></i></div><h3>{{ 'teams.organization.member_access_title'|trans }}</h3><p>{{ 'teams.organization.member_access_help'|trans }}</p></aside>
+                {% endif %}
+            </div>
+        </section>
+    {% endif %}
+
     {# Upgrade banner shown when the active plan limit is reached. #}
     {% if teamLimit is not null and ownedTeamsCount >= teamLimit %}
         <div class="pro-upgrade-banner">
@@ -162,6 +270,604 @@
 </div>
 
 <style>
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.company-workspace-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr);
+    gap: 1px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border: 1px solid var(--glass-card-border);
+    border-radius: var(--border-radius);
+    background: var(--glass-card-border);
+    box-shadow: var(--glass-card-shadow);
+}
+
+.company-workspace-card.is-member-view {
+    grid-template-columns: 1fr;
+}
+
+.company-workspace-main,
+.company-members-panel {
+    padding: 1.5rem;
+    background: var(--glass-card-bg);
+    backdrop-filter: var(--glass-card-blur);
+}
+
+.company-workspace-heading {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+}
+
+.company-workspace-icon {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: var(--border-radius-sm);
+    color: white;
+    background: var(--color-primary);
+}
+
+.company-workspace-eyebrow {
+    color: var(--color-text-medium);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.company-workspace-heading h2,
+.company-members-panel h3 {
+    margin: .15rem 0 0;
+    color: var(--color-text-dark);
+}
+
+.company-workspace-status {
+    margin-left: auto;
+    padding: .3rem .55rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.company-workspace-status.is-active {
+    color: #047857;
+    background: rgba(16, 185, 129, .12);
+}
+
+.company-workspace-status.is-suspended {
+    color: #b45309;
+    background: rgba(245, 158, 11, .12);
+}
+
+.company-seat-overview {
+    margin-top: 1.5rem;
+}
+
+.company-seat-title,
+.company-seat-meta,
+.company-member-row,
+.company-seat-form {
+    display: flex;
+    align-items: center;
+}
+
+.company-seat-title {
+    justify-content: space-between;
+    color: var(--color-text-dark);
+}
+
+.company-seat-title span,
+.company-seat-meta,
+.company-workspace-note,
+.company-seat-form small {
+    color: var(--color-text-medium);
+    font-size: .82rem;
+}
+
+.company-seat-progress {
+    height: 7px;
+    margin: .7rem 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-bg-hover);
+}
+
+.company-seat-progress span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-primary);
+}
+
+.company-seat-meta {
+    flex-wrap: wrap;
+    gap: .45rem 1rem;
+}
+
+.company-seat-warning {
+    margin: .9rem 0 0;
+    color: #b45309;
+    font-size: .84rem;
+}
+
+.company-workspace-note {
+    margin: 1.25rem 0 0;
+}
+
+.company-members-panel h3 {
+    font-size: 1rem;
+}
+
+.company-invite-description {
+    margin: .35rem 0 .8rem;
+    color: var(--color-text-medium);
+    font-size: .78rem;
+    line-height: 1.45;
+}
+
+.company-invite-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 128px auto;
+    gap: .45rem;
+    padding-bottom: .9rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.company-invite-field {
+    min-width: 0;
+}
+
+.company-invite-field input,
+.company-invite-field select {
+    width: 100%;
+    min-height: 38px;
+    padding: .55rem .65rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-dark);
+    background: var(--glass-card-bg);
+}
+
+.company-invite-form button {
+    min-height: 38px;
+    padding: .55rem .75rem;
+    border: 0;
+    border-radius: var(--border-radius-sm);
+    color: white;
+    font-weight: 700;
+    background: var(--color-primary);
+    cursor: pointer;
+}
+
+.company-members-list {
+    display: grid;
+    gap: .4rem;
+    max-height: 238px;
+    margin-top: .9rem;
+    overflow: auto;
+}
+
+@media (max-width: 720px) {
+    .company-invite-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.company-member-row {
+    gap: .7rem;
+    min-width: 0;
+    padding: .55rem;
+    border-radius: var(--border-radius-sm);
+    background: var(--color-bg-light);
+}
+
+.company-member-avatar {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--color-primary);
+    font-weight: 800;
+    background: rgba(16, 185, 129, .12);
+}
+
+.company-member-identity {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+}
+
+.company-member-identity strong {
+    overflow: hidden;
+    color: var(--color-text-dark);
+    font-size: .86rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.company-member-identity small {
+    color: var(--color-text-medium);
+    font-size: .72rem;
+}
+
+.company-member-remove {
+    border: 0;
+    color: #dc2626;
+    font-size: .75rem;
+    background: transparent;
+    cursor: pointer;
+}
+
+.company-member-role select {
+    max-width: 118px;
+    padding: .35rem .45rem;
+    border: 1px solid var(--glass-card-border);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-dark);
+    font-size: .75rem;
+    background: var(--glass-card-bg);
+}
+
+.company-seat-form {
+    gap: .6rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.company-seat-form div {
+    display: grid;
+    flex: 1;
+}
+
+.company-seat-form label {
+    color: var(--color-text-dark);
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.company-seat-form input {
+    width: 72px;
+    padding: .55rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    background: var(--color-white);
+    color: var(--color-text-dark);
+}
+
+.company-seat-form button {
+    padding: .6rem .8rem;
+    border: 0;
+    border-radius: var(--border-radius-sm);
+    color: white;
+    font-weight: 700;
+    background: var(--color-primary);
+    cursor: pointer;
+}
+
+.company-hub {
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border: 1px solid var(--glass-card-border);
+    border-radius: var(--border-radius);
+    background: var(--glass-card-bg);
+    box-shadow: var(--glass-card-shadow);
+    backdrop-filter: var(--glass-card-blur);
+}
+
+.company-hub__header {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: 1.35rem 1.45rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.company-hub__identity {
+    min-width: 0;
+    flex: 1;
+}
+
+.company-hub__identity h2 {
+    margin: .15rem 0 0;
+    color: var(--color-text-dark);
+    font-size: 1.2rem;
+}
+
+.company-hub__identity p {
+    margin: .25rem 0 0;
+    color: var(--color-text-medium);
+    font-size: .76rem;
+}
+
+.company-workspace-status i {
+    margin-right: .25rem;
+    font-size: .42rem;
+    vertical-align: middle;
+}
+
+.company-hub__metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-border);
+}
+
+.company-metric {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: 1rem 1.2rem;
+    background: color-mix(in srgb, var(--glass-card-bg) 92%, var(--color-bg-light));
+}
+
+.company-metric span {
+    color: var(--color-text-medium);
+    font-size: .72rem;
+    font-weight: 650;
+}
+
+.company-metric strong {
+    color: var(--color-text-dark);
+    font-size: 1.25rem;
+    letter-spacing: -.04em;
+}
+
+.company-metric strong small {
+    color: var(--color-text-light);
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+.company-metric.is-primary strong {
+    color: var(--color-primary);
+}
+
+.company-hub__capacity {
+    padding: .85rem 1.45rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg-light) 65%, transparent);
+}
+
+.company-hub__capacity > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--color-text-dark);
+    font-size: .75rem;
+}
+
+.company-hub__capacity > div:first-child span {
+    color: var(--color-text-medium);
+}
+
+.company-hub__capacity .company-seat-progress {
+    height: 5px;
+    margin: .55rem 0 0;
+}
+
+.company-hub__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(285px, .75fr);
+    gap: 0;
+}
+
+.company-hub__body.is-member-view {
+    grid-template-columns: minmax(0, 1.4fr) minmax(250px, .6fr);
+}
+
+.company-directory {
+    min-width: 0;
+    padding: 1.35rem 1.45rem;
+}
+
+.company-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .9rem;
+}
+
+.company-panel-heading span {
+    color: var(--color-text-medium);
+    font-size: .67rem;
+    font-weight: 750;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.company-panel-heading h3 {
+    margin: .15rem 0 0;
+    color: var(--color-text-dark);
+    font-size: 1rem;
+}
+
+.company-panel-heading > small {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--color-primary);
+    font-size: .72rem;
+    font-weight: 800;
+    background: rgba(16, 185, 129, .1);
+}
+
+.company-hub .company-members-list {
+    max-height: 390px;
+    margin: 0;
+}
+
+.company-hub .company-member-row {
+    min-height: 54px;
+    padding: .65rem .7rem;
+    border: 1px solid transparent;
+    background: color-mix(in srgb, var(--color-bg-light) 72%, transparent);
+}
+
+.company-hub .company-member-row:hover {
+    border-color: var(--glass-card-border);
+    background: var(--glass-card-bg);
+}
+
+.company-member-identity small {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.member-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #94a3b8;
+}
+
+.member-status-dot.is-active {
+    background: #10b981;
+}
+
+.member-status-dot.is-pending {
+    background: #f59e0b;
+}
+
+.company-role-label {
+    color: var(--color-text-medium);
+    font-size: .72rem;
+    font-weight: 650;
+}
+
+.company-hub .company-member-remove {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-light);
+}
+
+.company-hub .company-member-remove:hover {
+    color: #dc2626;
+    background: rgba(220, 38, 38, .08);
+}
+
+.company-actions,
+.company-member-access-card {
+    display: grid;
+    align-content: start;
+    gap: .8rem;
+    padding: 1.35rem;
+    border-left: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg-light) 55%, transparent);
+}
+
+.company-action-card,
+.company-seat-form {
+    display: block;
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid var(--glass-card-border);
+    border-radius: var(--border-radius);
+    background: var(--glass-card-bg);
+    box-shadow: 0 7px 22px rgba(15, 23, 42, .04);
+}
+
+.company-action-card__icon {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    margin-bottom: .7rem;
+    place-items: center;
+    border-radius: var(--border-radius-sm);
+    color: var(--color-primary);
+    font-size: .8rem;
+    background: rgba(16, 185, 129, .1);
+}
+
+.company-action-card h3,
+.company-seat-form label {
+    display: block;
+    margin: 0;
+    color: var(--color-text-dark);
+    font-size: .86rem;
+    font-weight: 750;
+}
+
+.company-action-card > p,
+.company-seat-form small {
+    display: block;
+    margin: .35rem 0 .8rem;
+    color: var(--color-text-medium);
+    font-size: .71rem;
+    line-height: 1.5;
+}
+
+.company-hub .company-invite-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .5rem;
+    padding: 0;
+    border: 0;
+}
+
+.company-hub .company-invite-field input,
+.company-hub .company-invite-field select {
+    min-height: 40px;
+    background: var(--color-white);
+}
+
+.company-hub .company-invite-form button {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+}
+
+.company-hub .company-seat-form {
+    padding-top: 1rem;
+}
+
+.company-seat-form__controls {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: .5rem;
+}
+
+.company-hub .company-seat-form input,
+.company-hub .company-seat-form button {
+    width: 100%;
+    min-height: 38px;
+}
+
+.company-member-access-card {
+    align-self: stretch;
+    border: 0;
+    border-left: 1px solid var(--color-border);
+    border-radius: 0;
+    box-shadow: none;
+}
+
 .teams-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -572,6 +1278,47 @@
 }
 
 @media (max-width: 768px) {
+    .company-workspace-card {
+        grid-template-columns: 1fr;
+    }
+
+    .company-seat-form {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+    .company-hub__header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .company-hub__identity {
+        flex-basis: calc(100% - 60px);
+    }
+
+    .company-hub__metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .company-hub__body,
+    .company-hub__body.is-member-view {
+        grid-template-columns: 1fr;
+    }
+
+    .company-actions,
+    .company-member-access-card {
+        border-top: 1px solid var(--color-border);
+        border-left: 0;
+    }
+
+    .company-hub .company-member-row {
+        flex-wrap: wrap;
+    }
+
+    .company-member-identity {
+        min-width: calc(100% - 54px);
+    }
+
     .page-header {
         flex-direction: column;
     }
@@ -609,6 +1356,24 @@
     .btn-view-team {
         width: 100%;
         justify-content: center;
+    }
+}
+
+@media (max-width: 460px) {
+    .teams-container {
+        padding: 1rem;
+    }
+
+    .company-hub__metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .company-directory,
+    .company-actions,
+    .company-hub__header,
+    .company-hub__capacity {
+        padding-right: 1rem;
+        padding-left: 1rem;
     }
 }
 </style>

@@ -102,6 +102,84 @@ final class SessionManagerTest extends TestCase
         $manager->createSession($user, deviceId: $deviceId);
     }
 
+    public function testUnknownDeviceIsTrustedWhenEmailTwoFactorAuthenticationIsDisabled(): void
+    {
+        $user = $this->createUser();
+        $deviceId = str_repeat('a', 64);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager
+            ->expects($this->once())
+            ->method('persist')
+            ->with($this->isInstanceOf(UserSession::class));
+        $entityManager->expects($this->once())->method('flush');
+
+        $userDeviceManager = $this->createMock(UserDeviceManager::class);
+        $userDeviceManager
+            ->expects($this->once())
+            ->method('getAccessState')
+            ->with($user, $deviceId)
+            ->willReturn(UserDeviceManager::STATE_UNKNOWN);
+        $userDeviceManager
+            ->expects($this->once())
+            ->method('trust')
+            ->with($user, $deviceId, null);
+        $userDeviceManager->expects($this->never())->method('remember');
+
+        $manager = new SessionManager(
+            $entityManager,
+            $this->createMock(UserSessionRepository::class),
+            new RequestStack(),
+            $this->createMock(DeviceIdentifier::class),
+            $userDeviceManager
+        );
+
+        [$session, $plainToken, $resolvedDeviceId] = $manager->createSession(
+            $user,
+            deviceId: $deviceId,
+            trustUnknownDevice: true,
+        );
+
+        self::assertSame($user, $session->getUser());
+        self::assertSame($deviceId, $resolvedDeviceId);
+        self::assertSame(64, strlen($plainToken));
+    }
+
+    public function testBlockedDeviceRemainsBlockedWhenUnknownDeviceTrustIsAllowed(): void
+    {
+        $user = $this->createUser();
+        $deviceId = str_repeat('b', 64);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never())->method('persist');
+
+        $userDeviceManager = $this->createMock(UserDeviceManager::class);
+        $userDeviceManager
+            ->expects($this->once())
+            ->method('getAccessState')
+            ->with($user, $deviceId)
+            ->willReturn(UserDeviceManager::STATE_BLOCKED);
+        $userDeviceManager
+            ->expects($this->once())
+            ->method('find')
+            ->with($user, $deviceId)
+            ->willReturn(null);
+        $userDeviceManager->expects($this->never())->method('trust');
+
+        $manager = new SessionManager(
+            $entityManager,
+            $this->createMock(UserSessionRepository::class),
+            new RequestStack(),
+            $this->createMock(DeviceIdentifier::class),
+            $userDeviceManager
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $manager->createSession(
+            $user,
+            deviceId: $deviceId,
+            trustUnknownDevice: true,
+        );
+    }
+
     public function testExistingDevicePreventsOnboardingAfterSessionHistoryWasDeleted(): void
     {
         $user = $this->createUser();

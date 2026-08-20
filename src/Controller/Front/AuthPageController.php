@@ -9,6 +9,7 @@ use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialManager;
 use App\Service\ExtensionOnboardingPolicy;
 use App\Service\SessionManager;
+use App\Service\OrganizationSeatManager;
 use App\Service\TokenCleaner;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -167,7 +168,8 @@ class AuthPageController extends AbstractController
         UserRepository $userRepository,
         EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher,
-        SessionManager $sessionManager
+        SessionManager $sessionManager,
+        OrganizationSeatManager $organizationSeats,
     ): Response {
         $token = $request->query->get('token');
         $email = $request->query->get('email');
@@ -208,6 +210,7 @@ class AuthPageController extends AbstractController
             $user->setTokenExpiresAt(null);
             $user->setRoles(['ROLE_USER']);
             $this->extensionOnboardingPolicy->initializeNewRegistration($user);
+            $organizationSeats->activatePendingMemberships($user);
 
             $em->flush();
 

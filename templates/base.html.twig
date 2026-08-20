@@ -20,14 +20,7 @@
 
     <title>{% block title %}Welcome!{% endblock %}</title>
 
-    <script>
-      (() => {
-        const savedTheme = window.localStorage.getItem('theme') || 'light';
-        const themeColor = savedTheme === 'dark' ? '#0f172a' : '#f8fafc';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
-      })();
-    </script>
+    {% include 'components/parts/_theme_boot.html.twig' %}
 
     <!-- Google Tag Manager -->
 <!-- Google tag (gtag.js) -->

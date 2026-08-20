@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Form\UserType;
 use App\Form\AvatarType;
 use App\Form\PreferencesType;
+use App\Service\EmailTwoFactorPolicy;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -104,7 +105,11 @@ final class SettingsController extends AbstractController
     }
 
 #[Route('/app/settings/preferences', name: 'app_user_preferences')]
-public function preferences(Request $request, EntityManagerInterface $em): Response
+public function preferences(
+    Request $request,
+    EntityManagerInterface $em,
+    EmailTwoFactorPolicy $emailTwoFactorPolicy,
+): Response
 {
     $user = $this->getUser();
 
@@ -112,7 +117,10 @@ public function preferences(Request $request, EntityManagerInterface $em): Respo
         throw $this->createAccessDeniedException();
     }
 
-    $form = $this->createForm(PreferencesType::class, $user);
+    $emailTwoFactorAvailable = $emailTwoFactorPolicy->isAvailableFor($user);
+    $form = $this->createForm(PreferencesType::class, $user, [
+        'email_two_factor_available' => $emailTwoFactorAvailable,
+    ]);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
@@ -128,6 +136,7 @@ public function preferences(Request $request, EntityManagerInterface $em): Respo
 
     return $this->render('settings/preferences.html.twig', [
         'form' => $form->createView(),
+        'emailTwoFactorAvailable' => $emailTwoFactorAvailable,
     ]);
 }
 

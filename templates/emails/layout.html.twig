@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="{{ locale|default('fr') }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>{% block title %}MYKEYNEST{% endblock %}</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f7f6;font-family:Arial,Helvetica,sans-serif;color:#172033;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">{% block preheader %}{% endblock %}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f3f7f6;">
+    <tr>
+      <td align="center" style="padding:38px 14px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+          <tr><td style="padding:0 8px 20px;">{% include 'emails/_brand_header.html.twig' %}</td></tr>
+          <tr>
+            <td style="overflow:hidden;background:#ffffff;border:1px solid #dfe8e5;border-radius:8px;box-shadow:0 18px 52px rgba(15,23,42,.08);">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr><td style="height:4px;background:#059669;font-size:0;line-height:0;">&nbsp;</td></tr>
+                <tr>
+                  <td style="padding:38px 42px 34px;">
+                    <p style="margin:0 0 14px;color:#059669;font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;">{% block eyebrow %}MYKEYNEST{% endblock %}</p>
+                    <h1 style="margin:0 0 14px;color:#172033;font-size:27px;line-height:1.25;letter-spacing:-.6px;">{% block heading %}{% endblock %}</h1>
+                    <div style="color:#596579;font-size:15px;line-height:1.7;">{% block content %}{% endblock %}</div>
+                    {% block action %}{% endblock %}
+                    {% block after_action %}{% endblock %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:22px 24px 0;color:#8a969f;font-size:11px;line-height:1.65;">
+              {% block footer %}
+                <p style="margin:0;">MYKEYNEST · Gestionnaire d’accès sécurisé</p>
+                <p style="margin:4px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>
+              {% endblock %}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -205,6 +205,15 @@ final class SitemapController extends AbstractController
             '0.3'
         ));
 
+        $urls = array_merge($urls, $this->localizedPublicEntries(
+            $urlGenerator,
+            'legal_privacy',
+            [],
+            $now,
+            'yearly',
+            '0.3'
+        ));
+
         foreach (['fr', 'en'] as $locale) {
             $urls[] = $this->entry(
                 $urlGenerator->generate('blog_index', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),

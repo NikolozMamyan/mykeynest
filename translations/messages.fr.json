@@ -96,6 +96,32 @@
     }
   },
   "email": {
+    "subscription": {
+      "subject": "Votre abonnement MYKEYNEST %plan% est actif",
+      "cancel_subject": "Votre abonnement MYKEYNEST sera arrêté le %date%",
+      "resume_subject": "Le renouvellement de votre abonnement MYKEYNEST est réactivé",
+      "payment_confirmed": "Paiement confirmé",
+      "activated_title": "Votre abonnement %plan% est actif",
+      "activated_intro": "Votre paiement a bien été confirmé. Toutes les fonctionnalités de votre offre sont disponibles dès maintenant.",
+      "activation_title": "Finalisez l’accès à votre abonnement %plan%",
+      "activation_intro": "Votre paiement est confirmé. Créez votre compte avec cette adresse pour rattacher automatiquement l’abonnement.",
+      "summary_title": "Récapitulatif de votre abonnement",
+      "plan_label": "Offre",
+      "seats_label": "Sièges",
+      "monthly_total_label": "Total mensuel",
+      "renewal_label": "Prochain renouvellement",
+      "billing_note": "Vos factures officielles et moyens de paiement restent disponibles depuis votre espace de facturation sécurisé Stripe.",
+      "open_app": "Accéder à mon espace",
+      "create_account": "Créer mon compte",
+      "cancelled_badge": "Annulation programmée",
+      "cancelled_title": "Votre abonnement prendra fin le %date%",
+      "cancelled_intro": "Votre demande est enregistrée. Vous conservez toutes les fonctionnalités de votre offre jusqu’à cette date et aucun nouveau mois ne sera facturé ensuite.",
+      "resumed_badge": "Renouvellement réactivé",
+      "resumed_title": "Votre abonnement continue normalement",
+      "resumed_intro": "L’annulation a été retirée. Votre offre restera active et sera renouvelée à la prochaine échéance.",
+      "manage": "Gérer mon abonnement",
+      "security_footer": "Cet e-mail concerne la facturation de votre compte MYKEYNEST. Notre équipe ne vous demandera jamais votre mot de passe."
+    },
     "welcome": {
       "title": "Bienvenue sur MYKEYNEST",
       "message": "Nous sommes ravis de vous accueillir, <strong>%email%</strong> ! Complétez votre profil pour profiter pleinement de l'application.",
@@ -1166,6 +1192,43 @@
   },
   "subscription": {
     "page_title": "Abonnements - Gestionnaire de mots de passe",
+    "redesign": {
+      "eyebrow": "Votre formule",
+      "title": "Un abonnement simple, sans surprise",
+      "subtitle": "Choisissez les fonctionnalités adaptées à votre activité. Les paiements et factures sont sécurisés par Stripe.",
+      "current_plan": "Abonnement actif",
+      "company_access": "Accès fourni par votre entreprise",
+      "company_access_help": "Votre siège Team est géré par l’administrateur de votre entreprise.",
+      "offers_eyebrow": "Offres mensuelles",
+      "offers_title": "Choisissez PRO ou TEAM",
+      "monthly_billing": "Facturation mensuelle · résiliable à tout moment",
+      "active_badge": "Actif",
+      "company_badge": "Siège entreprise",
+      "current_offer": "Votre offre actuelle",
+      "included_in_team": "Inclus dans Team",
+      "stripe_note": "Paiement sécurisé, factures et moyens de paiement gérés par Stripe."
+    },
+    "manage": {
+      "renews_on": "Prochain renouvellement le %date%",
+      "ends_on": "Accès maintenu jusqu’au %date%",
+      "billing_portal": "Gérer l’abonnement dans Stripe",
+      "cancel": "Annuler à l’échéance",
+      "cancel_confirm": "Confirmer l’annulation ? Votre accès restera actif jusqu’à la fin de la période déjà payée.",
+      "resume": "Réactiver le renouvellement",
+      "invalid_csrf": "La session a expiré. Rechargez la page puis réessayez.",
+      "cancel_scheduled": "Annulation enregistrée. Votre accès reste actif jusqu’au %date%.",
+      "cancel_error": "Impossible de programmer l’annulation pour le moment. Réessayez ou contactez le support.",
+      "resumed": "Le renouvellement automatique de votre abonnement est réactivé.",
+      "resume_error": "Impossible de réactiver le renouvellement pour le moment.",
+      "team_seats": "Nombre de sièges Team",
+      "upgrade_team": "Passer à Team",
+      "upgrade_confirm": "Confirmer le passage à Team ? Stripe facturera immédiatement la différence au prorata.",
+      "upgrade_proration": "La différence est calculée et facturée immédiatement par Stripe.",
+      "upgrade_success": "Votre passage à Team est confirmé. L’espace entreprise est prêt.",
+      "upgrade_error": "Le changement d’offre n’a pas pu être finalisé. Aucun changement n’a été appliqué.",
+      "change_to_pro": "Changer d’offre",
+      "downgrade_note": "Le passage vers PRO se gère dans votre espace de facturation Stripe."
+    },
     "hero": {
       "badge": "Nos offres",
       "title_before": "Choisissez le",
@@ -1181,6 +1244,8 @@
     "status_card": {
       "title": "Vous êtes abonné 🎉",
       "subtitle": "Merci pour votre confiance. Votre compte est actuellement en",
+      "organization_title": "Accès Team activé",
+      "organization_subtitle": "Votre siège entreprise vous donne actuellement accès au plan",
       "plan": "Pro",
       "benefits": {
         "unlimited_shares": "Partages illimités",
@@ -1370,6 +1435,87 @@
       }
     }
   },
+  "privacy": {
+    "meta_title": "Politique de confidentialité | MYKEYNEST",
+    "meta_description": "Politique de confidentialité de MYKEYNEST et de son extension Chrome : données traitées, finalités, permissions, conservation et droits.",
+    "language_label": "Langue de la politique",
+    "eyebrow": "Confidentialité et données utilisateur",
+    "title": "Politique de confidentialité",
+    "intro": "Cette politique explique de manière transparente comment le service MYKEYNEST et son extension de navigateur traitent vos données pour sécuriser, synchroniser et remplir vos identifiants.",
+    "updated": "Dernière mise à jour :",
+    "extension_id": "Extension Chrome :",
+    "controller": {
+      "title": "1. Responsable du traitement",
+      "text": "%publisher% exploite le service %brand%. Pour toute question relative à vos données personnelles ou pour exercer vos droits, contactez-nous à l’adresse ci-dessous."
+    },
+    "purpose": {
+      "title": "2. Finalité unique de l’extension",
+      "text": "L’extension MYKEYNEST permet à l’utilisateur authentifié d’accéder à son coffre, d’identifier les identifiants correspondant au site consulté, puis de remplir ou soumettre un formulaire de connexion à sa demande. Elle permet aussi de gérer les identifiants autorisés depuis l’interface de l’extension."
+    },
+    "data": {
+      "title": "3. Données collectées ou traitées",
+      "intro": "Selon les fonctions utilisées, MYKEYNEST peut traiter les catégories suivantes :",
+      "account": "Données de compte : nom, adresse e-mail, organisation, équipes et informations nécessaires aux partages.",
+      "authentication": "Données d’authentification : jeton d’accès de l’extension, identifiant technique d’installation et codes temporaires d’association. Le cookie de session du site n’est pas transmis à l’extension.",
+      "vault": "Données du coffre : nom du service, domaine, identifiant et mot de passe des entrées auxquelles votre compte est autorisé à accéder.",
+      "browser": "Données de navigation nécessaires à la fonction : URL ou domaine de l’onglet actif et structure des formulaires de connexion. L’extension analyse localement la présence de champs de connexion et ne lit pas les valeurs que vous tapez.",
+      "technical": "Données techniques et de sécurité : navigateur et version, système d’exploitation, version de l’extension, adresse IP, user-agent, événements d’association et erreurs techniques."
+    },
+    "uses": {
+      "title": "4. Utilisation des données",
+      "authentication": "Authentifier l’extension, associer une installation au bon compte et maintenir la session de l’extension.",
+      "autofill": "Rechercher les identifiants autorisés pour le domaine consulté, les afficher sur demande et exécuter le remplissage automatique.",
+      "sharing": "Appliquer les droits d’accès, les règles de partage et les limites du plan souscrit.",
+      "security": "Prévenir les accès non autorisés, sécuriser le service, enquêter sur les erreurs et détecter les abus.",
+      "support": "Assurer le support, communiquer les informations indispensables au service et respecter nos obligations légales."
+    },
+    "permissions": {
+      "title": "5. Permissions de l’extension",
+      "intro": "Ces autorisations sont utilisées uniquement pour les fonctionnalités annoncées de MYKEYNEST.",
+      "permission": "Permission",
+      "reason": "Pourquoi elle est nécessaire",
+      "storage": "Conserver localement le jeton de connexion, l’identifiant d’installation et les préférences de l’extension.",
+      "tabs": "Identifier l’onglet actif, déterminer son domaine et ouvrir les pages MYKEYNEST demandées par l’utilisateur.",
+      "notifications": "Informer l’utilisateur lorsqu’une étape d’association nécessite son attention et que la fenêtre de l’extension ne peut pas s’ouvrir.",
+      "all_urls": "Détecter localement les formulaires de connexion et remplir les identifiants sur les sites où l’utilisateur choisit d’utiliser MYKEYNEST.",
+      "host": "Communiquer avec l’API officielle MYKEYNEST pour l’authentification, le coffre, les autorisations et l’association de l’extension."
+    },
+    "storage": {
+      "title": "6. Stockage et transmission",
+      "local": "Le jeton de connexion, l’identifiant technique de l’installation et les préférences sont stockés dans l’espace local protégé de l’extension Chrome. Lors d’un remplissage après navigation, un identifiant d’entrée et le nom d’utilisateur peuvent être conservés temporairement en mémoire de session pendant deux minutes au maximum.",
+      "server": "Les données de compte et du coffre sont hébergées sur l’infrastructure du service. Les communications de production entre l’extension et MYKEYNEST utilisent HTTPS.",
+      "passwords": "Les mots de passe du coffre sont chiffrés au repos côté serveur. L’extension ne conserve pas durablement les mots de passe : elle les récupère uniquement lorsqu’une action autorisée de révélation ou de remplissage le nécessite."
+    },
+    "sharing": {
+      "title": "7. Destinataires et prestataires",
+      "no_sale": "Nous ne vendons pas vos données, ne les louons pas, ne les utilisons pas pour de la publicité personnalisée et ne les transférons pas à des courtiers en données.",
+      "hosting": "%provider% pour l’hébergement technique et le stockage du service.",
+      "email": "Brevo pour l’envoi des e-mails transactionnels et de sécurité.",
+      "billing": "Stripe pour le paiement et la gestion des abonnements ; MYKEYNEST ne stocke pas les numéros complets de carte bancaire.",
+      "browser": "Google Chrome et le Chrome Web Store pour la distribution et l’exécution de l’extension selon les paramètres du navigateur.",
+      "analytics": "L’extension elle-même n’intègre aucun outil publicitaire ni outil d’analyse d’audience. Le site public peut utiliser une mesure d’audience distincte ; cette page de confidentialité n’en charge pas."
+    },
+    "retention": {
+      "title": "8. Durée de conservation",
+      "text": "Nous conservons les données uniquement pendant la durée nécessaire au fonctionnement du compte, à la sécurité et aux obligations légales. Le jeton local est supprimé lors de la déconnexion de l’extension ; les données locales de l’installation peuvent aussi être supprimées via Chrome. Les données du compte peuvent être supprimées sur demande, sous réserve des durées imposées par la loi, la facturation ou la prévention de la fraude."
+    },
+    "security": {
+      "title": "9. Sécurité",
+      "text": "Nous appliquons des mesures techniques et organisationnelles adaptées, notamment le chiffrement des communications, le chiffrement au repos des secrets du coffre, le contrôle des droits d’accès, l’association des installations et la limitation de l’accès local aux contextes de confiance de l’extension. Aucun système ne peut toutefois garantir une sécurité absolue."
+    },
+    "limited_use": {
+      "title": "10. Chrome Web Store – Limited Use",
+      "text": "Les données obtenues par l’extension sont utilisées exclusivement pour fournir ou améliorer sa finalité unique visible par l’utilisateur. Elles ne sont ni vendues, ni utilisées pour de la publicité, ni transférées à des fins d’évaluation de crédit, et ne font pas l’objet d’un accès humain sauf avec votre consentement, pour la sécurité, le support, le respect de la loi ou lorsque les données sont agrégées et anonymisées."
+    },
+    "rights": {
+      "title": "11. Vos droits",
+      "text": "Selon la réglementation applicable, vous pouvez demander l’accès, la rectification, l’effacement, la limitation ou la portabilité de vos données, ainsi que vous opposer à certains traitements. Vous pouvez également introduire une réclamation auprès de l’autorité de protection des données compétente."
+    },
+    "changes": {
+      "title": "12. Modifications de cette politique",
+      "text": "Cette politique peut évoluer lorsque le service, l’extension ou les exigences légales changent. La date de mise à jour affichée en haut de la page indique la version actuellement applicable."
+    }
+  },
   "settings": {
     "title": "Réglages",
     "profile": {
@@ -1398,6 +1544,7 @@
       "preferences": "Préférences",
       "subscription": "Gestion d’abonnement",
       "contact": "Contact",
+      "privacy": "Confidentialité",
       "terms_cgu": "CGU",
       "terms_cgv": "CGV"
     },
@@ -1428,6 +1575,12 @@
         "label": "Demandes de feedback",
         "description": "Autoriser l’envoi de demandes de retour pour améliorer votre expérience."
       },
+      "email_two_factor": {
+        "label": "Double authentification par e-mail",
+        "description": "Demander une validation par e-mail lors d’une connexion depuis un nouvel appareil.",
+        "unavailable": "Disponible avec les offres PRO et TEAM.",
+        "upgrade": "Voir les offres"
+      },
       "security": {
         "title": "Cybersécurité",
         "description": "Paramètres liés à la sécurité et aux communications sensibles."
@@ -1445,6 +1598,72 @@
   },
   "teams": {
     "page_title": "Mes équipes",
+    "organization": {
+      "eyebrow": "Espace entreprise",
+      "title": "%name%",
+      "active": "Actif",
+      "suspended": "Suspendu",
+      "seats": "Sièges",
+      "used": "%used% / %purchased% utilisés",
+      "active_members": "%count% actifs",
+      "pending_members": "%count% en attente",
+      "available_seats": "%count% disponibles",
+      "guests": "%used% / %limit% invités externes",
+      "over_capacity": "Le nombre de membres dépasse les sièges achetés. Les invitations sont bloquées.",
+      "members_title": "Membres de l’entreprise",
+      "directory_eyebrow": "Annuaire",
+      "capacity_title": "Utilisation des sièges",
+      "metric_active": "Membres actifs",
+      "metric_pending": "En attente",
+      "metric_available": "Disponibles",
+      "invite_card_title": "Ajouter un collaborateur",
+      "member_access_title": "Votre accès entreprise",
+      "member_access_help": "Votre siège active les fonctionnalités Team. Les administrateurs de l’entreprise gèrent les membres, les rôles et la facturation.",
+      "invite": {
+        "description": "Invitez ici les collaborateurs de l’entreprise. Chaque invitation réserve un siège, puis le collaborateur peut être ajouté gratuitement à plusieurs groupes.",
+        "email_label": "Adresse e-mail du collaborateur",
+        "email_placeholder": "collaborateur@entreprise.com",
+        "role_label": "Rôle dans l’entreprise",
+        "role_member": "Membre",
+        "role_admin": "Administrateur",
+        "submit": "Inviter",
+        "invalid": "Vérifiez l’adresse e-mail et le rôle sélectionné.",
+        "success_pending": "Invitation envoyée. Le siège est réservé jusqu’à la création du compte.",
+        "success_active": "Le collaborateur a été ajouté à l’entreprise et son siège est actif.",
+        "mail_warning": "Le collaborateur a été ajouté, mais l’e-mail d’invitation n’a pas pu être envoyé.",
+        "email_subject": "Invitation à rejoindre %company% sur MYKEYNEST",
+        "email_eyebrow": "Invitation entreprise",
+        "email_title": "Rejoignez %company% sur MYKEYNEST",
+        "email_body_pending": "Créez votre compte pour rejoindre l’espace de votre entreprise. Un siège vous est déjà réservé.",
+        "email_body_active": "Votre compte a été rattaché à l’espace de votre entreprise. Vous pouvez maintenant accéder aux fonctionnalités Team.",
+        "email_role": "Rôle : %role%",
+        "email_action_pending": "Créer mon compte",
+        "email_action_active": "Ouvrir mon espace entreprise",
+        "email_expiry": "Ce lien d’inscription expire le %date%.",
+        "admin_description_company": "Un collaborateur doit déjà appartenir à l’entreprise. Un externe reste invité de ce groupe uniquement.",
+        "admin_description_personal": "Ajout direct ou invitation si le compte n’existe pas encore.",
+        "admin_type_employee": "Collaborateur actif de l’entreprise",
+        "admin_type_guest": "Invité externe sans siège"
+      },
+      "member_status_active": "Actif",
+      "member_status_pending": "Invitation en attente",
+      "member_status_suspended": "Suspendu",
+      "role_owner": "Propriétaire",
+      "role_admin": "Administrateur",
+      "role_member": "Membre",
+      "role_guest": "Invité externe",
+      "role_label": "Rôle dans l’entreprise",
+      "role_updated": "Le rôle du membre a été mis à jour.",
+      "invalid_role": "Ce rôle n’est pas valide.",
+      "invalid_csrf": "La vérification de sécurité a échoué.",
+      "remove": "Retirer",
+      "remove_confirm": "Retirer ce membre de l’entreprise et de toutes ses équipes ?",
+      "billing_title": "Adapter les sièges",
+      "billing_help": "Le propriétaire compte comme un siège. Stripe appliquera la proratisation.",
+      "billing_submit": "Mettre à jour",
+      "billing_error": "Stripe n’a pas pu modifier les sièges. Réessayez dans un instant.",
+      "workspace_note": "Un siège correspond à une personne. Les installations d’extension ne consomment pas de siège."
+    },
     "form": {
       "name_label": "Nom de l’équipe",
       "credentials_label": "Partager des identifiants existants (optionnel)",
@@ -1497,7 +1716,15 @@
         "add": {
           "title": "Ajouter un membre",
           "submit": "Ajouter",
-          "email_placeholder": "email@exemple.com"
+          "email_placeholder": "email@exemple.com",
+          "email_label": "Adresse e-mail",
+          "type_label": "Type d’accès",
+          "type_employee": "Collaborateur de l’entreprise · aucun siège supplémentaire",
+          "type_guest": "Invité externe · accès limité",
+          "company_help": "Les collaborateurs s’invitent depuis l’espace entreprise, puis s’ajoutent aux groupes sans siège supplémentaire",
+          "role_label": "Rôle dans l’équipe",
+          "role_member": "Membre",
+          "role_admin": "Administrateur"
         }
       }
     },

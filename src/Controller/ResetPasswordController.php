@@ -169,7 +169,7 @@ class ResetPasswordController extends AbstractController
         $email = (new TemplatedEmail())
             ->from(new Address('noreply@key-nest.com', 'MYKEYNEST'))
             ->to((string) $user->getEmail())
-            ->subject('Reinitialisez votre mot de passe MYKEYNEST')
+            ->subject('Réinitialisez votre mot de passe MYKEYNEST')
             ->htmlTemplate('reset_password/email.html.twig')
             ->textTemplate('reset_password/email.txt.twig')
             ->context([

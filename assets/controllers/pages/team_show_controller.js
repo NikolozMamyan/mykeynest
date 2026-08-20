@@ -7,9 +7,13 @@ export default class extends Controller {
     this.clearButton = this.element.querySelector("#clearCredentialsSearch");
     this.counter = this.element.querySelector("#credentialsCounter");
     this.emptyState = this.element.querySelector("#credentialsEmpty");
+    this.memberAccessType = this.element.querySelector('[name$="[membershipType]"]');
+    this.memberRole = this.element.querySelector('[name$="[role]"]');
+    this.memberRoleGroup = this.element.querySelector("[data-member-role-group]");
     this.handleKeydown = this.handleKeydown.bind(this);
     document.addEventListener("keydown", this.handleKeydown);
     this.syncCredentialsUI();
+    this.syncMemberAccessType();
   }
 
   disconnect() {
@@ -70,6 +74,16 @@ export default class extends Controller {
 
   syncSelection() {
     this.syncCredentialsUI();
+  }
+
+  syncMemberAccessType() {
+    if (!this.memberAccessType || !this.memberRole || !this.memberRoleGroup) return;
+
+    const isExternalGuest = this.memberAccessType.value === "guest";
+    if (isExternalGuest) {
+      this.memberRole.value = "MEMBER";
+    }
+    this.memberRoleGroup.hidden = isExternalGuest;
   }
 
   confirmDeleteTeam() {

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\SubscriptionPlanConfiguration;
 use App\Entity\User;
 use App\Repository\SubscriptionPlanConfigurationRepository;
+use App\Repository\OrganizationMemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class SubscriptionPlanService
@@ -67,7 +68,7 @@ final class SubscriptionPlanService
                 self::LIMIT_CREDENTIALS => null,
                 self::LIMIT_SHARES => null,
                 self::LIMIT_TEAMS => null,
-                self::LIMIT_EXTENSION_INSTALLATIONS => null,
+                self::LIMIT_EXTENSION_INSTALLATIONS => 5,
             ],
             'features' => [
                 self::FEATURE_PASSWORD_GENERATOR => true,
@@ -82,9 +83,13 @@ final class SubscriptionPlanService
     /** @var array<string, array{code:string, label:string, limits:array<string, int|null>, features:array<string, bool>, editable:bool, updatedAt:?\DateTimeImmutable}> */
     private array $resolvedPlans = [];
 
+    /** @var array<string, bool> */
+    private array $organizationTeamAccess = [];
+
     public function __construct(
         private readonly SubscriptionPlanConfigurationRepository $repository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly OrganizationMemberRepository $organizationMembers,
     ) {
     }
 
@@ -131,18 +136,27 @@ final class SubscriptionPlanService
         return $this->getPlan($this->resolveUserPlanCode($user));
     }
 
+    /**
+     * Personal billing remains distinct from the Team entitlement inherited
+     * through a company seat.
+     *
+     * @return array{code:string, label:string, limits:array<string, int|null>, features:array<string, bool>, editable:bool, updatedAt:?\DateTimeImmutable}
+     */
+    public function getPersonalPlanForUser(User $user): array
+    {
+        return $this->getPlan($this->resolvePersonalPlanCode($user));
+    }
+
     public function getLimit(User $user, string $limit): ?int
     {
-        $subscription = $user->getUserSubscription();
-        if (
-            $limit === self::LIMIT_EXTENSION_INSTALLATIONS
-            && $user->hasActivePlan(self::PLAN_TEAM)
-            && $subscription?->getStripePriceId() !== null
-        ) {
-            return $subscription->getQuantity();
-        }
-
         $value = $this->getPlanForUser($user)['limits'][$limit] ?? null;
+
+        return is_int($value) ? max(0, $value) : null;
+    }
+
+    public function getPersonalLimit(User $user, string $limit): ?int
+    {
+        $value = $this->getPersonalPlanForUser($user)['limits'][$limit] ?? null;
 
         return is_int($value) ? max(0, $value) : null;
     }
@@ -157,6 +171,16 @@ final class SubscriptionPlanService
         $maximum = $this->getLimit($user, $limit);
 
         return $maximum === null || $currentUsage < $maximum;
+    }
+
+    public function hasOrganizationTeamAccess(User $user): bool
+    {
+        $cacheKey = $user->getId() !== null
+            ? 'user_' . $user->getId()
+            : 'object_' . spl_object_id($user);
+
+        return $this->organizationTeamAccess[$cacheKey]
+            ??= $this->organizationMembers->findActiveTeamMembership($user) !== null;
     }
 
     /**
@@ -213,6 +237,19 @@ final class SubscriptionPlanService
     }
 
     private function resolveUserPlanCode(User $user): string
+    {
+        if ($user->hasActivePlan(self::PLAN_TEAM)) {
+            return self::PLAN_TEAM;
+        }
+
+        if ($this->hasOrganizationTeamAccess($user)) {
+            return self::PLAN_TEAM;
+        }
+
+        return $this->resolvePersonalPlanCode($user);
+    }
+
+    private function resolvePersonalPlanCode(User $user): string
     {
         if (!$user->hasActiveSubscription()) {
             return self::PLAN_FREE;

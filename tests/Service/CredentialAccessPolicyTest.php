@@ -3,8 +3,12 @@
 namespace App\Tests\Service;
 
 use App\Entity\Credential;
+use App\Entity\Organization;
+use App\Entity\OrganizationMember;
 use App\Entity\Team;
 use App\Entity\User;
+use App\Enum\OrganizationRole;
+use App\Repository\OrganizationMemberRepository;
 use App\Repository\SharedAccessRepository;
 use App\Repository\TeamCredentialPermissionRepository;
 use App\Repository\TeamRepository;
@@ -42,6 +46,7 @@ final class CredentialAccessPolicyTest extends TestCase
             $sharedAccessRepository,
             $teamRepository,
             $this->createMock(TeamCredentialPermissionRepository::class),
+            $this->createMock(OrganizationMemberRepository::class),
         );
 
         self::assertTrue($policy->canAccess($guest, $credential));
@@ -65,10 +70,49 @@ final class CredentialAccessPolicyTest extends TestCase
         $permissionRepository = $this->createMock(TeamCredentialPermissionRepository::class);
         $permissionRepository->method('allowsPasswordReveal')->with($team, $credential)->willReturn(true);
 
-        $policy = new CredentialAccessPolicy($sharedAccessRepository, $teamRepository, $permissionRepository);
+        $policy = new CredentialAccessPolicy(
+            $sharedAccessRepository,
+            $teamRepository,
+            $permissionRepository,
+            $this->createMock(OrganizationMemberRepository::class),
+        );
 
         self::assertTrue($policy->canRevealPassword($guest, $credential));
         self::assertFalse($policy->canEdit($guest, $credential));
+    }
+
+    public function testOrganizationGuestCannotRevealPasswordThroughAFullAccessTeam(): void
+    {
+        $owner = (new User())->setEmail('owner@example.test');
+        $guest = (new User())->setEmail('external@example.test');
+        $organization = (new Organization())->setName('Acme')->setOwner($owner);
+        $team = (new Team())->setName('Agency')->setOwner($owner)->setOrganization($organization);
+        $credential = $this->credentialOwnedBy($owner);
+        $membership = (new OrganizationMember())
+            ->setOrganization($organization)
+            ->setUser($guest)
+            ->setRole(OrganizationRole::GUEST);
+
+        $sharedAccessRepository = $this->createMock(SharedAccessRepository::class);
+        $sharedAccessRepository->method('userCanRevealPassword')->willReturn(false);
+
+        $teamRepository = $this->createMock(TeamRepository::class);
+        $teamRepository->method('findTeamsForUserAndCredential')->willReturn([$team]);
+
+        $permissionRepository = $this->createMock(TeamCredentialPermissionRepository::class);
+        $permissionRepository->method('allowsPasswordReveal')->willReturn(true);
+
+        $memberRepository = $this->createMock(OrganizationMemberRepository::class);
+        $memberRepository->method('findMembership')->with($organization, $guest)->willReturn($membership);
+
+        $policy = new CredentialAccessPolicy(
+            $sharedAccessRepository,
+            $teamRepository,
+            $permissionRepository,
+            $memberRepository,
+        );
+
+        self::assertFalse($policy->canRevealPassword($guest, $credential));
     }
 
     private function createPolicy(): CredentialAccessPolicy
@@ -77,6 +121,7 @@ final class CredentialAccessPolicyTest extends TestCase
             $this->createMock(SharedAccessRepository::class),
             $this->createMock(TeamRepository::class),
             $this->createMock(TeamCredentialPermissionRepository::class),
+            $this->createMock(OrganizationMemberRepository::class),
         );
     }
 

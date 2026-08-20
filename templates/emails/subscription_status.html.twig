@@ -1,0 +1,27 @@
+{% extends 'emails/layout.html.twig' %}
+
+{% set endDate = subscription.currentPeriodEnd ? subscription.currentPeriodEnd|date('d/m/Y') : '—' %}
+{% block title %}{{ cancelAtPeriodEnd ? 'email.subscription.cancelled_title'|trans({'%date%': endDate}, null, locale|default('fr')) : 'email.subscription.resumed_title'|trans({}, null, locale|default('fr')) }}{% endblock %}
+{% block eyebrow %}{{ (cancelAtPeriodEnd ? 'email.subscription.cancelled_badge' : 'email.subscription.resumed_badge')|trans({}, null, locale|default('fr')) }}{% endblock %}
+{% block heading %}{{ cancelAtPeriodEnd ? 'email.subscription.cancelled_title'|trans({'%date%': endDate}, null, locale|default('fr')) : 'email.subscription.resumed_title'|trans({}, null, locale|default('fr')) }}{% endblock %}
+
+{% block content %}
+  <p style="margin:0;">{{ (cancelAtPeriodEnd ? 'email.subscription.cancelled_intro' : 'email.subscription.resumed_intro')|trans({}, null, locale|default('fr')) }}</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:24px 0 0;background:#f7faf9;border:1px solid #e1e9e7;border-radius:6px;">
+    <tr>
+      <td style="padding:15px;color:#748079;font-size:12px;">{{ 'email.subscription.plan_label'|trans({}, null, locale|default('fr')) }}</td>
+      <td align="right" style="padding:15px;color:#172033;font-size:13px;font-weight:700;">MYKEYNEST {{ subscription.planCode|upper }}</td>
+    </tr>
+  </table>
+{% endblock %}
+
+{% block action %}
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:26px;">
+    <tr><td style="background:#059669;border-radius:4px;"><a href="{{ subscription_url }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">{{ 'email.subscription.manage'|trans({}, null, locale|default('fr')) }}</a></td></tr>
+  </table>
+{% endblock %}
+
+{% block footer %}
+  <p style="margin:0;">{{ 'email.subscription.security_footer'|trans({}, null, locale|default('fr')) }}</p>
+  <p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>
+{% endblock %}

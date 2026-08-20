@@ -4,6 +4,7 @@ namespace App\Tests\Service;
 
 use App\Service\StripePlanCatalog;
 use PHPUnit\Framework\TestCase;
+use Stripe\Subscription;
 
 final class StripePlanCatalogTest extends TestCase
 {
@@ -43,5 +44,27 @@ final class StripePlanCatalogTest extends TestCase
 
         $this->expectException(\LogicException::class);
         $catalog->getCheckoutLineItem('team', '');
+    }
+
+    public function testProToTeamUpgradeInvoicesTheProratedDifferenceImmediately(): void
+    {
+        $catalog = new StripePlanCatalog(6, 250);
+
+        self::assertSame([
+            'items' => [[
+                'id' => 'si_pro',
+                'price' => 'price_team',
+                'quantity' => 8,
+            ]],
+            'cancel_at_period_end' => false,
+            'payment_behavior' => Subscription::PAYMENT_BEHAVIOR_PENDING_IF_INCOMPLETE,
+            'proration_behavior' => Subscription::PRORATION_BEHAVIOR_ALWAYS_INVOICE,
+            'metadata' => [
+                'plan' => 'team',
+                'user_id' => '42',
+                'stripe_mode' => 'production',
+            ],
+            'expand' => ['customer', 'items.data.price', 'latest_invoice'],
+        ], $catalog->buildProToTeamUpdate('si_pro', 'price_team', 8, 42, 'production'));
     }
 }

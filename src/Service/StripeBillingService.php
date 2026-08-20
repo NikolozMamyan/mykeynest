@@ -17,18 +17,21 @@ use Stripe\StripeObject;
 use Stripe\Subscription;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class StripeBillingService
 {
     public function __construct(
         private readonly StripeEnvironmentManager $stripeEnvironments,
         private readonly StripePlanCatalog $plans,
+        private readonly OrganizationProvisioner $organizationProvisioner,
         private readonly UserRepository $users,
         private readonly UserSubscriptionRepository $subscriptions,
         private readonly EntityManagerInterface $entityManager,
         private readonly MailerService $mailer,
         private readonly AdminNotificationService $adminNotifications,
         private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $logger,
         private readonly string $appUrl,
     ) {
@@ -109,6 +112,162 @@ final class StripeBillingService
         ]);
 
         return $session->url;
+    }
+
+    public function setCancellationAtPeriodEnd(User $user, bool $cancelAtPeriodEnd): UserSubscription
+    {
+        $record = $this->requireManageableSubscription($user);
+        if ($record->isCancelAtPeriodEnd() === $cancelAtPeriodEnd) {
+            return $record;
+        }
+
+        $stripeMode = $record->getStripeMode();
+        $stripe = $this->stripeEnvironments->createClient($stripeMode);
+        $updated = $stripe->subscriptions->update((string) $record->getStripeSubscriptionId(), [
+            'cancel_at_period_end' => $cancelAtPeriodEnd,
+            'expand' => ['customer', 'items.data.price', 'latest_invoice'],
+        ]);
+
+        $synchronized = $this->synchronizeSubscriptionObject(
+            $updated,
+            $cancelAtPeriodEnd ? 'customer_cancellation_scheduled' : 'customer_cancellation_revoked',
+            $stripeMode,
+            $stripe,
+            $user,
+        );
+        if (!$synchronized instanceof UserSubscription) {
+            throw new \RuntimeException('Stripe n’a pas renvoyé un abonnement exploitable.');
+        }
+
+        $this->sendCancellationStatusEmail($user, $synchronized, $cancelAtPeriodEnd);
+
+        return $synchronized;
+    }
+
+    /**
+     * @return array{completed:bool,paymentUrl:?string,subscription:UserSubscription}
+     */
+    public function upgradeProToTeam(User $user, int $quantity): array
+    {
+        $record = $this->requireManageableSubscription($user);
+        if (mb_strtolower((string) $record->getPlanCode()) !== SubscriptionPlanService::PLAN_PRO) {
+            throw new \LogicException('Seul un abonnement PRO peut être converti vers Team depuis cette action.');
+        }
+
+        $stripeMode = $record->getStripeMode();
+        $stripe = $this->stripeEnvironments->createClient($stripeMode);
+        $stripeSubscription = $stripe->subscriptions->retrieve((string) $record->getStripeSubscriptionId(), [
+            'expand' => ['items.data.price'],
+        ]);
+        $item = $stripeSubscription->items->data[0] ?? null;
+        $itemId = $this->readString($item, 'id');
+        $currentPriceId = $this->toStripeId($item?->price ?? null);
+        $expectedProPriceId = $this->stripeEnvironments->getPriceId(SubscriptionPlanService::PLAN_PRO, $stripeMode);
+        if ($itemId === null || $currentPriceId !== $expectedProPriceId) {
+            throw new \RuntimeException('La ligne de facturation PRO est introuvable dans cet abonnement Stripe.');
+        }
+
+        $updated = $stripe->subscriptions->update(
+            (string) $record->getStripeSubscriptionId(),
+            $this->plans->buildProToTeamUpdate(
+                $itemId,
+                $this->stripeEnvironments->getPriceId(SubscriptionPlanService::PLAN_TEAM, $stripeMode),
+                $quantity,
+                (int) $user->getId(),
+                $stripeMode,
+            ),
+        );
+
+        $pendingUpdate = $updated->pending_update ?? null;
+        if ($pendingUpdate !== null) {
+            $paymentUrl = $this->readString($updated->latest_invoice ?? null, 'hosted_invoice_url');
+            if ($paymentUrl === null) {
+                throw new \RuntimeException('Le paiement complémentaire doit être confirmé, mais Stripe n’a fourni aucun lien de paiement.');
+            }
+
+            return [
+                'completed' => false,
+                'paymentUrl' => $paymentUrl,
+                'subscription' => $record,
+            ];
+        }
+
+        $synchronized = $this->synchronizeSubscriptionObject(
+            $updated,
+            'customer_upgrade_pro_to_team',
+            $stripeMode,
+            $stripe,
+            $user,
+            true,
+        );
+        if (!$synchronized instanceof UserSubscription) {
+            throw new \RuntimeException('Le nouvel abonnement Team n’a pas pu être synchronisé.');
+        }
+
+        return [
+            'completed' => true,
+            'paymentUrl' => null,
+            'subscription' => $synchronized,
+        ];
+    }
+
+    public function updateTeamSeatQuantity(User $user, int $quantity): int
+    {
+        $record = $user->getUserSubscription();
+        if (
+            !$record?->isActive()
+            || mb_strtolower((string) $record->getPlanCode()) !== SubscriptionPlanService::PLAN_TEAM
+            || !$record->getStripeSubscriptionId()
+        ) {
+            throw new \LogicException('Aucun abonnement Team actif n’est associé à ce compte.');
+        }
+
+        $minimum = $this->plans->getTeamMinimumSeats();
+        $maximum = $this->plans->getTeamMaximumSeats();
+        if ($quantity < $minimum || $quantity > $maximum) {
+            throw new \InvalidArgumentException(sprintf('La quantité doit être comprise entre %d et %d sièges.', $minimum, $maximum));
+        }
+        if ($quantity === $record->getQuantity()) {
+            return $quantity;
+        }
+
+        $stripeMode = $record->getStripeMode();
+        $stripe = $this->stripeEnvironments->createClient($stripeMode);
+        $teamPriceId = $this->stripeEnvironments->getPriceId(SubscriptionPlanService::PLAN_TEAM, $stripeMode);
+        $stripeSubscription = $stripe->subscriptions->retrieve($record->getStripeSubscriptionId(), [
+            'expand' => ['items.data.price'],
+        ]);
+        $subscriptionItemId = null;
+        foreach ($stripeSubscription->items->data as $item) {
+            if ($this->toStripeId($item->price ?? null) === $teamPriceId) {
+                $subscriptionItemId = $this->readString($item, 'id');
+                break;
+            }
+        }
+        if ($subscriptionItemId === null) {
+            throw new \RuntimeException('La ligne de facturation Team est introuvable dans cet abonnement Stripe.');
+        }
+
+        $updated = $stripe->subscriptions->update($record->getStripeSubscriptionId(), [
+            'items' => [[
+                'id' => $subscriptionItemId,
+                'quantity' => $quantity,
+            ]],
+            'proration_behavior' => 'create_prorations',
+        ]);
+
+        $actualQuantity = $quantity;
+        foreach ($updated->items->data as $item) {
+            if ($this->toStripeId($item->price ?? null) === $teamPriceId) {
+                $actualQuantity = max(1, (int) ($item->quantity ?? $quantity));
+                break;
+            }
+        }
+
+        $record->setQuantity($actualQuantity)->touch();
+        $this->entityManager->flush();
+
+        return $actualQuantity;
     }
 
     public function synchronizeCheckoutSession(
@@ -381,6 +540,7 @@ final class StripeBillingService
             return $record;
         }
         $wasActive = $record->isActive();
+        $previousPlan = mb_strtolower((string) $record->getPlanCode());
         $status = $this->readString($stripeSubscription, 'status') ?? 'unknown';
         $latestInvoice = $stripeSubscription->latest_invoice ?? null;
         $latestInvoicePaid = is_object($latestInvoice) && (
@@ -414,9 +574,10 @@ final class StripeBillingService
         }
 
         $user->setUserSubscription($record);
+        $this->organizationProvisioner->synchronize($user, $record);
         $this->entityManager->flush();
 
-        if (!$wasActive && $isActive) {
+        if ($isActive && (!$wasActive || $previousPlan !== $resolvedPlan)) {
             $this->sendActivationNotifications($user, $resolvedPlan, $source);
             $this->entityManager->flush();
         }
@@ -550,6 +711,17 @@ final class StripeBillingService
     private function sendActivationNotifications(User $user, string $planCode, string $source): void
     {
         $planName = strtoupper($planCode);
+        $subscription = $user->getUserSubscription();
+        $quantity = $planCode === SubscriptionPlanService::PLAN_TEAM
+            ? max($this->plans->getTeamMinimumSeats(), $subscription?->getQuantity() ?? 1)
+            : 1;
+        $monthlyAmount = number_format(
+            ($this->plans->getExpectedMonthlyAmount($planCode) * $quantity) / 100,
+            2,
+            ',',
+            ' ',
+        ) . ' €';
+        $locale = $user->getLocale();
 
         try {
             if (in_array('ROLE_GUEST', $user->getRoles(), true)) {
@@ -564,13 +736,17 @@ final class StripeBillingService
 
                 $this->mailer->send(
                     (string) $user->getEmail(),
-                    sprintf('Votre abonnement MYKEYNEST %s est actif', $planName),
+                    $this->translator->trans('email.subscription.subject', ['%plan%' => $planName], null, $locale),
                     'emails/pro_checkout_activation.html.twig',
                     [
                         'user' => $user,
                         'setup_url' => $setupUrl,
                         'expiresAt' => $expiresAt,
                         'planName' => $planName,
+                        'subscription' => $subscription,
+                        'quantity' => $quantity,
+                        'monthlyAmount' => $monthlyAmount,
+                        'locale' => $locale,
                     ]
                 );
             } else {
@@ -579,13 +755,17 @@ final class StripeBillingService
 
                 $this->mailer->send(
                     (string) $user->getEmail(),
-                    sprintf('Votre abonnement MYKEYNEST %s est actif', $planName),
+                    $this->translator->trans('email.subscription.subject', ['%plan%' => $planName], null, $locale),
                     'emails/pro_checkout_existing_user.html.twig',
                     [
                         'user' => $user,
                         'planName' => $planName,
                         'login_url' => $loginUrl,
                         'forgot_password_url' => $forgotPasswordUrl,
+                        'subscription' => $subscription,
+                        'quantity' => $quantity,
+                        'monthlyAmount' => $monthlyAmount,
+                        'locale' => $locale,
                     ]
                 );
             }
@@ -603,6 +783,52 @@ final class StripeBillingService
             $this->logger->error('Stripe subscription admin notification failed.', [
                 'user_id' => $user->getId(),
                 'plan' => $planCode,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function requireManageableSubscription(User $user): UserSubscription
+    {
+        $record = $user->getUserSubscription();
+        if (!$record?->isActive() || !$record->getStripeSubscriptionId()) {
+            throw new \LogicException('Aucun abonnement Stripe actif n’est associé à ce compte.');
+        }
+
+        return $record;
+    }
+
+    private function sendCancellationStatusEmail(
+        User $user,
+        UserSubscription $subscription,
+        bool $cancelAtPeriodEnd,
+    ): void {
+        try {
+            $locale = $user->getLocale();
+            $subjectParameters = $cancelAtPeriodEnd
+                ? ['%date%' => $subscription->getCurrentPeriodEnd()?->format('d/m/Y') ?? '—']
+                : [];
+            $this->mailer->send(
+                (string) $user->getEmail(),
+                $this->translator->trans(
+                    $cancelAtPeriodEnd ? 'email.subscription.cancel_subject' : 'email.subscription.resume_subject',
+                    $subjectParameters,
+                    null,
+                    $locale,
+                ),
+                'emails/subscription_status.html.twig',
+                [
+                    'user' => $user,
+                    'subscription' => $subscription,
+                    'cancelAtPeriodEnd' => $cancelAtPeriodEnd,
+                    'subscription_url' => $this->urlGenerator->generate('app_subscription', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'locale' => $locale,
+                ],
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->error('Stripe cancellation status email failed.', [
+                'user_id' => $user->getId(),
+                'cancel_at_period_end' => $cancelAtPeriodEnd,
                 'message' => $exception->getMessage(),
             ]);
         }

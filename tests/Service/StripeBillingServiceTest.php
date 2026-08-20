@@ -7,8 +7,12 @@ use App\Entity\UserSubscription;
 use App\Repository\UserRepository;
 use App\Repository\UserSubscriptionRepository;
 use App\Repository\StripePaymentConfigurationRepository;
+use App\Repository\OrganizationMemberRepository;
+use App\Repository\OrganizationRepository;
+use App\Repository\TeamRepository;
 use App\Service\AdminNotificationService;
 use App\Service\MailerService;
+use App\Service\OrganizationProvisioner;
 use App\Service\StripeBillingService;
 use App\Service\StripeEnvironmentManager;
 use App\Service\StripePlanCatalog;
@@ -17,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Stripe\Event;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class StripeBillingServiceTest extends TestCase
 {
@@ -201,6 +206,7 @@ final class StripeBillingServiceTest extends TestCase
     ): StripeBillingService {
         $mailer = $this->createMock(MailerService::class);
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $logger = new NullLogger();
 
         $paymentConfiguration = $this->createMock(StripePaymentConfigurationRepository::class);
@@ -218,12 +224,19 @@ final class StripeBillingServiceTest extends TestCase
         return new StripeBillingService(
             $stripeEnvironments,
             new StripePlanCatalog(6, 250),
+            new OrganizationProvisioner(
+                $this->createMock(OrganizationRepository::class),
+                $this->createMock(OrganizationMemberRepository::class),
+                $this->createMock(TeamRepository::class),
+                $entityManager,
+            ),
             $users ?? $this->createMock(UserRepository::class),
             $subscriptions,
             $entityManager,
             $mailer,
             new AdminNotificationService($mailer, $urlGenerator, $logger),
             $urlGenerator,
+            $translator,
             $logger,
             'https://key-nest.com',
         );

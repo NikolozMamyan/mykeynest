@@ -22,7 +22,12 @@ class SessionManager
     ) {
     }
 
-    public function createSession(User $user, ?string $deviceName = null, ?string $deviceId = null): array
+    public function createSession(
+        User $user,
+        ?string $deviceName = null,
+        ?string $deviceId = null,
+        bool $trustUnknownDevice = false,
+    ): array
     {
         $request = $this->requestStack->getCurrentRequest();
         $ipAddress = $request?->getClientIp();
@@ -43,11 +48,18 @@ class SessionManager
             );
         }
 
-        if ($deviceAccessState !== UserDeviceManager::STATE_TRUSTED) {
+        if (
+            $deviceAccessState !== UserDeviceManager::STATE_TRUSTED
+            && !$trustUnknownDevice
+        ) {
             throw new \RuntimeException('La validation de cet appareil est requise.');
         }
 
-        $this->userDeviceManager->remember($user, $deviceId, $deviceName);
+        if ($deviceAccessState === UserDeviceManager::STATE_TRUSTED) {
+            $this->userDeviceManager->remember($user, $deviceId, $deviceName);
+        } else {
+            $this->userDeviceManager->trust($user, $deviceId, $deviceName);
+        }
 
         $plainToken = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $plainToken);

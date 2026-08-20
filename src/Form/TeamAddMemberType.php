@@ -13,19 +13,32 @@ class TeamAddMemberType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('email', EmailType::class, [
-                'label' => 'User Email',
-            ])
-            ->add('role', ChoiceType::class, [
-                'label' => 'Role',
+        $builder->add('email', EmailType::class, [
+            'label' => 'teams.show.members.add.email_label',
+        ]);
+
+        if ($options['company_team']) {
+            $builder->add('membershipType', ChoiceType::class, [
+                'label' => 'teams.show.members.add.type_label',
                 'choices' => [
-                    'Membre' => TeamRole::MEMBER,
-                    'Admin'  => TeamRole::ADMIN,
+                    'teams.show.members.add.type_employee' => 'employee',
+                    'teams.show.members.add.type_guest' => 'guest',
                 ],
                 'expanded' => false,
                 'multiple' => false,
+                'mapped' => false,
             ]);
+        }
+
+        $builder->add('role', ChoiceType::class, [
+            'label' => 'teams.show.members.add.role_label',
+            'choices' => [
+                'teams.show.members.add.role_member' => TeamRole::MEMBER,
+                'teams.show.members.add.role_admin' => TeamRole::ADMIN,
+            ],
+            'expanded' => false,
+            'multiple' => false,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -33,6 +46,8 @@ class TeamAddMemberType extends AbstractType
         // on utilise un simple array (pas d’entity liée directement)
         $resolver->setDefaults([
             'csrf_protection' => true,
+            'company_team' => false,
         ]);
+        $resolver->setAllowedTypes('company_team', 'bool');
     }
 }

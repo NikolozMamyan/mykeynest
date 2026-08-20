@@ -16,10 +16,12 @@
       'business_comparatif',
       'business_audit',
       'legal_cgu',
-      'legal_cgv'
+      'legal_cgv',
+      'legal_privacy'
     ] %}
     {% set sensitiveAuthRoutes = ['app_guest_register', 'app_guest_shared_preview'] %}
     {% set isSensitiveAuthRoute = currentRoute in sensitiveAuthRoutes %}
+    {% set analyticsExcludedRoutes = sensitiveAuthRoutes|merge(['legal_privacy']) %}
     {% set legacyMetaHead = block('meta_description')|trim %}
     {% set canonicalUrl = block('canonical_url')|trim %}
     {% if canonicalUrl is empty %}
@@ -48,16 +50,9 @@
 
     <title>{% block title %}MYKEYNEST - Gestionnaire de mots de passe securise{% endblock %}</title>
 
-    <script>
-      (() => {
-        const savedTheme = window.localStorage.getItem('theme') || 'light';
-        const themeColor = savedTheme === 'dark' ? '#0f172a' : '#f8fafc';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
-      })();
-    </script>
+    {% include 'components/parts/_theme_boot.html.twig' %}
 
-    {% if not isSensitiveAuthRoute %}
+    {% if currentRoute not in analyticsExcludedRoutes %}
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-RG9YT46TFS"></script>
       <script>
         window.dataLayer = window.dataLayer || [];
@@ -160,7 +155,7 @@
     {% endblock %}
   </head>
 
-  <body class="auth-layout" data-controller="pwa-install">
+  <body class="auth-layout {% block body_class %}{% endblock %}" data-controller="pwa-install">
     {% set route = app.request.attributes.get('_route') %}
 
     {% if route not in ['show_login', 'show_register', 'app_pending_login'] %}

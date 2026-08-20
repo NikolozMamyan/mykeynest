@@ -26,6 +26,7 @@
         {% else %}
           {% include 'components/parts/lang_switcher.html.twig' %}
         {% endif %}
+        {% include 'components/parts/theme_mode_btn.html.twig' %}
       </div>
 
       <a href="/#features" class="nav-link" data-action="click->nav#smoothScroll">{{ 'landing.nav.features'|trans }}</a>
@@ -49,6 +50,8 @@
       <a href="{{ path('app_install_app') }}" class="btn btn-outline">{{ 'landing.nav.install_hybrid_app'|trans }}</a>
       <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
       <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
+
+      {% include 'components/parts/theme_mode_btn.html.twig' %}
 
       <div class="nav-lang" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
         {% set route = app.request.attributes.get('_route') %}

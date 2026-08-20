@@ -96,7 +96,7 @@
         <span class="company-name">{{ fullName ?: app.user.company }}</span>
       </button>
 
-      {% if not app.user.hasActiveSubscription %}
+      {% if not has_effective_paid_plan(app.user) %}
         <a href="{{ path('app_subscription') }}"
            class="profile-upgrade-crown"
            aria-label="{{ 'header.upgrade.aria'|trans }}"

@@ -43,13 +43,25 @@
       <div class="ds-section-head">
         <div>
           <h2 class="ds-section-title">Inviter un membre</h2>
-          <p class="ds-section-text">Ajout direct ou invitation guest si le compte n existe pas encore.</p>
+          <p class="ds-section-text">
+            {% if team.organization %}
+              {{ 'teams.organization.invite.admin_description_company'|trans }}
+            {% else %}
+              {{ 'teams.organization.invite.admin_description_personal'|trans }}
+            {% endif %}
+          </p>
         </div>
       </div>
 
       <form method="post" action="{{ path('admin_team_member_add', {id: team.id}) }}" class="ds-stack-md">
         <input type="hidden" name="_token" value="{{ csrf_token('admin_team_add_member_' ~ team.id) }}">
         <input class="ds-input" type="email" name="email" placeholder="email@exemple.com" required>
+        {% if team.organization %}
+          <select class="ds-select" name="membership_type">
+            <option value="employee">{{ 'teams.organization.invite.admin_type_employee'|trans }}</option>
+            <option value="guest">{{ 'teams.organization.invite.admin_type_guest'|trans }}</option>
+          </select>
+        {% endif %}
         <select class="ds-select" name="role">
           <option value="MEMBER">Membre</option>
           <option value="ADMIN">Admin</option>

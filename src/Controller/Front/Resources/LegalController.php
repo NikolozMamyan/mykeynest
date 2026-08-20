@@ -36,5 +36,14 @@ private function commonVars(): array
             'page_title' => 'Conditions Générales de Vente (CGV)',
         ]);
     }
+
+    #[Route('/privacy', name: 'legal_privacy', methods: ['GET'])]
+    public function privacy(): Response
+    {
+        $variables = $this->commonVars();
+        $variables['updated_at'] = new \DateTimeImmutable('2026-08-20');
+
+        return $this->render('legal/privacy.html.twig', $variables);
+    }
 }
 
