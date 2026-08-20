@@ -9,7 +9,7 @@
       <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
     </div>
     <h1 style="margin:0 0 .75rem;font-size:2rem;color:#0f172a;">Paiement confirme</h1>
-    <p style="margin:0 0 1rem;color:#475569;line-height:1.7;">Votre abonnement Pro est en cours d activation. Si vous venez de payer sans compte existant, un email vient de vous etre envoye pour definir votre mot de passe.</p>
+    <p style="margin:0 0 1rem;color:#475569;line-height:1.7;">Votre abonnement {{ plan|upper }} {{ synchronized ? 'est actif' : 'est en cours d activation' }}. Si vous venez de payer sans compte existant, un email vient de vous etre envoye pour definir votre mot de passe.</p>
     <p style="margin:0 0 2rem;color:#64748b;line-height:1.7;">Si vous aviez deja un compte, vous recevrez un email de confirmation et vous pouvez vous reconnecter normalement.</p>
     <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
       <a href="{{ path('show_login') }}" class="btn btn-primary">Se connecter</a>

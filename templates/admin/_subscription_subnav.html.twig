@@ -11,4 +11,9 @@
      class="admin-subnav__link {{ currentRoute == 'admin_subscription_plans' ? 'is-active' : '' }}">
     Plans
   </a>
+  <i class="fas fa-chevron-right admin-subnav__separator" aria-hidden="true"></i>
+  <a href="{{ path('admin_subscription_payment') }}"
+     class="admin-subnav__link {{ currentRoute == 'admin_subscription_payment' ? 'is-active' : '' }}">
+    {{ 'admin_payment.nav'|trans }}
+  </a>
 </nav>

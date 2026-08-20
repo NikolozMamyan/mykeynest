@@ -33,6 +33,21 @@ class UserSubscription
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $planCode = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripePriceId = null;
+
+    #[ORM\Column(length: 20, options: ['default' => 'production'])]
+    private string $stripeMode = 'production';
+
+    #[ORM\Column(options: ['default' => 1])]
+    private int $quantity = 1;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $currentPeriodEnd = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $cancelAtPeriodEnd = false;
+
     #[ORM\Column(options: ['default' => false])]
     private bool $isActive = false;
 
@@ -117,6 +132,66 @@ class UserSubscription
     public function setPlanCode(?string $planCode): static
     {
         $this->planCode = $planCode;
+
+        return $this;
+    }
+
+    public function getStripePriceId(): ?string
+    {
+        return $this->stripePriceId;
+    }
+
+    public function setStripePriceId(?string $stripePriceId): static
+    {
+        $this->stripePriceId = $stripePriceId;
+
+        return $this;
+    }
+
+    public function getStripeMode(): string
+    {
+        return $this->stripeMode;
+    }
+
+    public function setStripeMode(string $stripeMode): static
+    {
+        $this->stripeMode = $stripeMode;
+
+        return $this;
+    }
+
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): static
+    {
+        $this->quantity = max(1, $quantity);
+
+        return $this;
+    }
+
+    public function getCurrentPeriodEnd(): ?\DateTimeImmutable
+    {
+        return $this->currentPeriodEnd;
+    }
+
+    public function setCurrentPeriodEnd(?\DateTimeImmutable $currentPeriodEnd): static
+    {
+        $this->currentPeriodEnd = $currentPeriodEnd;
+
+        return $this;
+    }
+
+    public function isCancelAtPeriodEnd(): bool
+    {
+        return $this->cancelAtPeriodEnd;
+    }
+
+    public function setCancelAtPeriodEnd(bool $cancelAtPeriodEnd): static
+    {
+        $this->cancelAtPeriodEnd = $cancelAtPeriodEnd;
 
         return $this;
     }

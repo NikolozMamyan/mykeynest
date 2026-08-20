@@ -1,69 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Paiement réussi{% endblock %}
+{% block title %}Paiement confirme{% endblock %}
 
 {% block body %}
-<div class="subscription-result success">
-
-    <div class="icon">✅</div>
-
-    <h1>Paiement confirmé</h1>
-
-    <p>
-        Merci pour ton paiement 🎉  
-        Ton abonnement est en cours d’activation.
-    </p>
-
-    <p class="hint">
-        Cela peut prendre quelques secondes.  
-        Tu peux rafraîchir la page ou continuer à utiliser l’application.
-    </p>
-
-    <div class="actions">
-        <a href="{{ path('app_dashboard') }}" class="btn primary">
-            Retour au tableau de bord
-        </a>
-
-        <a href="{{ path('app_credential') }}" class="btn secondary">
-            Lets go
-        </a>
-    </div>
-
-</div>
+<section class="billing-result" data-active="{{ synchronized ? '1' : '0' }}">
+  <div class="billing-result__icon"><i class="fa-solid fa-circle-check"></i></div>
+  <p class="billing-result__eyebrow">Paiement confirme</p>
+  <h1>Votre abonnement est pret</h1>
+  <p id="billing-status-text">
+    {{ synchronized
+      ? 'Vos nouveaux droits sont actifs. Redirection vers votre tableau de bord…'
+      : 'Nous finalisons vos nouveaux droits. Cette page se met a jour automatiquement.' }}
+  </p>
+  <div class="billing-result__loader" aria-hidden="true"><span></span><span></span><span></span></div>
+  <a href="{{ path('app_dashboard') }}" class="billing-result__link">Continuer maintenant</a>
+</section>
 
 <style>
-.subscription-result {
-    max-width: 520px;
-    margin: 80px auto;
-    text-align: center;
-}
-.icon {
-    font-size: 64px;
-    margin-bottom: 20px;
-}
-.actions {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-.btn {
-    padding: 12px 22px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-}
-.btn.primary {
-    background: #4f46e5;
-    color: white;
-}
-.btn.secondary {
-    border: 1px solid #ddd;
-    color: #333;
-}
-.hint {
-    font-size: 14px;
-    color: #666;
-}
+.billing-result{max-width:560px;margin:9vh auto;padding:48px 32px;text-align:center;background:var(--color-white);border:1px solid var(--color-border);border-radius:4px;box-shadow:var(--shadow-lg)}
+.billing-result__icon{width:56px;height:56px;margin:0 auto 18px;display:grid;place-items:center;border-radius:50%;background:rgba(5,150,105,.1);color:var(--color-primary);font-size:24px}
+.billing-result__eyebrow{margin:0 0 8px;color:var(--color-primary);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.billing-result h1{margin:0 0 12px;color:var(--color-text-dark);font-size:30px}
+.billing-result p{color:var(--color-text-muted);line-height:1.65}
+.billing-result__loader{height:20px;margin:18px 0;display:flex;align-items:center;justify-content:center;gap:6px}
+.billing-result__loader span{width:7px;height:7px;border-radius:50%;background:var(--color-primary);animation:billingPulse 1s ease-in-out infinite}
+.billing-result__loader span:nth-child(2){animation-delay:.15s}.billing-result__loader span:nth-child(3){animation-delay:.3s}
+.billing-result__link{display:inline-flex;color:var(--color-primary);font-weight:700;text-decoration:none}
+@keyframes billingPulse{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
 </style>
+
+<script>
+(() => {
+  const root = document.querySelector('.billing-result');
+  const dashboardUrl = {{ path('app_dashboard')|json_encode|raw }};
+  const statusUrl = {{ path('app_subscription_status')|json_encode|raw }};
+  let attempts = 0;
+
+  const finish = () => window.setTimeout(() => window.location.replace(dashboardUrl), 500);
+  if (root?.dataset.active === '1') {
+    finish();
+    return;
+  }
+
+  const timer = window.setInterval(async () => {
+    attempts += 1;
+    try {
+      const response = await fetch(statusUrl, {headers: {'Accept': 'application/json'}, cache: 'no-store'});
+      const payload = response.ok ? await response.json() : null;
+      if (payload?.active === true) {
+        window.clearInterval(timer);
+        document.querySelector('#billing-status-text').textContent = 'Abonnement active. Redirection…';
+        finish();
+      }
+    } catch (error) {
+      // Stripe retries the webhook; the next poll can still complete normally.
+    }
+
+    if (attempts >= 20) {
+      window.clearInterval(timer);
+      document.querySelector('#billing-status-text').textContent = 'Paiement confirme. Vos droits seront actualises automatiquement dans quelques instants.';
+    }
+  }, 750);
+})();
+</script>
 {% endblock %}

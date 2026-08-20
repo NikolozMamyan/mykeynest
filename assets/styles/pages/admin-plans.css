@@ -7,6 +7,8 @@
   border-radius: var(--border-radius);
   background: var(--color-white);
   box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .admin-subnav__root {
@@ -28,12 +30,194 @@
   font-size: 0.9rem;
   font-weight: 700;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .admin-subnav__link:hover,
 .admin-subnav__link.is-active {
   background: var(--color-bg-hover);
   color: var(--color-primary);
+}
+
+.admin-payment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-payment-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1.15rem;
+  border: 1px solid var(--glass-card-border);
+  border-radius: var(--border-radius);
+  background: var(--glass-card-bg);
+  box-shadow: var(--glass-card-shadow);
+  backdrop-filter: var(--glass-card-blur);
+}
+
+.admin-payment-card.is-active {
+  border-color: rgba(5, 150, 105, 0.42);
+  box-shadow: 0 16px 38px rgba(5, 150, 105, 0.1);
+}
+
+.admin-payment-card.is-active.is-incomplete {
+  border-color: rgba(245, 158, 11, 0.42);
+  box-shadow: 0 16px 38px rgba(245, 158, 11, 0.08);
+}
+
+.admin-payment-card.is-production:not(.is-active) {
+  border-color: rgba(248, 113, 113, 0.28);
+}
+
+.admin-payment-card__header {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.8rem;
+}
+
+.admin-payment-card__icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--border-radius);
+  background: rgba(59, 130, 246, 0.1);
+  color: #1e3a8a;
+  font-size: 1.1rem;
+}
+
+.is-production .admin-payment-card__icon {
+  background: rgba(248, 113, 113, 0.14);
+  color: #ef4444;
+}
+
+.admin-payment-card__heading h2 {
+  margin: 0.15rem 0 0.25rem;
+  color: var(--color-text-dark);
+  font-size: 1.15rem;
+}
+
+.admin-payment-card__heading p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.admin-payment-card__active {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  font-size: 0.65rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.admin-payment-card__active.is-warning {
+  background: rgba(245, 158, 11, 0.13);
+  color: #b45309;
+}
+
+.admin-payment-checks {
+  display: grid;
+  gap: 0.55rem;
+  margin: 1rem 0;
+}
+
+.admin-payment-check {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 42px;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.admin-payment-check.is-configured {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.admin-payment-check.is-missing {
+  background: rgba(248, 113, 113, 0.09);
+  color: #dc2626;
+}
+
+.admin-payment-check code {
+  color: inherit;
+  font-size: 0.7rem;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.admin-payment-card__footer {
+  margin-top: auto;
+  padding-top: 0.15rem;
+}
+
+.admin-payment-live-button {
+  border: 0;
+  background: linear-gradient(135deg, #ef4444, #fb5f3d);
+  color: #fff;
+  box-shadow: 0 9px 22px rgba(239, 68, 68, 0.18);
+}
+
+.admin-payment-webhook {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.admin-payment-webhook__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: rgba(5, 150, 105, 0.1);
+  color: var(--color-primary);
+}
+
+.admin-payment-webhook code {
+  display: inline-block;
+  margin-top: 0.7rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-light);
+  color: var(--color-text-dark);
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.admin-payment-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--border-radius);
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--color-text-medium);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.admin-payment-note i {
+  margin-top: 0.15rem;
+  color: #2563eb;
+}
+
+.admin-payment-note p {
+  margin: 0;
 }
 
 .admin-plan-grid {
@@ -380,7 +564,8 @@
 }
 
 @media (max-width: 1024px) {
-  .admin-plan-grid {
+  .admin-plan-grid,
+  .admin-payment-grid {
     grid-template-columns: 1fr;
   }
 }

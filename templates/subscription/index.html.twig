@@ -768,6 +768,38 @@
         </div>
       </div>
 
+      <!-- TEAM -->
+      <div class="pricing-card">
+        <div class="card-header">
+          <div class="card-icon-wrapper">
+            <div class="card-icon-bg"></div>
+            <div class="card-icon"><i class="fa-solid fa-users-gear"></i></div>
+          </div>
+
+          <h3 class="plan-name">{{ 'subscription.plans.team.name'|trans }}</h3>
+          <div class="plan-price-wrapper">
+            <span class="plan-price">5,49€</span><small>{{ 'subscription.plans.team.price_suffix'|trans }}</small>
+          </div>
+          <p class="plan-description">{{ 'subscription.plans.team.description'|trans }}</p>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-body">
+          <ul class="features-list">
+            <li><span class="feature-icon"><i class="fa-solid fa-user-group"></i></span> {{ 'subscription.plans.team.minimum_seats'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-key"></i></span> {{ 'subscription.plans.limits.credentials_unlimited'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-share-nodes"></i></span> {{ 'subscription.plans.limits.shares_unlimited'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-puzzle-piece"></i></span> {{ 'subscription.plans.limits.extension_installations_unlimited'|trans }}</li>
+            <li><span class="feature-icon"><i class="fa-solid fa-user-shield"></i></span> {{ 'subscription.plans.team.centralized_admin'|trans }}</li>
+          </ul>
+
+          <a class="cta-button" href="{{ path('app_subscription_checkout_team') }}">
+            {{ 'subscription.plans.team.cta_upgrade'|trans }}
+          </a>
+        </div>
+      </div>
+
     </div>
   </section>
   {% endif %}

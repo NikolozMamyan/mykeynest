@@ -24,5 +24,25 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Service\StripePlanCatalog:
+        arguments:
+            $teamMinimumSeats: '%env(int:STRIPE_TEAM_MIN_SEATS)%'
+            $teamMaximumSeats: '%env(int:STRIPE_TEAM_MAX_SEATS)%'
+
+    App\Service\StripeEnvironmentManager:
+        arguments:
+            $sandboxSecretKey: '%env(STRIPE_SANDBOX_SECRET_KEY)%'
+            $sandboxProPriceId: '%env(STRIPE_SANDBOX_PRICE_PRO)%'
+            $sandboxTeamPriceId: '%env(STRIPE_SANDBOX_PRICE_TEAM)%'
+            $sandboxWebhookSecret: '%env(STRIPE_SANDBOX_WEBHOOK_SECRET)%'
+            $productionSecretKey: '%env(STRIPE_PRODUCTION_SECRET_KEY)%'
+            $productionProPriceId: '%env(STRIPE_PRODUCTION_PRICE_PRO)%'
+            $productionTeamPriceId: '%env(STRIPE_PRODUCTION_PRICE_TEAM)%'
+            $productionWebhookSecret: '%env(STRIPE_PRODUCTION_WEBHOOK_SECRET)%'
+
+    App\Service\StripeBillingService:
+        arguments:
+            $appUrl: '%env(APP_URL)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

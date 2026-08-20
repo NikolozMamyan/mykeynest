@@ -174,56 +174,88 @@
   <div class="wrap">
     <div class="sh">
       <span class="sh-label"><i class="fas fa-tag"></i> {{ 'landing.pricing.label'|trans }}</span>
-      <h2>{{ 'landing.pricing.title'|trans }}</h2>
-      <p>{{ 'landing.pricing.subtitle'|trans }}</p>
+      <h2>{{ 'landing.pricing.showcase.title'|trans }}</h2>
+      <p>{{ 'landing.pricing.showcase.subtitle'|trans }}</p>
+      <span class="pricing-cycle"><i class="fas fa-calendar-check"></i> {{ 'landing.pricing.showcase.billing'|trans }}</span>
     </div>
+
+    {% set landingFreePlan = subscription_plan('free') %}
     <div class="p-grid">
       <div class="p-card">
-        <p class="p-eye">{{ 'landing.pricing.plan.free_badge'|trans }}</p>
-        <h3>{{ 'landing.pricing.plan.basic_name'|trans }}</h3>
-        <p class="p-tag">{{ 'landing.pricing.plan.basic_tagline'|trans }}</p>
-        <p class="p-price">0€ <small>{{ 'landing.pricing.plan.per_month'|trans }}</small></p>
+        <div class="p-card-head">
+          <p class="p-eye">{{ 'landing.pricing.showcase.starter.eyebrow'|trans }}</p>
+          <h3>{{ 'landing.pricing.showcase.starter.name'|trans }}</h3>
+          <p class="p-tag">{{ 'landing.pricing.showcase.starter.target'|trans }}</p>
+          <p class="p-price"><span>0€</span> <small>{{ 'landing.pricing.showcase.per_month'|trans }}</small></p>
+          <a href="{{ path('show_register') }}" class="btn p-cta" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">{{ 'landing.pricing.showcase.starter.cta'|trans }}</a>
+        </div>
+        <p class="p-included"><i class="fas fa-user"></i> {{ 'landing.pricing.showcase.starter.included'|trans }}</p>
         <ul class="p-feats">
-          {% set landingFreePlan = subscription_plan('free') %}
-          <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.credentials is null ? 'subscription.plans.limits.credentials_unlimited' : 'subscription.plans.limits.credentials')|trans({'%limit%': landingFreePlan.limits.credentials}) }}</li>
-          <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.shares is null ? 'subscription.plans.limits.shares_unlimited' : 'subscription.plans.limits.shares')|trans({'%limit%': landingFreePlan.limits.shares}) }}</li>
-          <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.teams is null ? 'subscription.plans.limits.teams_unlimited' : 'subscription.plans.limits.teams')|trans({'%limit%': landingFreePlan.limits.teams}) }}</li>
-          {% if landingFreePlan.features.password_generator %}
-            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.password_generator'|trans }}</li>
-          {% endif %}
-          {% if landingFreePlan.limits.extension_installations != 0 %}
-            <li><i class="fas fa-check"></i> {{ (landingFreePlan.limits.extension_installations is null ? 'subscription.plans.limits.extension_installations_unlimited' : 'subscription.plans.limits.extension_installations')|trans({'%limit%': landingFreePlan.limits.extension_installations}) }}</li>
-          {% endif %}
-          {% if landingFreePlan.features.secure_notes %}
-            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.secure_notes'|trans }}</li>
-          {% endif %}
-          {% if landingFreePlan.features.security_checker %}
-            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.security_checker'|trans }}</li>
-          {% endif %}
-          {% if landingFreePlan.features.credential_import %}
-            <li><i class="fas fa-check"></i> {{ 'subscription.plans.features.credential_import'|trans }}</li>
-          {% endif %}
+          <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ landingFreePlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ landingFreePlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-wand-magic-sparkles"></i></span><b>{{ 'landing.pricing.showcase.features.generator'|trans }}</b><i class="fas fa-check p-yes"></i></li>
+          <li class="p-disabled"><span class="p-feature-icon"><i class="fas fa-mobile-screen"></i></span><b>{{ 'landing.pricing.showcase.features.two_factor'|trans }}</b><i class="fas fa-minus"></i></li>
+          <li class="p-disabled"><span class="p-feature-icon"><i class="fas fa-shield-halved"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><i class="fas fa-minus"></i></li>
         </ul>
-        <a href="{{ path('show_register') }}" class="btn btn-outline" style="width:100%" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">{{ 'landing.pricing.plan.basic_try'|trans }}</a>
       </div>
+
       <div class="p-card pop" aria-label="{{ 'landing.pricing.plan.pro_reco_aria'|trans }}">
-        <div class="pop-badge">{{ 'landing.pricing.plan.popular_badge'|trans }}</div>
-        <p class="p-eye">{{ 'landing.pricing.plan.pro_name'|trans }}</p>
-        <h3>Plan Pro</h3>
-        <p class="p-tag">{{ 'landing.pricing.plan.pro_tagline'|trans }}</p>
-        <p class="p-price">6,99€ <small>{{ 'landing.pricing.plan.per_month'|trans }}</small></p>
+        <div class="pop-badge"><i class="fas fa-fire"></i> {{ 'landing.pricing.plan.popular_badge'|trans }}</div>
+        <div class="p-card-head">
+          <p class="p-eye">{{ 'landing.pricing.showcase.pro.eyebrow'|trans }}</p>
+          <h3>{{ 'landing.pricing.showcase.pro.name'|trans }}</h3>
+          <p class="p-tag">{{ 'landing.pricing.showcase.pro.target'|trans }}</p>
+          <p class="p-price"><span>6,99€</span> <small>{{ 'landing.pricing.showcase.per_user_month'|trans }}</small></p>
+          <a href="{{ path('app_public_subscription_checkout_pro') }}" class="btn p-cta p-cta-primary" aria-label="{{ 'landing.pricing.plan.pro_aria'|trans }}">{{ 'landing.pricing.showcase.pro.cta'|trans }} <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <p class="p-included"><i class="fas fa-user"></i> {{ 'landing.pricing.showcase.pro.included'|trans }}</p>
         <ul class="p-feats">
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_1'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_2'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_3'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_4'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_5'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_6'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_7'|trans }}</li>
-          <li><i class="fas fa-check"></i> {{ 'landing.pricing.plan.features.pro_8'|trans }}</li>
+          <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-mobile-screen"></i></span><b>{{ 'landing.pricing.showcase.features.two_factor'|trans }}</b><i class="fas fa-check p-yes"></i></li>
+          <li><span class="p-feature-icon"><i class="fas fa-shield-halved"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><span>{{ 'landing.pricing.showcase.pro.audit'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-headset"></i></span><b>{{ 'landing.pricing.showcase.features.support'|trans }}</b><span>&lt; 2h</span></li>
         </ul>
-        <a href="{{ path('app_public_subscription_checkout_pro') }}" class="btn btn-primary" style="width:100%" aria-label="{{ 'landing.pricing.plan.pro_aria'|trans }}">{{ 'landing.pricing.plan.pro_choose'|trans }}</a>
-        <p class="p-note"><i class="fas fa-tag"></i> {{ 'landing.pricing.plan.pro_annual'|trans }}</p>
+      </div>
+
+      <div class="p-card">
+        <div class="p-card-head">
+          <p class="p-eye">{{ 'landing.pricing.showcase.team.eyebrow'|trans }}</p>
+          <h3>{{ 'landing.pricing.showcase.team.name'|trans }}</h3>
+          <p class="p-tag">{{ 'landing.pricing.showcase.team.target'|trans }}</p>
+          <p class="p-price"><span>5,49€</span> <small>{{ 'landing.pricing.showcase.per_user_month'|trans }}</small></p>
+          <a href="{{ path('app_public_subscription_checkout_team') }}" class="btn p-cta" aria-label="{{ 'landing.pricing.showcase.team.aria'|trans }}">{{ 'landing.pricing.showcase.team.cta'|trans }}</a>
+        </div>
+        <p class="p-included"><i class="fas fa-users"></i> {{ 'landing.pricing.showcase.team.included'|trans }}</p>
+        <ul class="p-feats">
+          <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-user-shield"></i></span><b>{{ 'landing.pricing.showcase.features.admin'|trans }}</b><i class="fas fa-check p-yes"></i></li>
+          <li><span class="p-feature-icon"><i class="fas fa-file-shield"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><span>{{ 'landing.pricing.showcase.team.audit'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-headset"></i></span><b>{{ 'landing.pricing.showcase.features.support'|trans }}</b><span>{{ 'landing.pricing.showcase.team.support'|trans }}</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pricing-comparison">
+      <div class="pricing-comparison__heading">
+        <span>{{ 'landing.pricing.showcase.comparison.eyebrow'|trans }}</span>
+        <h3>{{ 'landing.pricing.showcase.comparison.title'|trans }}</h3>
+      </div>
+      <div class="pricing-table-wrap">
+        <table class="pricing-table">
+          <thead><tr><th>{{ 'landing.pricing.showcase.comparison.feature'|trans }}</th><th>Starter</th><th>Pro</th><th>Team</th></tr></thead>
+          <tbody>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.passwords'|trans }}</th><td>{{ landingFreePlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.shares'|trans }}</th><td>{{ landingFreePlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.two_factor'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td><i class="fas fa-check p-yes"></i></td><td><i class="fas fa-check p-yes"></i></td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.audit'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td>{{ 'landing.pricing.showcase.pro.audit'|trans }}</td><td>{{ 'landing.pricing.showcase.team.audit'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.support'|trans }}</th><td>{{ 'landing.pricing.showcase.starter.support'|trans }}</td><td>{{ 'landing.pricing.showcase.pro.support'|trans }}</td><td>{{ 'landing.pricing.showcase.team.support'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.onboarding'|trans }}</th><td>{{ 'landing.pricing.showcase.starter.onboarding'|trans }}</td><td>{{ 'landing.pricing.showcase.pro.onboarding'|trans }}</td><td>{{ 'landing.pricing.showcase.team.onboarding'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.phishing'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td>{{ 'landing.pricing.showcase.pro.phishing'|trans }}</td><td>{{ 'landing.pricing.showcase.team.phishing'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.admin'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td><i class="fas fa-minus p-no"></i></td><td>{{ 'landing.pricing.showcase.team.admin'|trans }}</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

@@ -13,6 +13,49 @@
     "settings": "Settings",
     "subscription": "Subscriptions"
   },
+  "admin_subscription_billing": {
+    "seats": "%quantity% seat(s)",
+    "period_end": "Period ending %date%",
+    "cancel_scheduled": " · cancellation scheduled"
+  },
+  "admin_payment": {
+    "title": "Stripe Payment Admin",
+    "nav": "Payment",
+    "heading": "Payment configuration",
+    "intro": "Choose the mode used for new payments without editing environment variables on every switch.",
+    "mode_selection": "Stripe mode selection",
+    "active": "Active",
+    "active_button": "Active mode",
+    "active_incomplete_button": "Active mode · incomplete configuration",
+    "use_mode": "Use this mode",
+    "incomplete_button": "Incomplete configuration",
+    "sandbox": {
+      "name": "Sandbox",
+      "description": "Test mode used to validate the payment journey."
+    },
+    "production": {
+      "name": "Live",
+      "description": "Production mode with real payments.",
+      "confirm": "Enable Stripe Live for all new payments?"
+    },
+    "checks": {
+      "secret_key": "Secret key configured",
+      "pro_price": "Pro Price configured",
+      "team_price": "Team Price configured",
+      "webhook": "Webhook configured"
+    },
+    "webhook": {
+      "title": "Webhook address",
+      "description": "Use this same address for both Stripe Sandbox and Live destinations. The server automatically detects the matching signing secret."
+    },
+    "security_note": "Secrets are never stored in the database or displayed in the admin. The switch only stores the active mode; each environment continues to receive its own webhooks.",
+    "flash": {
+      "invalid_csrf": "Invalid CSRF token. The payment mode was not changed.",
+      "production_active": "Stripe Live is now used for new payments.",
+      "sandbox_active": "Stripe Sandbox is now used for new payments.",
+      "incomplete": "This mode cannot be enabled because its Stripe configuration is incomplete."
+    }
+  },
   "support_chat": {
     "title": "MYKEYNEST",
     "status": "Online - reply within 24h",
@@ -236,6 +279,69 @@
       "aria": "MYKEYNEST pricing plans",
       "title": "A simple and transparent plan",
       "subtitle": "Start for free, upgrade to premium when you need it.",
+      "showcase": {
+        "title": "A plan for every stage of growth",
+        "subtitle": "Protect your access today, then scale MYKEYNEST as your team grows.",
+        "billing": "Monthly billing · No commitment",
+        "per_month": "/ month",
+        "per_user_month": "/ user / month",
+        "unlimited": "Unlimited",
+        "features": {
+          "passwords": "Passwords",
+          "shares": "Secure shares",
+          "generator": "Generator & autofill",
+          "two_factor": "2FA authentication",
+          "audit": "Security audit",
+          "support": "Support",
+          "admin": "Centralized administration"
+        },
+        "starter": {
+          "eyebrow": "To get started",
+          "name": "Starter",
+          "target": "Independent professionals, freelancers and product discovery.",
+          "cta": "Start for free",
+          "included": "1 user included",
+          "support": "Standard email support",
+          "onboarding": "Self-service"
+        },
+        "pro": {
+          "eyebrow": "To move forward",
+          "name": "Pro",
+          "target": "SMBs with 1 to 5 people that want to secure every access.",
+          "cta": "Choose Pro",
+          "included": "1 user account included",
+          "audit": "Standard",
+          "support": "Priority response under 2 hours",
+          "onboarding": "Self-service + guide",
+          "phishing": "Self-paced training"
+        },
+        "team": {
+          "eyebrow": "For teams",
+          "name": "Team",
+          "target": "SMBs with 6+ people, agencies and organizations.",
+          "cta": "Choose Team",
+          "aria": "Choose the Team plan",
+          "included": "6 users minimum · adjustable quantity",
+          "audit": "Enhanced + monthly report",
+          "support": "Dedicated named contact",
+          "onboarding": "Guided video onboarding",
+          "phishing": "Live team session",
+          "admin": "Role-based access management"
+        },
+        "comparison": {
+          "eyebrow": "Full comparison",
+          "title": "The right level of support, with no surprises",
+          "feature": "Feature",
+          "passwords": "Passwords",
+          "shares": "Shares",
+          "two_factor": "2FA authentication",
+          "audit": "Security audit",
+          "support": "Support",
+          "onboarding": "Onboarding",
+          "phishing": "Team phishing awareness",
+          "admin": "Centralized administration"
+        }
+      },
       "plan": {
         "free_badge": "Free",
         "popular_badge": "Recommended",
@@ -249,7 +355,7 @@
         "pro_choose": "Choose Pro",
         "pro_aria": "Choose the Pro plan",
         "pro_reco_aria": "Recommended offer",
-        "pro_annual": "Annual billing available — save up to 20%",
+        "pro_annual": "Monthly billing, no commitment",
         "features": {
           "basic_1": "5 passwords",
           "basic_2": "Up to 5 shares",
@@ -1153,6 +1259,14 @@
           "f4": "Generator + security checker"
         },
         "cta_upgrade": "Upgrade to Pro"
+      },
+      "team": {
+        "name": "Team",
+        "price_suffix": "/user/month",
+        "description": "For SMBs with 6+ people that need centralized administration.",
+        "minimum_seats": "6 accounts minimum, adjustable quantity",
+        "centralized_admin": "Centralized role-based access management",
+        "cta_upgrade": "Upgrade to Team"
       }
     },
     "tools": {

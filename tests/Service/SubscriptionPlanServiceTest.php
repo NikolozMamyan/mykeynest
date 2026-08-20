@@ -19,13 +19,27 @@ final class SubscriptionPlanServiceTest extends TestCase
         $proUser = $this->createSubscribedUser('pro');
         $teamUser = $this->createSubscribedUser('team');
 
-        self::assertSame(5, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_CREDENTIALS));
-        self::assertSame(3, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_SHARES));
+        self::assertSame(15, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_CREDENTIALS));
+        self::assertSame(5, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_SHARES));
         self::assertSame(1, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_TEAMS));
         self::assertFalse($service->hasFeature($freeUser, SubscriptionPlanService::FEATURE_SECURE_NOTES));
         self::assertNull($service->getLimit($proUser, SubscriptionPlanService::LIMIT_CREDENTIALS));
         self::assertSame(1, $service->getLimit($proUser, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
         self::assertNull($service->getLimit($teamUser, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
+    }
+
+    public function testStripeTeamInstallationsAreLimitedToPaidSeatsWithoutChangingLegacyTeams(): void
+    {
+        $service = $this->createService();
+        $teamUser = $this->createSubscribedUser('team');
+        $teamUser->getUserSubscription()
+            ->setStripePriceId('price_team')
+            ->setQuantity(8);
+
+        self::assertSame(8, $service->getLimit(
+            $teamUser,
+            SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS,
+        ));
     }
 
     public function testStoredFreeConfigurationOverridesOnlyConfiguredRules(): void

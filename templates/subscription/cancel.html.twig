@@ -15,7 +15,7 @@
     </p>
 
     <div class="actions">
-        <a href="{{ path('app_subscription_checkout_pro') }}" class="btn primary">
+        <a href="{{ path(plan == 'team' ? 'app_subscription_checkout_team' : 'app_subscription_checkout_pro') }}" class="btn primary">
             Réessayer
         </a>
 

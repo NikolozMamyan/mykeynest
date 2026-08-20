@@ -1,0 +1,86 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ 'admin_payment.title'|trans }}{% endblock %}
+{% block admin_page_title %}{{ 'admin_payment.heading'|trans }}{% endblock %}
+{% block admin_page_intro %}{{ 'admin_payment.intro'|trans }}{% endblock %}
+
+{% block admin_subnav %}
+  {% include 'admin/_subscription_subnav.html.twig' %}
+{% endblock %}
+
+{% block admin_content %}
+  <section class="admin-payment-grid" aria-label="{{ 'admin_payment.mode_selection'|trans }}">
+    {% for modeName in ['sandbox', 'production'] %}
+      {% set mode = stripeModes[modeName] %}
+      {% set isProduction = modeName == 'production' %}
+      <article class="admin-payment-card {{ mode.active ? 'is-active' : '' }} {{ mode.ready ? '' : 'is-incomplete' }} {{ isProduction ? 'is-production' : 'is-sandbox' }}">
+        <header class="admin-payment-card__header">
+          <span class="admin-payment-card__icon">
+            <i class="fas {{ isProduction ? 'fa-bolt' : 'fa-flask' }}" aria-hidden="true"></i>
+          </span>
+          <div class="admin-payment-card__heading">
+            <h2>{{ (isProduction ? 'admin_payment.production.name' : 'admin_payment.sandbox.name')|trans }}</h2>
+            <p>{{ (isProduction ? 'admin_payment.production.description' : 'admin_payment.sandbox.description')|trans }}</p>
+          </div>
+          {% if mode.active %}
+            <span class="admin-payment-card__active {{ mode.ready ? '' : 'is-warning' }}">{{ 'admin_payment.active'|trans }}</span>
+          {% endif %}
+        </header>
+
+        <div class="admin-payment-checks">
+          {% set checks = [
+            { value: mode.secretKey, label: 'admin_payment.checks.secret_key', env: isProduction ? 'STRIPE_PRODUCTION_SECRET_KEY' : 'STRIPE_SANDBOX_SECRET_KEY' },
+            { value: mode.proPriceId, label: 'admin_payment.checks.pro_price', env: isProduction ? 'STRIPE_PRODUCTION_PRICE_PRO' : 'STRIPE_SANDBOX_PRICE_PRO' },
+            { value: mode.teamPriceId, label: 'admin_payment.checks.team_price', env: isProduction ? 'STRIPE_PRODUCTION_PRICE_TEAM' : 'STRIPE_SANDBOX_PRICE_TEAM' },
+            { value: mode.webhookSecret, label: 'admin_payment.checks.webhook', env: isProduction ? 'STRIPE_PRODUCTION_WEBHOOK_SECRET' : 'STRIPE_SANDBOX_WEBHOOK_SECRET' }
+          ] %}
+          {% for check in checks %}
+            <div class="admin-payment-check {{ check.value.configured ? 'is-configured' : 'is-missing' }}">
+              <i class="fas {{ check.value.configured ? 'fa-circle-check' : 'fa-circle-xmark' }}" aria-hidden="true"></i>
+              <span>{{ check.label|trans }}</span>
+              <code>{{ check.value.configured ? check.value.masked : check.env }}</code>
+            </div>
+          {% endfor %}
+        </div>
+
+        <footer class="admin-payment-card__footer">
+          {% if mode.active %}
+            <button class="ds-btn ds-btn--secondary" type="button" disabled>
+              {{ (mode.ready ? 'admin_payment.active_button' : 'admin_payment.active_incomplete_button')|trans }}
+            </button>
+          {% elseif mode.ready %}
+            <form method="post"
+                  action="{{ path('admin_subscription_payment') }}"
+                  {% if isProduction %}onsubmit="return confirm('{{ 'admin_payment.production.confirm'|trans|e('js') }}');"{% endif %}>
+              <input type="hidden" name="_token" value="{{ csrf_token('stripe_payment_mode') }}">
+              <input type="hidden" name="mode" value="{{ modeName }}">
+              <button class="ds-btn {{ isProduction ? 'admin-payment-live-button' : 'ds-btn--primary' }}" type="submit">
+                {{ 'admin_payment.use_mode'|trans }}
+              </button>
+            </form>
+          {% else %}
+            <button class="ds-btn ds-btn--secondary" type="button" disabled>
+              {{ 'admin_payment.incomplete_button'|trans }}
+            </button>
+          {% endif %}
+        </footer>
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="ds-surface admin-payment-webhook">
+    <div class="admin-payment-webhook__icon">
+      <i class="fas fa-link" aria-hidden="true"></i>
+    </div>
+    <div>
+      <h2 class="ds-section-title">{{ 'admin_payment.webhook.title'|trans }}</h2>
+      <p class="ds-section-text">{{ 'admin_payment.webhook.description'|trans }}</p>
+      <code>{{ webhookUrl }}</code>
+    </div>
+  </section>
+
+  <section class="admin-payment-note">
+    <i class="fas fa-shield-halved" aria-hidden="true"></i>
+    <p>{{ 'admin_payment.security_note'|trans }}</p>
+  </section>
+{% endblock %}

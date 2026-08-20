@@ -24,7 +24,7 @@
         <span>Blog</span>
       </a>
 
-      {% set subscriptionAdminRoutes = ['admin_subscriptions', 'admin_subscription_plans', 'admin_user_subscription_assign_pro', 'admin_user_subscription_deactivate'] %}
+      {% set subscriptionAdminRoutes = ['admin_subscriptions', 'admin_subscription_plans', 'admin_subscription_payment', 'admin_user_subscription_assign_pro', 'admin_user_subscription_deactivate'] %}
       <a href="{{ path('admin_subscriptions') }}"
          class="nav-item nav-item--parent {{ app.request.attributes.get('_route') in subscriptionAdminRoutes ? 'active' : '' }}">
         <i class="fas fa-credit-card"></i>
@@ -41,6 +41,11 @@
            class="nav-subitem {{ app.request.attributes.get('_route') == 'admin_subscription_plans' ? 'active' : '' }}">
           <i class="fas fa-chevron-right" aria-hidden="true"></i>
           <span>Plans</span>
+        </a>
+        <a href="{{ path('admin_subscription_payment') }}"
+           class="nav-subitem {{ app.request.attributes.get('_route') == 'admin_subscription_payment' ? 'active' : '' }}">
+          <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          <span>{{ 'admin_payment.nav'|trans }}</span>
         </a>
       </div>
 

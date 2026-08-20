@@ -29,6 +29,7 @@ use App\Service\ExtensionClientManager;
 use App\Service\ExtensionInstallationChallengeManager;
 use App\Service\MailerService;
 use App\Service\SessionManager;
+use App\Service\StripeEnvironmentManager;
 use App\Service\SubscriptionPlanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -40,6 +41,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -220,6 +222,44 @@ final class AdminController extends AbstractController
         return $this->render('admin/subscription_plans.html.twig', [
             'plans' => $plans->getPlans(),
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/subscriptions/payment', name: 'admin_subscription_payment', methods: ['GET', 'POST'])]
+    public function subscriptionPayment(
+        Request $request,
+        StripeEnvironmentManager $stripeEnvironments,
+        TranslatorInterface $translator,
+    ): Response
+    {
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('stripe_payment_mode', $request->request->getString('_token'))) {
+                $this->addFlash('error', $translator->trans('admin_payment.flash.invalid_csrf'));
+
+                return $this->redirectToRoute('admin_subscription_payment');
+            }
+
+            try {
+                $mode = $request->request->getString('mode');
+                $administrator = $this->getUser();
+                $updatedBy = $administrator instanceof User ? $administrator->getEmail() : null;
+                $stripeEnvironments->activateMode($mode, $updatedBy);
+                $this->addFlash(
+                    'success',
+                    $mode === StripeEnvironmentManager::MODE_PRODUCTION
+                        ? $translator->trans('admin_payment.flash.production_active')
+                        : $translator->trans('admin_payment.flash.sandbox_active'),
+                );
+            } catch (\InvalidArgumentException|\LogicException) {
+                $this->addFlash('error', $translator->trans('admin_payment.flash.incomplete'));
+            }
+
+            return $this->redirectToRoute('admin_subscription_payment');
+        }
+
+        return $this->render('admin/subscription_payment.html.twig', [
+            'stripeModes' => $stripeEnvironments->getAdminStatus(),
+            'webhookUrl' => $this->generateUrl('stripe_webhook', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
     }
 

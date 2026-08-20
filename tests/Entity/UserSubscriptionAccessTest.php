@@ -41,4 +41,21 @@ final class UserSubscriptionAccessTest extends TestCase
 
         self::assertFalse($user->hasActivePlan('team'));
     }
+
+    public function testStripeBillingDetailsAreNormalized(): void
+    {
+        $periodEnd = new \DateTimeImmutable('2026-09-20 12:00:00');
+        $subscription = (new UserSubscription())
+            ->setStripePriceId('price_team')
+            ->setStripeMode('sandbox')
+            ->setQuantity(0)
+            ->setCurrentPeriodEnd($periodEnd)
+            ->setCancelAtPeriodEnd(true);
+
+        self::assertSame('price_team', $subscription->getStripePriceId());
+        self::assertSame('sandbox', $subscription->getStripeMode());
+        self::assertSame(1, $subscription->getQuantity());
+        self::assertSame($periodEnd, $subscription->getCurrentPeriodEnd());
+        self::assertTrue($subscription->isCancelAtPeriodEnd());
+    }
 }

@@ -70,6 +70,12 @@
               <div class="ds-cell-stack">
                 <span class="ds-mono">{{ subscription and subscription.stripeCustomerId ? subscription.stripeCustomerId : 'customer: -' }}</span>
                 <span class="ds-mono">{{ subscription and subscription.stripeSubscriptionId ? subscription.stripeSubscriptionId : 'subscription: -' }}</span>
+                {% if subscription and subscription.stripePriceId %}
+                  <span class="ds-mono">{{ subscription.stripeMode|upper }} · {{ subscription.stripePriceId }} · {{ 'admin_subscription_billing.seats'|trans({'%quantity%': subscription.quantity}) }}</span>
+                {% endif %}
+                {% if subscription and subscription.currentPeriodEnd %}
+                  <span class="ds-muted">{{ 'admin_subscription_billing.period_end'|trans({'%date%': subscription.currentPeriodEnd|date('d/m/Y H:i')}) }}{{ subscription.cancelAtPeriodEnd ? 'admin_subscription_billing.cancel_scheduled'|trans : '' }}</span>
+                {% endif %}
               </div>
             </td>
             <td>{{ subscription ? subscription.updatedAt|date('d/m/Y H:i') : '-' }}</td>

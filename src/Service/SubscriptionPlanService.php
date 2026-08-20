@@ -32,8 +32,8 @@ final class SubscriptionPlanService
         self::PLAN_FREE => [
             'label' => 'Free',
             'limits' => [
-                self::LIMIT_CREDENTIALS => 5,
-                self::LIMIT_SHARES => 3,
+                self::LIMIT_CREDENTIALS => 15,
+                self::LIMIT_SHARES => 5,
                 self::LIMIT_TEAMS => 1,
                 self::LIMIT_EXTENSION_INSTALLATIONS => 1,
             ],
@@ -133,6 +133,15 @@ final class SubscriptionPlanService
 
     public function getLimit(User $user, string $limit): ?int
     {
+        $subscription = $user->getUserSubscription();
+        if (
+            $limit === self::LIMIT_EXTENSION_INSTALLATIONS
+            && $user->hasActivePlan(self::PLAN_TEAM)
+            && $subscription?->getStripePriceId() !== null
+        ) {
+            return $subscription->getQuantity();
+        }
+
         $value = $this->getPlanForUser($user)['limits'][$limit] ?? null;
 
         return is_int($value) ? max(0, $value) : null;

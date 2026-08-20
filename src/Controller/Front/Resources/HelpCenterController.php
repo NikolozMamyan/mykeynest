@@ -1099,8 +1099,8 @@ final class HelpCenterController extends AbstractController
                         'en' => 'What’s the difference between Free and Pro?',
                     ],
                     'excerpt' => [
-                        'fr' => 'Comparatif complet des deux plans : mots de passe, partages, 2FA, audit de sécurité, support prioritaire et prix.',
-                        'en' => 'A full comparison of both plans: passwords, sharing, 2FA, security audit, priority support, and pricing.',
+                        'fr' => 'Comparatif complet des trois plans : mots de passe, partages, 2FA, audit de sécurité, support et prix.',
+                        'en' => 'A full comparison of all three plans: passwords, sharing, 2FA, security audit, support, and pricing.',
                     ],
                     'readTime' => 3,
                     'popular' => true,
@@ -1127,12 +1127,12 @@ final class HelpCenterController extends AbstractController
                         [
                             'id' => 'prix',
                             'title' => [
-                                'fr' => 'Prix du plan Pro',
-                                'en' => 'Pro plan pricing',
+                                'fr' => 'Prix des plans Pro et Team',
+                                'en' => 'Pro and Team plan pricing',
                             ],
                             'content' => [
-                                'fr' => '<p>Le plan Pro est disponible à <strong>6,99 € / mois</strong>, sans engagement. Aucune carte bancaire requise pour l\'offre gratuite.</p>',
-                                'en' => '<p>The Pro plan is available for <strong>€6.99 / month</strong>, no commitment. No credit card is required for the Free plan.</p>',
+                                'fr' => '<p>Pro est disponible à <strong>6,99 € / utilisateur / mois</strong>. Team est disponible à <strong>5,49 € / utilisateur / mois</strong> à partir de 6 comptes. Les deux offres sont mensuelles et sans engagement.</p>',
+                                'en' => '<p>Pro is available for <strong>€6.99 / user / month</strong>. Team is available for <strong>€5.49 / user / month</strong> from 6 accounts. Both plans are monthly and have no commitment.</p>',
                             ],
                         ],
                     ],

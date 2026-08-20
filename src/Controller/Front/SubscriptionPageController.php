@@ -3,85 +3,34 @@
 namespace App\Controller\Front;
 
 use App\Entity\User;
-use App\Entity\UserSubscription;
-use App\Repository\UserRepository;
-use App\Repository\UserSubscriptionRepository;
-use App\Service\AdminNotificationService;
-use App\Service\MailerService;
+use App\Service\StripeBillingService;
 use App\Service\SubscriptionPlanService;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Stripe\BillingPortal\Session as PortalSession;
-use Stripe\Checkout\Session as CheckoutSession;
-use Stripe\Stripe;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class SubscriptionPageController extends AbstractController
 {
-    public function __construct(private readonly SubscriptionPlanService $subscriptionPlans)
-    {
-    }
-
-    private function createCheckoutRedirect(?User $user, string $successUrl, string $cancelUrl): RedirectResponse
-    {
-        Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
-
-        $checkoutParams = [
-            'mode' => 'subscription',
-            'line_items' => [[
-                'price' => $_ENV['STRIPE_PRICE_PRO'],
-                'quantity' => 1,
-            ]],
-            'success_url' => $successUrl,
-            'cancel_url' => $cancelUrl,
-            'metadata' => [
-                'plan' => 'pro',
-                'checkout_origin' => 'landing_public',
-            ],
-        ];
-
-        if ($user) {
-            $checkoutParams['client_reference_id'] = (string) $user->getId();
-            $checkoutParams['metadata']['user_id'] = (string) $user->getId();
-
-            if ($user->getStripeCustomerId()) {
-                $checkoutParams['customer'] = $user->getStripeCustomerId();
-            } else {
-                $checkoutParams['customer_email'] = $user->getEmail();
-            }
-        }
-
-        $session = CheckoutSession::create($checkoutParams);
-
-        return new RedirectResponse($session->url);
+    public function __construct(
+        private readonly SubscriptionPlanService $subscriptionPlans,
+        private readonly StripeBillingService $stripeBilling,
+        private readonly LoggerInterface $logger,
+    ) {
     }
 
     #[Route('/app/subscription', name: 'app_subscription')]
+    #[Route('/app/subscription/pro', name: 'app_subscription_pro')]
+    #[Route('/app/contact', name: 'app_contact')]
     public function index(): Response
     {
         return $this->render('subscription/index.html.twig', $this->getPlanPageData());
     }
 
-    #[Route('/app/subscription/pro', name: 'app_subscription_pro')]
-    public function pro(): Response
-    {
-        return $this->render('subscription/index.html.twig', $this->getPlanPageData());
-    }
-
-    #[Route('/app/contact', name: 'app_contact')]
-    public function contact(): Response
-    {
-        return $this->render('subscription/index.html.twig', $this->getPlanPageData());
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     private function getPlanPageData(): array
     {
         $user = $this->getUser();
@@ -89,277 +38,210 @@ final class SubscriptionPageController extends AbstractController
         return [
             'freePlan' => $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_FREE),
             'proPlan' => $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_PRO),
+            'teamPlan' => $this->subscriptionPlans->getPlan(SubscriptionPlanService::PLAN_TEAM),
             'currentPlan' => $user instanceof User ? $this->subscriptionPlans->getPlanForUser($user) : null,
         ];
     }
 
-    #[Route('/app/subscription/checkout/pro', name: 'app_subscription_checkout_pro')]
+    #[Route('/app/subscription/checkout/pro', name: 'app_subscription_checkout_pro', methods: ['GET'])]
     public function checkoutPro(): RedirectResponse
     {
-        /** @var User|null $user */
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('show_login');
-        }
+        return $this->startCheckout(SubscriptionPlanService::PLAN_PRO, false);
+    }
 
-        return $this->createCheckoutRedirect(
-            $user,
-            rtrim($_ENV['APP_URL'], '/') . '/app/subscription/success?session_id={CHECKOUT_SESSION_ID}',
-            rtrim($_ENV['APP_URL'], '/') . '/app/subscription/cancel'
-        );
+    #[Route('/app/subscription/checkout/team', name: 'app_subscription_checkout_team', methods: ['GET'])]
+    public function checkoutTeam(): RedirectResponse
+    {
+        return $this->startCheckout(SubscriptionPlanService::PLAN_TEAM, false);
     }
 
     #[Route('/pricing/pro/checkout', name: 'app_public_subscription_checkout_pro', methods: ['GET'])]
     public function publicCheckoutPro(): RedirectResponse
     {
+        return $this->startCheckout(SubscriptionPlanService::PLAN_PRO, true);
+    }
+
+    #[Route('/pricing/team/checkout', name: 'app_public_subscription_checkout_team', methods: ['GET'])]
+    public function publicCheckoutTeam(): RedirectResponse
+    {
+        return $this->startCheckout(SubscriptionPlanService::PLAN_TEAM, true);
+    }
+
+    #[Route('/app/subscription/success', name: 'app_subscription_success', methods: ['GET'])]
+    public function success(Request $request): Response
+    {
+        $sessionId = trim((string) $request->query->get('session_id', ''));
+        $stripeMode = trim((string) $request->query->get('stripe_mode', ''));
         /** @var User|null $user */
         $user = $this->getUser();
+        $synchronized = false;
 
-        return $this->createCheckoutRedirect(
-            $user,
-            rtrim($_ENV['APP_URL'], '/') . '/pricing/pro/success?session_id={CHECKOUT_SESSION_ID}',
-            rtrim($_ENV['APP_URL'], '/') . '/pricing/pro/cancel'
-        );
-    }
-
-    #[Route('/app/subscription/success', name: 'app_subscription_success')]
-    public function success(): Response
-    {
-        return $this->render('subscription/success.html.twig');
-    }
-
-    #[Route('/app/subscription/cancel', name: 'app_subscription_cancel')]
-    public function cancel(): Response
-    {
-        return $this->render('subscription/cancel.html.twig');
-    }
-
-    #[Route('/pricing/pro/success', name: 'app_public_subscription_success', methods: ['GET'])]
-    public function publicSuccess(
-        Request $request,
-        UserRepository $users,
-        UserSubscriptionRepository $subscriptions,
-        EntityManagerInterface $em,
-        MailerService $mailer,
-        UrlGeneratorInterface $urlGenerator,
-        LoggerInterface $logger,
-        AdminNotificationService $adminNotificationService
-    ): Response
-    {
-        $sessionId = (string) $request->query->get('session_id', '');
-
-        if ($sessionId !== '') {
+        if ($sessionId !== '' && $user !== null) {
             try {
-                Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
-
-                /** @var \Stripe\Checkout\Session $session */
-                $session = CheckoutSession::retrieve($sessionId, [
-                    'expand' => ['customer', 'subscription'],
-                ]);
-
-                if ($session->status === 'complete') {
-                    $user = $this->resolveCheckoutUser($session, $users, $em);
-
-                    if ($user) {
-                        $existingSubscription = $user->getUserSubscription() ?? $subscriptions->findOneBy(['user' => $user]);
-                        $wasActive = $existingSubscription?->isActive() ?? false;
-
-                        $this->syncSubscriptionRecord(
-                            user: $user,
-                            subscriptions: $subscriptions,
-                            em: $em,
-                            customerId: is_string($session->customer) ? $session->customer : ($session->customer->id ?? null),
-                            subscriptionId: is_string($session->subscription) ? $session->subscription : ($session->subscription->id ?? null),
-                            status: $session->payment_status === 'paid' ? 'active' : 'pending',
-                            isActive: $session->payment_status === 'paid',
-                            planCode: (string) ($session->metadata->plan ?? 'pro')
-                        );
-
-                        $em->flush();
-
-                        if (!$wasActive && $session->payment_status === 'paid') {
-                            $this->sendPostPaymentEmail($user, $mailer, $urlGenerator, $logger);
-                            $adminNotificationService->notifySubscriptionActivated($user, 'public_success_fallback');
-                            $em->flush();
-                        }
-                    }
-                }
-            } catch (\Throwable $e) {
-                $logger->error('Public Stripe success fallback failed', [
+                $synchronized = $this->stripeBilling->synchronizeCheckoutSession(
+                    $sessionId,
+                    $user,
+                    stripeMode: $stripeMode !== '' ? $stripeMode : null,
+                )?->isActive() ?? false;
+            } catch (\Symfony\Component\Security\Core\Exception\AccessDeniedException $exception) {
+                throw $exception;
+            } catch (\Throwable $exception) {
+                $this->logger->error('Authenticated Stripe Checkout synchronization failed.', [
                     'session_id' => $sessionId,
-                    'message' => $e->getMessage(),
+                    'user_id' => $user->getId(),
+                    'message' => $exception->getMessage(),
                 ]);
             }
         }
 
-        return $this->render('subscription/public_success.html.twig');
+        return $this->render('subscription/success.html.twig', ['synchronized' => $synchronized]);
+    }
+
+    #[Route('/app/subscription/status', name: 'app_subscription_status', methods: ['GET'])]
+    public function status(): JsonResponse
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        return $this->json([
+            'active' => $user?->hasActiveSubscription() ?? false,
+            'plan' => $user?->getUserSubscription()?->getPlanCode(),
+        ]);
+    }
+
+    #[Route('/app/subscription/cancel', name: 'app_subscription_cancel', methods: ['GET'])]
+    public function cancel(Request $request): Response
+    {
+        return $this->render('subscription/cancel.html.twig', [
+            'plan' => $this->normalizePlanQuery($request),
+        ]);
+    }
+
+    #[Route('/pricing/pro/success', name: 'app_public_subscription_success', methods: ['GET'])]
+    public function publicSuccess(Request $request): Response
+    {
+        return $this->handlePublicSuccess($request, SubscriptionPlanService::PLAN_PRO);
+    }
+
+    #[Route('/pricing/team/success', name: 'app_public_subscription_success_team', methods: ['GET'])]
+    public function publicTeamSuccess(Request $request): Response
+    {
+        return $this->handlePublicSuccess($request, SubscriptionPlanService::PLAN_TEAM);
     }
 
     #[Route('/pricing/pro/cancel', name: 'app_public_subscription_cancel', methods: ['GET'])]
     public function publicCancel(): Response
     {
-        return $this->render('subscription/public_cancel.html.twig');
+        return $this->render('subscription/public_cancel.html.twig', [
+            'plan' => SubscriptionPlanService::PLAN_PRO,
+            'retryRoute' => 'app_public_subscription_checkout_pro',
+        ]);
     }
 
-    #[Route('/app/subscription/portal', name: 'app_subscription_portal')]
+    #[Route('/pricing/team/cancel', name: 'app_public_subscription_cancel_team', methods: ['GET'])]
+    public function publicTeamCancel(): Response
+    {
+        return $this->render('subscription/public_cancel.html.twig', [
+            'plan' => SubscriptionPlanService::PLAN_TEAM,
+            'retryRoute' => 'app_public_subscription_checkout_team',
+        ]);
+    }
+
+    #[Route('/app/subscription/portal', name: 'app_subscription_portal', methods: ['GET'])]
     public function portal(): RedirectResponse
     {
         /** @var User|null $user */
         $user = $this->getUser();
-        $customerId = $user?->getUserSubscription()?->getStripeCustomerId() ?? $user?->getStripeCustomerId();
+        try {
+            $portalUrl = $user ? $this->stripeBilling->createPortalUrl($user) : null;
+        } catch (\Throwable $exception) {
+            $this->logger->error('Unable to create Stripe Billing Portal Session.', [
+                'user_id' => $user?->getId(),
+                'message' => $exception->getMessage(),
+            ]);
+            $this->addFlash('error', 'Le portail de facturation est temporairement indisponible.');
+            $portalUrl = null;
+        }
 
-        if (!$user || !$customerId) {
+        return $portalUrl ? $this->redirect($portalUrl) : $this->redirectToRoute('app_subscription');
+    }
+
+    private function startCheckout(string $planCode, bool $publicCheckout): RedirectResponse
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (!$publicCheckout && $user === null) {
+            return $this->redirectToRoute('show_login');
+        }
+
+        if ($user?->hasActiveSubscription()) {
+            try {
+                $portalUrl = $this->stripeBilling->createPortalUrl($user);
+                if ($portalUrl) {
+                    return $this->redirect($portalUrl);
+                }
+            } catch (\Throwable $exception) {
+                $this->logger->error('Unable to redirect an active subscriber to Stripe Billing Portal.', [
+                    'user_id' => $user->getId(),
+                    'message' => $exception->getMessage(),
+                ]);
+            }
+
+            $this->addFlash('info', 'Votre abonnement est deja actif.');
+
             return $this->redirectToRoute('app_subscription');
         }
 
-        Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
-
-        $session = PortalSession::create([
-            'customer' => $customerId,
-            'return_url' => rtrim($_ENV['APP_URL'], '/') . '/app/subscription',
-        ]);
-
-        return new RedirectResponse($session->url);
-    }
-
-    private function resolveCheckoutUser(
-        \Stripe\Checkout\Session $session,
-        UserRepository $users,
-        EntityManagerInterface $em
-    ): ?User {
-        $userId = $session->client_reference_id ?? null;
-        $email = $session->customer_email ?? ($session->customer_details->email ?? null);
-
-        if ($userId) {
-            $user = $users->find((int) $userId);
-            if ($user) {
-                return $user;
-            }
-        }
-
-        if (is_string($email) && $email !== '') {
-            $user = $users->findOneBy(['email' => strtolower(trim($email))]);
-            if ($user) {
-                return $user;
-            }
-
-            $user = new User();
-            $user->setEmail(strtolower(trim($email)));
-            $user->setCompany('');
-            $user->setPassword('');
-            $user->setRoles(['ROLE_GUEST']);
-            $user->setApiToken(bin2hex(random_bytes(32)));
-            $user->setTokenExpiresAt(new \DateTimeImmutable('+7 days'));
-            $user->regenerateApiExtensionToken();
-            $em->persist($user);
-
-            return $user;
-        }
-
-        return null;
-    }
-
-    private function syncSubscriptionRecord(
-        User $user,
-        UserSubscriptionRepository $subscriptions,
-        EntityManagerInterface $em,
-        ?string $customerId = null,
-        ?string $subscriptionId = null,
-        ?string $status = null,
-        ?bool $isActive = null,
-        ?string $planCode = null,
-        bool $clearSubscriptionId = false
-    ): UserSubscription {
-        $subscription = $user->getUserSubscription();
-
-        if (!$subscription) {
-            $subscription = $subscriptions->findOneBy(['user' => $user]);
-        }
-
-        if (!$subscription) {
-            $subscription = new UserSubscription();
-            $subscription->setUser($user);
-            $user->setUserSubscription($subscription);
-            $em->persist($subscription);
-        }
-
-        if ($customerId !== null) {
-            $subscription->setStripeCustomerId($customerId);
-        }
-
-        if ($clearSubscriptionId) {
-            $subscription->setStripeSubscriptionId(null);
-        } elseif ($subscriptionId !== null) {
-            $subscription->setStripeSubscriptionId($subscriptionId);
-        }
-
-        if ($status !== null) {
-            $subscription->setStatus($status);
-        }
-
-        if ($isActive !== null) {
-            $subscription->setIsActive($isActive);
-        }
-
-        if ($planCode !== null) {
-            $subscription->setPlanCode($planCode);
-        }
-
-        $subscription->touch();
-
-        return $subscription;
-    }
-
-    private function sendPostPaymentEmail(
-        User $user,
-        MailerService $mailer,
-        UrlGeneratorInterface $urlGenerator,
-        LoggerInterface $logger
-    ): void {
         try {
-            if (in_array('ROLE_GUEST', $user->getRoles(), true) && $user->getApiToken() !== null) {
-                $expiresAt = new \DateTimeImmutable('+7 days');
-                $user->setApiToken(bin2hex(random_bytes(32)));
-                $user->setTokenExpiresAt($expiresAt);
+            $session = $this->stripeBilling->createCheckoutSession($user, $planCode, $publicCheckout);
 
-                $setupUrl = $urlGenerator->generate('app_guest_register', [
-                    'token' => $user->getApiToken(),
-                    'email' => $user->getEmail(),
-                ], UrlGeneratorInterface::ABSOLUTE_URL);
-
-                $mailer->send(
-                    (string) $user->getEmail(),
-                    'Votre abonnement Pro est actif',
-                    'emails/pro_checkout_activation.html.twig',
-                    [
-                        'user' => $user,
-                        'setup_url' => $setupUrl,
-                        'expiresAt' => $expiresAt,
-                    ]
-                );
-
-                return;
-            }
-
-            $loginUrl = $urlGenerator->generate('show_login', [], UrlGeneratorInterface::ABSOLUTE_URL);
-            $forgotPasswordUrl = $urlGenerator->generate('app_forgot_password_request', [], UrlGeneratorInterface::ABSOLUTE_URL);
-
-            $mailer->send(
-                (string) $user->getEmail(),
-                'Votre abonnement Pro est actif',
-                'emails/pro_checkout_existing_user.html.twig',
-                [
-                    'user' => $user,
-                    'login_url' => $loginUrl,
-                    'forgot_password_url' => $forgotPasswordUrl,
-                ]
-            );
-        } catch (\Throwable $e) {
-            $logger->error('Public Stripe success fallback email failed', [
-                'user_id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'message' => $e->getMessage(),
+            return $this->redirect((string) $session->url);
+        } catch (\Throwable $exception) {
+            $this->logger->error('Unable to create Stripe Checkout Session.', [
+                'user_id' => $user?->getId(),
+                'plan' => $planCode,
+                'public_checkout' => $publicCheckout,
+                'message' => $exception->getMessage(),
             ]);
+            $this->addFlash('error', 'Le paiement est temporairement indisponible. Merci de reessayer dans quelques instants.');
+
+            return $publicCheckout
+                ? $this->redirect($this->generateUrl('app_landing') . '#pricing')
+                : $this->redirectToRoute('app_subscription');
         }
+    }
+
+    private function handlePublicSuccess(Request $request, string $planCode): Response
+    {
+        $sessionId = trim((string) $request->query->get('session_id', ''));
+        $stripeMode = trim((string) $request->query->get('stripe_mode', ''));
+        $synchronized = false;
+
+        if ($sessionId !== '') {
+            try {
+                $synchronized = $this->stripeBilling->synchronizeCheckoutSession(
+                    $sessionId,
+                    stripeMode: $stripeMode !== '' ? $stripeMode : null,
+                )?->isActive() ?? false;
+            } catch (\Throwable $exception) {
+                $this->logger->error('Public Stripe Checkout synchronization failed.', [
+                    'session_id' => $sessionId,
+                    'plan' => $planCode,
+                    'message' => $exception->getMessage(),
+                ]);
+            }
+        }
+
+        return $this->render('subscription/public_success.html.twig', [
+            'plan' => $planCode,
+            'synchronized' => $synchronized,
+        ]);
+    }
+
+    private function normalizePlanQuery(Request $request): string
+    {
+        return mb_strtolower((string) $request->query->get('plan')) === SubscriptionPlanService::PLAN_TEAM
+            ? SubscriptionPlanService::PLAN_TEAM
+            : SubscriptionPlanService::PLAN_PRO;
     }
 }

@@ -9,9 +9,9 @@
       <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
     </div>
     <h1 style="margin:0 0 .75rem;font-size:2rem;color:#0f172a;">Paiement annule</h1>
-    <p style="margin:0 0 2rem;color:#475569;line-height:1.7;">Aucun paiement n a ete finalise. Vous pouvez relancer le checkout Pro quand vous voulez.</p>
+    <p style="margin:0 0 2rem;color:#475569;line-height:1.7;">Aucun paiement n a ete finalise. Vous pouvez relancer le checkout {{ plan|upper }} quand vous voulez.</p>
     <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
-      <a href="{{ path('app_public_subscription_checkout_pro') }}" class="btn btn-primary">Reessayer</a>
+      <a href="{{ path(retryRoute) }}" class="btn btn-primary">Reessayer</a>
       <a href="{{ path('app_landing') }}#pricing" class="btn btn-outline">Retour au pricing</a>
     </div>
   </div>

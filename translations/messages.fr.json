@@ -13,6 +13,49 @@
     "settings": "Paramètres",
     "subscription": "Abonnements"
   },
+  "admin_subscription_billing": {
+    "seats": "%quantity% siège(s)",
+    "period_end": "Période jusqu'au %date%",
+    "cancel_scheduled": " · résiliation programmée"
+  },
+  "admin_payment": {
+    "title": "Admin Paiement Stripe",
+    "nav": "Paiement",
+    "heading": "Configuration des paiements",
+    "intro": "Choisissez le mode utilisé pour les nouveaux paiements sans modifier les variables à chaque bascule.",
+    "mode_selection": "Sélection du mode Stripe",
+    "active": "Actif",
+    "active_button": "Mode actif",
+    "active_incomplete_button": "Mode actif · configuration incomplète",
+    "use_mode": "Utiliser ce mode",
+    "incomplete_button": "Configuration incomplète",
+    "sandbox": {
+      "name": "Sandbox",
+      "description": "Mode test pour valider le parcours de paiement."
+    },
+    "production": {
+      "name": "Live",
+      "description": "Mode production avec de vrais paiements.",
+      "confirm": "Activer Stripe Live pour tous les nouveaux paiements ?"
+    },
+    "checks": {
+      "secret_key": "Clé secrète configurée",
+      "pro_price": "Price Pro configuré",
+      "team_price": "Price Team configuré",
+      "webhook": "Webhook configuré"
+    },
+    "webhook": {
+      "title": "Adresse du webhook",
+      "description": "Utilisez cette même adresse dans les destinations Stripe Sandbox et Live. Le serveur détecte automatiquement le bon secret de signature."
+    },
+    "security_note": "Les secrets ne sont jamais stockés en base ni affichés dans l’administration. Le switch conserve uniquement le mode actif ; chaque environnement continue de recevoir ses propres webhooks.",
+    "flash": {
+      "invalid_csrf": "Token CSRF invalide. Le mode de paiement n’a pas été modifié.",
+      "production_active": "Stripe Live est maintenant utilisé pour les nouveaux paiements.",
+      "sandbox_active": "Stripe Sandbox est maintenant utilisé pour les nouveaux paiements.",
+      "incomplete": "Impossible d’activer ce mode : sa configuration Stripe est incomplète."
+    }
+  },
   "support_chat": {
     "title": "MYKEYNEST",
     "status": "En ligne - reponse sous 24h",
@@ -236,6 +279,69 @@
       "aria": "Grilles tarifaires MYKEYNEST",
       "title": "Une offre simple et transparente",
       "subtitle": "Commencez gratuitement, passez au premium quand vous en ressentez le besoin.",
+      "showcase": {
+        "title": "Un plan pour chaque niveau de croissance",
+        "subtitle": "Protégez vos accès dès aujourd'hui, puis faites évoluer MYKEYNEST avec votre équipe.",
+        "billing": "Facturation mensuelle · Sans engagement",
+        "per_month": "/ mois",
+        "per_user_month": "/ utilisateur / mois",
+        "unlimited": "Illimité",
+        "features": {
+          "passwords": "Mots de passe",
+          "shares": "Partages sécurisés",
+          "generator": "Générateur & auto-remplissage",
+          "two_factor": "Authentification 2FA",
+          "audit": "Audit de sécurité",
+          "support": "Support",
+          "admin": "Administration centralisée"
+        },
+        "starter": {
+          "eyebrow": "Pour démarrer",
+          "name": "Starter",
+          "target": "Indépendants, freelances et découverte avant achat.",
+          "cta": "Commencer gratuitement",
+          "included": "1 utilisateur inclus",
+          "support": "Standard par email",
+          "onboarding": "Autonome"
+        },
+        "pro": {
+          "eyebrow": "Pour avancer",
+          "name": "Pro",
+          "target": "PME de 1 à 5 personnes qui veulent sécuriser chaque accès.",
+          "cta": "Choisir Pro",
+          "included": "1 compte utilisateur inclus",
+          "audit": "Standard",
+          "support": "Prioritaire en moins de 2h",
+          "onboarding": "Autonome + guide",
+          "phishing": "Auto-formation"
+        },
+        "team": {
+          "eyebrow": "Pour les équipes",
+          "name": "Team",
+          "target": "PME de 6 personnes et plus, agences et organisations.",
+          "cta": "Choisir Team",
+          "aria": "Choisir le plan Team",
+          "included": "6 utilisateurs minimum · quantité ajustable",
+          "audit": "Renforcé + rapport mensuel",
+          "support": "Dédié + interlocuteur nommé",
+          "onboarding": "Accompagné en visioconférence",
+          "phishing": "Session live pour l'équipe",
+          "admin": "Gestion des accès par rôle"
+        },
+        "comparison": {
+          "eyebrow": "Comparatif complet",
+          "title": "Le bon niveau d'accompagnement, sans surprise",
+          "feature": "Fonctionnalité",
+          "passwords": "Mots de passe",
+          "shares": "Partages",
+          "two_factor": "Authentification 2FA",
+          "audit": "Audit de sécurité",
+          "support": "Support",
+          "onboarding": "Onboarding",
+          "phishing": "Sensibilisation phishing équipe",
+          "admin": "Administration centralisée"
+        }
+      },
       "plan": {
         "free_badge": "Gratuit",
         "popular_badge": "Recommandé",
@@ -249,7 +355,7 @@
         "pro_choose": "Choisir Pro",
         "pro_aria": "Choisir le plan Pro",
         "pro_reco_aria": "Offre recommandée",
-        "pro_annual": "Facturation annuelle disponible — économisez jusqu'à 20%",
+        "pro_annual": "Facturation mensuelle, sans engagement",
         "features": {
           "basic_1": "5 mots de passe",
           "basic_2": "5 partages maximum",
@@ -1124,6 +1230,14 @@
           "f4": "Générateur + vérificateur de sécurité"
         },
         "cta_upgrade": "Passer en Pro"
+      },
+      "team": {
+        "name": "Team",
+        "price_suffix": "/utilisateur/mois",
+        "description": "Pour les PME de 6 personnes et plus qui ont besoin d'une administration centralisée.",
+        "minimum_seats": "6 comptes minimum, quantité ajustable",
+        "centralized_admin": "Gestion centralisée des accès par rôle",
+        "cta_upgrade": "Passer en Team"
       }
     },
     "tools": {
