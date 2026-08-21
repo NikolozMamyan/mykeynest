@@ -1,0 +1,50 @@
+{% set footerLocaleParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
+<footer class="public-footer" role="contentinfo">
+  <div class="public-footer__inner">
+    <div class="public-footer__brand">
+      {% include 'components/parts/logo.html.twig' %}
+      <p>{{ 'landing.footer.brand_text'|trans }}</p>
+      <a class="public-footer__mobile" href="{{ path('app_install_app', footerLocaleParams) }}">
+        <span class="public-footer__mobile-icon"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i></span>
+        <span>
+          <strong>{{ 'landing.nav.install_hybrid_app'|trans }}</strong>
+          <small>{{ 'install_app.hero.badge'|trans }}</small>
+        </span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    <div class="public-footer__column">
+      <h2>{{ 'landing.footer.product'|trans }}</h2>
+      <a href="{{ path('app_landing', footerLocaleParams) }}#features">{{ 'landing.footer.links.features'|trans }}</a>
+      <a href="{{ path('app_landing', footerLocaleParams) }}#pricing">{{ 'landing.footer.links.pricing'|trans }}</a>
+      <a href="{{ path('app_help_category', footerLocaleParams|merge({slug: 'extension'})) }}">{{ 'landing.footer.links.extension'|trans }}</a>
+      <a href="{{ path('app_public_generator', footerLocaleParams) }}">{{ 'landing.footer.links.generator'|trans }}</a>
+    </div>
+
+    <div class="public-footer__column">
+      <h2>{{ 'landing.footer.company'|trans }}</h2>
+      <a href="{{ path('business_solution', footerLocaleParams) }}">{{ 'landing.footer.links.cyber_pme_solution'|trans }}</a>
+      <a href="{{ path('business_comparatif', footerLocaleParams) }}">{{ 'landing.footer.links.password_manager_entreprise_comparatif'|trans }}</a>
+      <a href="{{ path('business_audit', footerLocaleParams) }}">{{ 'landing.footer.links.audit_cyber_pme'|trans }}</a>
+      <a href="{{ path('app_landing', footerLocaleParams) }}#contact">{{ 'landing.footer.links.contact'|trans }}</a>
+    </div>
+
+    <div class="public-footer__column">
+      <h2>{{ 'landing.footer.resources'|trans }}</h2>
+      <a href="{{ path('app_help_center', footerLocaleParams) }}">{{ 'landing.footer.links.help_center'|trans }}</a>
+      <a href="{{ path('app_help_category', footerLocaleParams|merge({slug: 'demarrer'})) }}">{{ 'landing.footer.links.documentation'|trans }}</a>
+      <a href="{{ path('app_help_category', footerLocaleParams|merge({slug: 'partage'})) }}">{{ 'landing.footer.links.guides'|trans }}</a>
+      <a href="{{ path('blog_index', {_locale: app.request.locale}) }}">{{ 'landing.footer.links.blog'|trans }}</a>
+    </div>
+  </div>
+
+  <div class="public-footer__bottom">
+    <span>&copy; {{ 'now'|date('Y') }} MYKEYNEST. {{ 'landing.footer.links.all_rights'|trans }}</span>
+    <nav aria-label="{{ app.request.locale == 'en' ? 'Legal information' : 'Informations légales' }}">
+      <a href="{{ path('legal_privacy', footerLocaleParams) }}">{{ 'landing.footer.links.privacy'|trans }}</a>
+      <a href="{{ path('legal_cgu', footerLocaleParams) }}">{{ app.request.locale == 'en' ? 'Terms of use' : 'CGU' }}</a>
+      <a href="{{ path('legal_cgv', footerLocaleParams) }}">{{ app.request.locale == 'en' ? 'Terms of sale' : 'CGV' }}</a>
+    </nav>
+  </div>
+</footer>

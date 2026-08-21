@@ -1,0 +1,7 @@
+{
+  "reset_password.validation.email_required": "Enter your email address.",
+  "reset_password.validation.email_invalid": "Enter a valid email address.",
+  "reset_password.validation.password_required": "Enter a new password.",
+  "reset_password.validation.password_length": "The password must contain at least {{ limit }} characters.",
+  "reset_password.validation.password_mismatch": "Both passwords must match."
+}

@@ -226,16 +226,18 @@
       "language": "Langue"
     },
     "hero": {
+      "eyebrow": "AES-256 · Contrôles d’accès · RGPD",
       "title_before": "Gérez les mots de passe et accès de votre équipe,",
       "title_highlight": "dans un seul espace sécurisé",
-      "subtitle": "MYKEYNEST est une solution de gestion des mots de passe et des accès pour PME, agences et équipes. Chiffrement AES-256, architecture zero-knowledge, partage sécurisé, audit de sécurité et auto-remplissage.",
+      "subtitle": "MYKEYNEST est une solution de gestion des mots de passe et des accès pour PME, agences et équipes. Chiffrement AES-256, partage sécurisé, audit de sécurité et auto-remplissage.",
+      "hint": "Démarrage gratuit · Sans carte bancaire",
       "cta_start": "Commencer gratuitement",
       "cta_start_aria": "Créer un compte gratuit sur MYKEYNEST",
       "cta_discover": "En savoir plus",
       "trust_aria": "Garanties de sécurité MYKEYNEST",
       "trust": {
         "aes": "Chiffrement AES-256",
-        "zeroknowledge": "Zero-knowledge",
+        "zeroknowledge": "Accès contrôlés",
         "hashed": "Installation hashée & signée"
       },
       "mock": {
@@ -249,8 +251,8 @@
       "title": "Gestion sécurisée des mots de passe et accès",
       "subtitle": "Toutes les fonctionnalités essentielles pour protéger les identifiants, partager les accès et sécuriser les équipes au quotidien.",
       "cards": {
-        "e2e_title": "Chiffrement de bout en bout",
-        "e2e_text": "Vos données sont chiffrées localement avec AES-256 avant d'être synchronisées. Seul vous y avez accès.",
+        "e2e_title": "Chiffrement AES-256",
+        "e2e_text": "Les identifiants enregistrés sont chiffrés avec AES-256 et ne sont restitués qu’aux utilisateurs autorisés.",
         "hashed_title": "Installation hashée & signée",
         "hashed_text": "Chaque déploiement génère une empreinte cryptographique unique. Si le code est modifié ou copié, l'accès est révoqué instantanément.",
         "hashed_tag": "Nouveau",
@@ -337,7 +339,7 @@
           "cta": "Choisir Pro",
           "included": "1 compte utilisateur inclus",
           "audit": "Standard",
-          "support": "Prioritaire en moins de 2h",
+          "support": "Support prioritaire",
           "onboarding": "Autonome + guide",
           "phishing": "Auto-formation"
         },
@@ -421,8 +423,8 @@
       "info": {
         "email_title": "Email",
         "support_title": "Support",
-        "support_text": "Disponible 24/7",
-        "support_time": "Temps de réponse : <strong>&lt; 2h</strong>",
+        "support_text": "Assistance par e-mail",
+        "support_time": "Réponse personnalisée selon la nature de la demande",
         "hours_title": "Horaires",
         "hours_text": "Lun - Ven : 9h - 18h<br>Sam - Dim : 10h - 16h"
       }
@@ -435,7 +437,7 @@
         "q1": "Qu'est-ce qu'un gestionnaire de mots de passe ?",
         "a1": "C'est un outil qui stocke et chiffre tous vos identifiants dans un coffre-fort numérique sécurisé. MYKEYNEST utilise le chiffrement AES-256, le même standard utilisé par les banques.",
         "q2": "Mes données sont-elles vraiment sécurisées ?",
-        "a2": "Oui. Vos données sont chiffrées localement sur votre appareil avant d'être synchronisées. Nous n'avons jamais accès à vos mots de passe en clair (architecture zero-knowledge).",
+        "a2": "Les identifiants enregistrés sont chiffrés avec AES-256. Les accès sont protégés par l’authentification, les autorisations du compte et les contrôles liés à l’extension.",
         "q3": "L'offre gratuite est-elle vraiment gratuite ?",
         "a3": "Oui, aucune carte bancaire requise. Vous pouvez utiliser MYKEYNEST gratuitement avec les fonctionnalités de base. Le plan Pro débloque des fonctionnalités avancées.",
         "q4": "Puis-je utiliser MYKEYNEST sur plusieurs appareils ?",
@@ -443,9 +445,9 @@
         "q5": "Qu'est-ce que l'installation hashée et en quoi me protège-t-elle ?",
         "a5": "Chaque installation de l'extension MYKEYNEST génère une empreinte cryptographique unique liée à votre instance. Si un attaquant tente de réutiliser vos identifiants sur un autre appareil, le hash ne correspond pas et l'accès est refusé. Si l'extension est modifiée ou corrompue, l'intégrité est détectée et le coffre-fort se verrouille automatiquement.",
         "q6": "Que se passe-t-il si j'oublie mon mot de passe maître ?",
-        "a6": "Nous ne pouvons pas le récupérer pour vous (zero-knowledge). C'est pourquoi il est essentiel de le conserver en lieu sûr. Vous pouvez configurer une récupération d'urgence.",
+        "a6": "Utilisez le parcours « Mot de passe oublié » depuis la page de connexion. Un lien de réinitialisation est envoyé à l’adresse e-mail associée au compte après les contrôles de sécurité.",
         "q7": "MYKEYNEST est-il conforme au RGPD ?",
-        "a7": "Oui. MYKEYNEST est une solution 100% européenne : vos données sont hébergées en Europe et ne transitent jamais vers des serveurs tiers hors UE. L'architecture zero-knowledge garantit que nous n'avons jamais accès à vos mots de passe en clair. La conformité RGPD est native.",
+        "a7": "MYKEYNEST documente les données traitées, leurs finalités, les prestataires utilisés et vos droits dans sa politique de confidentialité. Pour une question RGPD précise, contactez-nous à contact@key-nest.com.",
         "q8": "Comment fonctionne la double authentification (2FA) ?",
         "a8": "Le 2FA ajoute une couche de sécurité supplémentaire : en plus de votre mot de passe maître, un code temporaire est requis à chaque connexion. Disponible avec une application d'authentification (TOTP) ou par email."
       }
@@ -458,7 +460,7 @@
       "login": "Se connecter"
     },
     "footer": {
-      "brand_text": "Un gestionnaire de mots de passe moderne qui allie sécurité, simplicité et confidentialité. Solution 100% européenne.",
+      "brand_text": "Un gestionnaire de mots de passe moderne qui associe sécurité, simplicité et contrôle des accès.",
       "product": "Produit",
       "company": "Entreprise",
       "resources": "Ressources",
@@ -491,7 +493,7 @@
       "guest_card_label": "Compte invité",
       "features": {
         "secure_access": "Accès sécurisé aux identifiants partagés",
-        "e2ee": "Chiffrement de bout en bout",
+        "e2ee": "Secrets chiffrés avec AES-256-GCM",
         "one_time_link": "Lien à usage unique — expire après activation"
       }
     },
@@ -630,7 +632,7 @@
         "title": "Gestionnaire de Mots de Passe",
         "subtitle": "Sécurisez tous vos mots de passe en un seul endroit. Simple, sûr et accessible partout.",
         "features": {
-          "f1": "Chiffrement de bout en bout",
+          "f1": "Chiffrement AES-256-GCM",
           "f2": "Synchronisation instantanée",
           "f3": "Accessible sur tous vos appareils"
         }
@@ -669,6 +671,70 @@
         "hint": "Déjà un compte ?",
         "hint_link": "Se connecter"
       }
+    }
+  },
+  "reset_password": {
+    "common": {
+      "eyebrow": "Sécurité du compte",
+      "back_to_login": "Retour à la connexion"
+    },
+    "request": {
+      "meta_title": "Mot de passe oublié | MYKEYNEST",
+      "title": "Mot de passe oublié ?",
+      "subtitle": "Indiquez l’adresse e-mail de votre compte. Nous vous enverrons un lien sécurisé pour choisir un nouveau mot de passe.",
+      "email_label": "Adresse e-mail",
+      "email_placeholder": "vous@exemple.com",
+      "submit": "Recevoir le lien de réinitialisation",
+      "privacy_note": "Pour protéger votre compte, la réponse reste identique que cette adresse soit enregistrée ou non."
+    },
+    "check": {
+      "meta_title": "Consultez votre messagerie | MYKEYNEST",
+      "title": "Consultez votre messagerie",
+      "subtitle": "Si un compte correspond à cette adresse, un lien de réinitialisation vient d’être envoyé.",
+      "expiry": "Lien valable pendant %duration%",
+      "step_1": "Ouvrez la boîte de réception de l’adresse indiquée.",
+      "step_2": "Cliquez sur le lien sécurisé envoyé par MYKEYNEST.",
+      "step_3": "Choisissez un nouveau mot de passe unique.",
+      "not_received": "Vous n’avez rien reçu ? Vérifiez les courriers indésirables ou",
+      "try_again": "renvoyez une demande"
+    },
+    "reset": {
+      "meta_title": "Nouveau mot de passe | MYKEYNEST",
+      "title": "Choisissez un nouveau mot de passe",
+      "subtitle": "Utilisez au moins 12 caractères et évitez tout mot de passe déjà utilisé sur un autre service.",
+      "password_label": "Nouveau mot de passe",
+      "password_placeholder": "12 caractères minimum",
+      "confirm_label": "Confirmer le mot de passe",
+      "confirm_placeholder": "Saisissez-le une seconde fois",
+      "toggle_password": "Afficher ou masquer le mot de passe",
+      "requirements_aria": "Conseils pour le nouveau mot de passe",
+      "requirement_length": "12 caractères minimum avec plusieurs types de caractères",
+      "requirement_unique": "Un mot de passe unique, jamais utilisé ailleurs",
+      "submit": "Enregistrer le nouveau mot de passe",
+      "strength": {
+        "prefix": "Robustesse :",
+        "weak": "faible",
+        "medium": "moyenne",
+        "strong": "forte"
+      }
+    },
+    "flash": {
+      "rate_limited": "Trop de demandes ont été effectuées. Réessayez un peu plus tard.",
+      "delivery_failed": "L’e-mail n’a pas pu être envoyé pour le moment. Réessayez dans quelques minutes.",
+      "success": "Votre mot de passe a été modifié. Vous pouvez maintenant vous reconnecter."
+    },
+    "email": {
+      "subject": "Réinitialisez votre mot de passe MYKEYNEST",
+      "preheader": "Utilisez ce lien sécurisé pour choisir un nouveau mot de passe MYKEYNEST.",
+      "eyebrow": "Sécurité du compte",
+      "heading": "Réinitialisez votre mot de passe",
+      "intro": "Nous avons reçu une demande de réinitialisation pour votre compte MYKEYNEST. Utilisez le bouton ci-dessous pour choisir un nouveau mot de passe.",
+      "expiry": "Le lien expire dans %duration%.",
+      "action": "Choisir un nouveau mot de passe",
+      "ignore": "Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail : votre mot de passe ne sera pas modifié.",
+      "text_intro": "Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte MYKEYNEST.",
+      "text_action": "Ouvrez ce lien pour choisir un nouveau mot de passe :",
+      "text_ignore": "Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet e-mail."
     }
   },
   "credential_access": {
@@ -1751,12 +1817,12 @@
     "hero": {
       "title_before": "Créez des",
       "title_highlight": "mots de passe",
-      "title_after": "ultra-sécurisés en un clic",
-      "subtitle": "Protégez vos comptes avec des mots de passe impossibles à craquer. Génération instantanée, personnalisation complète et sécurité maximale.",
+      "title_after": "robustes en un clic",
+      "subtitle": "Générez localement des mots de passe longs et aléatoires, puis adaptez leur longueur et leurs caractères aux exigences du site.",
       "trust": {
         "no_storage": "Aucun stockage",
         "client_side": "100% côté client",
-        "open_source": "Open source"
+        "open_source": "API Web Crypto"
       }
     },
     "generator": {
@@ -1785,8 +1851,8 @@
       "subtitle": "La sécurité et la simplicité au service de vos données",
       "items": [
         {
-          "title": "Sécurité maximale",
-          "description": "Génération cryptographiquement sécurisée utilisant les algorithmes les plus robustes. Vos mots de passe sont impossibles à deviner ou à craquer."
+          "title": "Aléatoire cryptographique",
+          "description": "La génération utilise l’API Web Crypto du navigateur afin d’obtenir une source d’aléa adaptée aux usages de sécurité."
         },
         {
           "title": "Instantané et gratuit",
@@ -1812,7 +1878,7 @@
     },
     "seo": {
       "title": "Comment créer un mot de passe vraiment sécurisé ?",
-      "intro": "La sécurité de vos comptes en ligne commence par des mots de passe robustes. Notre générateur de mot de passe gratuit utilise des algorithmes cryptographiques avancés pour créer des combinaisons uniques et impossibles à deviner.",
+      "intro": "La sécurité de vos comptes en ligne commence par des mots de passe longs, uniques et aléatoires. Notre générateur gratuit utilise l’API Web Crypto du navigateur pour créer chaque combinaison.",
       "good_password_title": "Les caractéristiques d'un bon mot de passe",
       "good_password_text": "Un mot de passe sécurisé doit combiner plusieurs éléments essentiels. Il doit être suffisamment long (au moins 12 caractères), mélanger différents types de caractères (majuscules, minuscules, chiffres et symboles), et surtout être unique pour chaque compte.",
       "why_generator_title": "Pourquoi utiliser un générateur de mot de passe ?",
@@ -1831,7 +1897,7 @@
     },
     "cta": {
       "title": "Prêt à sécuriser vos comptes ?",
-      "description": "Rejoignez des milliers d'utilisateurs qui protègent leurs données avec MYKEYNEST",
+      "description": "Enregistrez et organisez vos accès dans un espace MYKEYNEST.",
       "button": "Créer un compte gratuit"
     }
   },
@@ -1852,7 +1918,27 @@
       "articles": "Articles",
       "categories": "Catégories",
       "response_time": "Temps de réponse",
-      "satisfaction": "Satisfaction"
+      "satisfaction": "Satisfaction",
+      "languages": "Documentation bilingue",
+      "maintained": "Contenus maintenus"
+    },
+    "summary": {
+      "title": "Des réponses claires pour chaque étape",
+      "description": "Le centre d’aide couvre la création du compte, la sécurité, les partages, l’extension navigateur et la facturation avec des procédures vérifiables.",
+      "points": {
+        "guides": {
+          "title": "Guides illustrés",
+          "text": "Les procédures essentielles s’appuient sur de véritables captures du produit."
+        },
+        "navigation": {
+          "title": "Parcours orienté résolution",
+          "text": "Chaque catégorie regroupe les actions, prérequis et points de contrôle utiles."
+        },
+        "support": {
+          "title": "Relais vers le support",
+          "text": "Une question propre à votre compte peut être transmise directement à notre équipe."
+        }
+      }
     },
     "sections": {
       "explore_label": "Explorer par thème",
@@ -1876,8 +1962,13 @@
       "aria": "Nous contacter",
       "write": {
         "title": "Nous écrire",
-        "desc": "Une question spécifique ? Notre équipe répond en moins de 2h en semaine.",
+        "desc": "Une question spécifique à votre compte ? Envoyez-nous le contexte nécessaire, sans communiquer votre mot de passe.",
         "cta": "Envoyer un message"
+      },
+      "privacy": {
+        "title": "Confidentialité",
+        "desc": "Consultez les données traitées par le service et l’extension navigateur.",
+        "cta": "Lire la politique"
       },
       "status": {
         "title": "Statut du service",
@@ -1891,20 +1982,20 @@
       "sub": "Les questions que tout le monde se pose.",
       "items": {
         "q1": "Mes mots de passe sont-ils vraiment sécurisés chez MYKEYNEST ?",
-        "a1": "Oui. Vos données sont chiffrées localement avec AES-256 avant d'être envoyées sur nos serveurs. Nous utilisons une architecture zero-knowledge : même nos équipes ne peuvent pas lire vos mots de passe. Seul votre mot de passe maître peut les déchiffrer.",
+        "a1": "MYKEYNEST protège les secrets du coffre par chiffrement au repos, sécurise les communications en HTTPS et applique des contrôles d’accès par compte, partage et organisation. Conservez néanmoins un mot de passe principal unique et activez la double authentification lorsque votre plan le permet.",
         "q2": "Puis-je utiliser MYKEYNEST sur plusieurs appareils ?",
-        "a2": "Absolument. La synchronisation multi-appareils est incluse dans tous les plans. Vos identifiants sont disponibles sur ordinateur, smartphone et tablette, toujours chiffrés de bout en bout.",
+        "a2": "Vous pouvez accéder à l’application web depuis vos appareils autorisés. Le nombre d’installations de l’extension navigateur dépend du plan et des règles définies pour votre organisation.",
         "q3": "Le générateur de mots de passe stocke-t-il mes mots de passe ?",
         "a3": "Non. Le générateur fonctionne entièrement côté client grâce à l'API crypto.getRandomValues du navigateur. Aucune donnée n'est transmise à nos serveurs. Le mot de passe disparaît dès que vous fermez l'onglet.",
         "q4": "Comment passer au plan Pro ?",
         "a4": "Depuis votre espace personnel, rendez-vous dans Paramètres › Abonnement et cliquez sur « Passer au Pro ». Le paiement est sécurisé via Stripe. Votre compte est mis à niveau instantanément, sans interruption de service.",
-        "q5": "MYKEYNEST est-il open source ?",
-        "a5": "Oui. Le code source est publiquement accessible sur GitHub, ce qui permet à la communauté d'auditer la sécurité et de contribuer. La transparence est l'un de nos principes fondamentaux."
+        "q5": "Où consulter les informations de confidentialité ?",
+        "a5": "La politique de confidentialité publique décrit les données traitées par le service et l’extension, les permissions du navigateur, les prestataires, la conservation et vos droits."
       }
     },
     "cta": {
       "title": "Vous n'avez pas trouvé la réponse ?",
-      "desc": "Notre équipe est disponible 7j/7 pour vous aider.",
+      "desc": "Contactez notre équipe avec le contexte de votre question. Ne communiquez jamais votre mot de passe.",
       "support": "Contacter le support",
       "create_account": "Créer un compte"
     }
@@ -1948,7 +2039,7 @@
       "other_categories": "Autres catégories",
       "contact": {
         "title": "Pas de réponse ?",
-        "desc": "Notre équipe est là pour vous. Réponse en moins de 2h en semaine.",
+        "desc": "Décrivez le problème, la page concernée et votre navigateur, sans transmettre de secret.",
         "cta": "Nous écrire"
       }
     }
@@ -1979,7 +2070,26 @@
       "no_aria": "Non, cet article ne m'a pas aidé",
       "yes": "Oui",
       "no": "Non",
-      "thank_you": "Merci pour votre retour !"
+      "thank_you": "Merci pour votre retour !",
+      "thanks_yes": "Merci. Votre retour nous aide à maintenir cette documentation utile.",
+      "thanks_no": "Merci. Nous utiliserons ce retour pour clarifier cet article."
+    },
+    "actions": {
+      "eyebrow": "Accès direct",
+      "create_account": "Créer mon compte MYKEYNEST",
+      "open_import": "Ouvrir l’import d’identifiants",
+      "install_mobile": "Ouvrir le guide d’installation mobile",
+      "read_privacy": "Consulter notre politique de confidentialité",
+      "reset_password": "Réinitialiser mon mot de passe",
+      "open_preferences": "Ouvrir les préférences de sécurité",
+      "open_audit": "Lancer l’audit de sécurité",
+      "open_generator": "Ouvrir le générateur de mots de passe",
+      "open_sharing": "Créer un partage sécurisé",
+      "manage_sharing": "Gérer mes partages",
+      "install_extension": "Installer l’extension Chrome officielle",
+      "open_extension": "Ouvrir la gestion de l’extension",
+      "compare_plans": "Comparer les offres MYKEYNEST",
+      "manage_subscription": "Gérer mon abonnement"
     },
     "sidebar": {
       "aria": "Ressources et articles liés",
@@ -1997,7 +2107,7 @@
       },
       "contact": {
         "title": "Pas de réponse ?",
-        "desc": "Notre équipe répond en moins de 2h en semaine.",
+        "desc": "Décrivez votre blocage et notre équipe vous répondra avec les étapes adaptées.",
         "cta": "Nous écrire"
       }
     }
@@ -2034,14 +2144,14 @@
         "software": {
           "title": "🔐 Logiciel",
           "item1": "Chiffrement AES-256",
-          "item2": "Architecture zero-knowledge",
+          "item2": "Contrôles d’accès par utilisateur",
           "item3": "Partage sécurisé entre collaborateurs",
           "item4": "Audit de sécurité intégré"
         },
         "maintenance": {
           "title": "🛠 Maintenance incluse",
           "item1": "Assistance technique dédiée",
-          "item2": "Support continu 7j/7",
+          "item2": "Support suivi selon la priorité",
           "item3": "Mises à jour accompagnées"
         },
         "training": {
@@ -2057,6 +2167,7 @@
           "item3": "Rapport de vulnérabilité détaillé"
         }
       },
+      "privacy_text": "Hébergement européen, stockage chiffré et contrôles de confidentialité documentés.",
       "explore": {
         "eyebrow": "Aller plus loin",
         "title": "Explorer nos ressources",
@@ -2074,15 +2185,15 @@
         "eyebrow": "Tarif transparent",
         "title": "Un prix honnête, tout compris",
         "unit": "par utilisateur / mois, sans engagement",
-        "badge": "3× moins cher que la concurrence",
-        "description": "Jusqu'à 3 à 4 fois moins cher que Bitwarden Teams ou 1Password Business, avec la maintenance, la formation et l'audit inclus dans le prix.",
+        "badge": "Tarif clair pour les PME",
+        "description": "Une offre lisible qui réunit le logiciel, le support et l’accompagnement annoncé, sans comparaison tarifaire trompeuse.",
         "cta": "Commencer maintenant",
         "feature1": "Mots de passe illimités",
         "feature2": "Partages illimités",
         "feature3": "Authentification 2FA",
         "feature4": "Audit de sécurité intégré",
         "feature5": "Formation collaborateurs",
-        "feature6": "Support prioritaire < 2h"
+        "feature6": "Support prioritaire"
       },
       "cta": {
         "title": "Prêt à sécuriser votre PME ?",
@@ -2243,7 +2354,17 @@
         "h1_and": "et",
         "h1_suffix": "quelle solution pour votre PME ?",
         "subtitle": "Comparaison factuelle des fonctionnalités, prix et services inclus. Pour vous aider à choisir en connaissance de cause.",
-        "disclaimer": "Données publiques — prix indicatifs au 01/2026. Vérifiez les tarifs officiels."
+        "disclaimer": "Données publiques — prix indicatifs vérifiés en 08/2026. Vérifiez les tarifs officiels avant votre achat."
+      },
+      "summary": {
+        "title": "Le bon choix dépend surtout de votre organisation",
+        "description": "Ce tableau met en regard des offres destinées aux équipes. Il ne remplace pas l’analyse de vos contraintes de sécurité, d’administration et d’accompagnement.",
+        "point1": "MYKEYNEST privilégie une prise en main simple, le partage contrôlé et un accompagnement en français.",
+        "point2": "Bitwarden et 1Password proposent des écosystèmes plus anciens et une architecture zero-knowledge documentée.",
+        "point3": "Comparez le coût total, le nombre de sièges et les services réellement inclus dans l’offre retenue."
+      },
+      "methodology": {
+        "text": "Méthode : prix hors taxes affichés par mois pour une facturation annuelle chez les concurrents. Sources officielles consultées en août 2026 :"
       },
       "table": {
         "eyebrow": "Tableau comparatif",
@@ -2276,9 +2397,9 @@
       "why": {
         "eyebrow": "Pourquoi choisir MYKEYNEST",
         "title": "4 raisons de nous choisir",
-        "subtitle": "Au-delà du prix, MYKEYNEST est la seule solution qui accompagne vraiment votre PME.",
+        "subtitle": "Au-delà du prix, évaluez la simplicité de déploiement, l’accompagnement et les besoins réels de votre PME.",
         "price": {
-          "title": "3× moins cher",
+          "title": "Tarif lisible",
           "desc": "À 6,99 €/utilisateur/mois, MYKEYNEST reste compétitif pour les PME qui veulent le logiciel, le support et l'accompagnement dans une offre unique."
         },
         "maintenance": {
@@ -2291,7 +2412,7 @@
         },
         "french": {
           "title": "Équipe française",
-          "desc": "Un support en français, une équipe basée en France, des réponses en moins de 2h en semaine."
+          "desc": "Un support en français et une équipe basée en France pour échanger avec des interlocuteurs qui comprennent votre contexte."
         }
       },
       "cta": {
@@ -2320,15 +2441,33 @@
         "eyebrow": "Audit & Formation",
         "h1_highlight": "Audit & Formation cybersécurité",
         "h1_suffix": "pour protéger votre PME",
-        "subtitle": "91 % des cyberattaques commencent par une erreur humaine. Nous auditons vos vulnérabilités et formons vos équipes pour que ça ne vous arrive pas.",
+        "subtitle": "Identifiez les accès fragiles, priorisez les corrections et donnez à vos équipes des réflexes concrets face au phishing et aux erreurs du quotidien.",
         "pill1": "Audit cybersécurité PME",
         "pill2": "Formation collaborateurs",
         "pill3": "Sensibilisation phishing"
       },
-      "proof": {
-        "stat1": "des cyberattaques commencent par une erreur humaine (source : IBM)",
-        "stat2": "les PME formées réduisent les incidents de sécurité",
-        "stat3": "coût moyen d'une cyberattaque pour une PME (source : ANSSI)"
+      "summary": {
+        "title": "Un diagnostic exploitable, pas un rapport décoratif",
+        "description": "L’intervention est cadrée selon votre environnement, vos outils et les risques qui comptent réellement pour votre activité.",
+        "point1": "Périmètre défini avec votre référent avant toute analyse.",
+        "point2": "Constats classés par criticité et accompagnés d’actions concrètes.",
+        "point3": "Restitution claire pour les équipes techniques comme pour la direction."
+      },
+      "deliverables": {
+        "eyebrow": "Livrables",
+        "title": "Ce que vous recevez à la fin de l’intervention",
+        "scope": {
+          "title": "État des lieux documenté",
+          "text": "Une synthèse du périmètre observé, des pratiques identifiées et des risques à traiter en priorité."
+        },
+        "roadmap": {
+          "title": "Plan de remédiation",
+          "text": "Des actions ordonnées par urgence, effort et impact pour avancer sans bloquer vos opérations."
+        },
+        "review": {
+          "title": "Restitution accompagnée",
+          "text": "Un échange de clôture pour comprendre les constats, répondre aux questions et organiser les prochaines étapes."
+        }
       },
       "services": {
         "eyebrow": "Nos services",

@@ -1,12 +1,10 @@
-Bonjour,
+{{ 'reset_password.email.text_intro'|trans }}
 
-Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte MYKEYNEST.
-
-Ouvrez ce lien pour choisir un nouveau mot de passe :
+{{ 'reset_password.email.text_action'|trans }}
 {{ url('app_reset_password', {token: resetToken.token}) }}
 
-Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.
+{{ 'reset_password.email.expiry'|trans({ '%duration%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }) }}
 
-Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.
+{{ 'reset_password.email.text_ignore'|trans }}
 
 MYKEYNEST

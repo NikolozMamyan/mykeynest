@@ -47,7 +47,6 @@
     <!-- Colonne droite - Formulaire -->
     <div class="login-form-section">
       <div class="widgets-toggles">
-        {% include 'components/parts/theme_mode_btn.html.twig' %}
         {% include "components/parts/lang_switcher.html.twig" %}
       </div>
 
@@ -87,10 +86,10 @@
 
         <p class="auth-hint">
           {{ 'auth.login.form.hint'|trans }}
-          <a href="/register">{{ 'auth.login.form.hint_link'|trans }}</a>
+          <a href="{{ path('show_register') }}">{{ 'auth.login.form.hint_link'|trans }}</a>
           <br>
           <br>
-          <a href="/reset-password">{{ 'auth.login.form.hint_link1'|trans }}</a>
+          <a href="{{ path('app_forgot_password_request') }}">{{ 'auth.login.form.hint_link1'|trans }}</a>
         </p>
       </form>
 

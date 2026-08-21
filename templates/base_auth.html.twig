@@ -19,7 +19,13 @@
       'legal_cgv',
       'legal_privacy'
     ] %}
-    {% set sensitiveAuthRoutes = ['app_guest_register', 'app_guest_shared_preview'] %}
+    {% set sensitiveAuthRoutes = [
+      'app_guest_register',
+      'app_guest_shared_preview',
+      'app_forgot_password_request',
+      'app_check_email',
+      'app_reset_password'
+    ] %}
     {% set isSensitiveAuthRoute = currentRoute in sensitiveAuthRoutes %}
     {% set analyticsExcludedRoutes = sensitiveAuthRoutes|merge(['legal_privacy']) %}
     {% set legacyMetaHead = block('meta_description')|trim %}
@@ -65,7 +71,7 @@
     {% if legacyMetaHead is not empty %}
       {{ legacyMetaHead|raw }}
     {% else %}
-      <meta name="description" content="{% block description %}Securisez vos mots de passe et vos acces avec MYKEYNEST. Chiffrement AES-256, zero-knowledge, synchronisation multi-appareils et partage securise.{% endblock %}" />
+      <meta name="description" content="{% block description %}Securisez vos mots de passe et vos acces avec MYKEYNEST. Chiffrement AES-256, synchronisation multi-appareils et partage securise.{% endblock %}" />
       {% set keywords = block('keywords')|trim %}
       {% if keywords is not empty %}
         <meta name="keywords" content="{{ keywords }}" />
@@ -115,7 +121,8 @@
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}?v=4" />
     <link rel="alternate" type="text/markdown" title="LLMs" href="{{ absolute_url(asset('llms.txt')) }}" />
 
-    {% if not isSensitiveAuthRoute %}
+    {% set externalIconExcludedRoutes = ['app_guest_register', 'app_guest_shared_preview'] %}
+    {% if currentRoute not in externalIconExcludedRoutes %}
       <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
       <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
 
@@ -127,6 +134,7 @@
 
     {% block head_extras %}{% endblock %}
     {% block stylesheets %}{% endblock %}
+    <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}" />
     {% block page_styles %}{% endblock %}
     {% block javascripts %}
       {% block importmap %}{{ importmap('app') }}{% endblock %}
@@ -163,9 +171,25 @@
     {% endif %}
 
     {% block body %}{% endblock %}
-    {{ render(path('app_support_chat_widget')) }}
+    {% if route not in ['show_login', 'show_register', 'app_pending_login', 'app_guest_register', 'app_guest_shared_preview'] %}
+      {% block public_footer %}
+        {% include 'components/parts/_public_footer.html.twig' %}
+      {% endblock %}
+    {% endif %}
+    {% set supportChatExcludedRoutes = [
+      'show_login',
+      'show_register',
+      'app_pending_login',
+      'app_guest_register',
+      'app_guest_shared_preview',
+      'app_forgot_password_request',
+      'app_check_email',
+      'app_reset_password'
+    ] %}
+    {% if route not in supportChatExcludedRoutes %}
+      {{ render(path('app_support_chat_widget')) }}
+    {% endif %}
     {% include './components/parts/_toasts.html.twig' %}
-    {% include './components/parts/_pwa_install_banner.html.twig' %}
   </body>
 </html>
 

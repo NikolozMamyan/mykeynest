@@ -16,12 +16,6 @@
         var(--color-bg, #f7f9fc);
     }
     .privacy-shell { width: min(980px, 100%); margin: 0 auto; }
-    .privacy-topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
-    .privacy-brand { display: inline-flex; align-items: center; gap: 10px; color: inherit; font-weight: 850; text-decoration: none; letter-spacing: -.02em; }
-    .privacy-brand img { width: 38px; height: 38px; object-fit: contain; }
-    .privacy-languages { display: flex; gap: 6px; }
-    .privacy-languages a { padding: 7px 10px; border-radius: 6px; color: var(--color-text-muted, #64748b); font-size: 13px; font-weight: 750; text-decoration: none; }
-    .privacy-languages a[aria-current="page"] { color: #047857; background: rgba(16, 185, 129, .12); }
     .privacy-hero, .privacy-card {
       border: 1px solid rgba(100, 116, 139, .18);
       border-radius: 10px;
@@ -56,22 +50,11 @@
     [data-theme="dark"] .privacy-intro, [data-theme="dark"] .privacy-meta, [data-theme="dark"] .privacy-card p, [data-theme="dark"] .privacy-list li, [data-theme="dark"] .privacy-table td { color: #aab8c6; }
     [data-theme="dark"] .privacy-table th { color: #f8fafc; }
     [data-theme="dark"] .privacy-table code, [data-theme="dark"] .privacy-card a { color: #5ee6b5; }
-    @media (max-width: 620px) { .privacy-page { padding: 24px 12px 48px; } .privacy-topbar { align-items: flex-start; } .privacy-brand span { display: none; } .privacy-table th, .privacy-table td { padding: 11px 8px; } }
+    @media (max-width: 620px) { .privacy-page { padding: 24px 12px 48px; } .privacy-table th, .privacy-table td { padding: 11px 8px; } }
   </style>
 
   <main class="privacy-page">
     <div class="privacy-shell">
-      <div class="privacy-topbar">
-        <a class="privacy-brand" href="{{ path('app_landing') }}">
-          <img src="{{ asset('apple-touch-icon.png') }}?v=4" alt="" />
-          <span>MYKEYNEST</span>
-        </a>
-        <nav class="privacy-languages" aria-label="{{ 'privacy.language_label'|trans }}">
-          <a href="{{ path('legal_privacy') }}" {% if app.request.locale != 'en' %}aria-current="page"{% endif %}>FR</a>
-          <a href="{{ path('legal_privacy', {lang: 'en'}) }}" {% if app.request.locale == 'en' %}aria-current="page"{% endif %}>EN</a>
-        </nav>
-      </div>
-
       <header class="privacy-hero">
         <p class="privacy-eyebrow">{{ 'privacy.eyebrow'|trans }}</p>
         <h1>{{ 'privacy.title'|trans }}</h1>

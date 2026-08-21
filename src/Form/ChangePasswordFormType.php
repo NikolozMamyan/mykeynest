@@ -27,11 +27,11 @@ class ChangePasswordFormType extends AbstractType
                 'first_options' => [
                     'constraints' => [
                         new NotBlank([
-                            'message' => 'Please enter a password',
+                            'message' => 'reset_password.validation.password_required',
                         ]),
                         new Length([
                             'min' => 12,
-                            'minMessage' => 'Your password should be at least {{ limit }} characters',
+                            'minMessage' => 'reset_password.validation.password_length',
                             // max length allowed by Symfony for security reasons
                             'max' => 4096,
                         ]),
@@ -43,7 +43,7 @@ class ChangePasswordFormType extends AbstractType
                 'second_options' => [
                     'label' => 'Repeat Password',
                 ],
-                'invalid_message' => 'The password fields must match.',
+                'invalid_message' => 'reset_password.validation.password_mismatch',
                 // Instead of being set onto the object directly,
                 // this is read and encoded in the controller
                 'mapped' => false,
@@ -53,6 +53,10 @@ class ChangePasswordFormType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([]);
+        $resolver->setDefaults([
+            // The reset token and this CSRF token share the same secure session.
+            // This remains reliable when the sensitive page hides its Referer.
+            'csrf_token_id' => 'reset_password_change',
+        ]);
     }
 }

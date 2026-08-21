@@ -1,17 +1,17 @@
 {% extends 'emails/layout.html.twig' %}
 
-{% block title %}Réinitialisez votre mot de passe{% endblock %}
-{% block preheader %}Utilisez ce lien sécurisé pour choisir un nouveau mot de passe MYKEYNEST.{% endblock %}
-{% block eyebrow %}Sécurité du compte{% endblock %}
-{% block heading %}Réinitialisez votre mot de passe{% endblock %}
+{% block title %}{{ 'reset_password.email.subject'|trans }}{% endblock %}
+{% block preheader %}{{ 'reset_password.email.preheader'|trans }}{% endblock %}
+{% block eyebrow %}{{ 'reset_password.email.eyebrow'|trans }}{% endblock %}
+{% block heading %}{{ 'reset_password.email.heading'|trans }}{% endblock %}
 
 {% block content %}
-  <p style="margin:0;">Nous avons reçu une demande de réinitialisation pour votre compte MYKEYNEST. Utilisez le bouton ci-dessous pour choisir un nouveau mot de passe.</p>
-  <p style="margin:22px 0 0;padding:12px 14px;background:#fff8e7;border-left:3px solid #f59e0b;border-radius:4px;color:#80601f;font-size:12px;">Le lien expire dans <strong>{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</strong>.</p>
+  <p style="margin:0;">{{ 'reset_password.email.intro'|trans }}</p>
+  <p style="margin:22px 0 0;padding:12px 14px;background:#fff8e7;border-left:3px solid #f59e0b;border-radius:4px;color:#80601f;font-size:12px;">{{ 'reset_password.email.expiry'|trans({ '%duration%': '<strong>' ~ (resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle')) ~ '</strong>' })|raw }}</p>
 {% endblock %}
 
 {% block action %}
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#059669;border-radius:4px;"><a href="{{ url('app_reset_password', {token: resetToken.token}) }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">Choisir un nouveau mot de passe</a></td></tr></table>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#059669;border-radius:4px;"><a href="{{ url('app_reset_password', {token: resetToken.token}) }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">{{ 'reset_password.email.action'|trans }}</a></td></tr></table>
 {% endblock %}
 
-{% block footer %}<p style="margin:0;">Si vous n’êtes pas à l’origine de cette demande, ignorez cet e-mail : votre mot de passe ne sera pas modifié.</p><p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>{% endblock %}
+{% block footer %}<p style="margin:0;">{{ 'reset_password.email.ignore'|trans }}</p><p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>{% endblock %}

@@ -1,0 +1,7 @@
+{
+  "reset_password.validation.email_required": "Saisissez votre adresse e-mail.",
+  "reset_password.validation.email_invalid": "Saisissez une adresse e-mail valide.",
+  "reset_password.validation.password_required": "Saisissez un nouveau mot de passe.",
+  "reset_password.validation.password_length": "Le mot de passe doit contenir au moins {{ limit }} caractères.",
+  "reset_password.validation.password_mismatch": "Les deux mots de passe doivent être identiques."
+}

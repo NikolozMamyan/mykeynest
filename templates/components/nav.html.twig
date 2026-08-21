@@ -8,10 +8,12 @@
     <button class="btn nav-toggle"
             type="button"
             aria-controls="primary-nav"
-            aria-expanded="false"
-            data-nav-target="toggle"
-            data-action="click->nav#toggleMenu">
-      <i class="fas fa-bars" aria-hidden="true"></i>
+      aria-expanded="false"
+      data-nav-target="toggle"
+      data-action="click->nav#toggleMenu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
     </button>
 
     <div class="nav-links"
@@ -26,13 +28,11 @@
         {% else %}
           {% include 'components/parts/lang_switcher.html.twig' %}
         {% endif %}
-        {% include 'components/parts/theme_mode_btn.html.twig' %}
       </div>
 
       <a href="/#features" class="nav-link" data-action="click->nav#smoothScroll">{{ 'landing.nav.features'|trans }}</a>
-      {# <a href="{{path('app_help_center')}}" class="nav-link">{{ 'landing.nav.how_it_works'|trans }}</a> #}
       <a href="/#pricing" class="nav-link" data-action="click->nav#smoothScroll">{{ 'landing.nav.pricing'|trans }}</a>
-      <a href="{{ path('app_install_app') }}" class="nav-link nav-link-mobile-only">{{ 'landing.nav.install_hybrid_app'|trans }}</a>
+      <a href="{{ path('app_help_center') }}" class="nav-link">{{ 'landing.footer.links.help_center'|trans }}</a>
 
       <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
          lang="{{ app.request.locale }}"
@@ -47,11 +47,8 @@
     </div>
 
     <div class="nav-cta">
-      <a href="{{ path('app_install_app') }}" class="btn btn-outline">{{ 'landing.nav.install_hybrid_app'|trans }}</a>
       <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
       <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
-
-      {% include 'components/parts/theme_mode_btn.html.twig' %}
 
       <div class="nav-lang" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
         {% set route = app.request.attributes.get('_route') %}

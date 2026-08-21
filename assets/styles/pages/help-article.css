@@ -279,6 +279,16 @@
 
     .art-content p:last-child { margin-bottom: 0; }
 
+    .art-content a {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        text-decoration: underline;
+        text-decoration-color: rgba(5, 150, 105, 0.35);
+        text-underline-offset: 0.18em;
+    }
+
+    .art-content a:hover { color: var(--color-primary); }
+
     .art-content ul, .art-content ol {
         padding-left: 1.25rem;
         margin-bottom: 1rem;
@@ -526,6 +536,59 @@
         align-items: center;
         gap: 0.25rem;
     }
+
+    .art-related-time svg {
+        width: 0.75rem;
+        height: 0.75rem;
+        flex: 0 0 0.75rem;
+    }
+
+    .art-guide-action {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 0.875rem;
+        margin-bottom: 1rem;
+        padding: 0.875rem 1rem;
+        color: var(--color-text-dark);
+        background: linear-gradient(135deg, rgba(5, 150, 105, 0.09), rgba(16, 185, 129, 0.03));
+        border: 1px solid rgba(5, 150, 105, 0.22);
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .art-guide-action:hover {
+        border-color: rgba(5, 150, 105, 0.5);
+        box-shadow: var(--shadow-green);
+        transform: translateY(-1px);
+    }
+
+    .art-guide-action__icon {
+        display: grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        color: var(--color-primary);
+        background: var(--color-white);
+        border: 1px solid rgba(5, 150, 105, 0.18);
+        border-radius: var(--border-radius-sm);
+    }
+
+    .art-guide-action small,
+    .art-guide-action strong { display: block; }
+
+    .art-guide-action small {
+        margin-bottom: 0.12rem;
+        color: var(--color-text-muted);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .art-guide-action strong { font-size: 0.875rem; }
+    .art-guide-action__arrow { color: var(--color-primary); }
 
     /* Share */
     .art-share-btns { display: flex; gap: 0.5rem; }

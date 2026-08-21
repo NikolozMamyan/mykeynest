@@ -92,10 +92,10 @@ final class HelpCenterController extends AbstractController
                     'en' => 'Security & Encryption',
                 ],
                 'description' => [
-                    'fr' => 'Architecture zero-knowledge, AES-256, mot de passe maître et bonnes pratiques.',
-                    'en' => 'Zero-knowledge architecture, AES-256, master password, and best practices.',
+                    'fr' => 'Chiffrement AES-256-GCM, sécurité du compte, 2FA et bonnes pratiques.',
+                    'en' => 'AES-256-GCM encryption, account security, 2FA, and best practices.',
                 ],
-                'tags' => 'sécurité mot de passe master chiffrement aes zero knowledge 2fa',
+                'tags' => 'sécurité mot de passe master chiffrement aes authentification 2fa',
                 'articleCount' => 5,
             ],
             [
@@ -183,8 +183,8 @@ final class HelpCenterController extends AbstractController
         $securityAccessFr = $freeHasSecurityChecker ? 'inclus au plan Free' : 'plan Pro requis';
         $securityAccessEn = $freeHasSecurityChecker ? 'included in the Free plan' : 'Pro plan required';
 
-        $proAdvantagesFr = ['Authentification 2FA', 'Support prioritaire &lt;2h'];
-        $proAdvantagesEn = ['2FA authentication', 'Priority support (&lt;2h)'];
+        $proAdvantagesFr = ['Authentification 2FA', 'Support prioritaire'];
+        $proAdvantagesEn = ['2FA authentication', 'Priority support'];
         if ($freeCredentialLimit !== null) {
             array_unshift($proAdvantagesFr, sprintf('Mots de passe <strong>illimités</strong> (vs %s)', $credentialComparisonFr));
             array_unshift($proAdvantagesEn, sprintf('<strong>Unlimited</strong> passwords (vs %s)', $credentialComparisonEn));
@@ -244,8 +244,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Create your account',
                             ],
                             'content' => [
-                                'fr' => '<p>Rendez-vous sur <strong>key-nest.com</strong> et cliquez sur <strong>Essai gratuit</strong>. Renseignez votre adresse email et choisissez un mot de passe maître robuste. Ce mot de passe est la <em>seule clé</em> qui déchiffre votre coffre — il ne sera jamais transmis à nos serveurs.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text"><strong>Astuce :</strong> Utilisez notre générateur intégré pour créer un mot de passe maître de 20+ caractères, puis notez-le dans un endroit physique sûr.</span></div>',
-                                'en' => '<p>Go to <strong>key-nest.com</strong> and click <strong>Free trial</strong>. Enter your email address and choose a strong master password. This password is the <em>only key</em> that decrypts your vault — it is never sent to our servers.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text"><strong>Tip:</strong> Use our built-in generator to create a 20+ character master password, then write it down in a safe physical place.</span></div>',
+                                'fr' => '<p>Rendez-vous sur <strong>key-nest.com</strong> et cliquez sur <strong>Essai gratuit</strong>. Renseignez votre adresse email et choisissez un mot de passe principal robuste et unique.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text"><strong>Astuce :</strong> utilisez une phrase de passe longue, activez la 2FA si votre offre le permet et ne réutilisez jamais ce mot de passe sur un autre service.</span></div>',
+                                'en' => '<p>Go to <strong>key-nest.com</strong> and click <strong>Free trial</strong>. Enter your email address and choose a strong, unique primary password.</p><div class="art-callout"><span class="art-callout-icon"><i class="fa-solid fa-lightbulb"></i></span><span class="art-callout-text"><strong>Tip:</strong> use a long passphrase, enable 2FA when your plan supports it and never reuse this password on another service.</span></div>',
                             ],
                         ],
                         [
@@ -266,8 +266,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'Add your first credential',
                             ],
                             'content' => [
-                                'fr' => '<p>Une fois connecté, cliquez sur <strong>+ Nouvel identifiant</strong>. Renseignez le site, l\'email et le mot de passe. MYKEYNEST chiffre tout localement avant la sauvegarde.</p>',
-                                'en' => '<p>Once logged in, click <strong>+ New credential</strong>. Enter the website, email/username, and password. MYKEYNEST encrypts everything locally before saving.</p>',
+                                'fr' => '<p>Une fois connecté, cliquez sur <strong>+ Nouvel identifiant</strong>. Renseignez le site, l\'email et le mot de passe. Le secret est chiffré avec AES-256-GCM avant sa persistance.</p>',
+                                'en' => '<p>Once logged in, click <strong>+ New credential</strong>. Enter the website, email/username and password. The secret is encrypted with AES-256-GCM before it is persisted.</p>',
                             ],
                         ],
                     ],
@@ -383,8 +383,8 @@ final class HelpCenterController extends AbstractController
                         'en' => 'Use MYKEYNEST on mobile',
                     ],
                     'excerpt' => [
-                        'fr' => 'L\'application mobile MYKEYNEST est disponible sur iOS et Android. Découvrez comment l\'installer et activer la biométrie.',
-                        'en' => 'The MYKEYNEST mobile app is available on iOS and Android. Learn how to install it and enable biometrics.',
+                        'fr' => 'Installez l’application web MYKEYNEST depuis votre navigateur sur iPhone, iPad ou Android.',
+                        'en' => 'Install the MYKEYNEST web app from your browser on iPhone, iPad, or Android.',
                     ],
                     'readTime' => 3,
                     'popular' => false,
@@ -400,23 +400,23 @@ final class HelpCenterController extends AbstractController
                         [
                             'id' => 'telecharger',
                             'title' => [
-                                'fr' => 'Télécharger l\'application',
-                                'en' => 'Download the app',
+                                'fr' => 'Installer depuis le navigateur',
+                                'en' => 'Install from your browser',
                             ],
                             'content' => [
-                                'fr' => '<p>L\'application est disponible sur l\'<strong>App Store</strong> (iOS 15+) et le <strong>Google Play Store</strong> (Android 9+). Recherchez « MYKEYNEST ».</p>',
-                                'en' => '<p>The app is available on the <strong>App Store</strong> (iOS 15+) and the <strong>Google Play Store</strong> (Android 9+). Search for “MYKEYNEST”.</p>',
+                                'fr' => '<p>MYKEYNEST est une application web installable : aucun téléchargement depuis l’App Store ou Google Play n’est nécessaire. Ouvrez le guide d’installation depuis le bouton ci-dessus, puis suivez les étapes adaptées à votre appareil.</p>',
+                                'en' => '<p>MYKEYNEST is an installable web app: no App Store or Google Play download is required. Open the installation guide using the button above, then follow the steps for your device.</p>',
                             ],
                         ],
                         [
-                            'id' => 'biometrie',
+                            'id' => 'raccourci',
                             'title' => [
-                                'fr' => 'Activer la biométrie',
-                                'en' => 'Enable biometrics',
+                                'fr' => 'Ajouter MYKEYNEST à l’écran d’accueil',
+                                'en' => 'Add MYKEYNEST to your home screen',
                             ],
                             'content' => [
-                                'fr' => '<p>Activez <strong>Face ID</strong> ou <strong>Touch ID</strong> dans <em>Paramètres › Sécurité › Biométrie</em> pour accéder à votre coffre sans saisir votre mot de passe maître à chaque fois.</p>',
-                                'en' => '<p>Enable <strong>Face ID</strong> or <strong>Touch ID</strong> in <em>Settings › Security › Biometrics</em> to access your vault without typing your master password every time.</p>',
+                                'fr' => '<p>Sur iPhone ou iPad, utilisez <strong>Partager › Sur l’écran d’accueil</strong>. Sur Android, choisissez <strong>Installer l’application</strong> ou <strong>Ajouter à l’écran d’accueil</strong> dans le menu du navigateur.</p>',
+                                'en' => '<p>On iPhone or iPad, use <strong>Share › Add to Home Screen</strong>. On Android, choose <strong>Install app</strong> or <strong>Add to Home screen</strong> from the browser menu.</p>',
                             ],
                         ],
                     ],
@@ -428,12 +428,12 @@ final class HelpCenterController extends AbstractController
                 'zero-knowledge-explique' => [
                     'slug' => 'zero-knowledge-explique',
                     'title' => [
-                        'fr' => 'Qu\'est-ce que l\'architecture zero-knowledge ?',
-                        'en' => 'What is zero-knowledge architecture?',
+                        'fr' => 'Comment MYKEYNEST protège les identifiants enregistrés ?',
+                        'en' => 'How does MYKEYNEST protect stored credentials?',
                     ],
                     'excerpt' => [
-                        'fr' => 'Découvrez comment MYKEYNEST garantit que personne, même nos équipes, ne peut accéder à vos mots de passe en clair.',
-                        'en' => 'Learn how MYKEYNEST ensures no one — not even our team — can access your passwords in plain text.',
+                        'fr' => 'Comprenez le chiffrement des secrets, les contrôles d’accès et les protections appliquées par le service.',
+                        'en' => 'Understand secret encryption, access controls and the protections applied by the service.',
                     ],
                     'readTime' => 4,
                     'popular' => true,
@@ -449,12 +449,12 @@ final class HelpCenterController extends AbstractController
                         [
                             'id' => 'definition',
                             'title' => [
-                                'fr' => 'C\'est quoi "zero-knowledge" ?',
-                                'en' => 'What does “zero-knowledge” mean?',
+                                'fr' => 'Protection des secrets enregistrés',
+                                'en' => 'Protection for stored secrets',
                             ],
                             'content' => [
-                                'fr' => '<p>L\'architecture <strong>zero-knowledge</strong> signifie que MYKEYNEST n\'a <em>jamais accès</em> à vos données en clair. Vos mots de passe sont chiffrés localement avant d\'être envoyés sur nos serveurs.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>En résumé :</strong> Même si nos serveurs étaient piratés, les attaquants ne verraient que du chiffré totalement inutilisable.</span></div>',
-                                'en' => '<p><strong>Zero-knowledge</strong> means MYKEYNEST <em>never has access</em> to your data in plain text. Your passwords are encrypted locally before being sent to our servers.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>In short:</strong> Even if our servers were hacked, attackers would only see unusable encrypted data.</span></div>',
+                                'fr' => '<p>MYKEYNEST chiffre les mots de passe enregistrés avec <strong>AES-256-GCM</strong> avant leur persistance. Les données chiffrées intègrent un vecteur d’initialisation aléatoire et une balise d’authentification qui permet de détecter une altération.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>Important :</strong> le chiffrement au repos complète l’authentification, les autorisations et la sécurité de votre appareil ; il ne les remplace pas.</span></div>',
+                                'en' => '<p>MYKEYNEST encrypts stored passwords with <strong>AES-256-GCM</strong> before persistence. Encrypted values include a random initialization vector and an authentication tag used to detect tampering.</p><div class="art-callout"><span class="art-callout-icon">🔒</span><span class="art-callout-text"><strong>Important:</strong> encryption at rest complements authentication, authorization and device security; it does not replace them.</span></div>',
                             ],
                         ],
                         [
@@ -464,8 +464,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'How does it work?',
                             ],
                             'content' => [
-                                'fr' => '<ol><li>Vous saisissez votre <strong>mot de passe maître</strong>.</li><li>Il est transformé en clé via <code>PBKDF2</code> — jamais transmis au serveur.</li><li>La clé déchiffre localement vos données récupérées depuis nos serveurs.</li></ol>',
-                                'en' => '<ol><li>You enter your <strong>master password</strong>.</li><li>It is derived into a key using <code>PBKDF2</code> — never sent to the server.</li><li>The key decrypts your data locally after it’s fetched from our servers.</li></ol>',
+                                'fr' => '<ol><li>Votre compte est authentifié et les autorisations sont vérifiées.</li><li>Une clé de chiffrement propre au compte est dérivée avec le secret applicatif.</li><li>Le serveur ne restitue le secret déchiffré qu’au parcours autorisé : affichage, partage permis ou remplissage par l’extension.</li></ol>',
+                                'en' => '<ol><li>Your account is authenticated and permissions are checked.</li><li>An account-specific encryption key is derived together with the application secret.</li><li>The server returns a decrypted secret only through an authorized flow: viewing, permitted sharing or extension autofill.</li></ol>',
                             ],
                         ],
                         [
@@ -475,8 +475,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'What this implies',
                             ],
                             'content' => [
-                                'fr' => '<p>Nous <strong>ne pouvons pas récupérer</strong> votre mot de passe maître si vous le perdez. Configurez une récupération d\'urgence depuis vos Paramètres.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Conservez votre mot de passe maître dans un lieu physique sûr.</span></div>',
-                                'en' => '<p>We <strong>cannot recover</strong> your master password if you lose it. Set up emergency recovery in your Settings.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Keep your master password in a safe physical place.</span></div>',
+                                'fr' => '<p>Protégez l’accès au compte avec un mot de passe unique, la 2FA lorsque disponible et des sessions régulièrement vérifiées. En cas d’oubli, utilisez le lien <strong>Mot de passe oublié</strong> depuis la page de connexion.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Ne transmettez jamais un lien de réinitialisation ou un code de validation à un tiers.</span></div>',
+                                'en' => '<p>Protect account access with a unique password, 2FA when available and regular session reviews. If you forget the password, use <strong>Forgot password</strong> on the sign-in page.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Never share a reset link or validation code with a third party.</span></div>',
                             ],
                         ],
                     ],
@@ -489,8 +489,8 @@ final class HelpCenterController extends AbstractController
                         'en' => 'How does AES-256 encryption work?',
                     ],
                     'excerpt' => [
-                        'fr' => 'Plongez dans les détails du standard de chiffrement militaire utilisé par MYKEYNEST pour protéger vos données.',
-                        'en' => 'Dive into the details of the military-grade encryption standard used by MYKEYNEST to protect your data.',
+                        'fr' => 'Découvrez le standard AES-256-GCM utilisé par MYKEYNEST pour protéger les secrets enregistrés.',
+                        'en' => 'Learn about the AES-256-GCM standard MYKEYNEST uses to protect stored secrets.',
                     ],
                     'readTime' => 6,
                     'popular' => false,
@@ -510,8 +510,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'What is AES-256?',
                             ],
                             'content' => [
-                                'fr' => '<p>AES-256 est le standard de chiffrement symétrique adopté par les gouvernements, militaires et banques. MYKEYNEST l\'utilise pour chiffrer toutes vos données.</p>',
-                                'en' => '<p>AES-256 is a symmetric encryption standard used by governments, militaries, and banks. MYKEYNEST uses it to encrypt all your data.</p>',
+                                'fr' => '<p>AES-256 est un standard de chiffrement symétrique largement étudié. MYKEYNEST utilise le mode authentifié <strong>AES-256-GCM</strong> pour chiffrer les mots de passe enregistrés et détecter une éventuelle altération.</p>',
+                                'en' => '<p>AES-256 is a widely studied symmetric encryption standard. MYKEYNEST uses authenticated <strong>AES-256-GCM</strong> to encrypt stored passwords and detect tampering.</p>',
                             ],
                         ],
                         [
@@ -567,8 +567,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'I forgot my master password',
                             ],
                             'content' => [
-                                'fr' => '<p>En raison du zero-knowledge, nous ne pouvons pas le récupérer. Si vous avez configuré une <strong>récupération d\'urgence</strong>, allez sur <em>Connexion › Mot de passe oublié</em>.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Sans récupération d\'urgence configurée au préalable, vos données seront inaccessibles.</span></div>',
-                                'en' => '<p>Because of zero-knowledge, we can’t recover it. If you enabled <strong>emergency recovery</strong>, go to <em>Login › Forgot password</em>.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Without emergency recovery set up beforehand, your data will be inaccessible.</span></div>',
+                                'fr' => '<p>Depuis la page de connexion, choisissez <strong>Mot de passe oublié</strong>, saisissez l’adresse e-mail du compte puis utilisez le lien reçu. Le lien est temporaire et ne doit jamais être partagé.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">Si vous ne recevez pas l’e-mail, vérifiez les courriers indésirables puis contactez le support sans communiquer d’identifiant sensible.</span></div>',
+                                'en' => '<p>On the sign-in page, choose <strong>Forgot password</strong>, enter the account email address and use the link you receive. The link is temporary and must never be shared.</p><div class="art-callout art-callout-warn"><span class="art-callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><span class="art-callout-text">If the email does not arrive, check spam and then contact support without disclosing sensitive credentials.</span></div>',
                             ],
                         ],
                     ],
@@ -1000,12 +1000,12 @@ final class HelpCenterController extends AbstractController
                 'installer-extension-firefox' => [
                     'slug' => 'installer-extension-firefox',
                     'title' => [
-                        'fr' => 'Installer l\'extension MYKEYNEST sur Firefox',
-                        'en' => 'Install the MYKEYNEST extension on Firefox',
+                        'fr' => 'Puis-je utiliser l’extension MYKEYNEST sur Firefox ?',
+                        'en' => 'Can I use the MYKEYNEST extension on Firefox?',
                     ],
                     'excerpt' => [
-                        'fr' => 'Guide d\'installation de l\'extension MYKEYNEST pour Firefox avec remplissage automatique des mots de passe.',
-                        'en' => 'Installation guide for the MYKEYNEST Firefox extension with password autofill.',
+                        'fr' => 'Consultez l’état de compatibilité des navigateurs et utilisez la version officielle disponible.',
+                        'en' => 'Check browser compatibility and use the currently available official version.',
                     ],
                     'readTime' => 3,
                     'popular' => false,
@@ -1021,12 +1021,12 @@ final class HelpCenterController extends AbstractController
                         [
                             'id' => 'installation-firefox',
                             'title' => [
-                                'fr' => 'Installer depuis Firefox Add-ons',
-                                'en' => 'Install from Firefox Add-ons',
+                                'fr' => 'Compatibilité actuelle',
+                                'en' => 'Current compatibility',
                             ],
                             'content' => [
-                                'fr' => '<p>Allez sur <strong>addons.mozilla.org</strong>, recherchez « MYKEYNEST » et cliquez sur <strong>Ajouter à Firefox</strong>. Acceptez les permissions et connectez-vous avec vos identifiants MYKEYNEST.</p>',
-                                'en' => '<p>Go to <strong>addons.mozilla.org</strong>, search for “MYKEYNEST”, and click <strong>Add to Firefox</strong>. Accept permissions and sign in with your MYKEYNEST credentials.</p>',
+                                'fr' => '<p>L’extension officielle MYKEYNEST est actuellement distribuée sur le <strong>Chrome Web Store</strong>. La version Firefox n’est pas encore publiée : n’installez aucun paquet provenant d’un site non officiel.</p>',
+                                'en' => '<p>The official MYKEYNEST extension is currently distributed through the <strong>Chrome Web Store</strong>. The Firefox version is not yet published: do not install packages from unofficial websites.</p>',
                             ],
                         ],
                     ],
@@ -1180,8 +1180,8 @@ final class HelpCenterController extends AbstractController
                         'en' => 'How to cancel my Pro subscription?',
                     ],
                     'excerpt' => [
-                        'fr' => 'Annulez à tout moment depuis vos paramètres. Vous conservez l\'accès Pro jusqu\'à la fin de la période en cours.',
-                        'en' => 'Cancel anytime from your settings. You keep Pro access until the end of the current billing period.',
+                        'fr' => 'Gérez l’annulation depuis le portail de facturation Stripe et conservez vos droits jusqu’à l’échéance.',
+                        'en' => 'Manage cancellation through the Stripe billing portal and keep your access until the renewal date.',
                     ],
                     'readTime' => 2,
                     'popular' => false,
@@ -1197,12 +1197,12 @@ final class HelpCenterController extends AbstractController
                         [
                             'id' => 'annuler',
                             'title' => [
-                                'fr' => 'Annuler depuis les paramètres',
-                                'en' => 'Cancel from settings',
+                                'fr' => 'Annuler depuis le portail Stripe',
+                                'en' => 'Cancel from the Stripe portal',
                             ],
                             'content' => [
-                                'fr' => '<p>Allez dans <strong>Paramètres › Abonnement</strong> et cliquez sur <strong>Annuler l\'abonnement</strong>. Votre accès Pro reste actif jusqu\'à la fin de la période mensuelle payée.</p>',
-                                'en' => '<p>Go to <strong>Settings › Subscription</strong> and click <strong>Cancel subscription</strong>. Your Pro access stays active until the end of the paid billing period.</p>',
+                                'fr' => '<p>Ouvrez la page <strong>Abonnement</strong> avec le bouton ci-dessus, puis choisissez <strong>Gérer la facturation</strong>. Dans le portail sécurisé Stripe, programmez l’annulation à l’échéance. Vos droits restent actifs jusqu’à la fin de la période déjà payée.</p>',
+                                'en' => '<p>Open the <strong>Subscription</strong> page using the button above, then choose <strong>Manage billing</strong>. In the secure Stripe portal, schedule cancellation for the renewal date. Your access remains active until the end of the paid period.</p>',
                             ],
                         ],
                         [
@@ -1212,8 +1212,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'What happens to my data?',
                             ],
                             'content' => [
-                                'fr' => '<p>Vos identifiants sont conservés. Les mots de passe au-delà du 5ème deviennent en lecture seule jusqu\'à ce que vous repassiez au Pro ou en supprimiez.</p>',
-                                'en' => '<p>Your credentials are kept. Passwords beyond the 5th become read-only until you upgrade again or delete some.</p>',
+                                'fr' => '<p>Vos identifiants sont conservés. À la fin de l’abonnement, les limites et fonctionnalités du plan gratuit configuré s’appliquent à nouveau. MYKEYNEST vous indique les éventuelles actions nécessaires depuis votre espace.</p>',
+                                'en' => '<p>Your credentials are kept. When the subscription ends, the configured Free plan limits and features apply again. MYKEYNEST shows any required actions in your account.</p>',
                             ],
                         ],
                     ],
@@ -1241,8 +1241,8 @@ final class HelpCenterController extends AbstractController
                 'categorySlug' => 'securite',
                 'articleSlug' => 'zero-knowledge-explique',
                 'title' => [
-                    'fr' => 'Qu\'est-ce que l\'architecture zero-knowledge ?',
-                    'en' => 'What is zero-knowledge architecture?',
+                    'fr' => 'Comment MYKEYNEST protège les identifiants enregistrés ?',
+                    'en' => 'How does MYKEYNEST protect stored credentials?',
                 ],
                 'categoryTitle' => [
                     'fr' => 'Sécurité & Chiffrement',

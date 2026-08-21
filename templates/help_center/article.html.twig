@@ -106,7 +106,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                {{ 'help_article.meta.read_time'|trans({ minutes: article.readTime }) }}
+                {{ 'help_article.meta.read_time'|trans({ '%minutes%': article.readTime }) }}
             </div>
         </div>
     </nav>
@@ -135,7 +135,7 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                {{ 'help_article.back.to_category'|trans({ category: category.title }) }}
+                {{ 'help_article.back.to_category'|trans({ '%category%': category.title }) }}
             </a>
 
             {# Article header #}
@@ -166,7 +166,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        {{ 'help_article.meta.updated_on'|trans({ date: article.updatedAt|date('d/m/Y') }) }}
+                        {{ 'help_article.meta.updated_on'|trans({ '%date%': article.updatedAt|date('d/m/Y') }) }}
                     </span>
 
                     <span class="art-meta-item">
@@ -174,10 +174,79 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        {{ 'help_article.meta.read_time'|trans({ minutes: article.readTime }) }}
+                        {{ 'help_article.meta.read_time'|trans({ '%minutes%': article.readTime }) }}
                     </span>
                 </div>
             </header>
+
+            {% set articleScreenshots = {
+                'creer-son-compte': {
+                    src: 'images/help/register-account.png',
+                    alt: app.request.locale == 'en' ? 'MYKEYNEST account creation form' : 'Formulaire de création de compte MYKEYNEST',
+                    caption: app.request.locale == 'en' ? 'The account form clearly separates company information, email and the master password.' : 'Le formulaire distingue clairement l’entreprise, l’adresse e-mail et le mot de passe principal.'
+                },
+                'application-mobile': {
+                    src: 'images/help/install-mobile.png',
+                    alt: app.request.locale == 'en' ? 'MYKEYNEST mobile installation page' : 'Page d’installation mobile MYKEYNEST',
+                    caption: app.request.locale == 'en' ? 'The installation page adapts its instructions to the detected device.' : 'La page d’installation adapte les instructions à l’appareil détecté.'
+                },
+                'utiliser-le-generateur': {
+                    src: 'images/help/password-generator.png',
+                    alt: app.request.locale == 'en' ? 'MYKEYNEST secure password generator' : 'Générateur de mots de passe sécurisé MYKEYNEST',
+                    caption: app.request.locale == 'en' ? 'Choose the length and character families, then copy the generated password.' : 'Choisissez la longueur et les familles de caractères, puis copiez le mot de passe généré.'
+                },
+                'installer-extension-chrome': {
+                    src: 'images/help/browser-extension.png',
+                    alt: app.request.locale == 'en' ? 'MYKEYNEST browser extension sign-in screen' : 'Écran de connexion de l’extension navigateur MYKEYNEST',
+                    caption: app.request.locale == 'en' ? 'Pair the extension with your web session before using autofill.' : 'Associez l’extension à votre session web avant d’utiliser le remplissage automatique.'
+                }
+            } %}
+            {% set articleScreenshot = articleScreenshots[article.slug] ?? null %}
+            {% if articleScreenshot %}
+                <figure class="art-product-shot">
+                    <div class="art-product-shot__bar" aria-hidden="true"><span></span><span></span><span></span><strong>MYKEYNEST</strong></div>
+                    <img src="{{ asset(articleScreenshot.src) }}?v=20260821" alt="{{ articleScreenshot.alt }}" loading="lazy" decoding="async">
+                    <figcaption>{{ articleScreenshot.caption }}</figcaption>
+                </figure>
+            {% endif %}
+
+            {% set chromeStoreUrl = 'https://chromewebstore.google.com/detail/mykeynest/llckfoodkfccmibgmpfiodjkpincnfid' %}
+            {% set articleActions = {
+                'creer-son-compte': { href: path('show_register'), label: 'help_article.actions.create_account', icon: 'fa-user-plus' },
+                'importer-identifiants': { href: path('credential_import'), label: 'help_article.actions.open_import', icon: 'fa-file-import' },
+                'synchronisation-appareils': { href: path('app_install_app'), label: 'help_article.actions.install_mobile', icon: 'fa-mobile-screen-button' },
+                'application-mobile': { href: path('app_install_app'), label: 'help_article.actions.install_mobile', icon: 'fa-mobile-screen-button' },
+                'zero-knowledge-explique': { href: path('legal_privacy'), label: 'help_article.actions.read_privacy', icon: 'fa-shield-halved' },
+                'aes-256-explique': { href: path('legal_privacy'), label: 'help_article.actions.read_privacy', icon: 'fa-shield-halved' },
+                'mot-de-passe-maitre': { href: path('app_forgot_password_request'), label: 'help_article.actions.reset_password', icon: 'fa-rotate-left' },
+                'activer-2fa': { href: path('app_user_preferences'), label: 'help_article.actions.open_preferences', icon: 'fa-shield-halved' },
+                'audit-securite': { href: path('app_security_checker'), label: 'help_article.actions.open_audit', icon: 'fa-shield' },
+                'utiliser-le-generateur': { href: path('app_public_generator'), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
+                'longueur-ideale': { href: path('app_public_generator'), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
+                'securite-generateur': { href: path('app_public_generator'), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
+                'partager-identifiant': { href: path('shared_access_new'), label: 'help_article.actions.open_sharing', icon: 'fa-share-nodes' },
+                'limite-partages-gratuits': { href: path('shared_access_index'), label: 'help_article.actions.manage_sharing', icon: 'fa-share-nodes' },
+                'revoquer-partage': { href: path('shared_access_index'), label: 'help_article.actions.manage_sharing', icon: 'fa-share-nodes' },
+                'installer-extension-chrome': { href: chromeStoreUrl, label: 'help_article.actions.install_extension', icon: 'fa-puzzle-piece', external: true },
+                'installer-extension-firefox': { href: chromeStoreUrl, label: 'help_article.actions.install_extension', icon: 'fa-puzzle-piece', external: true },
+                'autofill-ne-fonctionne-pas': { href: path('app_extention'), label: 'help_article.actions.open_extension', icon: 'fa-puzzle-piece' },
+                'difference-free-pro': { href: path('app_landing') ~ '#pricing', label: 'help_article.actions.compare_plans', icon: 'fa-table-columns' },
+                'passer-au-pro': { href: path('app_subscription'), label: 'help_article.actions.manage_subscription', icon: 'fa-credit-card' },
+                'annuler-abonnement': { href: path('app_subscription'), label: 'help_article.actions.manage_subscription', icon: 'fa-credit-card' }
+            } %}
+            {% set articleAction = articleActions[article.slug] ?? null %}
+            {% if articleAction %}
+                <a class="art-guide-action"
+                   href="{{ articleAction.href }}"
+                   {% if articleAction.external|default(false) %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                    <span class="art-guide-action__icon" aria-hidden="true"><i class="fa-solid {{ articleAction.icon }}"></i></span>
+                    <span>
+                        <small>{{ 'help_article.actions.eyebrow'|trans }}</small>
+                        <strong>{{ articleAction.label|trans }}</strong>
+                    </span>
+                    <i class="fa-solid fa-arrow-right art-guide-action__arrow" aria-hidden="true"></i>
+                </a>
+            {% endif %}
 
             {# Article body #}
             <article class="art-body-card" id="artContent">
@@ -194,8 +263,8 @@
             {# Like / Dislike #}
             <div class="art-helpful-card" id="artHelpfulCard"
                  data-article="{{ article.slug }}"
-                 data-yes="{{ article.helpfulYes }}"
-                 data-no="{{ article.helpfulNo }}">
+                 data-thanks-yes="{{ 'help_article.helpful.thanks_yes'|trans }}"
+                 data-thanks-no="{{ 'help_article.helpful.thanks_no'|trans }}">
 
                 <p class="art-helpful-label">{{ 'help_article.helpful.question'|trans }}</p>
                 <p class="art-helpful-sub">{{ 'help_article.helpful.sub'|trans }}</p>
@@ -207,7 +276,6 @@
                                   d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                         </svg>
                         {{ 'help_article.helpful.yes'|trans }}
-                        <span class="art-helpful-count" id="countYes">{{ article.helpfulYes }}</span>
                     </button>
 
                     <button class="art-helpful-btn art-helpful-btn-no" id="btnHelpNo" aria-label="{{ 'help_article.helpful.no_aria'|trans }}" data-action="click->help-article#voteNo">
@@ -216,7 +284,6 @@
                                   d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"/>
                         </svg>
                         {{ 'help_article.helpful.no'|trans }}
-                        <span class="art-helpful-count" id="countNo">{{ article.helpfulNo }}</span>
                     </button>
                 </div>
 
@@ -247,7 +314,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
-                                        {{ 'help_article.sidebar.related.time_short'|trans({ minutes: related.readTime }) }}
+                                        {{ 'help_article.sidebar.related.time_short'|trans({ '%minutes%': related.readTime }) }}
                                     </div>
                                 </div>
                             </a>

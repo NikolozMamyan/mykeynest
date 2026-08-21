@@ -17,7 +17,7 @@
   <div class="hero-inner">
     <div class="hero-text">
       <div class="hero-eyebrow" aria-hidden="true">
-        <i class="fas fa-shield-halved"></i> AES-256 - Zero-Knowledge - RGPD
+        <i class="fas fa-shield-halved"></i> {{ 'landing.hero.eyebrow'|trans }}
       </div>
       <h1 class="hero-h1">
         {{ 'landing.hero.title_before'|trans }}
@@ -30,7 +30,7 @@
         </a>
         <a href="#features" class="btn btn-outline btn-lg btn-w">{{ 'landing.hero.cta_discover'|trans }}</a>
       </div>
-      <p class="hero-hint"><i class="fas fa-circle-check"></i> Essai gratuit 14 jours - sans carte bancaire</p>
+      <p class="hero-hint"><i class="fas fa-circle-check"></i> {{ 'landing.hero.hint'|trans }}</p>
       <div class="trust" aria-label="{{ 'landing.hero.trust_aria'|trans }}">
         <div class="trust-item"><i class="fas fa-shield-check"></i><span>{{ 'landing.hero.trust.aes'|trans }}</span></div>
         <div class="trust-item"><i class="fas fa-lock"></i><span>{{ 'landing.hero.trust.zeroknowledge'|trans }}</span></div>
@@ -100,7 +100,7 @@
     <div class="s-div"></div>
     <div class="s-item"><i class="fas fa-euro-sign"></i> Donnees en Europe</div>
     <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-user-secret"></i> Zero-Knowledge</div>
+    <div class="s-item"><i class="fas fa-user-shield"></i> {{ 'landing.hero.trust.zeroknowledge'|trans }}</div>
     <div class="s-div"></div>
     <div class="s-item"><i class="fas fa-check-double"></i> RGPD</div>
   </div>
@@ -214,7 +214,7 @@
           <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
           <li><span class="p-feature-icon"><i class="fas fa-mobile-screen"></i></span><b>{{ 'landing.pricing.showcase.features.two_factor'|trans }}</b><i class="fas fa-check p-yes"></i></li>
           <li><span class="p-feature-icon"><i class="fas fa-shield-halved"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><span>{{ 'landing.pricing.showcase.pro.audit'|trans }}</span></li>
-          <li><span class="p-feature-icon"><i class="fas fa-headset"></i></span><b>{{ 'landing.pricing.showcase.features.support'|trans }}</b><span>&lt; 2h</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-headset"></i></span><b>{{ 'landing.pricing.showcase.features.support'|trans }}</b><span>{{ 'landing.pricing.showcase.pro.support'|trans }}</span></li>
         </ul>
       </div>
 
@@ -429,49 +429,6 @@
     </div>
   </div>
 </section>
-
-{# ======================== FOOTER ======================== #}
-<footer class="footer" role="contentinfo">
-  <div class="foot-grid">
-    <div class="foot-brand">
-      {% include 'components/parts/logo.html.twig' %}
-      <p>{{ 'landing.footer.brand_text'|trans }}</p>
-    </div>
-    <div class="foot-col">
-      <h4>{{ 'landing.footer.product'|trans }}</h4>
-      <ul>
-        <li><a href="#features">{{ 'landing.footer.links.features'|trans }}</a></li>
-        <li><a href="#pricing">{{ 'landing.footer.links.pricing'|trans }}</a></li>
-        <li><a href="#security">{{ 'landing.footer.links.security'|trans }}</a></li>
-        <li><a href="#">{{ 'landing.footer.links.extension'|trans }}</a></li>
-      </ul>
-    </div>
-    <div class="foot-col">
-      <h4>{{ 'landing.footer.company'|trans }}</h4>
-      <ul>
-        <li><a href="{{ path('business_solution') }}">{{ 'landing.footer.links.cyber_pme_solution'|trans }}</a></li>
-        <li><a href="{{ path('business_comparatif') }}">{{ 'landing.footer.links.password_manager_entreprise_comparatif'|trans }}</a></li>
-        <li><a href="{{ path('business_audit') }}">{{ 'landing.footer.links.audit_cyber_pme'|trans }}</a></li>
-        <li><a href="{{ path('blog_index', { _locale: app.request.locale }) }}" hreflang="{{ app.request.locale }}">{{ 'landing.footer.links.blog'|trans }}</a></li>
-      </ul>
-    </div>
-    <div class="foot-col">
-      <h4>{{ 'landing.footer.resources'|trans }}</h4>
-      <ul>
-        <li><a href="{{ path('app_help_center') }}">{{ 'landing.footer.links.help_center'|trans }}</a></li>
-        <li><a href="/help/center/demarrer">{{ 'landing.footer.links.documentation'|trans }}</a></li>
-        <li><a href="/help/center/partage">{{ 'landing.footer.links.guides'|trans }}</a></li>
-        <li><a href="{{ path('app_public_generator') }}">{{ 'landing.footer.links.generator'|trans }}</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="foot-bottom">
-    <p>&copy; {{ "now"|date("Y") }} MYKEYNEST. {{ 'landing.footer.links.all_rights'|trans }} |
-      <a href="{{ path('legal_privacy') }}">{{ 'landing.footer.links.privacy'|trans }}</a> |
-      <a href="{{ path('legal_cgv') }}">{{ 'landing.footer.links.terms'|trans }}</a>
-    </p>
-  </div>
-</footer>
 
 {# JSON-LD FAQ #}
 <script type="application/ld+json">

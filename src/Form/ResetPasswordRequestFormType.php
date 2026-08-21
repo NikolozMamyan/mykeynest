@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ResetPasswordRequestFormType extends AbstractType
@@ -17,7 +18,10 @@ class ResetPasswordRequestFormType extends AbstractType
                 'attr' => ['autocomplete' => 'email'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter your email',
+                        'message' => 'reset_password.validation.email_required',
+                    ]),
+                    new Email([
+                        'message' => 'reset_password.validation.email_invalid',
                     ]),
                 ],
             ])
@@ -26,6 +30,10 @@ class ResetPasswordRequestFormType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([]);
+        $resolver->setDefaults([
+            // This page deliberately sends no Referer header. Keep its CSRF
+            // token in the session instead of relying on stateless origin checks.
+            'csrf_token_id' => 'reset_password_request',
+        ]);
     }
 }

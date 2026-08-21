@@ -226,16 +226,18 @@
       "language": "Language"
     },
     "hero": {
+      "eyebrow": "AES-256 · Access controls · GDPR",
       "title_before": "Manage your team's passwords and access,",
       "title_highlight": "in one secure place",
-      "subtitle": "MYKEYNEST is a password and access management solution for SMBs, agencies, and teams. AES-256 encryption, zero-knowledge architecture, secure sharing, security audit, and auto-fill.",
+      "subtitle": "MYKEYNEST is a password and access management solution for SMBs, agencies, and teams. AES-256 encryption, secure sharing, security audit, and auto-fill.",
+      "hint": "Start for free · No credit card",
       "cta_start": "Get started for free",
       "cta_start_aria": "Create a free account on MYKEYNEST",
       "cta_discover": "Learn more",
       "trust_aria": "MYKEYNEST security guarantees",
       "trust": {
         "aes": "AES-256 encryption",
-        "zeroknowledge": "Zero-knowledge",
+        "zeroknowledge": "Controlled access",
         "hashed": "Hashed & signed installation"
       },
       "mock": {
@@ -249,8 +251,8 @@
       "title": "Secure password and access management",
       "subtitle": "Everything your team needs to protect credentials, share access securely, and stay in control every day.",
       "cards": {
-        "e2e_title": "End-to-end encryption",
-        "e2e_text": "Your data is encrypted locally with AES-256 before being synchronized. Only you can access it.",
+        "e2e_title": "AES-256 encryption",
+        "e2e_text": "Stored credentials are encrypted with AES-256 and returned only to authorized users.",
         "hashed_title": "Hashed & signed installation",
         "hashed_text": "Every deployment generates a unique cryptographic fingerprint. If the code is modified or copied, access is instantly revoked.",
         "hashed_tag": "New",
@@ -337,7 +339,7 @@
           "cta": "Choose Pro",
           "included": "1 user account included",
           "audit": "Standard",
-          "support": "Priority response under 2 hours",
+          "support": "Priority support",
           "onboarding": "Self-service + guide",
           "phishing": "Self-paced training"
         },
@@ -421,8 +423,8 @@
       "info": {
         "email_title": "Email",
         "support_title": "Support",
-        "support_text": "Available 24/7",
-        "support_time": "Response time: <strong>&lt; 2h</strong>",
+        "support_text": "Email support",
+        "support_time": "A personalized response based on the nature of your request",
         "hours_title": "Hours",
         "hours_text": "Mon - Fri: 9am - 6pm<br>Sat - Sun: 10am - 4pm"
       }
@@ -435,7 +437,7 @@
         "q1": "What is a password manager?",
         "a1": "It is a tool that stores and encrypts all your credentials in a secure digital vault. MYKEYNEST uses AES-256 encryption, the same standard used by banks.",
         "q2": "Are my data really secure?",
-        "a2": "Yes. Your data is encrypted locally on your device before being synchronized. We never have access to your passwords in plain text (zero-knowledge architecture).",
+        "a2": "Stored credentials are encrypted with AES-256. Access is protected by account authentication, permissions and extension security controls.",
         "q3": "Is the free plan really free?",
         "a3": "Yes, no credit card required. You can use MYKEYNEST for free with basic features. The Pro plan unlocks advanced features.",
         "q4": "Can I use MYKEYNEST on multiple devices?",
@@ -443,9 +445,9 @@
         "q5": "What is a hashed installation and how does it protect me?",
         "a5": "Every MYKEYNEST extension installation generates a unique cryptographic fingerprint tied to your instance. If an attacker tries to reuse your credentials on another device, the hash won't match and access is denied. If the extension is modified or corrupted, the integrity check fails and the vault locks automatically.",
         "q6": "What happens if I forget my master password?",
-        "a6": "We cannot recover it for you (zero-knowledge). That's why it's essential to keep it safe. You can set up emergency recovery.",
+        "a6": "Use the “Forgot password” flow from the sign-in page. A reset link is sent to the email address associated with the account after the security checks.",
         "q7": "Is MYKEYNEST GDPR compliant?",
-        "a7": "Yes. MYKEYNEST is a 100% European solution: your data is hosted in Europe and never transferred to third-party servers outside the EU. The zero-knowledge architecture ensures we never have access to your passwords in plain text. GDPR compliance is built-in, not an afterthought.",
+        "a7": "MYKEYNEST documents the data it processes, the purposes, service providers and your rights in its privacy policy. For a specific GDPR question, contact us at contact@key-nest.com.",
         "q8": "How does two-factor authentication (2FA) work?",
         "a8": "2FA adds an extra layer of security: in addition to your master password, a temporary code is required at each login. Available via an authenticator app (TOTP) or email."
       }
@@ -458,7 +460,7 @@
       "login": "Log in"
     },
     "footer": {
-      "brand_text": "A modern password manager that combines security, simplicity, and privacy. 100% European solution.",
+      "brand_text": "A modern password manager that combines security, simplicity and access control.",
       "product": "Product",
       "company": "Company",
       "resources": "Resources",
@@ -489,7 +491,7 @@
         "title": "Password Manager",
         "subtitle": "Secure all your passwords in one place. Simple, safe, and accessible everywhere.",
         "features": {
-          "f1": "End-to-end encryption",
+          "f1": "AES-256-GCM encryption",
           "f2": "Instant sync",
           "f3": "Available on all your devices"
         }
@@ -621,6 +623,70 @@
       "android_text": "Install MYKEYNEST on your phone for quicker access.",
       "install": "Install",
       "later": "Later"
+    }
+  },
+  "reset_password": {
+    "common": {
+      "eyebrow": "Account security",
+      "back_to_login": "Back to sign in"
+    },
+    "request": {
+      "meta_title": "Forgot password | MYKEYNEST",
+      "title": "Forgot your password?",
+      "subtitle": "Enter the email address for your account. We’ll send a secure link that lets you choose a new password.",
+      "email_label": "Email address",
+      "email_placeholder": "you@example.com",
+      "submit": "Send the reset link",
+      "privacy_note": "To protect your account, the response is the same whether or not this address is registered."
+    },
+    "check": {
+      "meta_title": "Check your inbox | MYKEYNEST",
+      "title": "Check your inbox",
+      "subtitle": "If an account matches this address, a password reset link has just been sent.",
+      "expiry": "Link valid for %duration%",
+      "step_1": "Open the inbox for the email address you entered.",
+      "step_2": "Click the secure link sent by MYKEYNEST.",
+      "step_3": "Choose a new, unique password.",
+      "not_received": "Nothing arrived? Check your spam folder or",
+      "try_again": "send another request"
+    },
+    "reset": {
+      "meta_title": "New password | MYKEYNEST",
+      "title": "Choose a new password",
+      "subtitle": "Use at least 12 characters and avoid passwords you already use for another service.",
+      "password_label": "New password",
+      "password_placeholder": "At least 12 characters",
+      "confirm_label": "Confirm password",
+      "confirm_placeholder": "Enter it a second time",
+      "toggle_password": "Show or hide password",
+      "requirements_aria": "New password guidance",
+      "requirement_length": "At least 12 characters with multiple character types",
+      "requirement_unique": "A unique password that is not used anywhere else",
+      "submit": "Save the new password",
+      "strength": {
+        "prefix": "Strength:",
+        "weak": "weak",
+        "medium": "medium",
+        "strong": "strong"
+      }
+    },
+    "flash": {
+      "rate_limited": "Too many requests were made. Please try again later.",
+      "delivery_failed": "The email could not be sent right now. Please try again in a few minutes.",
+      "success": "Your password has been changed. You can now sign in again."
+    },
+    "email": {
+      "subject": "Reset your MYKEYNEST password",
+      "preheader": "Use this secure link to choose a new MYKEYNEST password.",
+      "eyebrow": "Account security",
+      "heading": "Reset your password",
+      "intro": "We received a password reset request for your MYKEYNEST account. Use the button below to choose a new password.",
+      "expiry": "The link expires in %duration%.",
+      "action": "Choose a new password",
+      "ignore": "If you did not make this request, ignore this email: your password will not be changed.",
+      "text_intro": "We received a password reset request for your MYKEYNEST account.",
+      "text_action": "Open this link to choose a new password:",
+      "text_ignore": "If you did not make this request, you can ignore this email."
     }
   },
   "credential_access": {
@@ -1395,7 +1461,7 @@
       "guest_card_label": "Invited account",
       "features": {
         "secure_access": "Secure access to shared credentials",
-        "e2ee": "End-to-end encryption",
+        "e2ee": "Secrets encrypted with AES-256-GCM",
         "one_time_link": "One-time link — expires after activation"
       }
     },
@@ -1742,12 +1808,12 @@
     "hero": {
       "title_before": "Create",
       "title_highlight": "passwords",
-      "title_after": "ultra-secure in one click",
-      "subtitle": "Protect your accounts with passwords that are impossible to crack. Instant generation, full customization and maximum security.",
+      "title_after": "that are strong in one click",
+      "subtitle": "Generate long, random passwords locally, then adjust their length and character set to match each site’s requirements.",
       "trust": {
         "no_storage": "No storage",
         "client_side": "100% client-side",
-        "open_source": "Open source"
+        "open_source": "Web Crypto API"
       }
     },
     "generator": {
@@ -1776,8 +1842,8 @@
       "subtitle": "Security and simplicity for your data",
       "items": [
         {
-          "title": "Maximum security",
-          "description": "Cryptographically secure generation using the most robust algorithms. Your passwords are impossible to guess or crack."
+          "title": "Cryptographic randomness",
+          "description": "Generation uses the browser’s Web Crypto API to obtain a source of randomness suitable for security use cases."
         },
         {
           "title": "Instant and free",
@@ -1803,7 +1869,7 @@
     },
     "seo": {
       "title": "How to create a truly secure password?",
-      "intro": "The security of your online accounts starts with strong passwords. Our free password generator uses advanced cryptographic algorithms to create unique and unguessable combinations.",
+      "intro": "Online account security starts with long, unique and random passwords. Our free generator uses the browser’s Web Crypto API to create each combination.",
       "good_password_title": "Characteristics of a strong password",
       "good_password_text": "A secure password should combine several essential elements. It should be long enough (at least 12 characters), mix different character types (uppercase, lowercase, numbers and symbols), and above all be unique for each account.",
       "why_generator_title": "Why use a password generator?",
@@ -1822,7 +1888,7 @@
     },
     "cta": {
       "title": "Ready to secure your accounts?",
-      "description": "Join thousands of users who protect their data with MYKEYNEST",
+      "description": "Store and organize your access in a MYKEYNEST workspace.",
       "button": "Create a free account"
     }
   },
@@ -1843,7 +1909,27 @@
       "articles": "Articles",
       "categories": "Categories",
       "response_time": "Response time",
-      "satisfaction": "Satisfaction"
+      "satisfaction": "Satisfaction",
+      "languages": "Bilingual documentation",
+      "maintained": "Maintained content"
+    },
+    "summary": {
+      "title": "Clear answers for every step",
+      "description": "The help center covers account creation, security, sharing, the browser extension and billing through verifiable procedures.",
+      "points": {
+        "guides": {
+          "title": "Illustrated guides",
+          "text": "Essential procedures use real screenshots of the product."
+        },
+        "navigation": {
+          "title": "Resolution-focused navigation",
+          "text": "Each category groups the useful actions, prerequisites and checks."
+        },
+        "support": {
+          "title": "Support handoff",
+          "text": "Account-specific questions can be sent directly to our team."
+        }
+      }
     },
     "sections": {
       "explore_label": "Browse by topic",
@@ -1867,8 +1953,13 @@
       "aria": "Contact us",
       "write": {
         "title": "Write to us",
-        "desc": "A specific question? Our team replies in under 2 hours on weekdays.",
+        "desc": "Have an account-specific question? Send the necessary context without sharing your password.",
         "cta": "Send a message"
+      },
+      "privacy": {
+        "title": "Privacy",
+        "desc": "Review the data processed by the service and browser extension.",
+        "cta": "Read the policy"
       },
       "status": {
         "title": "Service status",
@@ -1882,20 +1973,20 @@
       "sub": "Questions everyone asks.",
       "items": {
         "q1": "Are my passwords really secure with MYKEYNEST?",
-        "a1": "Yes. Your data is encrypted locally with AES-256 before being sent to our servers. We use a zero-knowledge architecture: even our teams cannot read your passwords. Only your master password can decrypt them.",
+        "a1": "MYKEYNEST protects vault secrets with encryption at rest, secures communications over HTTPS and applies access controls by account, share and organization. You should still use a unique main password and enable two-factor authentication when your plan supports it.",
         "q2": "Can I use MYKEYNEST on multiple devices?",
-        "a2": "Absolutely. Multi-device sync is included in all plans. Your credentials are available on computer, smartphone, and tablet — always end-to-end encrypted.",
+        "a2": "You can access the web application from authorized devices. The number of browser-extension installations depends on the plan and the rules configured for your organization.",
         "q3": "Does the password generator store my passwords?",
         "a3": "No. The generator runs entirely client-side using the browser's crypto.getRandomValues API. No data is sent to our servers. The password disappears as soon as you close the tab.",
         "q4": "How do I upgrade to Pro?",
         "a4": "From your personal space, go to Settings › Subscription and click “Upgrade to Pro”. Payment is securely handled by Stripe. Your account is upgraded instantly with no downtime.",
-        "q5": "Is MYKEYNEST open source?",
-        "a5": "Yes. The source code is publicly available on GitHub, allowing the community to audit security and contribute. Transparency is one of our core principles."
+        "q5": "Where can I find privacy information?",
+        "a5": "The public privacy policy describes the data processed by the service and extension, browser permissions, service providers, retention and your rights."
       }
     },
     "cta": {
       "title": "Didn’t find the answer?",
-      "desc": "Our team is available 7 days a week to help you.",
+      "desc": "Contact our team with the context of your question. Never share your password.",
       "support": "Contact support",
       "create_account": "Create an account"
     }
@@ -1939,7 +2030,7 @@
       "other_categories": "Other categories",
       "contact": {
         "title": "No answer?",
-        "desc": "Our team is here for you. Reply in under 2 hours on weekdays.",
+        "desc": "Describe the issue, the affected page and your browser without sending any secret.",
         "cta": "Write to us"
       }
     }
@@ -1970,7 +2061,26 @@
       "no_aria": "No, this article did not help me",
       "yes": "Yes",
       "no": "No",
-      "thank_you": "Thanks for your feedback!"
+      "thank_you": "Thanks for your feedback!",
+      "thanks_yes": "Thank you. Your feedback helps us keep this documentation useful.",
+      "thanks_no": "Thank you. We will use this feedback to clarify the article."
+    },
+    "actions": {
+      "eyebrow": "Direct access",
+      "create_account": "Create my MYKEYNEST account",
+      "open_import": "Open credential import",
+      "install_mobile": "Open the mobile installation guide",
+      "read_privacy": "Read our privacy policy",
+      "reset_password": "Reset my password",
+      "open_preferences": "Open security preferences",
+      "open_audit": "Run the security audit",
+      "open_generator": "Open the password generator",
+      "open_sharing": "Create a secure share",
+      "manage_sharing": "Manage my shares",
+      "install_extension": "Install the official Chrome extension",
+      "open_extension": "Open extension management",
+      "compare_plans": "Compare MYKEYNEST plans",
+      "manage_subscription": "Manage my subscription"
     },
     "sidebar": {
       "aria": "Resources and related articles",
@@ -1988,7 +2098,7 @@
       },
       "contact": {
         "title": "No answer?",
-        "desc": "Our team replies in under 2 hours on weekdays.",
+        "desc": "Describe what is blocking you and our team will reply with the relevant next steps.",
         "cta": "Write to us"
       }
     }
@@ -2025,14 +2135,14 @@
         "software": {
           "title": "🔐 Software",
           "item1": "AES-256 encryption",
-          "item2": "Zero-knowledge architecture",
+          "item2": "Per-user access controls",
           "item3": "Secure sharing between team members",
           "item4": "Built-in security audit"
         },
         "maintenance": {
           "title": "🛠 Included maintenance",
           "item1": "Dedicated technical support",
-          "item2": "Continuous 7-day support",
+          "item2": "Tracked support based on priority",
           "item3": "Guided updates"
         },
         "training": {
@@ -2048,6 +2158,7 @@
           "item3": "Detailed vulnerability report"
         }
       },
+      "privacy_text": "European hosting, encrypted storage and documented privacy controls.",
       "explore": {
         "eyebrow": "Go further",
         "title": "Explore our resources",
@@ -2065,15 +2176,15 @@
         "eyebrow": "Transparent pricing",
         "title": "One honest price, everything included",
         "unit": "per user / month, no commitment",
-        "badge": "3× cheaper than competitors",
-        "description": "Up to 3 to 4 times cheaper than Bitwarden Teams or 1Password Business, with maintenance, training and audit included in the price.",
+        "badge": "Clear pricing for SMBs",
+        "description": "A straightforward offer combining the software, support and stated guidance without misleading price comparisons.",
         "cta": "Get started now",
         "feature1": "Unlimited passwords",
         "feature2": "Unlimited sharing",
         "feature3": "2FA authentication",
         "feature4": "Built-in security audit",
         "feature5": "Employee training",
-        "feature6": "Priority support < 2h"
+        "feature6": "Priority support"
       },
       "cta": {
         "title": "Ready to secure your SMB?",
@@ -2234,7 +2345,17 @@
         "h1_and": "and",
         "h1_suffix": "which solution for your SMB?",
         "subtitle": "Factual comparison of features, pricing and included services. To help you make an informed decision.",
-        "disclaimer": "Public data — indicative prices as of 01/2026. Check official pricing."
+        "disclaimer": "Public data — indicative prices checked in 08/2026. Verify official pricing before purchasing."
+      },
+      "summary": {
+        "title": "The right choice depends on how your team works",
+        "description": "This table compares offers designed for teams. It does not replace an assessment of your security, administration and support requirements.",
+        "point1": "MYKEYNEST focuses on simple adoption, controlled sharing and French-language support.",
+        "point2": "Bitwarden and 1Password offer longer-established ecosystems and documented zero-knowledge architectures.",
+        "point3": "Compare total cost, seat requirements and the services actually included in the selected plan."
+      },
+      "methodology": {
+        "text": "Method: pre-tax monthly prices based on annual billing for competitors. Official sources checked in August 2026:"
       },
       "table": {
         "eyebrow": "Comparison table",
@@ -2267,9 +2388,9 @@
       "why": {
         "eyebrow": "Why choose MYKEYNEST",
         "title": "4 reasons to choose us",
-        "subtitle": "Beyond price, MYKEYNEST is the only solution that truly supports your SMB.",
+        "subtitle": "Beyond price, assess deployment simplicity, support and the actual needs of your SMB.",
         "price": {
-          "title": "3× cheaper",
+          "title": "Straightforward pricing",
           "desc": "At €6.99/user/month, MYKEYNEST remains competitive for SMBs that want software, support, and guidance in one offer."
         },
         "maintenance": {
@@ -2282,7 +2403,7 @@
         },
         "french": {
           "title": "French team",
-          "desc": "French-language support, a team based in France, responses in under 2 hours on weekdays."
+          "desc": "French-language support and a team based in France, so you can work with people who understand your context."
         }
       },
       "cta": {
@@ -2311,15 +2432,33 @@
         "eyebrow": "Audit & Training",
         "h1_highlight": "Cybersecurity Audit & Training",
         "h1_suffix": "to protect your SMB",
-        "subtitle": "91% of cyberattacks start with human error. We audit your vulnerabilities and train your teams so it doesn't happen to you.",
+        "subtitle": "Identify fragile access, prioritize fixes and give your teams practical habits for handling phishing and everyday mistakes.",
         "pill1": "SMB cybersecurity audit",
         "pill2": "Employee training",
         "pill3": "Phishing awareness"
       },
-      "proof": {
-        "stat1": "of cyberattacks start with human error (source: IBM)",
-        "stat2": "trained SMBs reduce security incidents",
-        "stat3": "average cost of a cyberattack for an SMB (source: ANSSI)"
+      "summary": {
+        "title": "An actionable assessment, not a decorative report",
+        "description": "The engagement is scoped around your environment, tools and the risks that matter to your business.",
+        "point1": "The scope is agreed with your point of contact before any analysis.",
+        "point2": "Findings are ranked by severity and paired with practical actions.",
+        "point3": "The final review is clear for technical teams and management alike."
+      },
+      "deliverables": {
+        "eyebrow": "Deliverables",
+        "title": "What you receive at the end of the engagement",
+        "scope": {
+          "title": "Documented baseline",
+          "text": "A summary of the reviewed scope, observed practices and the risks that should be addressed first."
+        },
+        "roadmap": {
+          "title": "Remediation roadmap",
+          "text": "Actions ordered by urgency, effort and impact so you can improve security without disrupting operations."
+        },
+        "review": {
+          "title": "Guided review",
+          "text": "A closing session to explain findings, answer questions and organize the next steps."
+        }
       },
       "services": {
         "eyebrow": "Our services",

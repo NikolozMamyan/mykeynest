@@ -2,6 +2,12 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
     static targets = ['input', 'container', 'progressBar', 'feedback'];
+    static values = {
+        weak: { type: String, default: 'Faible' },
+        medium: { type: String, default: 'Moyen' },
+        strong: { type: String, default: 'Fort' },
+        prefix: { type: String, default: 'Force du mot de passe :' },
+    };
 
     connect() {
         this.check();
@@ -11,10 +17,12 @@ export default class extends Controller {
         const password = this.inputTarget.value;
         
         if (password.length === 0) {
+            this.containerTarget.hidden = true;
             this.containerTarget.style.display = 'none';
             return;
         }
 
+        this.containerTarget.hidden = false;
         this.containerTarget.style.display = 'block';
         
         const strength = this.calculateStrength(password);
@@ -36,15 +44,15 @@ export default class extends Controller {
         if (/[^a-zA-Z0-9]/.test(password)) score++;
         
         // Déterminer le niveau
-        if (score <= 3) return { level: 'weak', text: 'Faible', color: 'var(--color-danger-start)' };
-        if (score <= 5) return { level: 'medium', text: 'Moyen', color: 'var(--color-warning)' };
-        return { level: 'strong', text: 'Fort', color: 'var(--color-success)' };
+        if (score <= 3) return { level: 'weak', text: this.weakValue, color: 'var(--color-danger-start)' };
+        if (score <= 5) return { level: 'medium', text: this.mediumValue, color: 'var(--color-warning)' };
+        return { level: 'strong', text: this.strongValue, color: 'var(--color-success)' };
     }
 
     updateUI(strength) {
         this.progressBarTarget.setAttribute('data-strength', strength.level);
         this.progressBarTarget.style.backgroundColor = strength.color;
-        this.feedbackTarget.textContent = `Force du mot de passe : ${strength.text}`;
+        this.feedbackTarget.textContent = `${this.prefixValue} ${strength.text}`;
         this.feedbackTarget.style.color = strength.color;
     }
 }

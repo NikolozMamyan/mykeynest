@@ -96,20 +96,14 @@ export default class extends Controller {
     const slug = this.card?.dataset.article;
     if (!slug || window.localStorage.getItem(`helpful_${slug}`)) return;
 
-    const countNode = this.element.querySelector(type === "yes" ? "#countYes" : "#countNo");
     const thankNode = this.element.querySelector("#helpfulThank");
-    const count = Number.parseInt(countNode?.textContent || "0", 10);
-
-    if (countNode) {
-      countNode.textContent = String(count + 1);
-    }
 
     this.markVoteState(type);
 
     if (thankNode) {
       thankNode.textContent = type === "yes"
-        ? "Merci pour votre retour ! Nous sommes ravis que cet article vous ait aide."
-        : "Merci ! Nous allons ameliorer cet article. Besoin d'aide supplementaire ? Contactez-nous.";
+        ? (this.card.dataset.thanksYes || "Merci pour votre retour.")
+        : (this.card.dataset.thanksNo || "Merci, votre retour a été pris en compte.");
       thankNode.style.display = "block";
     }
 

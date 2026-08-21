@@ -39,6 +39,8 @@
   width: 50px;
 }
 
+.nav-toggle svg { width: 1.15rem; height: 1.15rem; }
+
 .nav-links {
   display: none;
   position: fixed;

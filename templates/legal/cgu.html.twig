@@ -79,12 +79,12 @@
 
         <h2 id="cgu-3">3. Sécurité, chiffrement, architecture</h2>
         <p>
-          Le Service met en œuvre un chiffrement côté client et un fonctionnement de type « zero-knowledge » :
-          les données sont chiffrées avant stockage/transit.
+          Le Service met en œuvre un chiffrement AES-256-GCM des mots de passe enregistrés,
+          des contrôles d’accès par utilisateur et des communications protégées pendant le transit.
         </p>
         <ul>
           <li>Vous êtes responsable de la confidentialité de vos identifiants et secrets.</li>
-          <li>En cas de perte de votre secret principal / clé, la récupération peut être impossible.</li>
+          <li>En cas d’oubli, utilisez uniquement le parcours officiel de réinitialisation du mot de passe.</li>
         </ul>
 
         <h2 id="cgu-4">4. Responsabilité de l’Utilisateur</h2>
