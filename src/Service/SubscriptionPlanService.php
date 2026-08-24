@@ -175,9 +175,15 @@ final class SubscriptionPlanService
 
     public function hasOrganizationTeamAccess(User $user): bool
     {
-        $cacheKey = $user->getId() !== null
-            ? 'user_' . $user->getId()
-            : 'object_' . spl_object_id($user);
+        // A new registration has no database identifier yet and therefore
+        // cannot have a persisted organization membership. Passing this
+        // transient entity to Doctrine as a query parameter raises an
+        // ORMInvalidArgumentException before the account can be created.
+        if ($user->getId() === null) {
+            return false;
+        }
+
+        $cacheKey = 'user_' . $user->getId();
 
         return $this->organizationTeamAccess[$cacheKey]
             ??= $this->organizationMembers->findActiveTeamMembership($user) !== null;

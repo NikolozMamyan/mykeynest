@@ -30,6 +30,24 @@ final class SubscriptionPlanServiceTest extends TestCase
         self::assertSame(5, $service->getLimit($teamUser, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
     }
 
+    public function testTransientRegistrationUsesFreePlanWithoutQueryingOrganizationMemberships(): void
+    {
+        $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);
+        $repository->method('findByPlanCode')->willReturn(null);
+        $organizationMembers = $this->createMock(OrganizationMemberRepository::class);
+        $organizationMembers->expects(self::never())->method('findActiveTeamMembership');
+        $service = new SubscriptionPlanService(
+            $repository,
+            $this->createMock(EntityManagerInterface::class),
+            $organizationMembers,
+        );
+
+        $user = new User();
+
+        self::assertSame(SubscriptionPlanService::PLAN_FREE, $service->getPlanForUser($user)['code']);
+        self::assertSame(1, $service->getLimit($user, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
+    }
+
     public function testStripeSeatQuantityDoesNotChangePerMemberInstallationLimit(): void
     {
         $service = $this->createService();
@@ -55,7 +73,7 @@ final class SubscriptionPlanServiceTest extends TestCase
             $this->createMock(EntityManagerInterface::class),
             $organizationMembers,
         );
-        $user = new User();
+        $user = $this->createPersistedUser();
 
         self::assertSame(SubscriptionPlanService::PLAN_TEAM, $service->getPlanForUser($user)['code']);
         self::assertSame(5, $service->getLimit($user, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
@@ -104,7 +122,7 @@ final class SubscriptionPlanServiceTest extends TestCase
 
         self::assertSame(
             SubscriptionPlanService::PLAN_TEAM,
-            $service->getPlanForUser($this->createSubscribedUser(SubscriptionPlanService::PLAN_PRO))['code'],
+            $service->getPlanForUser($this->createSubscribedUser(SubscriptionPlanService::PLAN_PRO, 2))['code'],
         );
     }
 
@@ -166,12 +184,26 @@ final class SubscriptionPlanServiceTest extends TestCase
         );
     }
 
-    private function createSubscribedUser(string $planCode): User
+    private function createSubscribedUser(string $planCode, ?int $id = null): User
     {
         $subscription = (new UserSubscription())
             ->setPlanCode($planCode)
             ->setIsActive(true);
 
-        return (new User())->setUserSubscription($subscription);
+        $user = (new User())->setUserSubscription($subscription);
+
+        return $id === null ? $user : $this->setUserId($user, $id);
+    }
+
+    private function createPersistedUser(): User
+    {
+        return $this->setUserId(new User(), 1);
+    }
+
+    private function setUserId(User $user, int $id): User
+    {
+        (new \ReflectionProperty(User::class, 'id'))->setValue($user, $id);
+
+        return $user;
     }
 }

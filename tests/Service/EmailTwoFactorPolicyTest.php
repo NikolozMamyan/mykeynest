@@ -45,6 +45,7 @@ final class EmailTwoFactorPolicyTest extends TestCase
     {
         $policy = new EmailTwoFactorPolicy($this->createPlanService(new OrganizationMember()));
         $user = new User();
+        (new \ReflectionProperty(User::class, 'id'))->setValue($user, 1);
 
         self::assertTrue($policy->isAvailableFor($user));
         self::assertTrue($policy->isEnabledFor($user));
