@@ -1400,7 +1400,8 @@
       "upgrade_success": "Votre passage à Team est confirmé. L’espace entreprise est prêt.",
       "upgrade_error": "Le changement d’offre n’a pas pu être finalisé. Aucun changement n’a été appliqué.",
       "change_to_pro": "Changer d’offre",
-      "downgrade_note": "Le passage vers PRO se gère dans votre espace de facturation Stripe."
+      "downgrade_note": "Le passage vers PRO se gère dans votre espace de facturation Stripe.",
+      "admin_managed": "Abonnement géré par votre administrateur"
     },
     "hero": {
       "badge": "Nos offres",

@@ -1,100 +1,179 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Dashboard Admin{% endblock %}
-{% block admin_page_title %}Dashboard Admin{% endblock %}
-{% block admin_page_intro %}Administration structuree par domaine pour eviter le melange entre blog, subscriptions, sessions et extension.{% endblock %}
+{% block title %}Pilotage Admin · MYKEYNEST{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-dashboard{% endblock %}
+{% block admin_page_title %}Vue d’ensemble{% endblock %}
+{% block admin_page_intro %}Les indicateurs essentiels et les actions qui demandent votre attention.{% endblock %}
+
+{% block admin_toolbar %}
+  <div class="admin-periods" aria-label="Période d’analyse">
+    {% for value, label in {1: '24 h', 7: '7 jours', 30: '30 jours', 90: '90 jours'} %}
+      <a href="{{ path('app_admin', {period: value}) }}" class="admin-period {{ dashboard.periodDays == value ? 'is-active' : '' }}">{{ label }}</a>
+    {% endfor %}
+  </div>
+  <span class="admin-live-status"><span></span>Données actualisées</span>
+{% endblock %}
 
 {% block admin_content %}
-  <section class="ds-grid-3">
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Articles blog', value: articlesCount } only %}
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Utilisateurs', value: usersCount } only %}
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Subscriptions actives', value: activeSubscriptionsCount } only %}
+  <section class="admin-kpi-grid" aria-label="Indicateurs principaux">
+    <a class="admin-kpi" href="{{ path('admin_users') }}">
+      <span class="admin-kpi__icon"><i class="fas fa-users"></i></span>
+      <span class="admin-kpi__meta">Utilisateurs clients</span>
+      <strong>{{ dashboard.metrics.users }}</strong>
+      <small>Vue globale des comptes</small>
+    </a>
+    <a class="admin-kpi" href="{{ path('admin_extensions', {status: 'active'}) }}">
+      <span class="admin-kpi__icon admin-kpi__icon--blue"><i class="fas fa-puzzle-piece"></i></span>
+      <span class="admin-kpi__meta">Extension active</span>
+      <strong>{{ dashboard.metrics.extensionActivationRate }}%</strong>
+      <small>{{ dashboard.metrics.activeExtensionUsers }} utilisateur(s) sur la période</small>
+    </a>
+    <a class="admin-kpi" href="{{ path('admin_subscriptions', {subscription: 'active'}) }}">
+      <span class="admin-kpi__icon admin-kpi__icon--violet"><i class="fas fa-credit-card"></i></span>
+      <span class="admin-kpi__meta">Abonnements actifs</span>
+      <strong>{{ dashboard.metrics.activeSubscriptions }}</strong>
+      <small>Pro et Team confondus</small>
+    </a>
+    <a class="admin-kpi {{ dashboard.metrics.attentionItems > 0 ? 'admin-kpi--attention' : '' }}" href="#admin-attention">
+      <span class="admin-kpi__icon admin-kpi__icon--amber"><i class="fas fa-bell"></i></span>
+      <span class="admin-kpi__meta">À traiter</span>
+      <strong>{{ dashboard.metrics.attentionItems }}</strong>
+      <small>{{ dashboard.metrics.pendingChallenges }} installation(s) en attente</small>
+    </a>
   </section>
 
-  <section class="ds-grid-3">
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Sessions actives', value: activeSessionsCount } only %}
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Sessions bloquees', value: blockedSessionsCount } only %}
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Users recents', value: recentUsers|length } only %}
-  </section>
-
-  <section class="ds-grid-2">
-    <div class="ds-surface">
+  <section class="admin-dashboard-grid">
+    <article class="ds-surface admin-panel">
       <div class="ds-section-head">
         <div>
-          <h2 class="ds-section-title">Blog</h2>
-          <p class="ds-section-text">Derniers articles publies.</p>
+          <span class="admin-eyebrow">Activation produit</span>
+          <h2 class="ds-section-title">Signaux d’adoption</h2>
+          <p class="ds-section-text">Volumes actuels à chaque étape du parcours utilisateur.</p>
         </div>
-        <a class="ds-section-link" href="{{ path('admin_blog') }}">Ouvrir</a>
+        <a class="ds-section-link" href="{{ path('admin_users') }}">Explorer</a>
       </div>
+      <div class="admin-funnel">
+        {% set funnelBase = dashboard.funnel|first %}
+        {% for step in dashboard.funnel %}
+          {% set percentage = funnelBase.value > 0 ? ((step.value / funnelBase.value) * 100)|round : 0 %}
+          <div class="admin-funnel__row">
+            <div class="admin-funnel__label"><span>{{ step.label }}</span><strong>{{ step.value }} <small>{{ percentage }}%</small></strong></div>
+            <div class="admin-progress"><span style="width: {{ percentage }}%"></span></div>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
 
-      <div class="ds-table-wrap">
-        <table class="ds-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Titre</th>
-              <th>Publication</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for article in recentArticles %}
-              <tr>
-                <td>#{{ article.id }}</td>
-                <td class="ds-title-strong">{{ article.h1Fr ?: article.slugFr }}</td>
-                <td>{{ article.publishedAt ? article.publishedAt|date('d/m/Y H:i') : '-' }}</td>
-              </tr>
-            {% else %}
-              <tr>
-                <td colspan="3" class="ds-empty">Aucun article a afficher.</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <article class="ds-surface admin-panel">
+      <div class="ds-section-head">
+        <div>
+          <span class="admin-eyebrow">Business</span>
+          <h2 class="ds-section-title">Répartition des offres</h2>
+          <p class="ds-section-text">Composition de la base clients actuelle.</p>
+        </div>
+        <a class="ds-section-link" href="{{ path('admin_subscriptions') }}">Gérer</a>
+      </div>
+      <div class="admin-plan-list">
+        {% for plan in dashboard.plans %}
+          <div class="admin-plan-row">
+            <span class="admin-plan-dot admin-plan-dot--{{ plan.key }}"></span>
+            <span class="admin-plan-row__name">{{ plan.label }}</span>
+            <div class="admin-progress"><span style="width: {{ plan.percentage }}%"></span></div>
+            <strong>{{ plan.value }}</strong><small>{{ plan.percentage }}%</small>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="admin-inline-metrics">
+        <div><span>Sessions actives</span><strong>{{ dashboard.metrics.activeSessions }}</strong></div>
+        <div><span>Extensions actives</span><strong>{{ dashboard.metrics.activeExtensionUsers }}</strong></div>
+      </div>
+    </article>
+  </section>
+
+  <section id="admin-attention" class="ds-surface admin-panel admin-attention-panel">
+    <div class="ds-section-head">
+      <div>
+        <span class="admin-eyebrow">Centre d’action</span>
+        <h2 class="ds-section-title">À traiter maintenant</h2>
+        <p class="ds-section-text">Uniquement les éléments nécessitant une décision ou un suivi.</p>
       </div>
     </div>
-
-    <div class="ds-surface">
-      <div class="ds-section-head">
-        <div>
-          <h2 class="ds-section-title">Subscriptions</h2>
-          <p class="ds-section-text">Derniers comptes et etat d abonnement.</p>
+    <div class="admin-action-grid">
+      <div class="admin-action-column">
+        <div class="admin-action-column__head">
+          <span class="admin-action-icon admin-action-icon--amber"><i class="fas fa-plug-circle-exclamation"></i></span>
+          <div><strong>Installations en attente</strong><small>{{ dashboard.attention.pendingChallenges|length }} affichée(s)</small></div>
+          <a href="{{ path('admin_extensions', {status: 'pending'}) }}">Voir tout</a>
         </div>
-        <a class="ds-section-link" href="{{ path('admin_subscriptions') }}">Ouvrir</a>
+        {% for challenge in dashboard.attention.pendingChallenges %}
+          <a class="admin-action-item" href="{{ path('admin_user_show', {id: challenge.user.id}) }}#extensions">
+            <span><strong>{{ challenge.user.email }}</strong><small>{{ challenge.deviceLabel ?: challenge.browserName ?: 'Nouvel appareil' }}</small></span><i class="fas fa-chevron-right"></i>
+          </a>
+        {% else %}
+          <div class="admin-empty-compact"><i class="fas fa-circle-check"></i> Aucune demande en attente</div>
+        {% endfor %}
       </div>
 
-      <div class="ds-table-wrap">
-        <table class="ds-table">
-          <thead>
-            <tr>
-              <th>Utilisateur</th>
-              <th>Plan</th>
-              <th>Statut</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in recentUsers %}
-              {% set subscription = user.userSubscription %}
-              <tr>
-                <td class="ds-title-strong">{{ user.email }}</td>
-                <td>{{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</td>
-                <td>
-                  {% if subscription and subscription.isActive %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'active', tone: 'success' } only %}
-                  {% elseif subscription %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'inactive', tone: 'warning' } only %}
-                  {% else %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'aucun', tone: 'muted' } only %}
-                  {% endif %}
-                </td>
-              </tr>
-            {% else %}
-              <tr>
-                <td colspan="3" class="ds-empty">Aucun utilisateur a afficher.</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="admin-action-column">
+        <div class="admin-action-column__head">
+          <span class="admin-action-icon admin-action-icon--red"><i class="fas fa-shield-halved"></i></span>
+          <div><strong>Extensions bloquées</strong><small>{{ dashboard.attention.blockedExtensions|length }} affichée(s)</small></div>
+          <a href="{{ path('admin_extensions', {status: 'blocked'}) }}">Voir tout</a>
+        </div>
+        {% for client in dashboard.attention.blockedExtensions %}
+          <a class="admin-action-item" href="{{ path('admin_user_show', {id: client.user.id}) }}#extensions">
+            <span><strong>{{ client.user.email }}</strong><small>{{ client.deviceLabel ?: client.clientId }}</small></span><i class="fas fa-chevron-right"></i>
+          </a>
+        {% else %}
+          <div class="admin-empty-compact"><i class="fas fa-circle-check"></i> Aucun client bloqué</div>
+        {% endfor %}
       </div>
+
+      <div class="admin-action-column">
+        <div class="admin-action-column__head">
+          <span class="admin-action-icon admin-action-icon--violet"><i class="fas fa-calendar-xmark"></i></span>
+          <div><strong>Résiliations prévues</strong><small>{{ dashboard.attention.scheduledCancellations|length }} affichée(s)</small></div>
+          <a href="{{ path('admin_subscriptions', {subscription: 'active'}) }}">Voir tout</a>
+        </div>
+        {% for subscription in dashboard.attention.scheduledCancellations %}
+          <a class="admin-action-item" href="{{ path('admin_user_show', {id: subscription.user.id}) }}#billing">
+            <span><strong>{{ subscription.user.email }}</strong><small>{{ subscription.planCode|upper }} · {{ subscription.currentPeriodEnd ? subscription.currentPeriodEnd|date('d/m/Y') : 'échéance inconnue' }}</small></span><i class="fas fa-chevron-right"></i>
+          </a>
+        {% else %}
+          <div class="admin-empty-compact"><i class="fas fa-circle-check"></i> Aucune résiliation programmée</div>
+        {% endfor %}
+      </div>
+
+      <div class="admin-action-column">
+        <div class="admin-action-column__head">
+          <span class="admin-action-icon"><i class="fas fa-comments"></i></span>
+          <div><strong>Support non lu</strong><small>{{ dashboard.attention.unreadConversations|length }} affichée(s)</small></div>
+          <a href="{{ path('admin_chat') }}">Ouvrir</a>
+        </div>
+        {% for conversation in dashboard.attention.unreadConversations %}
+          <a class="admin-action-item" href="{{ path('admin_chat', {conversation: conversation.id}) }}">
+            <span><strong>{{ conversation.email }}</strong><small>{{ conversation.lastMessageAt|date('d/m/Y H:i') }}</small></span><i class="fas fa-chevron-right"></i>
+          </a>
+        {% else %}
+          <div class="admin-empty-compact"><i class="fas fa-circle-check"></i> Tous les messages sont lus</div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-surface admin-panel">
+    <div class="ds-section-head">
+      <div><span class="admin-eyebrow">Déploiement</span><h2 class="ds-section-title">Versions de l’extension</h2><p class="ds-section-text">Versions ayant communiqué avec l’application sur la période sélectionnée.</p></div>
+      <a class="ds-section-link" href="{{ path('admin_extensions') }}">Voir les installations</a>
+    </div>
+    <div class="admin-version-list">
+      {% set versionTotal = 0 %}{% for version in dashboard.versions %}{% set versionTotal = versionTotal + version.total %}{% endfor %}
+      {% for version in dashboard.versions %}
+        {% set percentage = versionTotal > 0 ? ((version.total / versionTotal) * 100)|round : 0 %}
+        <div class="admin-version-row"><span class="admin-version-code">v{{ version.version }}</span><div class="admin-progress"><span style="width: {{ percentage }}%"></span></div><strong>{{ version.total }}</strong><small>{{ percentage }}%</small></div>
+      {% else %}
+        <div class="admin-empty-compact">Aucune activité d’extension sur cette période.</div>
+      {% endfor %}
     </div>
   </section>
 {% endblock %}

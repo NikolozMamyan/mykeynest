@@ -1,114 +1,122 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Admin Users{% endblock %}
+{% block title %}Utilisateurs · Admin MYKEYNEST{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-users-page{% endblock %}
 {% block admin_page_title %}Utilisateurs{% endblock %}
-{% block admin_page_intro %}Recherche transverse sur les comptes, leur abonnement et leur activite recente.{% endblock %}
+{% block admin_page_intro %}La vue centrale des comptes, de leur activation et de leurs accès.{% endblock %}
 
 {% block admin_toolbar %}
-  <form method="get" action="{{ path('admin_users') }}" class="ds-search-form ds-toolbar-grow">
-    <input class="ds-input" type="search" name="q" value="{{ filters.q }}" placeholder="Email, entreprise ou ID">
-    <select class="ds-select" name="subscription">
-      <option value="all" {{ filters.subscription == 'all' ? 'selected' : '' }}>Tous abonnements</option>
-      <option value="active" {{ filters.subscription == 'active' ? 'selected' : '' }}>Actifs</option>
-      <option value="inactive" {{ filters.subscription == 'inactive' ? 'selected' : '' }}>Inactifs</option>
-      <option value="free" {{ filters.subscription == 'free' ? 'selected' : '' }}>Sans abonnement</option>
+  <form method="get" action="{{ path('admin_users') }}" class="admin-filter-bar ds-toolbar-grow">
+    <label class="admin-search-field">
+      <i class="fas fa-magnifying-glass"></i>
+      <input type="search" name="q" value="{{ filters.q }}" placeholder="Email, entreprise ou ID" aria-label="Rechercher un utilisateur">
+    </label>
+    <select class="ds-select" name="subscription" aria-label="Filtrer par abonnement">
+      <option value="all" {{ filters.subscription == 'all' ? 'selected' : '' }}>Toutes les offres</option>
+      <option value="active" {{ filters.subscription == 'active' ? 'selected' : '' }}>Abonnement Stripe actif</option>
+      <option value="pro" {{ filters.subscription == 'pro' ? 'selected' : '' }}>Pro</option>
+      <option value="team" {{ filters.subscription == 'team' ? 'selected' : '' }}>Team</option>
+      <option value="inactive" {{ filters.subscription == 'inactive' ? 'selected' : '' }}>Abonnement inactif</option>
+      <option value="free" {{ filters.subscription == 'free' ? 'selected' : '' }}>Free</option>
     </select>
-    <select class="ds-select" name="role">
-      <option value="all" {{ filters.role == 'all' ? 'selected' : '' }}>Tous roles</option>
-      <option value="admin" {{ filters.role == 'admin' ? 'selected' : '' }}>Admins</option>
-      <option value="user" {{ filters.role == 'user' ? 'selected' : '' }}>Users</option>
-      <option value="guest" {{ filters.role == 'guest' ? 'selected' : '' }}>Guests</option>
+    <select class="ds-select" name="role" aria-label="Filtrer par rôle">
+      <option value="all" {{ filters.role == 'all' ? 'selected' : '' }}>Tous les rôles</option>
+      <option value="admin" {{ filters.role == 'admin' ? 'selected' : '' }}>Administrateurs</option>
+      <option value="user" {{ filters.role == 'user' ? 'selected' : '' }}>Utilisateurs</option>
+      <option value="guest" {{ filters.role == 'guest' ? 'selected' : '' }}>Invités</option>
     </select>
-    <select class="ds-select" name="sort">
-      <option value="newest" {{ filters.sort == 'newest' ? 'selected' : '' }}>Plus recents</option>
+    <select class="ds-select" name="sort" aria-label="Trier les résultats">
+      <option value="newest" {{ filters.sort == 'newest' ? 'selected' : '' }}>Plus récents</option>
       <option value="oldest" {{ filters.sort == 'oldest' ? 'selected' : '' }}>Plus anciens</option>
       <option value="email" {{ filters.sort == 'email' ? 'selected' : '' }}>Email</option>
       <option value="company" {{ filters.sort == 'company' ? 'selected' : '' }}>Entreprise</option>
     </select>
-    <button type="submit" class="ds-btn ds-btn--primary">Filtrer</button>
+    <button type="submit" class="ds-btn ds-btn--primary"><i class="fas fa-sliders"></i> Filtrer</button>
+    {% if filters.q or filters.subscription != 'all' or filters.role != 'all' or filters.sort != 'newest' %}
+      <a href="{{ path('admin_users') }}" class="ds-btn ds-btn--ghost" aria-label="Réinitialiser les filtres"><i class="fas fa-rotate-left"></i></a>
+    {% endif %}
   </form>
 {% endblock %}
 
 {% block admin_content %}
-  <div class="ds-surface ds-table-wrap">
-    <table class="ds-table">
-      <thead>
-        <tr>
-          <th>Utilisateur</th>
-          <th>Entreprise</th>
-          <th>Roles</th>
-          <th>Abonnement</th>
-          <th>Sessions</th>
-          <th>Extensions</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for user in users %}
-          {% set subscription = user.userSubscription %}
-          {% set onboardingStatus = user.extensionOnboardingStatus %}
-          <tr>
-            <td>
-              <div class="ds-cell-stack">
-                <span class="ds-title-strong">#{{ user.id }} {{ user.email }}</span>
-                <span class="ds-muted">{{ subscription ? 'MAJ abonnement: ' ~ subscription.updatedAt|date('d/m/Y H:i') : 'Compte sans abonnement' }}</span>
-              </div>
-            </td>
-            <td>{{ user.company ?: '-' }}</td>
-            <td class="ds-text-break">{{ user.roles ? user.roles|join(', ') : 'ROLE_USER' }}</td>
-            <td>
-              <div class="ds-cell-stack">
-                <span class="ds-title-strong">{{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</span>
-                {% if subscription and subscription.isActive %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'active', tone: 'success' } only %}
-                {% elseif subscription %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: subscription.status ?: 'inactive', tone: 'warning' } only %}
-                {% else %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'aucun', tone: 'muted' } only %}
-                {% endif %}
-              </div>
-            </td>
-            <td>{{ sessionCounts[user.id] ?? 0 }}</td>
-            <td>
-              <div class="ds-cell-stack">
-                <span>{{ extensionCounts[user.id] ?? 0 }} installation(s)</span>
-                {% if 'ROLE_ADMIN' in user.roles %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'non applicable', tone: 'muted' } only %}
-                {% elseif onboardingStatus == 'completed' %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'onboarding termine', tone: 'success' } only %}
-                {% elseif onboardingStatus == 'pending' %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'installation requise', tone: 'warning' } only %}
-                {% else %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'reporte', tone: 'muted' } only %}
-                {% endif %}
-              </div>
-            </td>
-            <td>
-              <div class="ds-actions-stack">
-                <a href="{{ path('admin_user_show', {id: user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Ouvrir la fiche</a>
-                {% if 'ROLE_ADMIN' not in user.roles %}
-                  <form method="post"
-                        action="{{ path('admin_user_extension_onboarding_update', {id: user.id}) }}"
-                        class="ds-actions-stack"
-                        onsubmit="return confirm('Modifier le parcours d installation ? Pour Free et Pro, recommencer remplacera l installation actuelle.');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('admin_extension_onboarding_' ~ user.id) }}">
-                    <select name="status" class="ds-input" style="min-width:170px; width:100%;" required aria-label="Action onboarding pour {{ user.email }}">
-                      <option value="">Gerer l’installation…</option>
-                      <option value="completed">Marquer comme terminee</option>
-                      <option value="pending">Annuler et recommencer</option>
-                    </select>
-                    <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Appliquer</button>
-                  </form>
-                {% endif %}
-              </div>
-            </td>
-          </tr>
-        {% else %}
-          <tr>
-            <td colspan="7" class="ds-empty">Aucun utilisateur ne correspond aux filtres.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="admin-list-summary">
+    <div><strong>{{ pagination.total }}</strong><span>compte(s) trouvé(s)</span></div>
+    <span>Page {{ pagination.page }} sur {{ pagination.pages }}</span>
   </div>
+
+  <section class="ds-surface admin-data-surface">
+    <div class="ds-table-wrap">
+      <table class="ds-table admin-user-table">
+        <thead>
+          <tr>
+            <th>Utilisateur</th>
+            <th>Offre et entreprise</th>
+            <th>Activation</th>
+            <th>Accès</th>
+            <th>Dernière activité</th>
+            <th><span class="sr-only">Action</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in userRows %}
+            {% set user = row.user %}
+            {% set subscription = row.subscription %}
+            {% set displayName = ((user.prenom ?: '') ~ ' ' ~ (user.nom ?: ''))|trim %}
+            <tr>
+              <td>
+                <a class="admin-user-identity" href="{{ path('admin_user_show', {id: user.id}) }}">
+                  <span class="admin-avatar">{{ (user.prenom ?: user.email)|first|upper }}</span>
+                  <span><strong>{{ displayName ?: user.email }}</strong><small>{{ displayName ? user.email : 'Compte #' ~ user.id }}</small></span>
+                </a>
+              </td>
+              <td>
+                <div class="admin-primary-secondary">
+                  <span class="admin-plan-badge admin-plan-badge--{{ row.effectivePlan }}">{{ row.effectivePlan|upper }}</span>
+                  <strong>{{ row.membership ? row.membership.organization.name : (user.company ?: 'Sans entreprise') }}</strong>
+                  <small>{{ row.planSource }}{% if row.membership %} · {{ row.membership.role.value|lower|capitalize }}{% endif %}</small>
+                </div>
+              </td>
+              <td>
+                <div class="admin-primary-secondary">
+                  {% include 'components/ui/status_badge.html.twig' with row.extensions.state only %}
+                  <small>{{ row.credentials }} identifiant(s)</small>
+                </div>
+              </td>
+              <td>
+                <div class="admin-access-summary">
+                  <span title="Sessions actives"><i class="fas fa-arrow-right-to-bracket"></i><strong>{{ row.sessions.active }}</strong> session(s)</span>
+                  <span title="Appareils connus"><i class="fas fa-laptop"></i><strong>{{ row.devices }}</strong> appareil(s)</span>
+                  {% if row.sessions.blocked > 0 %}<span class="is-danger"><i class="fas fa-shield-halved"></i><strong>{{ row.sessions.blocked }}</strong> bloquée(s)</span>{% endif %}
+                </div>
+              </td>
+              <td>
+                <div class="admin-primary-secondary">
+                  <strong>{{ row.lastActivity ? row.lastActivity|date('d/m/Y H:i') : 'Jamais' }}</strong>
+                  <small>{{ row.lastActivity ? 'Session ou extension' : 'Aucune activité détectée' }}</small>
+                </div>
+              </td>
+              <td><a class="admin-row-action" href="{{ path('admin_user_show', {id: user.id}) }}" aria-label="Ouvrir la fiche de {{ user.email }}"><i class="fas fa-chevron-right"></i></a></td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="ds-empty"><div class="admin-empty-state"><i class="fas fa-user-slash"></i><strong>Aucun utilisateur</strong><span>Modifiez les filtres pour élargir la recherche.</span></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% if pagination.pages > 1 %}
+    <nav class="admin-pagination" aria-label="Pagination des utilisateurs">
+      {% set queryParams = app.request.query.all %}
+      <a class="admin-pagination__control {{ pagination.page <= 1 ? 'is-disabled' : '' }}" href="{{ pagination.page > 1 ? path('admin_users', queryParams|merge({page: pagination.page - 1})) : '#' }}"><i class="fas fa-chevron-left"></i> Précédent</a>
+      <div class="admin-pagination__pages">
+        {% for page in 1..pagination.pages %}
+          {% if page == 1 or page == pagination.pages or (page >= pagination.page - 2 and page <= pagination.page + 2) %}
+            <a href="{{ path('admin_users', queryParams|merge({page: page})) }}" class="{{ page == pagination.page ? 'is-active' : '' }}">{{ page }}</a>
+          {% elseif page == 2 or page == pagination.pages - 1 %}<span>…</span>{% endif %}
+        {% endfor %}
+      </div>
+      <a class="admin-pagination__control {{ pagination.page >= pagination.pages ? 'is-disabled' : '' }}" href="{{ pagination.page < pagination.pages ? path('admin_users', queryParams|merge({page: pagination.page + 1})) : '#' }}">Suivant <i class="fas fa-chevron-right"></i></a>
+    </nav>
+  {% endif %}
 {% endblock %}

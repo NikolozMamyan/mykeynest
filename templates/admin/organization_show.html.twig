@@ -1,0 +1,134 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ organization.name }} · Admin MYKEYNEST{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-organization-detail{% endblock %}
+{% block admin_page_title %}Gestion de l’entreprise{% endblock %}
+{% block admin_page_intro %}Pilotez l’abonnement hors Stripe, les licences et les accès de {{ organization.name }}.{% endblock %}
+
+{% block admin_toolbar %}
+  <a href="{{ path('admin_organizations') }}" class="ds-btn ds-btn--secondary"><i class="fas fa-arrow-left"></i> Espaces Team</a>
+  <div class="ds-toolbar-group">
+    <a href="{{ path('admin_user_show', {id: organization.owner.id}) }}" class="ds-btn ds-btn--ghost"><i class="fas fa-user"></i> Fiche propriétaire</a>
+    <a href="{{ path('admin_subscriptions', {q: organization.owner.email}) }}" class="ds-btn ds-btn--ghost"><i class="fas fa-credit-card"></i> Abonnement</a>
+  </div>
+{% endblock %}
+
+{% block admin_content %}
+  {% set subscription = organization.subscription %}
+  {% set seatPercentage = seatSummary.purchased > 0 ? ((seatSummary.used / seatSummary.purchased) * 100)|round : 0 %}
+
+  <section class="admin-profile-hero admin-organization-hero">
+    <span class="admin-organization-icon"><i class="fas fa-building-shield"></i></span>
+    <div class="admin-profile-main">
+      <div class="admin-profile-title"><h2>{{ organization.name }}</h2></div>
+      <p>{{ organization.owner.email }} · Entreprise #{{ organization.id }}</p>
+      <div class="admin-profile-tags">
+        <span><i class="fas fa-users"></i>{{ organization.members|length }} membre(s)</span>
+        <span><i class="fas fa-layer-group"></i>{{ organization.teams|length }} groupe(s)</span>
+        <span><i class="fas fa-calendar"></i>Créée le {{ organization.createdAt|date('d/m/Y') }}</span>
+      </div>
+    </div>
+    <div class="admin-profile-status">
+      {% include 'components/ui/status_badge.html.twig' with {label: organization.isActive ? 'Active' : 'Suspendue', tone: organization.isActive ? 'success' : 'warning'} only %}
+      <small>{{ stripeManaged ? 'Facturation Stripe' : 'Facturation manuelle' }}</small>
+    </div>
+  </section>
+
+  <section class="admin-mini-kpis">
+    <div><span class="admin-mini-kpis__icon"><i class="fas fa-id-card"></i></span><span>Licences achetées<strong>{{ seatSummary.purchased }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--blue"><i class="fas fa-user-check"></i></span><span>Licences utilisées<strong>{{ seatSummary.used }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--green"><i class="fas fa-user-plus"></i></span><span>Disponibles<strong>{{ seatSummary.available }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon {{ seatSummary.pending > 0 ? 'admin-mini-kpis__icon--amber' : 'admin-mini-kpis__icon--green' }}"><i class="fas fa-envelope"></i></span><span>En attente<strong>{{ seatSummary.pending }}</strong></span></div>
+  </section>
+
+  {% if stripeManaged %}
+    <div class="admin-management-notice admin-management-notice--stripe">
+      <i class="fa-brands fa-stripe"></i>
+      <div><strong>Entreprise synchronisée avec Stripe</strong><span>Le plan, la quantité et le propriétaire de facturation sont protégés contre les modifications manuelles. Utilisez Stripe pour les modifier.</span></div>
+    </div>
+  {% elseif not subscription %}
+    <div class="admin-management-notice admin-management-notice--warning"><i class="fas fa-triangle-exclamation"></i><div><strong>Abonnement manquant</strong><span>Cette entreprise ne possède aucun abonnement Team associé.</span></div></div>
+  {% endif %}
+
+  <section class="admin-management-grid">
+    <article class="ds-surface admin-management-card">
+      <div class="admin-section-heading"><div><span class="admin-eyebrow">Configuration</span><h2>Entreprise et licences</h2></div></div>
+      <form method="post" action="{{ path('admin_organization_manual_update', {id: organization.id}) }}" class="admin-management-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_organization_update_' ~ organization.id) }}">
+        <label><span>Nom de l’entreprise</span><input class="ds-input" type="text" name="name" value="{{ organization.name }}" maxlength="180" required {{ stripeManaged or not subscription ? 'disabled' : '' }}></label>
+        <label><span>Nombre de licences</span><input class="ds-input" type="number" name="quantity" value="{{ subscription ? subscription.quantity : teamMinimumSeats }}" min="{{ teamMinimumSeats }}" max="{{ teamMaximumSeats }}" required {{ stripeManaged or not subscription ? 'disabled' : '' }}><small>Entre {{ teamMinimumSeats }} et {{ teamMaximumSeats }}. Une réduction est bloquée si les licences sont déjà utilisées.</small></label>
+        <button class="ds-btn ds-btn--primary" type="submit" {{ stripeManaged or not subscription ? 'disabled' : '' }}><i class="fas fa-check"></i> Enregistrer</button>
+      </form>
+    </article>
+
+    <article class="ds-surface admin-management-card">
+      <div class="admin-section-heading"><div><span class="admin-eyebrow">Propriété</span><h2>Transférer l’entreprise</h2></div></div>
+      <p>Le nouveau propriétaire recevra l’abonnement Team manuel. L’ancien propriétaire restera administrateur et continuera à utiliser une licence.</p>
+      <form method="post" action="{{ path('admin_organization_manual_transfer', {id: organization.id}) }}" class="admin-management-form" onsubmit="return confirm('Transférer définitivement cette entreprise et son abonnement manuel ?');">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_organization_transfer_' ~ organization.id) }}">
+        <label><span>Email du nouveau propriétaire</span><input class="ds-input" type="email" name="email" placeholder="utilisateur@entreprise.com" required {{ stripeManaged or not subscription ? 'disabled' : '' }}><small>Le compte doit déjà exister et ne posséder aucun autre abonnement.</small></label>
+        <button class="ds-btn ds-btn--secondary" type="submit" {{ stripeManaged or not subscription ? 'disabled' : '' }}><i class="fas fa-arrow-right-arrow-left"></i> Transférer</button>
+      </form>
+    </article>
+
+    <article class="ds-surface admin-management-card admin-management-card--danger">
+      <div class="admin-section-heading"><div><span class="admin-eyebrow">Accès</span><h2>{{ organization.isActive ? 'Suspendre l’entreprise' : 'Réactiver l’entreprise' }}</h2></div></div>
+      <p>{{ organization.isActive ? 'Tous les membres perdront immédiatement les fonctionnalités Team. Les données et les attributions seront conservées.' : 'Les membres actifs récupéreront immédiatement leurs fonctionnalités Team.' }}</p>
+      <form method="post" action="{{ path('admin_organization_manual_toggle', {id: organization.id}) }}" onsubmit="return confirm('{{ organization.isActive ? 'Suspendre l’entreprise et retirer les accès Team ?' : 'Réactiver cette entreprise ?' }}');">
+        <input type="hidden" name="_token" value="{{ csrf_token('admin_organization_toggle_' ~ organization.id) }}">
+        <input type="hidden" name="action" value="{{ organization.isActive ? 'suspend' : 'activate' }}">
+        <button class="ds-btn {{ organization.isActive ? 'ds-btn--warning' : 'ds-btn--primary' }}" type="submit" {{ stripeManaged or not subscription ? 'disabled' : '' }}><i class="fas {{ organization.isActive ? 'fa-pause' : 'fa-play' }}"></i> {{ organization.isActive ? 'Suspendre' : 'Réactiver' }}</button>
+      </form>
+    </article>
+  </section>
+
+  <section class="admin-detail-section">
+    <div class="admin-section-heading"><div><span class="admin-eyebrow">Licences</span><h2>Membres de l’entreprise</h2></div><span class="admin-limit-note">{{ seatSummary.used }} / {{ seatSummary.purchased }} utilisées</span></div>
+    <div class="admin-progress admin-progress--large"><span style="width: {{ seatPercentage > 100 ? 100 : seatPercentage }}%"></span></div>
+    <div class="ds-surface ds-table-wrap admin-members-table">
+      <table class="ds-table">
+        <thead><tr><th>Utilisateur</th><th>Rôle</th><th>Statut</th><th>Licence</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for membership in organization.members %}
+            <tr>
+              <td><div class="admin-member-identity"><span class="admin-avatar admin-avatar--small">{{ membership.user.email|first|upper }}</span><span><a href="{{ path('admin_user_show', {id: membership.user.id}) }}">{{ membership.user.email }}</a><small>Ajouté le {{ membership.invitedAt|date('d/m/Y') }}</small></span></div></td>
+              <td>
+                {% if not stripeManaged and membership.role.value in ['ADMIN', 'MEMBER'] %}
+                  <form method="post" action="{{ path('admin_organization_member_role', {id: membership.id}) }}" class="admin-member-role-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_organization_member_role_' ~ membership.id) }}">
+                    <select class="ds-select" name="role" aria-label="Rôle de {{ membership.user.email }}"><option value="ADMIN" {{ membership.role.value == 'ADMIN' ? 'selected' : '' }}>Administrateur</option><option value="MEMBER" {{ membership.role.value == 'MEMBER' ? 'selected' : '' }}>Membre</option></select>
+                    <button type="submit" title="Enregistrer le rôle"><i class="fas fa-check"></i></button>
+                  </form>
+                {% else %}<strong>{{ membership.role.value|lower|capitalize }}</strong>{% endif %}
+              </td>
+              <td>{% include 'components/ui/status_badge.html.twig' with {label: membership.status.value, tone: membership.status.value == 'ACTIVE' ? 'success' : (membership.status.value == 'SUSPENDED' ? 'danger' : 'warning')} only %}</td>
+              <td>{{ membership.role.value == 'GUEST' ? 'Invité' : (membership.consumesSeat ? 'Utilisée' : 'Libre') }}</td>
+              <td>
+                {% if not stripeManaged and membership.role.value != 'OWNER' %}
+                  <div class="admin-member-actions">
+                    <form method="post" action="{{ path('admin_organization_member_toggle', {id: membership.id}) }}">
+                      <input type="hidden" name="_token" value="{{ csrf_token('admin_organization_member_toggle_' ~ membership.id) }}">
+                      <button class="ds-btn ds-btn--ghost" type="submit"><i class="fas {{ membership.status.value == 'ACTIVE' ? 'fa-pause' : 'fa-play' }}"></i> {{ membership.status.value == 'ACTIVE' ? 'Suspendre' : 'Activer' }}</button>
+                    </form>
+                    <form method="post" action="{{ path('admin_organization_member_remove', {id: membership.id}) }}" onsubmit="return confirm('Retirer ce membre de l’entreprise et de ses groupes ?');">
+                      <input type="hidden" name="_token" value="{{ csrf_token('admin_organization_member_remove_' ~ membership.id) }}">
+                      <button class="ds-btn ds-btn--danger" type="submit"><i class="fas fa-user-minus"></i> Retirer</button>
+                    </form>
+                  </div>
+                {% else %}<span class="ds-muted">{{ stripeManaged ? 'Géré par Stripe' : 'Propriétaire' }}</span>{% endif %}
+              </td>
+            </tr>
+          {% else %}<tr><td colspan="5" class="ds-empty">Aucun membre dans cette entreprise.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="admin-detail-section">
+    <div class="admin-section-heading"><div><span class="admin-eyebrow">Partage</span><h2>Groupes associés</h2></div></div>
+    <div class="admin-team-links">
+      {% for team in organization.teams %}<a class="ds-surface" href="{{ path('admin_team_show', {id: team.id}) }}"><span class="admin-device-icon"><i class="fas fa-users"></i></span><span><strong>{{ team.name }}</strong><small>{{ team.members|length }} membre(s) · {{ team.credentials|length }} identifiant(s)</small></span><i class="fas fa-chevron-right"></i></a>
+      {% else %}<div class="ds-surface admin-empty-compact">Aucun groupe rattaché à cette entreprise.</div>{% endfor %}
+    </div>
+  </section>
+{% endblock %}

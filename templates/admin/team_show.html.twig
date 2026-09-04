@@ -1,25 +1,25 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Admin Team {{ team.name }}{% endblock %}
+{% block title %}Groupe {{ team.name }} · Admin MYKEYNEST{% endblock %}
 {% block admin_page_class %}ds-page--wide{% endblock %}
-{% block admin_page_title %}Fiche Equipe{% endblock %}
-{% block admin_page_intro %}Gestion admin d une equipe: membres, invitation et suppression.{% endblock %}
+{% block admin_page_title %}Groupe de partage{% endblock %}
+{% block admin_page_intro %}Gestion des membres et des identifiants rattachés à ce groupe.{% endblock %}
 
 {% block admin_toolbar %}
   <div class="ds-toolbar-group">
-    <a href="{{ path('admin_teams') }}" class="ds-btn ds-btn--secondary">Retour teams</a>
-    <form method="post" action="{{ path('admin_team_delete', {id: team.id}) }}" class="ds-inline-form" onsubmit="return confirm('Supprimer cette equipe ?');">
+    <a href="{{ path('admin_teams') }}" class="ds-btn ds-btn--secondary">Retour aux groupes</a>
+    <form method="post" action="{{ path('admin_team_delete', {id: team.id}) }}" class="ds-inline-form" onsubmit="return confirm('Supprimer ce groupe ?');">
       <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_team_' ~ team.id) }}">
-      <button type="submit" class="ds-btn ds-btn--danger">Supprimer l equipe</button>
+      <button type="submit" class="ds-btn ds-btn--danger">Supprimer le groupe</button>
     </form>
   </div>
 {% endblock %}
 
 {% block admin_content %}
   <section class="ds-grid-3">
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Team ID', value: team.id } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Groupe ID', value: team.id } only %}
     {% include 'components/ui/metric_card.html.twig' with { label: 'Membres', value: team.members|length } only %}
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Credentials', value: team.credentials|length } only %}
+    {% include 'components/ui/metric_card.html.twig' with { label: 'Identifiants', value: team.credentials|length } only %}
   </section>
 
   <section class="ds-grid-2">

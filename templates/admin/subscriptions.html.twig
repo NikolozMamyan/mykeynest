@@ -45,6 +45,7 @@
       <tbody>
         {% for user in users %}
           {% set subscription = user.userSubscription %}
+          {% set stripeManaged = subscription and (subscription.stripeCustomerId or subscription.stripeSubscriptionId or subscription.stripePriceId) %}
           <tr>
             <td>
               <div class="ds-cell-stack">
@@ -82,14 +83,22 @@
             <td>
               <div class="ds-actions-stack">
                 <a href="{{ path('admin_user_show', {id: user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Fiche user</a>
-                {% if not subscription or not subscription.isActive %}
-                  <form method="post" action="{{ path('admin_user_subscription_assign_pro', {id: user.id}) }}" class="ds-inline-form">
-                    <input type="hidden" name="_token" value="{{ csrf_token('assign_pro_' ~ user.id) }}">
-                    <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Activer Pro</button>
-                  </form>
+                {% if not stripeManaged %}
+                  <details class="admin-subscription-quick-edit">
+                    <summary class="ds-btn ds-btn--primary ds-btn--block">{{ subscription and subscription.isActive ? 'Modifier l’offre' : 'Activer manuellement' }}</summary>
+                    <form method="post" action="{{ path('admin_user_subscription_manual_update', {id: user.id}) }}" data-controller="admin-manual-subscription">
+                      <input type="hidden" name="_token" value="{{ csrf_token('manual_subscription_' ~ user.id) }}">
+                      <label><span>Offre</span><select class="ds-select" name="plan" data-admin-manual-subscription-target="plan" data-action="change->admin-manual-subscription#refresh"><option value="pro" {{ subscription and subscription.planCode|lower == 'pro' ? 'selected' : '' }}>Pro</option><option value="team" {{ subscription and subscription.planCode|lower == 'team' ? 'selected' : '' }}>Team</option></select></label>
+                      <label data-admin-manual-subscription-target="teamSetting"><span>Licences</span><input class="ds-input" type="number" name="quantity" min="{{ teamMinimumSeats }}" max="{{ teamMaximumSeats }}" value="{{ subscription and subscription.planCode|lower == 'team' ? subscription.quantity : teamMinimumSeats }}" required></label>
+                      <label data-admin-manual-subscription-target="teamSetting"><span>Entreprise</span><input class="ds-input" type="text" name="organization_name" maxlength="180" value="{{ subscription and subscription.organization ? subscription.organization.name : user.company }}"></label>
+                      <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Appliquer</button>
+                    </form>
+                  </details>
+                {% else %}
+                  <span class="admin-limit-note"><i class="fa-brands fa-stripe"></i> Synchronisé</span>
                 {% endif %}
 
-                {% if subscription %}
+                {% if subscription and subscription.isActive and not stripeManaged %}
                   <form method="post" action="{{ path('admin_user_subscription_deactivate', {id: user.id}) }}" class="ds-inline-form" onsubmit="return confirm('Desactiver cet abonnement ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('deactivate_subscription_' ~ user.id) }}">
                     <button type="submit" class="ds-btn ds-btn--warning ds-btn--block">Desactiver</button>

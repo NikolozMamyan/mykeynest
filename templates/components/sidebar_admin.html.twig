@@ -7,80 +7,101 @@
   </div>
 
   <nav class="sidebar-nav">
-    <div class="nav-section">
-      <div class="nav-section-title">
-        Admin
-      </div>
+    {% set currentRoute = app.request.attributes.get('_route') %}
+    {% set userRoutes = ['admin_users', 'admin_user_show', 'admin_user_extension_onboarding_update', 'admin_user_sessions_revoke_all'] %}
+    {% set organizationRoutes = ['admin_organizations'] %}
+    {% set teamRoutes = ['admin_teams', 'admin_team_show', 'admin_team_member_add', 'admin_team_member_remove', 'admin_team_delete'] %}
+    {% set accessRoutes = ['admin_sessions', 'admin_session_revoke', 'admin_session_block_device', 'admin_session_unblock_device'] %}
+    {% set extensionRoutes = ['admin_extensions', 'admin_extension_client_block', 'admin_extension_client_unblock', 'admin_extension_client_revoke', 'admin_extension_challenge_approve', 'admin_extension_challenge_reject'] %}
+    {% set subscriptionRoutes = ['admin_subscriptions', 'admin_subscription_plans', 'admin_subscription_payment', 'admin_user_subscription_assign_pro', 'admin_user_subscription_deactivate'] %}
+
+    <div class="nav-section nav-section--admin">
+      <div class="nav-section-title">Pilotage</div>
 
       <a href="{{ path('app_admin') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_admin' ? 'active' : '' }}">
+         class="nav-item {{ currentRoute == 'app_admin' ? 'active' : '' }}">
         <i class="fas fa-house"></i>
-        <span>Dashboard</span>
+        <span>Vue d’ensemble</span>
       </a>
 
-      <a href="{{ path('admin_blog') }}"
-         class="nav-item {{ app.request.attributes.get('_route') in ['admin_blog', 'admin_article_new', 'admin_article_edit'] ? 'active' : '' }}">
-        <i class="fas fa-newspaper"></i>
-        <span>Blog</span>
+      <a href="{{ path('admin_users') }}"
+         class="nav-item {{ currentRoute in userRoutes ? 'active' : '' }}">
+        <i class="fas fa-users-viewfinder"></i>
+        <span>Utilisateurs</span>
+      </a>
+    </div>
+
+    <div class="nav-section nav-section--admin">
+      <div class="nav-section-title">Entreprises</div>
+
+      <a href="{{ path('admin_organizations') }}"
+         class="nav-item {{ currentRoute in organizationRoutes ? 'active' : '' }}">
+        <i class="fas fa-building-shield"></i>
+        <span>Espaces Team</span>
       </a>
 
-      {% set subscriptionAdminRoutes = ['admin_subscriptions', 'admin_subscription_plans', 'admin_subscription_payment', 'admin_user_subscription_assign_pro', 'admin_user_subscription_deactivate'] %}
-      <a href="{{ path('admin_subscriptions') }}"
-         class="nav-item nav-item--parent {{ app.request.attributes.get('_route') in subscriptionAdminRoutes ? 'active' : '' }}">
-        <i class="fas fa-credit-card"></i>
-        <span>Subscriptions</span>
-        <i class="fas fa-chevron-down nav-item-chevron" aria-hidden="true"></i>
+      <a href="{{ path('admin_teams') }}"
+         class="nav-item {{ currentRoute in teamRoutes ? 'active' : '' }}">
+        <i class="fas fa-people-group"></i>
+        <span>Groupes de partage</span>
       </a>
-      <div class="nav-submenu" aria-label="Sous-menu subscriptions">
-        <a href="{{ path('admin_subscriptions') }}"
-           class="nav-subitem {{ app.request.attributes.get('_route') == 'admin_subscriptions' ? 'active' : '' }}">
-          <i class="fas fa-chevron-right" aria-hidden="true"></i>
-          <span>Gestion</span>
-        </a>
-        <a href="{{ path('admin_subscription_plans') }}"
-           class="nav-subitem {{ app.request.attributes.get('_route') == 'admin_subscription_plans' ? 'active' : '' }}">
-          <i class="fas fa-chevron-right" aria-hidden="true"></i>
-          <span>Plans</span>
-        </a>
-        <a href="{{ path('admin_subscription_payment') }}"
-           class="nav-subitem {{ app.request.attributes.get('_route') == 'admin_subscription_payment' ? 'active' : '' }}">
-          <i class="fas fa-chevron-right" aria-hidden="true"></i>
-          <span>{{ 'admin_payment.nav'|trans }}</span>
-        </a>
-      </div>
+    </div>
 
-      <a href="{{ path('admin_sessions') }}"
-         class="nav-item {{ app.request.attributes.get('_route') in ['admin_sessions', 'admin_session_revoke', 'admin_session_block_device', 'admin_session_unblock_device'] ? 'active' : '' }}">
-        <i class="fas fa-user-shield"></i>
-        <span>Sessions</span>
+    <div class="nav-section nav-section--admin">
+      <div class="nav-section-title">Sécurité et accès</div>
+
+      <a href="{{ path('admin_sessions') }}" class="nav-item {{ currentRoute in accessRoutes ? 'active' : '' }}">
+        <i class="fas fa-laptop-shield"></i>
+        <span>Appareils et sessions</span>
       </a>
 
-      <a href="{{ path('admin_extensions') }}"
-         class="nav-item {{ app.request.attributes.get('_route') in ['admin_extensions', 'admin_extension_client_block', 'admin_extension_client_unblock', 'admin_extension_client_revoke', 'admin_extension_challenge_approve', 'admin_extension_challenge_reject'] ? 'active' : '' }}">
+      <a href="{{ path('admin_extensions') }}" class="nav-item {{ currentRoute in extensionRoutes ? 'active' : '' }}">
         <i class="fas fa-puzzle-piece"></i>
-        <span>Extension install</span>
+        <span>Extensions</span>
       </a>
+    </div>
+
+    <div class="nav-section nav-section--admin">
+      <div class="nav-section-title">Revenus</div>
+
+      <a href="{{ path('admin_subscriptions') }}" class="nav-item {{ currentRoute in subscriptionRoutes ? 'active' : '' }}">
+        <i class="fas fa-credit-card"></i>
+        <span>Abonnements</span>
+      </a>
+
+      <div class="admin-nav-children" aria-label="Gestion des abonnements">
+        <a href="{{ path('admin_subscriptions') }}" class="admin-nav-child {{ currentRoute == 'admin_subscriptions' ? 'active' : '' }}">Gestion</a>
+        <a href="{{ path('admin_subscription_plans') }}" class="admin-nav-child {{ currentRoute == 'admin_subscription_plans' ? 'active' : '' }}">Plans</a>
+        <a href="{{ path('admin_subscription_payment') }}" class="admin-nav-child {{ currentRoute == 'admin_subscription_payment' ? 'active' : '' }}">Paiements</a>
+      </div>
+    </div>
+
+    <div class="nav-section nav-section--admin">
+      <div class="nav-section-title">Relation client</div>
 
       <a href="{{ path('admin_emailing') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'admin_emailing' ? 'active' : '' }}">
+         class="nav-item {{ currentRoute == 'admin_emailing' ? 'active' : '' }}">
         <i class="fas fa-envelope"></i>
         <span>Emailing</span>
       </a>
 
       <a href="{{ path('admin_chat') }}"
-         class="nav-item {{ app.request.attributes.get('_route') in ['admin_chat', 'admin_chat_reply', 'admin_chat_close', 'admin_chat_delete'] ? 'active' : '' }}">
+         class="nav-item {{ currentRoute in ['admin_chat', 'admin_chat_reply', 'admin_chat_close', 'admin_chat_delete'] ? 'active' : '' }}">
         <i class="fas fa-comments"></i>
-        <span>Chat</span>
+        <span>Support</span>
         {% set supportChatUnreadCount = support_chat_unread_count() %}
         {% if supportChatUnreadCount > 0 %}
           <span class="nav-item-badge">{{ supportChatUnreadCount > 99 ? '99+' : supportChatUnreadCount }}</span>
         {% endif %}
       </a>
+    </div>
 
-      <a href="{{ path('admin_teams') }}"
-         class="nav-item {{ app.request.attributes.get('_route') in ['admin_teams', 'admin_team_show', 'admin_team_member_add', 'admin_team_member_remove', 'admin_team_delete'] ? 'active' : '' }}">
-        <i class="fas fa-users"></i>
-        <span>Teams</span>
+    <div class="nav-section nav-section--admin">
+      <div class="nav-section-title">Contenu</div>
+      <a href="{{ path('admin_blog') }}"
+         class="nav-item {{ currentRoute in ['admin_blog', 'admin_article_new', 'admin_article_edit'] ? 'active' : '' }}">
+        <i class="fas fa-newspaper"></i>
+        <span>Blog</span>
       </a>
     </div>
   </nav>

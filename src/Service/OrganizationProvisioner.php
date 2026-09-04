@@ -25,7 +25,7 @@ final class OrganizationProvisioner
     }
 
     /**
-     * Keep the company workspace aligned with a user's Stripe Team subscription.
+     * Keep the company workspace aligned with a user's Team subscription.
      * The caller owns the transaction and flush.
      */
     public function synchronize(User $user, UserSubscription $subscription): ?Organization

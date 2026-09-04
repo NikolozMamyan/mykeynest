@@ -180,6 +180,13 @@
     color: var(--color-text-medium);
 }
 
+.subscription-action.is-static {
+    border-color: color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--app-surface));
+    color: var(--color-primary);
+    cursor: default;
+}
+
 .subscription-action.danger {
     border-color: rgba(220, 38, 38, .2);
     background: rgba(255, 255, 255, .8);

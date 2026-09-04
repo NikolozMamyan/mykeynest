@@ -6,29 +6,37 @@ use App\Entity\Article;
 use App\Entity\EmailCampaign;
 use App\Entity\ExtensionClient;
 use App\Entity\ExtensionInstallationChallenge;
+use App\Entity\Organization;
+use App\Entity\OrganizationMember;
 use App\Entity\Team;
 use App\Entity\User;
-use App\Entity\UserSubscription;
+use App\Enum\OrganizationRole;
 use App\Enum\TeamRole;
 use App\Form\Admin\ArticleType;
 use App\Form\Admin\SubscriptionPlanType;
 use App\Repository\ExtensionClientRepository;
 use App\Repository\ExtensionInstallationChallengeRepository;
 use App\Repository\EmailCampaignRepository;
+use App\Repository\OrganizationRepository;
 use App\Repository\TeamMemberRepository;
 use App\Repository\TeamRepository;
+use App\Repository\UserDeviceRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserSessionRepository;
-use App\Repository\UserSubscriptionRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
 use App\Service\ExtensionClientManager;
 use App\Service\ExtensionInstallationChallengeManager;
+use App\Service\AdminInsightsService;
 use App\Service\MailerService;
+use App\Service\ManualSubscriptionManager;
+use App\Service\OrganizationSeatManager;
 use App\Service\SessionManager;
 use App\Service\StripeEnvironmentManager;
+use App\Service\StripePlanCatalog;
 use App\Service\SubscriptionPlanService;
 use App\Service\TeamMemberAssignmentManager;
 use App\Service\TeamNotifier;
@@ -64,20 +72,14 @@ final class AdminController extends AbstractController
 
     #[Route('', name: 'app_admin', methods: ['GET'])]
     public function index(
-        EntityManagerInterface $em,
         Request $request,
-        UserRepository $userRepository,
-        UserSessionRepository $userSessionRepository
+        AdminInsightsService $adminInsights
     ): Response
     {
+        $period = (int) $request->query->get('period', 30);
+
         return $this->render('admin/index.html.twig', [
-            'recentArticles' => array_slice($this->getArticles($em), 0, 5),
-            'recentUsers' => array_slice($this->getUsers($userRepository), 0, 5),
-            'articlesCount' => $this->countArticles($em),
-            'usersCount' => $this->countUsers($userRepository),
-            'activeSubscriptionsCount' => $this->countActiveSubscriptions($userRepository),
-            'activeSessionsCount' => $this->countActiveSessions($userSessionRepository),
-            'blockedSessionsCount' => $this->countBlockedSessions($userSessionRepository),
+            'dashboard' => $adminInsights->buildDashboard($period),
         ]);
     }
 
@@ -98,35 +100,31 @@ final class AdminController extends AbstractController
     public function users(
         Request $request,
         UserRepository $userRepository,
-        UserSessionRepository $userSessionRepository,
-        ExtensionClientRepository $extensionClientRepository
+        AdminInsightsService $adminInsights
     ): Response {
         $filters = $this->buildUserFilters($request);
+        $page = max(1, (int) $request->query->get('page', 1));
+        $perPage = 30;
         $qb = $userRepository->createQueryBuilder('u')
             ->leftJoin('u.userSubscription', 's')
             ->addSelect('s');
 
         $this->applyUserFilters($qb, $filters);
-
-        /** @var list<User> $users */
-        $users = $qb
-            ->setMaxResults(200)
-            ->getQuery()
-            ->getResult();
-
-        $userIds = array_map(static fn(User $user) => $user->getId(), $users);
+        $pagination = $this->paginateQuery($qb, $page, $perPage);
 
         return $this->render('admin/users.html.twig', [
-            'users' => $users,
+            'userRows' => $adminInsights->buildUserRows($pagination['items']),
             'filters' => $filters,
-            'sessionCounts' => $this->fetchUserCounts($userSessionRepository, 's.user', $userIds, 's'),
-            'extensionCounts' => $this->fetchUserCounts($extensionClientRepository, 'ec.user', $userIds, 'ec'),
+            'pagination' => $pagination,
         ]);
     }
 
     #[Route('/subscriptions', name: 'admin_subscriptions', methods: ['GET'])]
-    public function subscriptions(Request $request, UserRepository $userRepository): Response
-    {
+    public function subscriptions(
+        Request $request,
+        UserRepository $userRepository,
+        StripePlanCatalog $stripePlans,
+    ): Response {
         $filters = $this->buildUserFilters($request);
         $qb = $userRepository->createQueryBuilder('u')
             ->leftJoin('u.userSubscription', 's')
@@ -137,11 +135,17 @@ final class AdminController extends AbstractController
         return $this->render('admin/subscriptions.html.twig', [
             'users' => $qb->setMaxResults(200)->getQuery()->getResult(),
             'filters' => $filters,
+            'teamMinimumSeats' => $stripePlans->getTeamMinimumSeats(),
+            'teamMaximumSeats' => $stripePlans->getTeamMaximumSeats(),
         ]);
     }
 
     #[Route('/sessions', name: 'admin_sessions', methods: ['GET'])]
-    public function sessions(Request $request, UserSessionRepository $userSessionRepository): Response
+    public function sessions(
+        Request $request,
+        UserSessionRepository $userSessionRepository,
+        AdminInsightsService $adminInsights
+    ): Response
     {
         $filters = $this->buildSessionFilters($request);
         $qb = $userSessionRepository->createQueryBuilder('s')
@@ -156,9 +160,11 @@ final class AdminController extends AbstractController
             ->setMaxResults(250)
             ->getQuery()
             ->getResult();
+        $accessOverview = $adminInsights->groupSessionsByUser($sessions);
 
         return $this->render('admin/sessions.html.twig', [
-            'sessions' => $sessions,
+            'accessGroups' => $accessOverview['groups'],
+            'accessStats' => $accessOverview['stats'],
             'filters' => $filters,
         ]);
     }
@@ -167,8 +173,11 @@ final class AdminController extends AbstractController
     public function showUser(
         User $user,
         UserSessionRepository $userSessionRepository,
+        UserDeviceRepository $userDeviceRepository,
         ExtensionClientRepository $extensionClientRepository,
-        ExtensionInstallationChallengeRepository $challengeRepository
+        ExtensionInstallationChallengeRepository $challengeRepository,
+        AdminInsightsService $adminInsights,
+        StripePlanCatalog $stripePlans,
     ): Response {
         $sessions = $userSessionRepository->createQueryBuilder('s')
             ->andWhere('s.user = :user')
@@ -199,6 +208,11 @@ final class AdminController extends AbstractController
             'sessions' => $sessions,
             'extensionClients' => $extensionClients,
             'extensionChallenges' => $extensionChallenges,
+            'devices' => $userDeviceRepository->findBy(['user' => $user], ['lastSeenAt' => 'DESC']),
+            'memberships' => $adminInsights->getUserMemberships($user),
+            'userOverview' => $adminInsights->buildUserRows([$user])[0],
+            'teamMinimumSeats' => $stripePlans->getTeamMinimumSeats(),
+            'teamMaximumSeats' => $stripePlans->getTeamMaximumSeats(),
         ]);
     }
 
@@ -312,15 +326,17 @@ final class AdminController extends AbstractController
 
     #[Route('/extensions', name: 'admin_extensions', methods: ['GET'])]
     public function extensions(
+        Request $request,
         ExtensionClientRepository $extensionClientRepository,
-        ExtensionInstallationChallengeRepository $challengeRepository
+        ExtensionInstallationChallengeRepository $challengeRepository,
+        AdminInsightsService $adminInsights
     ): Response {
         $clients = $extensionClientRepository->createQueryBuilder('ec')
             ->leftJoin('ec.user', 'u')
             ->addSelect('u')
             ->orderBy('ec.lastSeenAt', 'DESC')
             ->addOrderBy('ec.id', 'DESC')
-            ->setMaxResults(200)
+            ->setMaxResults(300)
             ->getQuery()
             ->getResult();
 
@@ -329,13 +345,22 @@ final class AdminController extends AbstractController
             ->addSelect('u')
             ->orderBy('c.createdAt', 'DESC')
             ->addOrderBy('c.id', 'DESC')
-            ->setMaxResults(200)
+            ->setMaxResults(300)
             ->getQuery()
             ->getResult();
 
+        $query = $this->sanitizeSearchQuery($request->query->get('q', ''));
+        $status = (string) $request->query->get('status', 'all');
+        if (!in_array($status, ['all', 'active', 'pending', 'blocked', 'revoked', 'missing'], true)) {
+            $status = 'all';
+        }
+        $extensionOverview = $adminInsights->groupExtensionsByUser($clients, $challenges, $query, $status);
+
         return $this->render('admin/extensions.html.twig', [
-            'clients' => $clients,
-            'challenges' => $challenges,
+            'extensionGroups' => $extensionOverview['groups'],
+            'extensionStats' => $extensionOverview['stats'],
+            'latestVersion' => $extensionOverview['latestVersion'],
+            'filters' => ['q' => $query, 'status' => $status],
         ]);
     }
 
@@ -462,6 +487,217 @@ final class AdminController extends AbstractController
             'formData' => $formData,
             'campaigns' => $campaigns,
         ]);
+    }
+
+    #[Route('/organizations', name: 'admin_organizations', methods: ['GET'])]
+    public function organizations(
+        Request $request,
+        OrganizationRepository $organizationRepository,
+        OrganizationSeatManager $organizationSeats,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        $q = $this->sanitizeSearchQuery($request->query->get('q', ''));
+        $qb = $organizationRepository->createQueryBuilder('organization')
+            ->leftJoin('organization.owner', 'owner')->addSelect('owner')
+            ->leftJoin('organization.subscription', 'subscription')->addSelect('subscription')
+            ->leftJoin('organization.members', 'membership')->addSelect('membership')
+            ->leftJoin('membership.user', 'memberUser')->addSelect('memberUser')
+            ->orderBy('organization.updatedAt', 'DESC')
+            ->addOrderBy('organization.id', 'DESC');
+
+        if ($q !== '') {
+            $qb->andWhere('organization.name LIKE :q OR owner.email LIKE :q OR memberUser.email LIKE :q')
+                ->setParameter('q', '%' . $q . '%');
+        }
+
+        $organizationRows = array_map(
+            static fn (Organization $organization): array => [
+                'organization' => $organization,
+                'seats' => $organizationSeats->getSeatSummary($organization),
+                'stripeManaged' => $organization->getSubscription() !== null
+                    && $manualSubscriptions->isStripeManaged($organization->getSubscription()),
+            ],
+            $qb->setMaxResults(200)->getQuery()->getResult(),
+        );
+
+        return $this->render('admin/organizations.html.twig', [
+            'organizationRows' => $organizationRows,
+            'q' => $q,
+        ]);
+    }
+
+    #[Route('/organizations/{id}', name: 'admin_organization_show', methods: ['GET'])]
+    public function showOrganization(
+        Organization $organization,
+        OrganizationSeatManager $organizationSeats,
+        ManualSubscriptionManager $manualSubscriptions,
+        StripePlanCatalog $stripePlans,
+    ): Response {
+        $subscription = $organization->getSubscription();
+
+        return $this->render('admin/organization_show.html.twig', [
+            'organization' => $organization,
+            'seatSummary' => $organizationSeats->getSeatSummary($organization),
+            'stripeManaged' => $subscription !== null && $manualSubscriptions->isStripeManaged($subscription),
+            'teamMinimumSeats' => $stripePlans->getTeamMinimumSeats(),
+            'teamMaximumSeats' => $stripePlans->getTeamMaximumSeats(),
+        ]);
+    }
+
+    #[Route('/organizations/{id}/manual/update', name: 'admin_organization_manual_update', methods: ['POST'])]
+    public function updateManualOrganization(
+        Organization $organization,
+        Request $request,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_organization_update_' . $organization->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_organization_show', ['id' => $organization->getId()]);
+        }
+
+        try {
+            $manualSubscriptions->updateOrganization(
+                $organization,
+                $request->request->getString('name'),
+                $request->request->getInt('quantity'),
+            );
+            $this->addFlash('success', 'L’entreprise et ses licences ont été mises à jour.');
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_organization_show', ['id' => $organization->getId()]);
+    }
+
+    #[Route('/organizations/{id}/manual/toggle', name: 'admin_organization_manual_toggle', methods: ['POST'])]
+    public function toggleManualOrganization(
+        Organization $organization,
+        Request $request,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_organization_toggle_' . $organization->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_organization_show', ['id' => $organization->getId()]);
+        }
+
+        try {
+            $activate = $request->request->getString('action') === 'activate';
+            $manualSubscriptions->setOrganizationActive($organization, $activate);
+            $this->addFlash($activate ? 'success' : 'warning', $activate
+                ? 'L’entreprise et son abonnement Team sont actifs.'
+                : 'L’entreprise et son abonnement Team sont suspendus.');
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_organization_show', ['id' => $organization->getId()]);
+    }
+
+    #[Route('/organizations/{id}/manual/transfer', name: 'admin_organization_manual_transfer', methods: ['POST'])]
+    public function transferManualOrganization(
+        Organization $organization,
+        Request $request,
+        UserRepository $users,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        if (!$this->isCsrfTokenValid('admin_organization_transfer_' . $organization->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_organization_show', ['id' => $organization->getId()]);
+        }
+
+        $email = mb_strtolower(trim($request->request->getString('email')));
+        $newOwner = filter_var($email, FILTER_VALIDATE_EMAIL) ? $users->findOneBy(['email' => $email]) : null;
+        if (!$newOwner instanceof User) {
+            $this->addFlash('error', 'Aucun utilisateur MYKEYNEST ne correspond à cette adresse email.');
+
+            return $this->redirectToRoute('admin_organization_show', ['id' => $organization->getId()]);
+        }
+
+        try {
+            $manualSubscriptions->transferOrganization($organization, $newOwner);
+            $this->addFlash('success', sprintf('%s est maintenant propriétaire de l’entreprise.', $newOwner->getEmail()));
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_organization_show', ['id' => $organization->getId()]);
+    }
+
+    #[Route('/organization-members/{id}/role', name: 'admin_organization_member_role', methods: ['POST'])]
+    public function updateOrganizationMemberRole(
+        OrganizationMember $membership,
+        Request $request,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        $organization = $membership->getOrganization();
+        if (!$this->isCsrfTokenValid('admin_organization_member_role_' . $membership->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_organization_show', ['id' => $organization?->getId()]);
+        }
+
+        try {
+            $role = OrganizationRole::tryFrom($request->request->getString('role'));
+            if (!$role instanceof OrganizationRole) {
+                throw new \InvalidArgumentException('Rôle invalide.');
+            }
+            $manualSubscriptions->changeMemberRole($membership, $role);
+            $this->addFlash('success', 'Le rôle du membre a été mis à jour.');
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_organization_show', ['id' => $organization?->getId()]);
+    }
+
+    #[Route('/organization-members/{id}/toggle', name: 'admin_organization_member_toggle', methods: ['POST'])]
+    public function toggleOrganizationMember(
+        OrganizationMember $membership,
+        Request $request,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        $organization = $membership->getOrganization();
+        if (!$this->isCsrfTokenValid('admin_organization_member_toggle_' . $membership->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_organization_show', ['id' => $organization?->getId()]);
+        }
+
+        try {
+            $wasActive = $membership->getStatus()->value === 'ACTIVE';
+            $manualSubscriptions->toggleMembership($membership);
+            $this->addFlash($wasActive ? 'warning' : 'success', $wasActive ? 'Le membre a été suspendu.' : 'Le membre a été réactivé.');
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_organization_show', ['id' => $organization?->getId()]);
+    }
+
+    #[Route('/organization-members/{id}/remove', name: 'admin_organization_member_remove', methods: ['POST'])]
+    public function removeOrganizationMember(
+        OrganizationMember $membership,
+        Request $request,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        $organization = $membership->getOrganization();
+        if (!$this->isCsrfTokenValid('admin_organization_member_remove_' . $membership->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('admin_organization_show', ['id' => $organization?->getId()]);
+        }
+
+        try {
+            $manualSubscriptions->removeMembership($membership);
+            $this->addFlash('warning', 'Le membre a été retiré de l’entreprise et de ses groupes.');
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_organization_show', ['id' => $organization?->getId()]);
     }
 
     #[Route('/teams', name: 'admin_teams', methods: ['GET'])]
@@ -643,49 +879,80 @@ final class AdminController extends AbstractController
     public function assignProToUser(
         User $user,
         Request $request,
-        EntityManagerInterface $em,
-        UserSubscriptionRepository $subscriptionRepository
+        ManualSubscriptionManager $manualSubscriptions,
     ): Response {
         if (!$this->isCsrfTokenValid('assign_pro_' . $user->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Token CSRF invalide.');
 
-            return $this->redirectToRoute('admin_subscriptions');
+            return $this->redirectAfterSubscriptionAction($request, $user);
         }
 
-        $subscription = $this->getOrCreateSubscription($user, $subscriptionRepository, $em);
-        $subscription->setPlanCode('pro');
-        $subscription->setStatus('admin_active');
-        $subscription->setIsActive(true);
-        $subscription->touch();
-        $em->flush();
+        try {
+            $manualSubscriptions->activate($user, SubscriptionPlanService::PLAN_PRO);
+            $this->addFlash('success', 'Abonnement Pro manuel attribué à ' . $user->getEmail() . '.');
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
 
-        $this->addFlash('success', 'Abonnement Pro attribue a ' . $user->getEmail() . '.');
+        return $this->redirectAfterSubscriptionAction($request, $user);
+    }
 
-        return $this->redirectToRoute('admin_subscriptions');
+    #[Route('/users/{id}/subscription/manual', name: 'admin_user_subscription_manual_update', methods: ['POST'])]
+    public function updateManualUserSubscription(
+        User $user,
+        Request $request,
+        ManualSubscriptionManager $manualSubscriptions,
+    ): Response {
+        if (!$this->isCsrfTokenValid('manual_subscription_' . $user->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectAfterSubscriptionAction($request, $user);
+        }
+
+        $planCode = mb_strtolower(trim($request->request->getString('plan')));
+        try {
+            $manualSubscriptions->activate(
+                $user,
+                $planCode,
+                $request->request->getInt('quantity', 1),
+                $request->request->getString('organization_name'),
+            );
+            $this->addFlash('success', sprintf(
+                'L’offre %s est maintenant gérée manuellement pour %s.',
+                mb_strtoupper($planCode),
+                $user->getEmail(),
+            ));
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
+
+        return $this->redirectAfterSubscriptionAction($request, $user);
     }
 
     #[Route('/users/{id}/subscription/deactivate', name: 'admin_user_subscription_deactivate', methods: ['POST'])]
     public function deactivateUserSubscription(
         User $user,
         Request $request,
-        EntityManagerInterface $em,
-        UserSubscriptionRepository $subscriptionRepository
+        ManualSubscriptionManager $manualSubscriptions,
     ): Response {
         if (!$this->isCsrfTokenValid('deactivate_subscription_' . $user->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Token CSRF invalide.');
 
-            return $this->redirectToRoute('admin_subscriptions');
+            return $this->redirectAfterSubscriptionAction($request, $user);
         }
 
-        $subscription = $this->getOrCreateSubscription($user, $subscriptionRepository, $em);
-        $subscription->setIsActive(false);
-        $subscription->setStatus('admin_disabled');
-        $subscription->touch();
-        $em->flush();
+        try {
+            $subscription = $user->getUserSubscription();
+            if ($subscription === null) {
+                throw new \LogicException('Aucun abonnement ne peut être désactivé pour ce compte.');
+            }
+            $manualSubscriptions->deactivate($subscription);
+            $this->addFlash('warning', 'Abonnement manuel désactivé pour ' . $user->getEmail() . '.');
+        } catch (\LogicException $exception) {
+            $this->addFlash('error', $exception->getMessage());
+        }
 
-        $this->addFlash('warning', 'Abonnement desactive pour ' . $user->getEmail() . '.');
-
-        return $this->redirectToRoute('admin_subscriptions');
+        return $this->redirectAfterSubscriptionAction($request, $user);
     }
 
     #[Route('/users/{id}/sessions/revoke-all', name: 'admin_user_sessions_revoke_all', methods: ['POST'])]
@@ -1231,21 +1498,13 @@ final class AdminController extends AbstractController
         return array_values(array_unique($recipients));
     }
 
-    private function getOrCreateSubscription(
-        User $user,
-        UserSubscriptionRepository $subscriptionRepository,
-        EntityManagerInterface $em
-    ): UserSubscription {
-        $subscription = $user->getUserSubscription() ?? $subscriptionRepository->findOneBy(['user' => $user]);
-
-        if (!$subscription) {
-            $subscription = new UserSubscription();
-            $subscription->setUser($user);
-            $user->setUserSubscription($subscription);
-            $em->persist($subscription);
+    private function redirectAfterSubscriptionAction(Request $request, User $user): Response
+    {
+        if ($request->request->getString('_redirect') === 'user') {
+            return $this->redirectToRoute('admin_user_show', ['id' => $user->getId()]);
         }
 
-        return $subscription;
+        return $this->redirectToRoute('admin_subscriptions');
     }
 
     /**
@@ -1278,71 +1537,6 @@ final class AdminController extends AbstractController
     }
 
     /**
-     * @return list<User>
-     */
-    private function getUsers(UserRepository $userRepository): array
-    {
-        /** @var list<User> $users */
-        $users = $userRepository->createQueryBuilder('u')
-            ->leftJoin('u.userSubscription', 's')
-            ->addSelect('s')
-            ->orderBy('u.id', 'DESC')
-            ->setMaxResults(100)
-            ->getQuery()
-            ->getResult();
-
-        return $users;
-    }
-
-    private function countArticles(EntityManagerInterface $em): int
-    {
-        return (int) $em->getRepository(Article::class)->createQueryBuilder('a')
-            ->select('COUNT(a.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    private function countUsers(UserRepository $userRepository): int
-    {
-        return (int) $userRepository->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    private function countActiveSubscriptions(UserRepository $userRepository): int
-    {
-        return (int) $userRepository->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->innerJoin('u.userSubscription', 's')
-            ->andWhere('s.isActive = :active')
-            ->setParameter('active', true)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    private function countActiveSessions(UserSessionRepository $userSessionRepository): int
-    {
-        return (int) $userSessionRepository->createQueryBuilder('s')
-            ->select('COUNT(s.id)')
-            ->andWhere('s.isBlocked = false')
-            ->andWhere('s.isRevoked = false')
-            ->andWhere('s.expiresAt > :now')
-            ->setParameter('now', new DateTimeImmutable())
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    private function countBlockedSessions(UserSessionRepository $userSessionRepository): int
-    {
-        return (int) $userSessionRepository->createQueryBuilder('s')
-            ->select('COUNT(s.id)')
-            ->andWhere('s.isBlocked = true')
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    /**
      * @return array{q:string,subscription:string,role:string,sort:string}
      */
     private function buildUserFilters(Request $request): array
@@ -1353,7 +1547,7 @@ final class AdminController extends AbstractController
 
         return [
             'q' => $this->sanitizeSearchQuery($request->query->get('q', '')),
-            'subscription' => in_array($subscription, ['all', 'active', 'inactive', 'free'], true) ? $subscription : 'all',
+            'subscription' => in_array($subscription, ['all', 'active', 'inactive', 'free', 'pro', 'team'], true) ? $subscription : 'all',
             'role' => in_array($role, ['all', 'admin', 'user', 'guest'], true) ? $role : 'all',
             'sort' => in_array($sort, ['newest', 'oldest', 'email', 'company'], true) ? $sort : 'newest',
         ];
@@ -1364,6 +1558,16 @@ final class AdminController extends AbstractController
      */
     private function applyUserFilters(QueryBuilder $qb, array $filters): void
     {
+        $activeTeamMembership = 'EXISTS (SELECT teamMembership.id FROM App\\Entity\\OrganizationMember teamMembership '
+            . 'JOIN teamMembership.organization teamOrganization '
+            . 'JOIN teamOrganization.subscription teamSubscription '
+            . 'WHERE teamMembership.user = u '
+            . 'AND teamMembership.status = :activeMemberStatus '
+            . 'AND teamMembership.role != :guestMemberRole '
+            . 'AND teamOrganization.status = :activeOrganizationStatus '
+            . 'AND teamSubscription.isActive = true '
+            . 'AND LOWER(teamSubscription.planCode) = :teamPlan)';
+
         if ($filters['q'] !== '') {
             if (ctype_digit($filters['q'])) {
                 $qb->andWhere('u.id = :exactId OR u.email LIKE :query OR u.company LIKE :query')
@@ -1378,7 +1582,28 @@ final class AdminController extends AbstractController
         match ($filters['subscription']) {
             'active' => $qb->andWhere('s.isActive = true'),
             'inactive' => $qb->andWhere('s.id IS NOT NULL')->andWhere('s.isActive = false'),
-            'free' => $qb->andWhere('s.id IS NULL'),
+            'free' => $qb
+                ->andWhere('(s.id IS NULL OR s.isActive = false)')
+                ->andWhere('NOT ' . $activeTeamMembership)
+                ->setParameter('activeMemberStatus', 'ACTIVE')
+                ->setParameter('guestMemberRole', 'GUEST')
+                ->setParameter('activeOrganizationStatus', 'ACTIVE')
+                ->setParameter('teamPlan', 'team'),
+            'pro' => $qb
+                ->andWhere('s.isActive = true')
+                ->andWhere('LOWER(s.planCode) = :proPlan')
+                ->andWhere('NOT ' . $activeTeamMembership)
+                ->setParameter('proPlan', 'pro')
+                ->setParameter('activeMemberStatus', 'ACTIVE')
+                ->setParameter('guestMemberRole', 'GUEST')
+                ->setParameter('activeOrganizationStatus', 'ACTIVE')
+                ->setParameter('teamPlan', 'team'),
+            'team' => $qb
+                ->andWhere('(s.isActive = true AND LOWER(s.planCode) = :teamPlan) OR ' . $activeTeamMembership)
+                ->setParameter('activeMemberStatus', 'ACTIVE')
+                ->setParameter('guestMemberRole', 'GUEST')
+                ->setParameter('activeOrganizationStatus', 'ACTIVE')
+                ->setParameter('teamPlan', 'team'),
             default => null,
         };
 
@@ -1441,29 +1666,33 @@ final class AdminController extends AbstractController
     }
 
     /**
-     * @param list<int|null> $userIds
-     * @return array<int, int>
+     * @return array{items:list<User>,page:int,pages:int,total:int,perPage:int}
      */
-    private function fetchUserCounts(object $repository, string $field, array $userIds, string $alias): array
+    private function paginateQuery(QueryBuilder $queryBuilder, int $page, int $perPage): array
     {
-        $userIds = array_values(array_filter($userIds, static fn(?int $id) => $id !== null));
-        if ($userIds === []) {
-            return [];
+        $queryBuilder
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage);
+
+        $paginator = new Paginator($queryBuilder, true);
+        $total = count($paginator);
+        $pages = max(1, (int) ceil($total / $perPage));
+
+        if ($page > $pages) {
+            $page = $pages;
+            $queryBuilder->setFirstResult(($page - 1) * $perPage);
+            $paginator = new Paginator($queryBuilder, true);
         }
 
-        $rows = $repository->createQueryBuilder($alias)
-            ->select('IDENTITY(' . $field . ') AS userId, COUNT(' . $alias . '.id) AS itemCount')
-            ->andWhere($field . ' IN (:userIds)')
-            ->setParameter('userIds', $userIds)
-            ->groupBy($field)
-            ->getQuery()
-            ->getArrayResult();
+        /** @var list<User> $items */
+        $items = iterator_to_array($paginator->getIterator(), false);
 
-        $counts = [];
-        foreach ($rows as $row) {
-            $counts[(int) $row['userId']] = (int) $row['itemCount'];
-        }
-
-        return $counts;
+        return [
+            'items' => $items,
+            'page' => $page,
+            'pages' => $pages,
+            'total' => $total,
+            'perPage' => $perPage,
+        ];
     }
 }

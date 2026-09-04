@@ -1,0 +1,57 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Espaces Team · Admin MYKEYNEST{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-organizations-page{% endblock %}
+{% block admin_page_title %}Espaces Team{% endblock %}
+{% block admin_page_intro %}Les entreprises, leurs propriétaires et la consommation réelle des licences Team.{% endblock %}
+
+{% block admin_toolbar %}
+  <form method="get" action="{{ path('admin_organizations') }}" class="admin-filter-bar ds-toolbar-grow">
+    <label class="admin-search-field"><i class="fas fa-magnifying-glass"></i><input type="search" name="q" value="{{ q }}" placeholder="Entreprise, propriétaire ou membre" aria-label="Rechercher une entreprise"></label>
+    <button type="submit" class="ds-btn ds-btn--primary"><i class="fas fa-magnifying-glass"></i> Rechercher</button>
+    {% if q %}<a href="{{ path('admin_organizations') }}" class="ds-btn ds-btn--ghost"><i class="fas fa-rotate-left"></i></a>{% endif %}
+  </form>
+{% endblock %}
+
+{% block admin_content %}
+  <section class="admin-organization-grid">
+    {% for row in organizationRows %}
+      {% set organization = row.organization %}
+      {% set subscription = organization.subscription %}
+      {% set seatPercentage = row.seats.purchased > 0 ? ((row.seats.used / row.seats.purchased) * 100)|round : 0 %}
+      <article class="ds-surface admin-organization-card">
+        <header>
+          <span class="admin-organization-icon"><i class="fas fa-building-shield"></i></span>
+          <div><h2><a class="admin-organization-title" href="{{ path('admin_organization_show', {id: organization.id}) }}">{{ organization.name }}</a></h2><a href="{{ path('admin_user_show', {id: organization.owner.id}) }}">{{ organization.owner.email }}</a></div>
+          <div class="admin-organization-statuses">
+            {% include 'components/ui/status_badge.html.twig' with {label: organization.isActive ? 'Active' : 'Suspendue', tone: organization.isActive ? 'success' : 'warning'} only %}
+            {% include 'components/ui/status_badge.html.twig' with {label: row.stripeManaged ? 'Stripe' : 'Manuel', tone: row.stripeManaged ? 'info' : 'muted'} only %}
+          </div>
+        </header>
+        <div class="admin-seat-usage">
+          <div><span>Licences utilisées</span><strong>{{ row.seats.used }} / {{ row.seats.purchased }}</strong></div>
+          <div class="admin-progress"><span style="width: {{ seatPercentage > 100 ? 100 : seatPercentage }}%"></span></div>
+          <small>{{ row.seats.active }} membre(s) actif(s) · {{ row.seats.pending }} invitation(s) en attente · {{ row.seats.available }} disponible(s)</small>
+        </div>
+        <div class="admin-organization-facts">
+          <span><small>Offre</small><strong>{{ subscription and subscription.planCode ? subscription.planCode|upper : 'Aucune' }}</strong></span>
+          <span><small>Groupes</small><strong>{{ organization.teams|length }}</strong></span>
+          <span><small>Création</small><strong>{{ organization.createdAt|date('d/m/Y') }}</strong></span>
+        </div>
+        <details class="admin-member-list">
+          <summary>Voir les membres <i class="fas fa-chevron-down"></i></summary>
+          <div>
+            {% for membership in organization.members %}
+              <a href="{{ path('admin_user_show', {id: membership.user.id}) }}"><span class="admin-avatar admin-avatar--small">{{ membership.user.email|first|upper }}</span><span><strong>{{ membership.user.email }}</strong><small>{{ membership.role.value|lower|capitalize }}</small></span>{% include 'components/ui/status_badge.html.twig' with {label: membership.status.value, tone: membership.status.value == 'ACTIVE' ? 'success' : 'warning'} only %}</a>
+            {% else %}<span class="admin-empty-compact">Aucun membre.</span>{% endfor %}
+          </div>
+        </details>
+        <div class="admin-card-actions">
+          <a class="ds-btn ds-btn--secondary" href="{{ path('admin_organization_show', {id: organization.id}) }}"><i class="fas fa-sliders"></i> Gérer l’entreprise</a>
+        </div>
+      </article>
+    {% else %}
+      <div class="ds-surface admin-empty-state"><i class="fas fa-building-circle-xmark"></i><strong>Aucun espace Team</strong><span>Aucune entreprise ne correspond à cette recherche.</span></div>
+    {% endfor %}
+  </section>
+{% endblock %}

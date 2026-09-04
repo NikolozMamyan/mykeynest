@@ -1,200 +1,115 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Admin Extensions{% endblock %}
-{% block admin_page_class %}ds-page--wide{% endblock %}
-{% block admin_page_title %}Extension Installation{% endblock %}
-{% block admin_page_intro %}Visibilite sur les clients extension installes et les demandes d installation en attente.{% endblock %}
+{% block title %}Extensions · Admin MYKEYNEST{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-extensions-page{% endblock %}
+{% block admin_page_title %}Extensions{% endblock %}
+{% block admin_page_intro %}Suivez l’installation, l’état des clients et l’adoption des versions pour chaque utilisateur.{% endblock %}
+
+{% block admin_toolbar %}
+  <form method="get" action="{{ path('admin_extensions') }}" class="admin-filter-bar ds-toolbar-grow">
+    <label class="admin-search-field"><i class="fas fa-magnifying-glass"></i><input type="search" name="q" value="{{ filters.q }}" placeholder="Utilisateur, navigateur, OS ou version" aria-label="Rechercher une extension"></label>
+    <select class="ds-select" name="status" aria-label="Filtrer par statut">
+      <option value="all" {{ filters.status == 'all' ? 'selected' : '' }}>Tous les statuts</option>
+      <option value="active" {{ filters.status == 'active' ? 'selected' : '' }}>Actives</option>
+      <option value="pending" {{ filters.status == 'pending' ? 'selected' : '' }}>Installations en cours</option>
+      <option value="blocked" {{ filters.status == 'blocked' ? 'selected' : '' }}>Action requise</option>
+      <option value="revoked" {{ filters.status == 'revoked' ? 'selected' : '' }}>Révoquées</option>
+      <option value="missing" {{ filters.status == 'missing' ? 'selected' : '' }}>Non installées</option>
+    </select>
+    <button type="submit" class="ds-btn ds-btn--primary"><i class="fas fa-sliders"></i> Filtrer</button>
+    {% if filters.q or filters.status != 'all' %}<a href="{{ path('admin_extensions') }}" class="ds-btn ds-btn--ghost" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>{% endif %}
+  </form>
+{% endblock %}
 
 {% block admin_content %}
-  <section class="ds-surface">
-    <div class="ds-section-head">
-      <div>
-        <h2 class="ds-section-title">Clients extension</h2>
-        <p class="ds-section-text">Derniers clients vus avec statut de revocation ou blocage.</p>
-      </div>
-    </div>
-
-    <div class="ds-table-wrap">
-      <table class="ds-table">
-        <thead>
-          <tr>
-            <th>Utilisateur</th>
-            <th>Client</th>
-            <th>Environnement</th>
-            <th>Activite</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for client in clients %}
-            <tr>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-title-strong">{{ client.user.email }}</span>
-                  <span class="ds-muted">{{ client.user.company ?: '-' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-mono">{{ client.clientId }}</span>
-                  <span>{{ client.deviceLabel ?: 'Appareil inconnu' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span>{{ client.browserName ?: '-' }} {{ client.browserVersion ?: '' }}</span>
-                  <span>{{ client.osName ?: '-' }} {{ client.osVersion ?: '' }}</span>
-                  <span>Extension {{ client.extensionVersion ?: '-' }} / manifest {{ client.manifestVersion ?: '-' }}</span>
-                  <span class="ds-muted">{{ client.originType ?: '-' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span>Premier: {{ client.firstSeenAt ? client.firstSeenAt|date('d/m/Y H:i') : '-' }}</span>
-                  <span>Dernier: {{ client.lastSeenAt ? client.lastSeenAt|date('d/m/Y H:i') : '-' }}</span>
-                  <span class="ds-mono">{{ client.lastIpAddress ?: '-' }}</span>
-                </div>
-              </td>
-              <td>
-                {% if client.isBlocked %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'bloquee', tone: 'danger' } only %}
-                {% elseif client.isRevoked %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'revoquee', tone: 'warning' } only %}
-                {% else %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'active', tone: 'success' } only %}
-                {% endif %}
-
-                <div class="ds-cell-stack" style="margin-top:0.5rem;">
-                  {% if client.blockedReason %}
-                    <span class="ds-muted">Blocage: {{ client.blockedReason }}</span>
-                  {% endif %}
-                  {% if client.revokedReason %}
-                    <span class="ds-muted">Revocation: {{ client.revokedReason }}</span>
-                  {% endif %}
-                </div>
-              </td>
-              <td>
-                <div class="ds-actions-stack">
-                  {% if not client.isRevoked %}
-                    <form method="post" action="{{ path('admin_extension_client_revoke', {id: client.id}) }}" class="ds-inline-form" onsubmit="return confirm('Revoquer ce client extension ?');">
-                      <input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_extension_' ~ client.id) }}">
-                      <button type="submit" class="ds-btn ds-btn--warning ds-btn--block">Revoquer</button>
-                    </form>
-                  {% endif %}
-
-                  {% if not client.isBlocked %}
-                    <form method="post" action="{{ path('admin_extension_client_block', {id: client.id}) }}" class="ds-inline-form" onsubmit="return confirm('Bloquer ce client extension ?');">
-                      <input type="hidden" name="_token" value="{{ csrf_token('admin_block_extension_' ~ client.id) }}">
-                      <button type="submit" class="ds-btn ds-btn--danger ds-btn--block">Bloquer</button>
-                    </form>
-                  {% else %}
-                    <form method="post" action="{{ path('admin_extension_client_unblock', {id: client.id}) }}" class="ds-inline-form" onsubmit="return confirm('Debloquer ce client extension ?');">
-                      <input type="hidden" name="_token" value="{{ csrf_token('admin_unblock_extension_' ~ client.id) }}">
-                      <button type="submit" class="ds-btn ds-btn--success ds-btn--block">Debloquer</button>
-                    </form>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-          {% else %}
-            <tr>
-              <td colspan="6" class="ds-empty">Aucun client extension a afficher.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <section class="admin-mini-kpis" aria-label="Résumé des extensions">
+    <div><span class="admin-mini-kpis__icon"><i class="fas fa-users"></i></span><span>Utilisateurs suivis<strong>{{ extensionStats.users }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--green"><i class="fas fa-circle-check"></i></span><span>Installations actives<strong>{{ extensionStats.active }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--amber"><i class="fas fa-clock"></i></span><span>En attente<strong>{{ extensionStats.pending }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--red"><i class="fas fa-triangle-exclamation"></i></span><span>Action requise<strong>{{ extensionStats.blocked }}</strong></span></div>
   </section>
 
-  <section class="ds-surface">
-    <div class="ds-section-head">
-      <div>
-        <h2 class="ds-section-title">Demandes d installation</h2>
-        <p class="ds-section-text">Historique des challenges d approbation envoyes par e-mail.</p>
-      </div>
-    </div>
+  <div class="admin-release-note">
+    <span class="admin-release-note__icon"><i class="fas fa-code-branch"></i></span>
+    <div><strong>Version la plus récente observée : {{ latestVersion ? 'v' ~ latestVersion : 'inconnue' }}</strong><span>Cette valeur provient des extensions ayant contacté l’application ; elle permet de suivre progressivement la mise à jour Chrome Store.</span></div>
+  </div>
 
-    <div class="ds-table-wrap">
-      <table class="ds-table">
-        <thead>
-          <tr>
-            <th>Utilisateur</th>
-            <th>Client demande</th>
-            <th>Contexte</th>
-            <th>Dates</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for challenge in challenges %}
-            <tr>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-title-strong">{{ challenge.user.email }}</span>
-                  <span class="ds-mono">{{ challenge.publicId }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-mono">{{ challenge.requestedClientId }}</span>
-                  <span>{{ challenge.deviceLabel ?: 'Appareil inconnu' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span>{{ challenge.browserName ?: '-' }} {{ challenge.browserVersion ?: '' }}</span>
-                  <span>{{ challenge.osName ?: '-' }} {{ challenge.osVersion ?: '' }}</span>
-                  <span>Extension {{ challenge.extensionVersion ?: '-' }}</span>
-                  <span class="ds-mono">{{ challenge.ipAddress ?: '-' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span>Cree: {{ challenge.createdAt ? challenge.createdAt|date('d/m/Y H:i') : '-' }}</span>
-                  <span>Expire: {{ challenge.expiresAt ? challenge.expiresAt|date('d/m/Y H:i') : '-' }}</span>
-                  <span>Approve: {{ challenge.approvedAt ? challenge.approvedAt|date('d/m/Y H:i') : '-' }}</span>
-                  <span>Reject: {{ challenge.rejectedAt ? challenge.rejectedAt|date('d/m/Y H:i') : '-' }}</span>
-                </div>
-              </td>
-              <td>
-                {% if challenge.status == 'approved' %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'approved', tone: 'success' } only %}
-                {% elseif challenge.status == 'pending' %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'pending', tone: 'warning' } only %}
-                {% elseif challenge.status == 'rejected' %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'rejected', tone: 'danger' } only %}
-                {% elseif challenge.status == 'completed' %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'completed', tone: 'success' } only %}
-                {% else %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: challenge.status, tone: 'muted' } only %}
-                {% endif %}
-              </td>
-              <td>
-                <div class="ds-actions-stack">
-                  {% if challenge.status == 'pending' and challenge.expiresAt and challenge.expiresAt > date() %}
-                    <form method="post" action="{{ path('admin_extension_challenge_approve', {id: challenge.id}) }}" class="ds-inline-form" onsubmit="return confirm('Approuver cette installation ?');">
-                      <input type="hidden" name="_token" value="{{ csrf_token('admin_approve_extension_challenge_' ~ challenge.id) }}">
-                      <button type="submit" class="ds-btn ds-btn--success ds-btn--block">Approuver</button>
-                    </form>
-                    <form method="post" action="{{ path('admin_extension_challenge_reject', {id: challenge.id}) }}" class="ds-inline-form" onsubmit="return confirm('Rejeter cette installation ?');">
-                      <input type="hidden" name="_token" value="{{ csrf_token('admin_reject_extension_challenge_' ~ challenge.id) }}">
-                      <button type="submit" class="ds-btn ds-btn--danger ds-btn--block">Rejeter</button>
-                    </form>
+  <section class="admin-cluster-list">
+    {% for group in extensionGroups %}
+      {% set user = group.user %}
+      <details class="admin-user-cluster" {{ (group.state.key in ['blocked', 'pending']) ? 'open' : '' }}>
+        <summary>
+          <span class="admin-avatar">{{ (user.prenom ?: user.email)|first|upper }}</span>
+          <span class="admin-cluster-identity"><strong>{{ user.email }}</strong><small>{{ user.company ?: 'Sans entreprise' }} · #{{ user.id }}</small></span>
+          <span class="admin-cluster-metric"><strong>{{ group.clients|length }}</strong><small>installation(s)</small></span>
+          <span class="admin-cluster-metric"><strong>{{ group.pending }}</strong><small>en attente</small></span>
+          <span class="admin-cluster-last"><strong>{{ group.lastActivity ? group.lastActivity|date('d/m/Y H:i') : 'Jamais' }}</strong><small>dernière communication</small></span>
+          {% include 'components/ui/status_badge.html.twig' with {label: group.state.label, tone: group.state.tone} only %}
+          <i class="fas fa-chevron-down admin-cluster-chevron"></i>
+        </summary>
+
+        <div class="admin-cluster-body">
+          <div class="admin-cluster-toolbar">
+            <span>Onboarding : <strong>{{ user.extensionOnboardingStatus }}</strong></span>
+            <a href="{{ path('admin_user_show', {id: user.id}) }}#extensions" class="ds-btn ds-btn--secondary"><i class="fas fa-user"></i> Fiche utilisateur</a>
+          </div>
+
+          {% if group.clients is not empty %}
+            <div class="admin-extension-grid">
+              {% for client in group.clients %}
+                <article class="admin-extension-card {{ client.isBlocked ? 'is-danger' : '' }}">
+                  <header>
+                    <span class="admin-device-icon"><i class="fas fa-puzzle-piece"></i></span>
+                    <div><strong>{{ client.deviceLabel ?: 'Extension sans nom' }}</strong><small>{{ client.clientId }}</small></div>
+                    {% if client.isBlocked %}{% include 'components/ui/status_badge.html.twig' with {label: 'Bloquée', tone: 'danger'} only %}{% elseif client.isRevoked %}{% include 'components/ui/status_badge.html.twig' with {label: 'Révoquée', tone: 'warning'} only %}{% else %}{% include 'components/ui/status_badge.html.twig' with {label: 'Active', tone: 'success'} only %}{% endif %}
+                  </header>
+                  <div class="admin-extension-specs">
+                    <span><i class="fab fa-chrome"></i><strong>{{ client.browserName ?: 'Navigateur inconnu' }}</strong> {{ client.browserVersion }}</span>
+                    <span><i class="fas fa-display"></i><strong>{{ client.osName ?: 'OS inconnu' }}</strong> {{ client.osVersion }}</span>
+                    <span><i class="fas fa-code-branch"></i><strong>v{{ client.extensionVersion ?: '?' }}</strong> · Manifest {{ client.manifestVersion ?: '?' }}</span>
+                    <span><i class="fas fa-clock"></i>{{ client.lastSeenAt ? client.lastSeenAt|date('d/m/Y H:i') : 'Jamais vue' }}</span>
+                    <span><i class="fas fa-network-wired"></i>{{ client.lastIpAddress ?: 'IP inconnue' }}</span>
+                  </div>
+                  {% if client.blockedReason or client.revokedReason %}<p class="admin-reason">{{ client.blockedReason ?: client.revokedReason }}</p>{% endif %}
+                  <footer class="admin-card-actions">
+                    {% if not client.isRevoked %}
+                      <form method="post" action="{{ path('admin_extension_client_revoke', {id: client.id}) }}" onsubmit="return confirm('Révoquer définitivement ce client extension ?');"><input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_extension_' ~ client.id) }}"><button type="submit"><i class="fas fa-arrow-right-from-bracket"></i> Révoquer</button></form>
+                    {% endif %}
+                    {% if not client.isBlocked %}
+                      <form method="post" action="{{ path('admin_extension_client_block', {id: client.id}) }}" onsubmit="return confirm('Bloquer ce client extension ?');"><input type="hidden" name="_token" value="{{ csrf_token('admin_block_extension_' ~ client.id) }}"><button type="submit" class="is-danger"><i class="fas fa-ban"></i> Bloquer</button></form>
+                    {% else %}
+                      <form method="post" action="{{ path('admin_extension_client_unblock', {id: client.id}) }}" onsubmit="return confirm('Débloquer ce client extension ?');"><input type="hidden" name="_token" value="{{ csrf_token('admin_unblock_extension_' ~ client.id) }}"><button type="submit"><i class="fas fa-unlock"></i> Débloquer</button></form>
+                    {% endif %}
+                  </footer>
+                </article>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if group.challenges is not empty %}
+            <div class="admin-challenge-section">
+              <h3>Demandes d’installation</h3>
+              {% for challenge in group.challenges %}
+                <div class="admin-challenge-row">
+                  <span class="admin-device-icon"><i class="fas fa-link"></i></span>
+                  <div><strong>{{ challenge.deviceLabel ?: challenge.requestedClientId }}</strong><small>{{ challenge.browserName ?: 'Navigateur inconnu' }} {{ challenge.browserVersion }} · créée le {{ challenge.createdAt|date('d/m/Y H:i') }}</small></div>
+                  {% if challenge.status == 'pending' and challenge.expiresAt > date() %}
+                    <div class="admin-card-actions">
+                      <form method="post" action="{{ path('admin_extension_challenge_approve', {id: challenge.id}) }}" onsubmit="return confirm('Approuver cette installation ?');"><input type="hidden" name="_token" value="{{ csrf_token('admin_approve_extension_challenge_' ~ challenge.id) }}"><button type="submit"><i class="fas fa-check"></i> Approuver</button></form>
+                      <form method="post" action="{{ path('admin_extension_challenge_reject', {id: challenge.id}) }}" onsubmit="return confirm('Rejeter cette installation ?');"><input type="hidden" name="_token" value="{{ csrf_token('admin_reject_extension_challenge_' ~ challenge.id) }}"><button type="submit" class="is-danger"><i class="fas fa-xmark"></i> Rejeter</button></form>
+                    </div>
                   {% else %}
-                    <span class="ds-muted">Aucune action</span>
+                    {% set challengeTone = challenge.status in ['approved', 'completed'] ? 'success' : (challenge.status == 'rejected' ? 'danger' : 'muted') %}
+                    {% include 'components/ui/status_badge.html.twig' with {label: challenge.status, tone: challengeTone} only %}
                   {% endif %}
                 </div>
-              </td>
-            </tr>
-          {% else %}
-            <tr>
-              <td colspan="6" class="ds-empty">Aucune demande d installation a afficher.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </details>
+    {% else %}
+      <div class="ds-surface admin-empty-state"><i class="fas fa-puzzle-piece"></i><strong>Aucune extension correspondante</strong><span>Modifiez la recherche ou le statut sélectionné.</span></div>
+    {% endfor %}
   </section>
 {% endblock %}

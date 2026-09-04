@@ -9,7 +9,8 @@
 
 {% block body %}
 {% set currentCode = currentPlan.code|default('free')|lower %}
-{% set ownsSubscription = subscription and subscription.active and subscription.stripeSubscriptionId %}
+{% set ownsSubscription = subscription and subscription.active %}
+{% set stripeManaged = ownsSubscription and subscription.stripeSubscriptionId %}
 {% set ownedPlan = ownsSubscription ? subscription.planCode|lower : null %}
 {% set hasCompanyAccess = currentCode == 'team' and not ownsSubscription %}
 
@@ -28,6 +29,8 @@
         <h2>MYKEYNEST {{ currentCode|upper }}</h2>
         {% if hasCompanyAccess %}
           <p>{{ 'subscription.redesign.company_access_help'|trans }}</p>
+        {% elseif ownsSubscription and not stripeManaged %}
+          <p><i class="fa-solid fa-user-shield"></i> {{ 'subscription.manage.admin_managed'|trans }}</p>
         {% elseif subscription.cancelAtPeriodEnd %}
           <p class="subscription-ending-message"><i class="fa-solid fa-calendar-xmark"></i> {{ 'subscription.manage.ends_on'|trans({'%date%': subscription.currentPeriodEnd ? subscription.currentPeriodEnd|date('d/m/Y') : '—'}) }}</p>
         {% else %}
@@ -35,7 +38,7 @@
         {% endif %}
       </div>
 
-      {% if ownsSubscription %}
+      {% if stripeManaged %}
         <div class="subscription-current__actions">
           <a href="{{ path('app_subscription_portal') }}" class="subscription-action secondary"><i class="fa-solid fa-receipt"></i> {{ 'subscription.manage.billing_portal'|trans }}</a>
           {% if subscription.cancelAtPeriodEnd %}
@@ -44,6 +47,10 @@
               <button class="subscription-action primary" type="submit"><i class="fa-solid fa-rotate-left"></i> {{ 'subscription.manage.resume'|trans }}</button>
             </form>
           {% endif %}
+        </div>
+      {% elseif ownsSubscription %}
+        <div class="subscription-current__actions">
+          <span class="subscription-action is-static"><i class="fa-solid fa-user-shield"></i> {{ 'subscription.manage.admin_managed'|trans }}</span>
         </div>
       {% endif %}
     </section>
@@ -65,9 +72,11 @@
           <div class="subscription-plan-price"><strong>6,99€</strong><span>{{ 'landing.pricing.showcase.per_user_month'|trans }}</span></div>
           {% if ownedPlan == 'pro' %}
             <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.redesign.current_offer'|trans }}</button>
-          {% elseif ownedPlan == 'team' %}
+          {% elseif ownedPlan == 'team' and stripeManaged %}
             <a class="subscription-plan-cta is-secondary" href="{{ path('app_subscription_portal') }}">{{ 'subscription.manage.change_to_pro'|trans }}</a>
             <small class="subscription-plan-note">{{ 'subscription.manage.downgrade_note'|trans }}</small>
+          {% elseif ownedPlan == 'team' %}
+            <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.manage.admin_managed'|trans }}</button>
           {% elseif currentCode == 'team' %}
             <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.redesign.included_in_team'|trans }}</button>
           {% else %}
@@ -90,7 +99,7 @@
           <h3>TEAM</h3>
           <p>{{ 'landing.pricing.showcase.team.target'|trans }}</p>
           <div class="subscription-plan-price"><strong>5,49€</strong><span>{{ 'landing.pricing.showcase.per_user_month'|trans }}</span></div>
-          {% if ownedPlan == 'pro' %}
+          {% if ownedPlan == 'pro' and stripeManaged %}
             <form class="subscription-upgrade-form" method="post" action="{{ path('app_subscription_upgrade_team') }}" onsubmit="return confirm('{{ 'subscription.manage.upgrade_confirm'|trans|e('js') }}');">
               <input type="hidden" name="_token" value="{{ csrf_token('subscription_upgrade_team') }}">
               <label for="teamUpgradeQuantity">{{ 'subscription.manage.team_seats'|trans }}</label>
@@ -100,6 +109,8 @@
               </div>
               <small><i class="fa-solid fa-bolt"></i> {{ 'subscription.manage.upgrade_proration'|trans }}</small>
             </form>
+          {% elseif ownedPlan == 'pro' %}
+            <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.manage.admin_managed'|trans }}</button>
           {% elseif currentCode == 'team' %}
             <button class="subscription-plan-cta is-disabled" type="button" disabled>{{ 'subscription.redesign.current_offer'|trans }}</button>
           {% else %}

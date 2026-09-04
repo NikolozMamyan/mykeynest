@@ -1429,7 +1429,8 @@
       "upgrade_success": "Your Team upgrade is confirmed. Your company workspace is ready.",
       "upgrade_error": "The plan change could not be completed. No change was applied.",
       "change_to_pro": "Change plan",
-      "downgrade_note": "Switching to PRO is managed in your Stripe billing area."
+      "downgrade_note": "Switching to PRO is managed in your Stripe billing area.",
+      "admin_managed": "Subscription managed by your administrator"
     },
     "hero": {
       "badge": "Our plans",

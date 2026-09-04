@@ -1,126 +1,115 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Admin Sessions{% endblock %}
-{% block admin_page_class %}ds-page--wide{% endblock %}
-{% block admin_page_title %}Sessions{% endblock %}
-{% block admin_page_intro %}Surveillance des sessions users avec actions de revocation et blocage appareil.{% endblock %}
+{% block title %}Appareils et sessions · Admin MYKEYNEST{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-access-page{% endblock %}
+{% block admin_page_title %}Appareils et sessions{% endblock %}
+{% block admin_page_intro %}Une lecture par utilisateur, puis par appareil, pour comprendre les accès sans parcourir une liste technique.{% endblock %}
 
 {% block admin_toolbar %}
-  <form method="get" action="{{ path('admin_sessions') }}" class="ds-search-form ds-toolbar-grow">
-    <input class="ds-input" type="search" name="q" value="{{ filters.q }}" placeholder="Email, entreprise, device, IP, session ID">
-    <select class="ds-select" name="status">
-      <option value="all" {{ filters.status == 'all' ? 'selected' : '' }}>Tous statuts</option>
+  <form method="get" action="{{ path('admin_sessions') }}" class="admin-filter-bar ds-toolbar-grow">
+    <label class="admin-search-field">
+      <i class="fas fa-magnifying-glass"></i>
+      <input type="search" name="q" value="{{ filters.q }}" placeholder="Utilisateur, appareil, IP ou ID" aria-label="Rechercher dans les accès">
+    </label>
+    <select class="ds-select" name="status" aria-label="Filtrer par statut">
+      <option value="all" {{ filters.status == 'all' ? 'selected' : '' }}>Tous les statuts</option>
       <option value="active" {{ filters.status == 'active' ? 'selected' : '' }}>Actives</option>
-      <option value="blocked" {{ filters.status == 'blocked' ? 'selected' : '' }}>Bloquees</option>
-      <option value="revoked" {{ filters.status == 'revoked' ? 'selected' : '' }}>Revoquees</option>
-      <option value="expired" {{ filters.status == 'expired' ? 'selected' : '' }}>Expirees</option>
+      <option value="blocked" {{ filters.status == 'blocked' ? 'selected' : '' }}>Bloquées</option>
+      <option value="revoked" {{ filters.status == 'revoked' ? 'selected' : '' }}>Révoquées</option>
+      <option value="expired" {{ filters.status == 'expired' ? 'selected' : '' }}>Expirées</option>
     </select>
-    <button type="submit" class="ds-btn ds-btn--primary">Filtrer</button>
+    <button type="submit" class="ds-btn ds-btn--primary"><i class="fas fa-sliders"></i> Filtrer</button>
+    {% if filters.q or filters.status != 'all' %}<a href="{{ path('admin_sessions') }}" class="ds-btn ds-btn--ghost" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>{% endif %}
   </form>
 {% endblock %}
 
 {% block admin_content %}
-  <div class="ds-surface ds-table-wrap">
-    <table class="ds-table">
-      <thead>
-        <tr>
-          <th>Utilisateur</th>
-          <th>Appareil</th>
-          <th>Reseau</th>
-          <th>Activite</th>
-          <th>Statut</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for session in sessions %}
-          <tr>
-            <td>
-              <div class="ds-cell-stack">
-                <span class="ds-title-strong">#{{ session.id }} {{ session.user.email }}</span>
-                <span class="ds-muted">{{ session.user.company ?: '-' }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="ds-cell-stack">
-                <span class="ds-title-strong">{{ session.deviceName ?: 'Appareil inconnu' }}</span>
-                <span class="ds-mono">{{ session.deviceId ?: 'device: -' }}</span>
-                <span class="ds-muted ds-text-break">{{ session.userAgent ?: '-' }}</span>
-              </div>
-            </td>
-            <td><span class="ds-mono">{{ session.ipAddress ?: '-' }}</span></td>
-            <td>
-              <div class="ds-cell-stack">
-                <span>Creee: {{ session.createdAt ? session.createdAt|date('d/m/Y H:i') : '-' }}</span>
-                <span>Derniere activite: {{ session.lastActivityAt ? session.lastActivityAt|date('d/m/Y H:i') : '-' }}</span>
-                <span>Expire: {{ session.expiresAt ? session.expiresAt|date('d/m/Y H:i') : '-' }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="ds-badges">
-                {% if session.isBlocked %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'bloquee', tone: 'danger' } only %}
-                {% endif %}
-                {% if session.isRevoked %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'revoquee', tone: 'warning' } only %}
-                {% endif %}
-                {% if not session.isBlocked and not session.isRevoked and session.expiresAt and session.expiresAt > date() %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'active', tone: 'success' } only %}
-                {% endif %}
-                {% if session.expiresAt and session.expiresAt <= date() %}
-                  {% include 'components/ui/status_badge.html.twig' with { label: 'expiree', tone: 'muted' } only %}
-                {% endif %}
-              </div>
-              <div class="ds-cell-stack" style="margin-top:0.5rem;">
-                {% if session.blockedReason %}
-                  <span class="ds-muted">Blocage: {{ session.blockedReason }}</span>
-                {% endif %}
-                {% if session.revokedReason %}
-                  <span class="ds-muted">Revocation: {{ session.revokedReason }}</span>
-                {% endif %}
-              </div>
-            </td>
-            <td>
-              <div class="ds-actions-stack">
-                <a href="{{ path('admin_user_show', {id: session.user.id}) }}" class="ds-btn ds-btn--secondary ds-btn--block">Fiche user</a>
-                {% if not session.isRevoked %}
-                  <form method="post" action="{{ path('admin_session_revoke', {id: session.id}) }}" class="ds-inline-form" onsubmit="return confirm('Revoquer cette session ?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_session_' ~ session.id) }}">
-                    <button type="submit" class="ds-btn ds-btn--warning ds-btn--block">
-                      <i class="fas fa-ban"></i>
-                      <span>Revoquer</span>
-                    </button>
-                  </form>
-                {% endif %}
+  <section class="admin-mini-kpis" aria-label="Résumé des accès">
+    <div><span class="admin-mini-kpis__icon"><i class="fas fa-users"></i></span><span>Utilisateurs concernés<strong>{{ accessStats.users }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--blue"><i class="fas fa-key"></i></span><span>Sessions trouvées<strong>{{ accessStats.sessions }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--green"><i class="fas fa-signal"></i></span><span>Actives maintenant<strong>{{ accessStats.active }}</strong></span></div>
+    <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--red"><i class="fas fa-ban"></i></span><span>Bloquées<strong>{{ accessStats.blocked }}</strong></span></div>
+  </section>
 
-                {% if session.deviceId and not session.isBlocked %}
-                  <form method="post" action="{{ path('admin_session_block_device', {id: session.id}) }}" class="ds-inline-form" onsubmit="return confirm('Bloquer cet appareil et ses sessions ?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('admin_block_device_' ~ session.id) }}">
-                    <button type="submit" class="ds-btn ds-btn--danger ds-btn--block">
-                      <i class="fas fa-user-lock"></i>
-                      <span>Bloquer appareil</span>
-                    </button>
-                  </form>
-                {% endif %}
+  <section class="admin-cluster-list">
+    {% for group in accessGroups %}
+      {% set user = group.user %}
+      <details class="admin-user-cluster" {{ loop.first and accessGroups|length <= 3 ? 'open' : '' }}>
+        <summary>
+          <span class="admin-avatar">{{ (user.prenom ?: user.email)|first|upper }}</span>
+          <span class="admin-cluster-identity"><strong>{{ user.email }}</strong><small>{{ user.company ?: 'Sans entreprise' }} · #{{ user.id }}</small></span>
+          <span class="admin-cluster-metric"><strong>{{ group.devices|length }}</strong><small>appareil(s)</small></span>
+          <span class="admin-cluster-metric"><strong>{{ group.activeCount }}</strong><small>active(s)</small></span>
+          <span class="admin-cluster-last"><strong>{{ group.lastActivity ? group.lastActivity|date('d/m/Y H:i') : 'Jamais' }}</strong><small>dernière activité</small></span>
+          {% if group.blockedCount > 0 %}{% include 'components/ui/status_badge.html.twig' with {label: group.blockedCount ~ ' bloquée(s)', tone: 'danger'} only %}{% else %}{% include 'components/ui/status_badge.html.twig' with {label: 'Sous contrôle', tone: 'success'} only %}{% endif %}
+          <i class="fas fa-chevron-down admin-cluster-chevron"></i>
+        </summary>
 
-                {% if session.deviceId and session.isBlocked %}
-                  <form method="post" action="{{ path('admin_session_unblock_device', {id: session.id}) }}" class="ds-inline-form" onsubmit="return confirm('Debloquer cet appareil ?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('admin_unblock_device_' ~ session.id) }}">
-                    <button type="submit" class="ds-btn ds-btn--success ds-btn--block">
-                      <i class="fas fa-unlock"></i>
-                      <span>Debloquer appareil</span>
-                    </button>
-                  </form>
-                {% endif %}
-              </div>
-            </td>
-          </tr>
-        {% else %}
-          <tr>
-            <td colspan="6" class="ds-empty">Aucune session a afficher.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+        <div class="admin-cluster-body">
+          <div class="admin-cluster-toolbar">
+            <span>Les sessions sont regroupées sous leur appareil connu.</span>
+            <a href="{{ path('admin_user_show', {id: user.id}) }}#access" class="ds-btn ds-btn--secondary"><i class="fas fa-user"></i> Fiche utilisateur</a>
+          </div>
+
+          <div class="admin-device-grid">
+            {% for deviceRow in group.devices %}
+              {% set knownDevice = deviceRow.device %}
+              <article class="admin-device-card">
+                <header>
+                  <span class="admin-device-icon"><i class="fas fa-laptop"></i></span>
+                  <div><strong>{{ deviceRow.deviceName }}</strong><small>{{ deviceRow.deviceId ?: 'Identifiant indisponible' }}</small></div>
+                  {% if knownDevice and knownDevice.isBlocked %}
+                    {% include 'components/ui/status_badge.html.twig' with {label: 'Bloqué', tone: 'danger'} only %}
+                  {% elseif knownDevice and knownDevice.revokedAt %}
+                    {% include 'components/ui/status_badge.html.twig' with {label: 'Révoqué', tone: 'warning'} only %}
+                  {% elseif knownDevice and knownDevice.isTrusted %}
+                    {% include 'components/ui/status_badge.html.twig' with {label: 'Vérifié', tone: 'success'} only %}
+                  {% else %}
+                    {% include 'components/ui/status_badge.html.twig' with {label: 'Non vérifié', tone: 'muted'} only %}
+                  {% endif %}
+                </header>
+                <div class="admin-device-meta">
+                  <span><i class="fas fa-location-dot"></i>{{ deviceRow.ipAddress ?: 'IP inconnue' }}</span>
+                  <span><i class="fas fa-clock"></i>{{ deviceRow.lastSeenAt ? deviceRow.lastSeenAt|date('d/m/Y H:i') : 'Jamais vu' }}</span>
+                  <span><i class="fas fa-key"></i>{{ deviceRow.sessions|length }} session(s)</span>
+                </div>
+
+                <div class="admin-session-list">
+                  {% for session in deviceRow.sessions %}
+                    {% set sessionActive = not session.isBlocked and not session.isRevoked and session.expiresAt > date() %}
+                    <div class="admin-session-row">
+                      <span class="admin-session-state {{ sessionActive ? 'is-active' : (session.isBlocked ? 'is-blocked' : '') }}"></span>
+                      <div><strong>Session #{{ session.id }}</strong><small>Activité {{ session.lastActivityAt|date('d/m/Y H:i') }} · expire {{ session.expiresAt|date('d/m/Y H:i') }}</small></div>
+                      <div class="admin-session-actions">
+                        {% if not session.isRevoked %}
+                          <form method="post" action="{{ path('admin_session_revoke', {id: session.id}) }}" onsubmit="return confirm('Révoquer cette session ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_session_' ~ session.id) }}"><button type="submit" title="Révoquer la session"><i class="fas fa-arrow-right-from-bracket"></i></button>
+                          </form>
+                        {% endif %}
+                        {% if session.deviceId and not session.isBlocked %}
+                          <form method="post" action="{{ path('admin_session_block_device', {id: session.id}) }}" onsubmit="return confirm('Bloquer cet appareil et ses sessions ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin_block_device_' ~ session.id) }}"><button class="is-danger" type="submit" title="Bloquer l’appareil"><i class="fas fa-ban"></i></button>
+                          </form>
+                        {% elseif session.deviceId %}
+                          <form method="post" action="{{ path('admin_session_unblock_device', {id: session.id}) }}" onsubmit="return confirm('Débloquer cet appareil ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('admin_unblock_device_' ~ session.id) }}"><button type="submit" title="Débloquer l’appareil"><i class="fas fa-unlock"></i></button>
+                          </form>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% else %}
+                    <div class="admin-empty-compact">Aucune session rattachée à cet appareil.</div>
+                  {% endfor %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </div>
+      </details>
+    {% else %}
+      <div class="ds-surface admin-empty-state"><i class="fas fa-shield-circle-check"></i><strong>Aucun accès correspondant</strong><span>La recherche et les filtres ne retournent aucune session.</span></div>
+    {% endfor %}
+  </section>
+
+  {% if accessStats.sessions >= 250 %}<p class="admin-limit-note"><i class="fas fa-circle-info"></i> Les 250 sessions les plus récentes sont affichées. Affinez la recherche pour cibler un compte.</p>{% endif %}
 {% endblock %}

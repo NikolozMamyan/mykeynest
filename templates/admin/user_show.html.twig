@@ -1,229 +1,129 @@
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Admin User {{ user.email }}{% endblock %}
-{% block admin_page_class %}ds-page--wide{% endblock %}
-{% block admin_page_title %}Fiche Utilisateur{% endblock %}
-{% block admin_page_intro %}Vue admin centralisee pour suivre abonnement, sessions et extensions d un compte.{% endblock %}
+{% block title %}{{ user.email }} · Admin MYKEYNEST{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-user-detail{% endblock %}
+{% block admin_page_title %}Fiche utilisateur{% endblock %}
+{% block admin_page_intro %}Compte, abonnement, appareils et extension réunis dans un seul dossier.{% endblock %}
 
 {% block admin_toolbar %}
+  <a href="{{ path('admin_users') }}" class="ds-btn ds-btn--secondary"><i class="fas fa-arrow-left"></i> Utilisateurs</a>
   <div class="ds-toolbar-group">
-    <a href="{{ path('admin_users') }}" class="ds-btn ds-btn--secondary">Retour users</a>
-    <a href="{{ path('admin_subscriptions', { q: user.email }) }}" class="ds-btn ds-btn--secondary">Voir abonnement</a>
-    <a href="{{ path('admin_sessions', { q: user.email }) }}" class="ds-btn ds-btn--secondary">Voir sessions</a>
+    <a href="{{ path('admin_subscriptions', {q: user.email}) }}" class="ds-btn ds-btn--ghost"><i class="fas fa-credit-card"></i> Abonnement</a>
+    <a href="{{ path('admin_sessions', {q: user.email}) }}" class="ds-btn ds-btn--ghost"><i class="fas fa-laptop"></i> Accès</a>
+    <a href="{{ path('admin_extensions', {q: user.email}) }}" class="ds-btn ds-btn--ghost"><i class="fas fa-puzzle-piece"></i> Extension</a>
   </div>
 {% endblock %}
 
 {% block admin_content %}
   {% set subscription = user.userSubscription %}
+  {% set stripeManaged = subscription and (subscription.stripeCustomerId or subscription.stripeSubscriptionId or subscription.stripePriceId) %}
+  {% set displayName = ((user.prenom ?: '') ~ ' ' ~ (user.nom ?: ''))|trim %}
+  {% set activeSessions = 0 %}{% set blockedSessions = 0 %}
+  {% for session in sessions %}{% if not session.isBlocked and not session.isRevoked and session.expiresAt > date() %}{% set activeSessions = activeSessions + 1 %}{% endif %}{% if session.isBlocked %}{% set blockedSessions = blockedSessions + 1 %}{% endif %}{% endfor %}
 
-  <section class="ds-grid-3">
-    {% include 'components/ui/metric_card.html.twig' with { label: 'User ID', value: user.id } only %}
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Sessions recentes', value: sessions|length } only %}
-    {% include 'components/ui/metric_card.html.twig' with { label: 'Extensions', value: extensionClients|length } only %}
+  <section class="admin-profile-hero">
+    <span class="admin-profile-avatar">{{ (user.prenom ?: user.email)|first|upper }}</span>
+    <div class="admin-profile-main">
+      <div class="admin-profile-title"><h2>{{ displayName ?: user.email }}</h2>{% if 'ROLE_ADMIN' in user.roles %}{% include 'components/ui/status_badge.html.twig' with {label: 'Administrateur', tone: 'warning'} only %}{% endif %}</div>
+      <p>{{ user.email }} · Compte #{{ user.id }}</p>
+      <div class="admin-profile-tags">
+        <span><i class="fas fa-building"></i>{{ user.company ?: 'Entreprise non renseignée' }}</span>
+        <span><i class="fas fa-language"></i>{{ user.locale|upper }}</span>
+        <span><i class="fas fa-phone"></i>{{ user.phone ?: 'Non renseigné' }}</span>
+      </div>
+    </div>
+    <div class="admin-profile-status">
+      <span class="admin-plan-badge admin-plan-badge--{{ userOverview.effectivePlan }}">{{ userOverview.effectivePlan|upper }}</span>
+      <small>{{ userOverview.planSource }}</small>
+    </div>
   </section>
 
-  <section class="ds-grid-2">
-    <div class="ds-surface">
-      <div class="ds-section-head">
-        <div>
-          <h2 class="ds-section-title">{{ user.email }}</h2>
-          <p class="ds-section-text">{{ user.company ?: 'Entreprise non renseignee' }}</p>
-        </div>
-      </div>
+  <nav class="admin-section-nav" aria-label="Sections de la fiche utilisateur">
+    <a href="#overview">Vue d’ensemble</a><a href="#billing">Abonnement</a><a href="#access">Appareils et sessions</a><a href="#extensions">Extension</a><a href="#organization">Entreprise</a>
+  </nav>
 
-      <div class="ds-cell-stack">
-        <span><strong>Roles:</strong> {{ user.roles ? user.roles|join(', ') : 'ROLE_USER' }}</span>
-        <span><strong>Locale:</strong> {{ user.locale }}</span>
-        <span><strong>Telephone:</strong> {{ user.phone ?: '-' }}</span>
-        <span><strong>Extension token:</strong> {{ user.apiExtensionToken ? 'present' : 'absent' }}</span>
-        <span>
-          <strong>Onboarding extension:</strong>
-          {% if 'ROLE_ADMIN' in user.roles %}
-            {% include 'components/ui/status_badge.html.twig' with { label: 'non applicable', tone: 'muted' } only %}
-          {% elseif user.extensionOnboardingStatus == 'completed' %}
-            {% include 'components/ui/status_badge.html.twig' with { label: 'termine', tone: 'success' } only %}
-          {% elseif user.extensionOnboardingStatus == 'pending' %}
-            {% include 'components/ui/status_badge.html.twig' with { label: 'requis', tone: 'warning' } only %}
-          {% else %}
-            {% include 'components/ui/status_badge.html.twig' with { label: 'reporte', tone: 'muted' } only %}
+  <section id="overview" class="admin-detail-section">
+    <div class="admin-section-heading"><div><span class="admin-eyebrow">Compte</span><h2>Vue d’ensemble</h2></div></div>
+    <div class="admin-mini-kpis">
+      <div><span class="admin-mini-kpis__icon"><i class="fas fa-key"></i></span><span>Sessions actives<strong>{{ activeSessions }}</strong></span></div>
+      <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--blue"><i class="fas fa-laptop"></i></span><span>Appareils connus<strong>{{ devices|length }}</strong></span></div>
+      <div><span class="admin-mini-kpis__icon admin-mini-kpis__icon--green"><i class="fas fa-puzzle-piece"></i></span><span>Extensions<strong>{{ extensionClients|length }}</strong></span></div>
+      <div><span class="admin-mini-kpis__icon {{ blockedSessions > 0 ? 'admin-mini-kpis__icon--red' : 'admin-mini-kpis__icon--green' }}"><i class="fas fa-shield-halved"></i></span><span>Sessions bloquées<strong>{{ blockedSessions }}</strong></span></div>
+    </div>
+    <div class="ds-surface admin-account-grid">
+      <div><span>Email</span><strong>{{ user.email }}</strong></div><div><span>Rôles techniques</span><strong>{{ user.roles|join(', ') }}</strong></div><div><span>2FA par email</span><strong>{{ user.emailTwoFactorEnabled ? 'Activée' : 'Désactivée' }}</strong></div><div><span>Token extension</span><strong>{{ user.apiExtensionToken ? 'Configuré' : 'Absent' }}</strong></div>
+    </div>
+  </section>
+
+  <section id="billing" class="admin-detail-section">
+    <div class="admin-section-heading"><div><span class="admin-eyebrow">Revenus</span><h2>Abonnement</h2></div><a href="{{ path('admin_subscriptions', {q: user.email}) }}">Ouvrir dans la gestion</a></div>
+    <div class="ds-surface admin-split-panel">
+      <div class="admin-account-grid">
+        <div><span>Offre</span><strong>{{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</strong></div>
+        <div><span>Statut</span><strong>{{ subscription and subscription.status ? subscription.status : 'Aucun' }}</strong></div>
+        <div><span>Quantité</span><strong>{{ subscription ? subscription.quantity : 1 }} siège(s)</strong></div>
+        <div><span>Prochaine échéance</span><strong>{{ subscription and subscription.currentPeriodEnd ? subscription.currentPeriodEnd|date('d/m/Y') : '—' }}</strong></div>
+        <div><span>Gestion</span><strong>{{ stripeManaged ? 'Stripe · ' ~ subscription.stripeMode|capitalize : (subscription ? 'Facturation manuelle' : '—') }}</strong></div>
+        <div><span>Renouvellement</span><strong>{{ stripeManaged ? (subscription.cancelAtPeriodEnd ? 'Arrêt programmé' : 'Automatique') : (subscription ? 'Géré par l’administrateur' : '—') }}</strong></div>
+      </div>
+      <div class="admin-sensitive-actions">
+        <h3>{{ stripeManaged ? 'Abonnement Stripe protégé' : 'Abonnement hors Stripe' }}</h3>
+        {% if stripeManaged %}
+          <p>Le plan et la quantité sont synchronisés par les webhooks. Ils ne peuvent pas être écrasés ici.</p>
+        {% else %}
+          <p>Activez ou modifiez les droits d’un client facturé manuellement.</p>
+          <form method="post" action="{{ path('admin_user_subscription_manual_update', {id: user.id}) }}" class="admin-manual-subscription-form" data-controller="admin-manual-subscription" onsubmit="return confirm('Appliquer immédiatement cette offre manuelle ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('manual_subscription_' ~ user.id) }}">
+            <input type="hidden" name="_redirect" value="user">
+            <label><span>Offre</span><select class="ds-select" name="plan" data-admin-manual-subscription-target="plan" data-action="change->admin-manual-subscription#refresh"><option value="pro" {{ subscription and subscription.planCode|lower == 'pro' ? 'selected' : '' }}>Pro</option><option value="team" {{ subscription and subscription.planCode|lower == 'team' ? 'selected' : '' }}>Team</option></select></label>
+            <label data-admin-manual-subscription-target="teamSetting"><span>Licences Team</span><input class="ds-input" type="number" name="quantity" min="{{ teamMinimumSeats }}" max="{{ teamMaximumSeats }}" value="{{ subscription and subscription.planCode|lower == 'team' ? subscription.quantity : teamMinimumSeats }}" required></label>
+            <label data-admin-manual-subscription-target="teamSetting"><span>Nom de l’entreprise</span><input class="ds-input" type="text" name="organization_name" maxlength="180" value="{{ subscription and subscription.organization ? subscription.organization.name : user.company }}"></label>
+            <button type="submit" class="ds-btn ds-btn--primary"><i class="fas fa-bolt"></i> {{ subscription and subscription.isActive ? 'Mettre à jour' : 'Activer' }}</button>
+          </form>
+          {% if subscription and subscription.isActive %}
+            <form method="post" action="{{ path('admin_user_subscription_deactivate', {id: user.id}) }}" onsubmit="return confirm('Désactiver cet abonnement manuel ? Les droits seront retirés immédiatement.');"><input type="hidden" name="_token" value="{{ csrf_token('deactivate_subscription_' ~ user.id) }}"><input type="hidden" name="_redirect" value="user"><button type="submit" class="ds-btn ds-btn--warning"><i class="fas fa-pause"></i> Désactiver</button></form>
           {% endif %}
-        </span>
-        <span><strong>Termine le:</strong> {{ user.extensionOnboardedAt ? user.extensionOnboardedAt|date('d/m/Y H:i') : '-' }}</span>
-      </div>
-
-      {% if 'ROLE_ADMIN' not in user.roles %}
-        <form method="post"
-              action="{{ path('admin_user_extension_onboarding_update', {id: user.id}) }}"
-              class="ds-actions-stack"
-              style="margin-top:1rem;"
-              onsubmit="return confirm('Modifier le parcours d installation ? Pour Free et Pro, recommencer remplacera l installation actuelle.');">
-          <input type="hidden" name="_token" value="{{ csrf_token('admin_extension_onboarding_' ~ user.id) }}">
-          <input type="hidden" name="_redirect" value="show">
-          <select name="status" class="ds-input" style="min-width:0; width:100%;" required>
-            <option value="">Gerer l’installation…</option>
-            <option value="completed">Marquer comme terminee</option>
-            <option value="pending">Annuler et recommencer</option>
-          </select>
-          <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Appliquer</button>
-        </form>
-      {% endif %}
-    </div>
-
-    <div class="ds-surface">
-      <div class="ds-section-head">
-        <div>
-          <h2 class="ds-section-title">Abonnement</h2>
-          <p class="ds-section-text">Etat courant et actions rapides.</p>
-        </div>
-      </div>
-
-      <div class="ds-cell-stack">
-        <span><strong>Plan:</strong> {{ subscription and subscription.planCode ? subscription.planCode|upper : 'FREE' }}</span>
-        <span><strong>Statut:</strong> {{ subscription and subscription.status ? subscription.status : 'aucun' }}</span>
-        <span><strong>Customer Stripe:</strong> <span class="ds-mono">{{ subscription and subscription.stripeCustomerId ? subscription.stripeCustomerId : '-' }}</span></span>
-        <span><strong>Subscription Stripe:</strong> <span class="ds-mono">{{ subscription and subscription.stripeSubscriptionId ? subscription.stripeSubscriptionId : '-' }}</span></span>
-      </div>
-
-      <div class="ds-actions-stack" style="margin-top:1rem;">
-        {% if not subscription or not subscription.isActive %}
-          <form method="post" action="{{ path('admin_user_subscription_assign_pro', {id: user.id}) }}" class="ds-inline-form">
-            <input type="hidden" name="_token" value="{{ csrf_token('assign_pro_' ~ user.id) }}">
-            <button type="submit" class="ds-btn ds-btn--primary ds-btn--block">Activer Pro</button>
-          </form>
+          {% if subscription and subscription.organization %}<a class="ds-btn ds-btn--secondary" href="{{ path('admin_organization_show', {id: subscription.organization.id}) }}"><i class="fas fa-building-shield"></i> Gérer l’entreprise</a>{% endif %}
         {% endif %}
-        {% if subscription %}
-          <form method="post" action="{{ path('admin_user_subscription_deactivate', {id: user.id}) }}" class="ds-inline-form" onsubmit="return confirm('Desactiver cet abonnement ?');">
-            <input type="hidden" name="_token" value="{{ csrf_token('deactivate_subscription_' ~ user.id) }}">
-            <button type="submit" class="ds-btn ds-btn--warning ds-btn--block">Desactiver</button>
-          </form>
-        {% endif %}
+        {% if subscription and (subscription.stripeCustomerId or subscription.stripeSubscriptionId) %}<details class="admin-technical-details"><summary>Identifiants Stripe</summary><span>Customer : <code>{{ subscription.stripeCustomerId ?: '—' }}</code></span><span>Subscription : <code>{{ subscription.stripeSubscriptionId ?: '—' }}</code></span></details>{% endif %}
       </div>
     </div>
   </section>
 
-  <section class="ds-grid-2">
-    <div class="ds-surface ds-table-wrap">
-      <div class="ds-section-head">
-        <div>
-          <h2 class="ds-section-title">Sessions recentes</h2>
-          <p class="ds-section-text">Controle rapide des sessions et appareils.</p>
-        </div>
-        <form method="post" action="{{ path('admin_user_sessions_revoke_all', {id: user.id}) }}" class="ds-inline-form" onsubmit="return confirm('Revoquer toutes les sessions de cet utilisateur ?');">
-          <input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_all_sessions_' ~ user.id) }}">
-          <button type="submit" class="ds-btn ds-btn--danger">Revoquer toutes</button>
-        </form>
-      </div>
-      <table class="ds-table">
-        <thead>
-          <tr>
-            <th>Session</th>
-            <th>Appareil</th>
-            <th>Reseau</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for session in sessions %}
-            <tr>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-title-strong">#{{ session.id }}</span>
-                  <span class="ds-muted">{{ session.lastActivityAt ? session.lastActivityAt|date('d/m/Y H:i') : '-' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span>{{ session.deviceName ?: 'Appareil inconnu' }}</span>
-                  <span class="ds-mono">{{ session.deviceId ?: '-' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-mono">{{ session.ipAddress ?: '-' }}</span>
-                  <span class="ds-muted ds-text-break">{{ session.userAgent ?: '-' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="ds-badges">
-                  {% if session.isBlocked %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'bloquee', tone: 'danger' } only %}
-                  {% elseif session.isRevoked %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'revoquee', tone: 'warning' } only %}
-                  {% elseif session.expiresAt and session.expiresAt <= date() %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'expiree', tone: 'muted' } only %}
-                  {% else %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'active', tone: 'success' } only %}
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-          {% else %}
-            <tr>
-              <td colspan="4" class="ds-empty">Aucune session recente.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <section id="access" class="admin-detail-section">
+    <div class="admin-section-heading">
+      <div><span class="admin-eyebrow">Sécurité</span><h2>Appareils et sessions</h2></div>
+      <form method="post" action="{{ path('admin_user_sessions_revoke_all', {id: user.id}) }}" onsubmit="return confirm('Révoquer toutes les sessions de cet utilisateur ?');"><input type="hidden" name="_token" value="{{ csrf_token('admin_revoke_all_sessions_' ~ user.id) }}"><button type="submit" class="ds-btn ds-btn--danger"><i class="fas fa-arrow-right-from-bracket"></i> Tout déconnecter</button></form>
     </div>
+    <div class="admin-device-grid">
+      {% for device in devices %}
+        <article class="admin-device-card"><header><span class="admin-device-icon"><i class="fas fa-laptop"></i></span><div><strong>{{ device.deviceName ?: 'Appareil non identifié' }}</strong><small>{{ device.deviceId }}</small></div>{% if device.isBlocked %}{% include 'components/ui/status_badge.html.twig' with {label: 'Bloqué', tone: 'danger'} only %}{% elseif device.revokedAt %}{% include 'components/ui/status_badge.html.twig' with {label: 'Révoqué', tone: 'warning'} only %}{% elseif device.isTrusted %}{% include 'components/ui/status_badge.html.twig' with {label: 'Vérifié', tone: 'success'} only %}{% else %}{% include 'components/ui/status_badge.html.twig' with {label: 'Non vérifié', tone: 'muted'} only %}{% endif %}</header><div class="admin-device-meta"><span><i class="fas fa-network-wired"></i>{{ device.ipAddress ?: 'IP inconnue' }}</span><span><i class="fas fa-clock"></i>{{ device.lastSeenAt|date('d/m/Y H:i') }}</span></div></article>
+      {% else %}<div class="ds-surface admin-empty-compact">Aucun appareil enregistré.</div>{% endfor %}
+    </div>
+    <div class="ds-surface admin-data-surface admin-detail-table"><div class="ds-table-wrap"><table class="ds-table"><thead><tr><th>Session</th><th>Appareil</th><th>Réseau</th><th>Activité</th><th>État</th></tr></thead><tbody>
+      {% for session in sessions %}<tr><td><strong>#{{ session.id }}</strong></td><td>{{ session.deviceName ?: 'Inconnu' }}</td><td><code>{{ session.ipAddress ?: '—' }}</code></td><td>{{ session.lastActivityAt|date('d/m/Y H:i') }}</td><td>{% if session.isBlocked %}{% include 'components/ui/status_badge.html.twig' with {label: 'Bloquée', tone: 'danger'} only %}{% elseif session.isRevoked %}{% include 'components/ui/status_badge.html.twig' with {label: 'Révoquée', tone: 'warning'} only %}{% elseif session.expiresAt <= date() %}{% include 'components/ui/status_badge.html.twig' with {label: 'Expirée', tone: 'muted'} only %}{% else %}{% include 'components/ui/status_badge.html.twig' with {label: 'Active', tone: 'success'} only %}{% endif %}</td></tr>
+      {% else %}<tr><td colspan="5" class="ds-empty">Aucune session récente.</td></tr>{% endfor %}
+    </tbody></table></div></div>
+  </section>
 
-    <div class="ds-surface ds-table-wrap">
-      <div class="ds-section-head">
-        <div>
-          <h2 class="ds-section-title">Extensions et challenges</h2>
-          <p class="ds-section-text">Visibilite sur les installations associees.</p>
-        </div>
-      </div>
-      <table class="ds-table">
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Derniere activite</th>
-            <th>Etat</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for client in extensionClients %}
-            <tr>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-title-strong">{{ client.deviceLabel ?: client.clientId }}</span>
-                  <span class="ds-muted">{{ client.browserName ?: '-' }} {{ client.browserVersion ?: '' }}</span>
-                </div>
-              </td>
-              <td>{{ client.lastSeenAt ? client.lastSeenAt|date('d/m/Y H:i') : '-' }}</td>
-              <td>
-                <div class="ds-badges">
-                  {% if client.isBlocked %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'bloquee', tone: 'danger' } only %}
-                  {% elseif client.isRevoked %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'revoquee', tone: 'warning' } only %}
-                  {% else %}
-                    {% include 'components/ui/status_badge.html.twig' with { label: 'active', tone: 'success' } only %}
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-          {% endfor %}
-          {% for challenge in extensionChallenges %}
-            <tr>
-              <td>
-                <div class="ds-cell-stack">
-                  <span class="ds-title-strong">Challenge {{ challenge.requestedClientId ?: '#' ~ challenge.id }}</span>
-                  <span class="ds-muted">{{ challenge.deviceLabel ?: challenge.browserName ?: '-' }}</span>
-                </div>
-              </td>
-              <td>{{ challenge.createdAt ? challenge.createdAt|date('d/m/Y H:i') : '-' }}</td>
-              <td>{% include 'components/ui/status_badge.html.twig' with { label: challenge.status ?: 'pending', tone: challenge.status == 'approved' ? 'success' : (challenge.status == 'rejected' ? 'warning' : 'muted') } only %}</td>
-            </tr>
-          {% else %}
-            {% if extensionClients is empty %}
-              <tr>
-                <td colspan="3" class="ds-empty">Aucune extension ni challenge recent.</td>
-              </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
+  <section id="extensions" class="admin-detail-section">
+    <div class="admin-section-heading"><div><span class="admin-eyebrow">Produit</span><h2>Extension navigateur</h2></div><a href="{{ path('admin_extensions', {q: user.email}) }}">Ouvrir dans les extensions</a></div>
+    <div class="ds-surface admin-split-panel admin-onboarding-panel">
+      <div><span class="admin-device-icon"><i class="fas fa-route"></i></span><h3>Parcours d’installation</h3><p>État actuel : <strong>{{ user.extensionOnboardingStatus }}</strong>{% if user.extensionOnboardedAt %}, terminé le {{ user.extensionOnboardedAt|date('d/m/Y H:i') }}{% endif %}.</p></div>
+      {% if 'ROLE_ADMIN' not in user.roles %}<form method="post" action="{{ path('admin_user_extension_onboarding_update', {id: user.id}) }}" class="admin-inline-action" onsubmit="return confirm('Modifier le parcours d’installation ? Pour Free et Pro, recommencer remplacera l’installation actuelle.');"><input type="hidden" name="_token" value="{{ csrf_token('admin_extension_onboarding_' ~ user.id) }}"><input type="hidden" name="_redirect" value="show"><select name="status" class="ds-select" required><option value="">Choisir une action…</option><option value="completed">Marquer comme terminé</option><option value="pending">Annuler et recommencer</option></select><button type="submit" class="ds-btn ds-btn--primary">Appliquer</button></form>{% endif %}
+    </div>
+    <div class="admin-extension-grid">
+      {% for client in extensionClients %}<article class="admin-extension-card"><header><span class="admin-device-icon"><i class="fas fa-puzzle-piece"></i></span><div><strong>{{ client.deviceLabel ?: 'Extension sans nom' }}</strong><small>{{ client.clientId }}</small></div>{% if client.isBlocked %}{% include 'components/ui/status_badge.html.twig' with {label: 'Bloquée', tone: 'danger'} only %}{% elseif client.isRevoked %}{% include 'components/ui/status_badge.html.twig' with {label: 'Révoquée', tone: 'warning'} only %}{% else %}{% include 'components/ui/status_badge.html.twig' with {label: 'Active', tone: 'success'} only %}{% endif %}</header><div class="admin-extension-specs"><span><i class="fab fa-chrome"></i>{{ client.browserName ?: 'Navigateur inconnu' }} {{ client.browserVersion }}</span><span><i class="fas fa-code-branch"></i>Version {{ client.extensionVersion ?: '?' }}</span><span><i class="fas fa-clock"></i>{{ client.lastSeenAt|date('d/m/Y H:i') }}</span></div></article>
+      {% else %}<div class="ds-surface admin-empty-compact">Aucune extension associée à ce compte.</div>{% endfor %}
+    </div>
+    {% if extensionChallenges is not empty %}<div class="ds-surface admin-history-list"><h3>Historique des demandes</h3>{% for challenge in extensionChallenges %}<div><span><strong>{{ challenge.deviceLabel ?: challenge.requestedClientId }}</strong><small>{{ challenge.createdAt|date('d/m/Y H:i') }}</small></span>{% include 'components/ui/status_badge.html.twig' with {label: challenge.status, tone: challenge.status in ['approved', 'completed'] ? 'success' : (challenge.status == 'rejected' ? 'danger' : 'warning')} only %}</div>{% endfor %}</div>{% endif %}
+  </section>
+
+  <section id="organization" class="admin-detail-section">
+    <div class="admin-section-heading"><div><span class="admin-eyebrow">Collaboration</span><h2>Entreprise et licences</h2></div><a href="{{ path('admin_organizations') }}">Voir les entreprises</a></div>
+    <div class="ds-surface admin-history-list">
+      {% for membership in memberships %}<div><span><strong><a href="{{ path('admin_organization_show', {id: membership.organization.id}) }}">{{ membership.organization.name }}</a></strong><small>{{ membership.role.value|lower|capitalize }} · invitation {{ membership.invitedAt|date('d/m/Y') }}</small></span>{% include 'components/ui/status_badge.html.twig' with {label: membership.status.value, tone: membership.status.value == 'ACTIVE' ? 'success' : (membership.status.value == 'SUSPENDED' ? 'danger' : 'warning')} only %}</div>
+      {% else %}<div class="admin-empty-compact">Cet utilisateur n’appartient à aucun espace Team.</div>{% endfor %}
     </div>
   </section>
 {% endblock %}
