@@ -225,7 +225,7 @@ final class StripeBillingService
         $minimum = $this->plans->getTeamMinimumSeats();
         $maximum = $this->plans->getTeamMaximumSeats();
         if ($quantity < $minimum || $quantity > $maximum) {
-            throw new \InvalidArgumentException(sprintf('La quantité doit être comprise entre %d et %d sièges.', $minimum, $maximum));
+            throw new \InvalidArgumentException(sprintf('La quantité doit être comprise entre %d et %d licences.', $minimum, $maximum));
         }
         if ($quantity === $record->getQuantity()) {
             return $quantity;

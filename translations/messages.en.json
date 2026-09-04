@@ -1,7 +1,7 @@
 {
   "breadcrumb": {
     "dashboard": "Dashboard",
-    "teams": "Teams",
+    "teams": "Company",
     "credentials": "Passwords",
     "new": "New",
     "shared_access": "Secure sharing",
@@ -195,6 +195,7 @@
     }
   },
   "sidebar": {
+    "navigation_aria": "Application navigation",
     "sections": {
       "main": "Main",
       "tools": "Tools",
@@ -202,8 +203,9 @@
     },
     "items": {
       "dashboard": "Dashboard",
-      "teams": "Teams",
+      "teams": "Company",
       "credentials": "Passwords",
+      "sessions": "Session Manager",
       "shared_access": "Secure sharing",
       "extension": "Browser extension",
       "generator": "Generator",
@@ -211,7 +213,16 @@
       "security_checker": "Security checker",
       "subscription": "Subscriptions",
       "settings": "Settings",
+      "more": "More",
       "logout": "Log out"
+    },
+    "mobile": {
+      "aria": "Main navigation",
+      "home": "Home",
+      "vault": "Vault",
+      "sharing": "Share",
+      "teams": "Company",
+      "more": "More"
     }
   },
   "landing": {
@@ -893,10 +904,77 @@
   },
   "extension": {
     "page": {
+      "meta_title": "Browser extension | MYKEYNEST",
+      "configuration": {
+        "eyebrow": "Browser preferences",
+        "title": "Choose how MYKEYNEST appears",
+        "subtitle": "Adapt the extension to the way you browse. Changes are applied immediately in this browser.",
+        "connected": "Extension connected",
+        "aria": "Extension display mode",
+        "recommended": "Recommended",
+        "local_note": "These preferences apply only to this extension installation.",
+        "modes": {
+          "default": {
+            "title": "Classic opening",
+            "description": "MYKEYNEST opens its window when you select a sign-in field."
+          },
+          "inline": {
+            "title": "Suggestion below fields",
+            "description": "A discreet suggestion appears directly below the active field, just like Dashlane."
+          },
+          "off": {
+            "title": "Discreet mode",
+            "description": "No automatic window. Only a small badge confirms that a sign-in page was detected."
+          }
+        },
+        "order": {
+          "title": "Credential order",
+          "description": "Choose how your vault is organised in the extension.",
+          "aria": "Credential display order",
+          "custom_hint": "In custom mode, move credentials and Shared or Team sections directly in the extension.",
+          "modes": {
+            "recent": {
+              "title": "Most recent",
+              "description": "Newest entries first"
+            },
+            "domain": {
+              "title": "By domain",
+              "description": "Alphabetical order"
+            },
+            "custom": {
+              "title": "Custom",
+              "description": "Your drag-and-drop order"
+            }
+          }
+        },
+        "exclusions": {
+          "title": "Excluded sites",
+          "description": "Completely hide MYKEYNEST suggestions and the detection badge on selected domains.",
+          "label": "URL or domain to exclude",
+          "placeholder": "example.com or https://example.com",
+          "add": "Add",
+          "empty": "No excluded site for this installation.",
+          "note": "An excluded domain also covers its subdomains. Secure pairing with MYKEYNEST remains active.",
+          "invalid": "Enter a valid URL or domain.",
+          "remove": "Remove"
+        }
+      },
+      "status": {
+        "checking": "Looking for the extension…",
+        "installed": "Extension detected",
+        "not_found": "Extension not detected",
+        "ready": "Preferences ready to change",
+        "saving": "Saving…",
+        "saved": "Preferences saved",
+        "save_error": "Unable to save. Reload the extension and try again.",
+        "update_required": "Update the extension to enable these preferences."
+      },
       "hero": {
+        "eyebrow": "Official Chrome extension",
         "title": "Browser extension",
-        "tagline": "Access your passwords directly from your browser",
-        "download": "Download the extension"
+        "tagline": "Access your vault and sign in securely without leaving the page you are browsing.",
+        "download": "Install from Chrome Web Store",
+        "store_note": "Secure installation from the official Google Chrome store."
       },
       "demo": {
         "window_title": "Extension installation",
@@ -1053,9 +1131,29 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "overview": "Overview",
+    "hero": {
+      "eyebrow": "Your secure workspace",
+      "greeting": "Hello",
+      "greeting_named": "Hello %name%",
+      "description": {
+        "free": "Everything you need to save, organize and share access securely.",
+        "pro": "Your vault is ready: manage unlimited access and keep an eye on its security.",
+        "team": "Manage company access, sharing groups and your members' security from one place."
+      },
+      "add_credential": "Add a credential",
+      "share_access": "Share access"
+    },
+    "usage": {
+      "title": "Plan usage",
+      "credentials": "Credentials",
+      "shares": "Shares",
+      "groups": "Groups",
+      "unlimited": "Unlimited"
+    },
     "stats": {
       "credentials": "Credentials",
-      "teams": "Teams",
+      "teams": "Groups",
       "active_shares": "Active shares",
       "drafts": "Drafts",
       "change": {
@@ -1077,11 +1175,12 @@
       }
     },
     "teams": {
-      "title": "My teams",
+      "title": "My groups",
       "create": "Create",
+      "owner": "Owner",
       "empty": {
-        "title": "No teams",
-        "desc": "Create your first team to share securely."
+        "title": "No groups",
+        "desc": "Create your first group to share securely."
       },
       "meta": {
         "members": "members",
@@ -1091,9 +1190,17 @@
     "quick_actions": {
       "title": "Quick actions",
       "new_credential": "New credential",
-      "invite_member": "Invite a member",
+      "new_credential_desc": "Save a new account",
       "share_access": "Share access",
-      "create_team": "Create a team"
+      "share_access_desc": "Grant secure access",
+      "enterprise": "Company",
+      "enterprise_desc": {
+        "free": "Create and organize your groups",
+        "pro": "Organize your sharing groups",
+        "team": "Manage members and licenses"
+      },
+      "extension": "Extension",
+      "extension_desc": "Configure automatic form filling"
     },
     "drafts": {
       "title": "Pending drafts",
@@ -1293,12 +1400,12 @@
       "subtitle": "Choose the features that fit your business. Payments and invoices are secured by Stripe.",
       "current_plan": "Active subscription",
       "company_access": "Access provided by your company",
-      "company_access_help": "Your Team seat is managed by your company administrator.",
+      "company_access_help": "Your Team license is managed by your company administrator.",
       "offers_eyebrow": "Monthly plans",
       "offers_title": "Choose PRO or TEAM",
       "monthly_billing": "Monthly billing · cancel any time",
       "active_badge": "Active",
-      "company_badge": "Company seat",
+      "company_badge": "Company license",
       "current_offer": "Your current plan",
       "included_in_team": "Included with Team",
       "stripe_note": "Secure payments, invoices and payment methods managed by Stripe."
@@ -1315,7 +1422,7 @@
       "cancel_error": "Cancellation could not be scheduled right now. Try again or contact support.",
       "resumed": "Automatic renewal for your subscription is active again.",
       "resume_error": "Renewal could not be resumed right now.",
-      "team_seats": "Number of Team seats",
+      "team_seats": "Number of Team licenses",
       "upgrade_team": "Upgrade to Team",
       "upgrade_confirm": "Confirm the upgrade to Team? Stripe will immediately charge the prorated difference.",
       "upgrade_proration": "Stripe calculates and charges the difference immediately.",
@@ -1340,7 +1447,7 @@
       "title": "You're subscribed 🎉",
       "subtitle": "Thanks for your trust. Your account is currently on",
       "organization_title": "Team access enabled",
-      "organization_subtitle": "Your company seat currently gives you access to the",
+      "organization_subtitle": "Your company license currently gives you access to the",
       "plan": "Pro",
       "benefits": {
         "unlimited_shares": "Unlimited sharing",
@@ -1654,44 +1761,47 @@
     "hint": "Tip: click the “+” button to change your avatar."
   },
   "teams": {
-    "page_title": "My teams",
+    "page_title": "Company | MYKEYNEST",
     "organization": {
       "eyebrow": "Company workspace",
       "title": "%name%",
       "active": "Active",
       "suspended": "Suspended",
-      "seats": "Seats",
-      "used": "%used% / %purchased% used",
+      "seats": "Licenses",
+      "used": "%used% / %purchased% assigned",
       "active_members": "%count% active",
       "pending_members": "%count% pending",
       "available_seats": "%count% available",
       "guests": "%used% / %limit% external guests",
-      "over_capacity": "The number of members exceeds purchased seats. Invitations are blocked.",
+      "over_capacity": "The number of members exceeds purchased licenses. Invitations are temporarily blocked.",
       "members_title": "Company members",
       "directory_eyebrow": "Directory",
-      "capacity_title": "Seat usage",
+      "capacity_title": "Assigned licenses",
       "metric_active": "Active members",
       "metric_pending": "Pending",
       "metric_available": "Available",
       "invite_card_title": "Add an employee",
       "member_access_title": "Your company access",
-      "member_access_help": "Your seat enables Team features. Company administrators manage members, roles and billing.",
+      "member_access_help": "Your license enables Team features. Company administrators manage members, roles and billing.",
       "invite": {
-        "description": "Invite company employees here. Each invitation reserves one seat, then the employee can be added to multiple groups at no extra cost.",
+        "description": "Simply enter the employee’s email address. MYKEYNEST assigns the license automatically.",
         "email_label": "Employee email address",
         "email_placeholder": "employee@company.com",
         "role_label": "Company role",
         "role_member": "Member",
         "role_admin": "Administrator",
-        "submit": "Invite",
-        "invalid": "Check the email address and selected role.",
-        "success_pending": "Invitation sent. The seat is reserved until the account is created.",
-        "success_active": "The employee was added to the company and their seat is active.",
+        "submit": "Invite and assign",
+        "auto_license": "1 license will be assigned automatically when you send the invitation.",
+        "role_after_invite": "The Member role is applied by default. The owner can promote the person to Administrator afterwards.",
+        "no_license": "All licenses are already assigned. Add one before inviting another employee.",
+        "invalid": "Check the email address entered.",
+        "success_pending": "Invitation sent. A license is reserved until the account is created.",
+        "success_active": "The employee was added to the company and their license is active.",
         "mail_warning": "The employee was added, but the invitation email could not be sent.",
         "email_subject": "Invitation to join %company% on MYKEYNEST",
         "email_eyebrow": "Company invitation",
         "email_title": "Join %company% on MYKEYNEST",
-        "email_body_pending": "Create your account to join your company workspace. A seat has already been reserved for you.",
+        "email_body_pending": "Create your account to join your company workspace. A license has already been reserved for you.",
         "email_body_active": "Your account has been linked to your company workspace. You can now use the Team features.",
         "email_role": "Role: %role%",
         "email_action_pending": "Create my account",
@@ -1700,7 +1810,7 @@
         "admin_description_company": "An employee must already belong to the company. An external person remains a guest of this group only.",
         "admin_description_personal": "Add an existing account or send an invitation if the account does not exist yet.",
         "admin_type_employee": "Active company employee",
-        "admin_type_guest": "External guest without a seat"
+        "admin_type_guest": "External guest without a license"
       },
       "member_status_active": "Active",
       "member_status_pending": "Invitation pending",
@@ -1715,60 +1825,87 @@
       "invalid_csrf": "The security check failed.",
       "remove": "Remove",
       "remove_confirm": "Remove this member from the company and all their teams?",
-      "billing_title": "Adjust seats",
-      "billing_help": "The owner counts as one seat. Stripe will apply proration.",
+      "billing_title": "Manage licenses",
+      "billing_quantity": "Total licenses",
+      "billing_help": "The owner uses one license. Stripe applies proration automatically.",
       "billing_submit": "Update",
-      "billing_error": "Stripe could not update the seats. Please try again in a moment.",
-      "workspace_note": "A seat represents one person. Extension installations never consume seats."
+      "billing_error": "Stripe could not update the licenses. Please try again in a moment.",
+      "add_one_license": "Add 1 license",
+      "add_license_confirm": "Add one license to your Team subscription? Stripe will prorate the current billing period.",
+      "ask_owner_license": "Ask the company owner to add a license.",
+      "maximum_reached": "The limit of %maximum% licenses has been reached.",
+      "workspace_note": "One license represents one person. Extension installations and groups do not use additional licenses."
+    },
+    "personal": {
+      "eyebrow": "%plan% plan",
+      "free_title": "Your personal groups, kept simple",
+      "free_description": "Create a sharing group with your current plan. Upgrade to Team when you need to administer access for your whole company.",
+      "pro_title": "Your Pro collaboration space",
+      "pro_description": "Your personal groups are unlimited. Team adds a company directory, centralized licenses and delegated administration.",
+      "team_title": "Activating your Team workspace",
+      "team_description": "Your Team subscription is active. The company workspace is being synchronized and will appear here automatically.",
+      "groups_limit": "%limit% personal group included",
+      "groups_unlimited": "Unlimited personal groups",
+      "centralized_members": "Centralized directory with Team",
+      "automatic_licenses": "Automatic licenses with Team",
+      "discover_team": "Discover the Team plan"
+    },
+    "groups": {
+      "eyebrow": "Collaboration",
+      "title": "Sharing groups",
+      "description": "Organize credentials by project, department or client without using another license.",
+      "count": "%count% group(s)"
     },
     "form": {
-      "name_label": "Team name",
+      "name_label": "Group name",
       "credentials_label": "Share existing credentials (optional)",
       "select_credentials_label": "Select credentials"
     },
     "header": {
-      "title": "My teams",
-      "subtitle": "Manage your teams and collaborate efficiently",
-      "new_team": "New team"
+      "title": "Company",
+      "subtitle_personal": "Organize sharing today and centralize access as your company grows.",
+      "subtitle_team": "Manage your company members, licenses and groups.",
+      "new_team": "New group",
+      "limit_hint": "Your plan’s group limit has been reached."
     },
     "empty": {
-      "title": "No teams yet",
-      "description": "Create your first team to start collaborating",
-      "action": "Create a team"
+      "title": "No groups yet",
+      "description": "Create your first group to organize and share credentials.",
+      "action": "Create a group"
     },
     "card": {
       "members": "member",
       "members_plural": "members",
-      "view": "View team",
+      "view": "Open group",
       "leave": "Leave",
-      "leave_confirm": "Are you sure you want to leave this team?",
+      "leave_confirm": "Are you sure you want to leave this group?",
       "owner_fallback": "N/A"
     },
     "show": {
-      "title": "Team %name%",
-      "back": "Back to teams",
-      "delete_team": "Delete team",
+      "title": "Group %name%",
+      "back": "Back to company",
+      "delete_team": "Delete group",
       "created_at": "Created on %date%",
       "owner": "Owner: %email%",
       "na": "N/A",
       "credentials": {
         "title": "Shared credentials",
         "add": "Add",
-        "empty": "No credential shared with this team",
-        "remove_confirm": "Remove this credential from the team?",
+        "empty": "No credential shared with this group",
+        "remove_confirm": "Remove this credential from the group?",
         "remove_title": "Remove this credential",
         "modal": {
           "title": "Add credentials",
-          "help": "Select the credentials to share with this team",
+          "help": "Select the credentials to share with this group",
           "cancel": "Cancel",
           "submit": "Add credentials"
         }
       },
       "members": {
-        "title": "Team members",
-        "empty": "No members in this team",
+        "title": "Group members",
+        "empty": "No members in this group",
         "joined_at": "Added on %date%",
-        "remove_confirm": "Remove this member from the team?",
+        "remove_confirm": "Remove this member from the group?",
         "remove_title": "Remove this member",
         "add": {
           "title": "Add a member",
@@ -1776,9 +1913,9 @@
           "email_placeholder": "email@example.com",
           "email_label": "Email address",
           "type_label": "Access type",
-          "type_employee": "Company employee · no additional seat",
+          "type_employee": "Company employee · no additional license",
           "type_guest": "External guest · limited access",
-          "company_help": "Invite employees from the company workspace, then add them to groups without using another seat",
+          "company_help": "Invite employees from the company workspace, then add them to groups without using another license",
           "role_label": "Team role",
           "role_member": "Member",
           "role_admin": "Administrator"
@@ -1786,21 +1923,21 @@
       }
     },
     "new": {
-      "page_title": "New team",
+      "page_title": "New group",
       "back": "Back",
       "header": {
-        "title": "Create a new team",
-        "subtitle": "Start collaborating by creating your team"
+        "title": "Create a new group",
+        "subtitle": "Organize the people and credentials for a project in one place."
       },
       "form": {
-        "submit_create_team": "Create team",
-        "name_placeholder": "e.g. Marketing Team",
-        "credentials_help": "Select the credentials to share with this team right away"
+        "submit_create_team": "Create group",
+        "name_placeholder": "e.g. Marketing",
+        "credentials_help": "Select the credentials to share with this group right away."
       }
     },
     "pro_banner": {
       "title": "Limit reached!",
-      "description": "You’ve reached the limit of %limit% created teams. Upgrade to PRO to create unlimited teams and collaborate without limits.",
+      "description": "You’ve reached the limit of %limit% group(s). Upgrade to PRO to create unlimited groups.",
       "action": "Upgrade to PRO"
     }
   },

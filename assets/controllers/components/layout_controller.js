@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["sidebar", "backdrop", "passLength"]
+  static targets = ["sidebar", "backdrop", "passLength", "mobileMenuButton"]
 
   connect() {
     this.loadCredentialCount()
@@ -39,6 +39,9 @@ export default class extends Controller {
 
     this.sidebarTarget.classList.toggle("open", isOpen)
     this.backdropTarget.classList.toggle("active", isOpen)
+    if (this.hasMobileMenuButtonTarget) {
+      this.mobileMenuButtonTarget.setAttribute("aria-expanded", isOpen ? "true" : "false")
+    }
     document.documentElement.classList.toggle("is-sidebar-open", isOpen)
     document.body.classList.toggle("is-sidebar-open", isOpen)
   }

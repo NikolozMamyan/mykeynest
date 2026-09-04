@@ -3,6 +3,7 @@
 {% block title %}{{ 'teams.page_title'|trans }}{% endblock %}
 
 {% block body %}
+{% set currentPlanCode = currentPlan.code|default('free') %}
 <div class="teams-container">
     <div class="page-header">
         <div class="header-content">
@@ -14,7 +15,7 @@
                 <h1>{{ 'teams.header.title'|trans }}</h1>
             </div>
             <p class="header-subtitle">
-                {{ 'teams.header.subtitle'|trans }}
+                {{ (organization and organization.active ? 'teams.header.subtitle_team' : 'teams.header.subtitle_personal')|trans }}
             </p>
         </div>
 
@@ -27,7 +28,7 @@
                 {{ 'teams.header.new_team'|trans }}
             </a>
         {% else %}
-            <div class="btn-primary-action btn-disabled" title="Passez à PRO pour créer plus d'équipes">
+            <div class="btn-primary-action btn-disabled" title="{{ 'teams.header.limit_hint'|trans }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -52,16 +53,25 @@
                 </span>
             </header>
 
-            <div class="company-hub__metrics">
-                <div class="company-metric is-primary"><span>{{ 'teams.organization.seats'|trans }}</span><strong>{{ seatSummary.used }}<small>/{{ seatSummary.purchased }}</small></strong></div>
-                <div class="company-metric"><span>{{ 'teams.organization.metric_active'|trans }}</span><strong>{{ seatSummary.active }}</strong></div>
-                <div class="company-metric"><span>{{ 'teams.organization.metric_pending'|trans }}</span><strong>{{ seatSummary.pending }}</strong></div>
-                <div class="company-metric"><span>{{ 'teams.organization.metric_available'|trans }}</span><strong>{{ seatSummary.available }}</strong></div>
-            </div>
-
-            <div class="company-hub__capacity">
-                <div><strong>{{ 'teams.organization.capacity_title'|trans }}</strong><span>{{ 'teams.organization.used'|trans({'%used%': seatSummary.used, '%purchased%': seatSummary.purchased}) }}</span></div>
+            <div class="company-license-overview">
+                <div class="company-license-overview__top">
+                    <div class="company-license-overview__identity">
+                        <span class="company-license-overview__icon"><i class="fa-solid fa-ticket"></i></span>
+                        <div>
+                            <strong>{{ 'teams.organization.capacity_title'|trans }}</strong>
+                            <span>{{ 'teams.organization.used'|trans({'%used%': seatSummary.used, '%purchased%': seatSummary.purchased}) }}</span>
+                        </div>
+                    </div>
+                    <span class="company-license-available {{ seatSummary.available == 0 ? 'is-empty' : '' }}">
+                        {{ 'teams.organization.available_seats'|trans({'%count%': seatSummary.available}) }}
+                    </span>
+                </div>
                 <div class="company-seat-progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ seatSummary.purchased }}" aria-valuenow="{{ seatSummary.used }}"><span style="width: {{ seatPercent > 100 ? 100 : seatPercent }}%"></span></div>
+                <div class="company-license-overview__meta">
+                    <span><i class="fa-solid fa-circle-check"></i> {{ 'teams.organization.active_members'|trans({'%count%': seatSummary.active}) }}</span>
+                    <span><i class="fa-regular fa-clock"></i> {{ 'teams.organization.pending_members'|trans({'%count%': seatSummary.pending}) }}</span>
+                    <span><i class="fa-solid fa-user-tag"></i> {{ 'teams.organization.guests'|trans({'%used%': seatSummary.guests, '%limit%': seatSummary.guestLimit}) }}</span>
+                </div>
                 {% if seatSummary.overCapacity %}<p class="company-seat-warning"><i class="fa-solid fa-triangle-exclamation"></i> {{ 'teams.organization.over_capacity'|trans }}</p>{% endif %}
             </div>
 
@@ -110,38 +120,82 @@
                             <div class="company-action-card">
                                 <div class="company-action-card__icon"><i class="fa-solid fa-user-plus"></i></div>
                                 <h3>{{ 'teams.organization.invite_card_title'|trans }}</h3>
-                                <p>{{ 'teams.organization.invite.description'|trans }}</p>
-                                {{ form_start(organizationInviteForm, {'attr': {'class': 'company-invite-form'}}) }}
-                                    <div class="company-invite-field">
-                                        {{ form_label(organizationInviteForm.email, null, {'label_attr': {'class': 'sr-only'}}) }}
-                                        {{ form_widget(organizationInviteForm.email, {'attr': {'placeholder': 'teams.organization.invite.email_placeholder'|trans}}) }}
-                                        {{ form_errors(organizationInviteForm.email) }}
+                                {% if seatSummary.available > 0 %}
+                                    <p>{{ 'teams.organization.invite.description'|trans }}</p>
+                                    <div class="company-license-auto-note">
+                                        <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                                        <span>{{ 'teams.organization.invite.auto_license'|trans }}</span>
                                     </div>
-                                    <div class="company-invite-field">
-                                        {{ form_label(organizationInviteForm.role, null, {'label_attr': {'class': 'sr-only'}}) }}
-                                        {{ form_widget(organizationInviteForm.role) }}
-                                        {{ form_errors(organizationInviteForm.role) }}
-                                    </div>
-                                    <button type="submit"><i class="fa-solid fa-arrow-right"></i> {{ 'teams.organization.invite.submit'|trans }}</button>
-                                {{ form_end(organizationInviteForm) }}
+                                    {{ form_start(organizationInviteForm, {'attr': {'class': 'company-invite-form'}}) }}
+                                        <div class="company-invite-field">
+                                            {{ form_label(organizationInviteForm.email, null, {'label_attr': {'class': 'sr-only'}}) }}
+                                            {{ form_widget(organizationInviteForm.email, {'attr': {'placeholder': 'teams.organization.invite.email_placeholder'|trans, 'autocomplete': 'email'}}) }}
+                                            {{ form_errors(organizationInviteForm.email) }}
+                                        </div>
+                                        <button type="submit"><i class="fa-solid fa-paper-plane"></i> {{ 'teams.organization.invite.submit'|trans }}</button>
+                                    {{ form_end(organizationInviteForm) }}
+                                    <small class="company-role-help">{{ 'teams.organization.invite.role_after_invite'|trans }}</small>
+                                {% else %}
+                                    <p>{{ 'teams.organization.invite.no_license'|trans }}</p>
+                                    {% if organization.owner and app.user and organization.owner.id == app.user.id and seatSummary.purchased < seatMaximum %}
+                                        <form class="company-quick-license-form" method="post" action="{{ path('app_team_company_seats_update') }}" onsubmit="return confirm('{{ 'teams.organization.add_license_confirm'|trans|e('js') }}');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('update_company_seats_' ~ organization.id) }}">
+                                            <input type="hidden" name="quantity" value="{{ seatSummary.purchased + 1 }}">
+                                            <button type="submit"><i class="fa-solid fa-plus"></i> {{ 'teams.organization.add_one_license'|trans }}</button>
+                                        </form>
+                                    {% elseif seatSummary.purchased >= seatMaximum %}
+                                        <small class="company-role-help">{{ 'teams.organization.maximum_reached'|trans({'%maximum%': seatMaximum}) }}</small>
+                                    {% else %}
+                                        <small class="company-role-help">{{ 'teams.organization.ask_owner_license'|trans }}</small>
+                                    {% endif %}
+                                {% endif %}
                             </div>
                         {% endif %}
 
                         {% if organization.owner and app.user and organization.owner.id == app.user.id and organization.active %}
-                            <form class="company-seat-form" method="post" action="{{ path('app_team_company_seats_update') }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('update_company_seats_' ~ organization.id) }}">
-                                <div><label for="company-seat-quantity">{{ 'teams.organization.billing_title'|trans }}</label><small>{{ 'teams.organization.billing_help'|trans }}</small></div>
-                                <div class="company-seat-form__controls">
-                                    <input id="company-seat-quantity" type="number" name="quantity" min="{{ seatSummary.used > seatMinimum ? seatSummary.used : seatMinimum }}" max="{{ seatMaximum }}" value="{{ seatSummary.purchased }}" required>
-                                    <button type="submit">{{ 'teams.organization.billing_submit'|trans }}</button>
-                                </div>
-                            </form>
+                            <details class="company-license-settings">
+                                <summary>
+                                    <span><i class="fa-solid fa-sliders"></i> {{ 'teams.organization.billing_title'|trans }}</span>
+                                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                                </summary>
+                                <form class="company-seat-form" method="post" action="{{ path('app_team_company_seats_update') }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('update_company_seats_' ~ organization.id) }}">
+                                    <div><label for="company-seat-quantity">{{ 'teams.organization.billing_quantity'|trans }}</label><small>{{ 'teams.organization.billing_help'|trans }}</small></div>
+                                    <div class="company-seat-form__controls">
+                                        <input id="company-seat-quantity" type="number" name="quantity" min="{{ seatSummary.used > seatMinimum ? seatSummary.used : seatMinimum }}" max="{{ seatMaximum }}" value="{{ seatSummary.purchased }}" required>
+                                        <button type="submit">{{ 'teams.organization.billing_submit'|trans }}</button>
+                                    </div>
+                                </form>
+                            </details>
                         {% endif %}
                     </aside>
                 {% else %}
                     <aside class="company-action-card company-member-access-card"><div class="company-action-card__icon"><i class="fa-solid fa-id-badge"></i></div><h3>{{ 'teams.organization.member_access_title'|trans }}</h3><p>{{ 'teams.organization.member_access_help'|trans }}</p></aside>
                 {% endif %}
             </div>
+        </section>
+    {% elseif not organization %}
+        <section class="enterprise-plan-card is-{{ currentPlanCode }}">
+            <div class="enterprise-plan-card__icon">
+                <i class="{{ currentPlanCode == 'team' ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-building-shield' }}"></i>
+            </div>
+            <div class="enterprise-plan-card__content">
+                <span class="enterprise-plan-card__eyebrow">{{ 'teams.personal.eyebrow'|trans({'%plan%': currentPlan.label|default('Free')}) }}</span>
+                <h2>{{ ('teams.personal.' ~ currentPlanCode ~ '_title')|trans }}</h2>
+                <p>{{ ('teams.personal.' ~ currentPlanCode ~ '_description')|trans }}</p>
+                {% if currentPlanCode != 'team' %}
+                    <div class="enterprise-plan-card__features">
+                        <span><i class="fa-solid fa-layer-group"></i> {{ (teamLimit is null ? 'teams.personal.groups_unlimited' : 'teams.personal.groups_limit')|trans({'%limit%': teamLimit}) }}</span>
+                        <span><i class="fa-solid fa-users-gear"></i> {{ 'teams.personal.centralized_members'|trans }}</span>
+                        <span><i class="fa-solid fa-ticket"></i> {{ 'teams.personal.automatic_licenses'|trans }}</span>
+                    </div>
+                {% endif %}
+            </div>
+            {% if currentPlanCode != 'team' %}
+                <a href="{{ path('app_subscription') }}" class="enterprise-plan-card__cta">
+                    {{ 'teams.personal.discover_team'|trans }} <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            {% endif %}
         </section>
     {% endif %}
 
@@ -169,6 +223,15 @@
             </a>
         </div>
     {% endif %}
+
+    <div class="groups-section-heading">
+        <div>
+            <span>{{ 'teams.groups.eyebrow'|trans }}</span>
+            <h2>{{ 'teams.groups.title'|trans }}</h2>
+            <p>{{ 'teams.groups.description'|trans }}</p>
+        </div>
+        <strong>{{ 'teams.groups.count'|trans({'%count%': teams|length}) }}</strong>
+    </div>
 
     {% if teams is empty %}
         <div class="empty-state">
@@ -868,6 +931,276 @@
     box-shadow: none;
 }
 
+.company-license-overview {
+    padding: 1rem 1.45rem 1.1rem;
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg-light) 65%, transparent);
+}
+
+.company-license-overview__top,
+.company-license-overview__identity,
+.company-license-overview__meta {
+    display: flex;
+    align-items: center;
+}
+
+.company-license-overview__top {
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.company-license-overview__identity {
+    min-width: 0;
+    gap: .7rem;
+}
+
+.company-license-overview__identity > div {
+    display: grid;
+    gap: .12rem;
+}
+
+.company-license-overview__identity strong {
+    color: var(--color-text-dark);
+    font-size: .84rem;
+}
+
+.company-license-overview__identity span:not(.company-license-overview__icon) {
+    color: var(--color-text-medium);
+    font-size: .74rem;
+}
+
+.company-license-overview__icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    border-radius: var(--border-radius-sm);
+    color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 11%, transparent);
+}
+
+.company-license-available {
+    padding: .4rem .6rem;
+    border-radius: 999px;
+    color: #047857;
+    font-size: .7rem;
+    font-weight: 750;
+    background: rgba(16, 185, 129, .11);
+    white-space: nowrap;
+}
+
+.company-license-available.is-empty {
+    color: #b45309;
+    background: rgba(245, 158, 11, .12);
+}
+
+.company-license-overview__meta {
+    flex-wrap: wrap;
+    gap: .45rem 1rem;
+    color: var(--color-text-medium);
+    font-size: .72rem;
+}
+
+.company-license-overview__meta i {
+    margin-right: .22rem;
+    color: var(--color-primary);
+}
+
+.company-license-auto-note {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    margin: .65rem 0;
+    padding: .65rem .7rem;
+    border-radius: var(--border-radius-sm);
+    color: var(--color-primary);
+    font-size: .71rem;
+    font-weight: 650;
+    line-height: 1.4;
+    background: color-mix(in srgb, var(--color-primary) 9%, transparent);
+}
+
+.company-license-auto-note i {
+    margin-top: .12rem;
+}
+
+.company-role-help {
+    display: block;
+    margin-top: .65rem;
+    color: var(--color-text-medium);
+    font-size: .68rem;
+    line-height: 1.45;
+}
+
+.company-quick-license-form button,
+.enterprise-plan-card__cta {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    border: 0;
+    border-radius: var(--border-radius-sm);
+    color: #fff;
+    font-weight: 750;
+    background: var(--color-primary);
+    cursor: pointer;
+}
+
+.company-quick-license-form button {
+    width: 100%;
+    padding: .65rem .8rem;
+}
+
+.company-license-settings {
+    border: 1px solid var(--glass-card-border);
+    border-radius: var(--border-radius);
+    background: var(--glass-card-bg);
+}
+
+.company-license-settings > summary {
+    display: flex;
+    min-height: 44px;
+    padding: .75rem .85rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    color: var(--color-text-dark);
+    font-size: .76rem;
+    font-weight: 750;
+    list-style: none;
+    cursor: pointer;
+}
+
+.company-license-settings > summary::-webkit-details-marker {
+    display: none;
+}
+
+.company-license-settings > summary span i {
+    margin-right: .4rem;
+    color: var(--color-primary);
+}
+
+.company-license-settings > summary > i {
+    color: var(--color-text-light);
+    font-size: .65rem;
+    transition: transform .18s ease;
+}
+
+.company-license-settings[open] > summary > i {
+    transform: rotate(180deg);
+}
+
+.company-license-settings .company-seat-form {
+    margin: 0;
+    padding: .2rem .85rem .85rem;
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.enterprise-plan-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.25rem 1.35rem;
+    border: 1px solid var(--glass-card-border);
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 8%, var(--glass-card-bg)), var(--glass-card-bg));
+    box-shadow: var(--glass-card-shadow);
+}
+
+.enterprise-plan-card__icon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border-radius: var(--border-radius);
+    color: var(--color-primary);
+    font-size: 1.05rem;
+    background: color-mix(in srgb, var(--color-primary) 11%, transparent);
+}
+
+.enterprise-plan-card__content {
+    min-width: 0;
+}
+
+.enterprise-plan-card__eyebrow,
+.groups-section-heading > div > span {
+    color: var(--color-primary);
+    font-size: .67rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.enterprise-plan-card h2 {
+    margin: .18rem 0 .3rem;
+    color: var(--color-text-dark);
+    font-size: 1rem;
+}
+
+.enterprise-plan-card p {
+    margin: 0;
+    color: var(--color-text-medium);
+    font-size: .78rem;
+    line-height: 1.5;
+}
+
+.enterprise-plan-card__features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem .9rem;
+    margin-top: .75rem;
+    color: var(--color-text-medium);
+    font-size: .7rem;
+}
+
+.enterprise-plan-card__features i {
+    margin-right: .28rem;
+    color: var(--color-primary);
+}
+
+.enterprise-plan-card__cta {
+    padding: .7rem .9rem;
+    font-size: .76rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.groups-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 0 1rem;
+}
+
+.groups-section-heading h2 {
+    margin: .15rem 0 .18rem;
+    color: var(--color-text-dark);
+    font-size: 1.1rem;
+}
+
+.groups-section-heading p {
+    margin: 0;
+    color: var(--color-text-medium);
+    font-size: .78rem;
+}
+
+.groups-section-heading > strong {
+    padding: .4rem .6rem;
+    border-radius: 999px;
+    color: var(--color-primary);
+    font-size: .7rem;
+    background: color-mix(in srgb, var(--color-primary) 9%, transparent);
+    white-space: nowrap;
+}
+
 .teams-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -1305,6 +1638,15 @@
         grid-template-columns: 1fr;
     }
 
+    .enterprise-plan-card {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .enterprise-plan-card__cta {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
     .company-actions,
     .company-member-access-card {
         border-top: 1px solid var(--color-border);
@@ -1371,9 +1713,25 @@
     .company-directory,
     .company-actions,
     .company-hub__header,
-    .company-hub__capacity {
+    .company-hub__capacity,
+    .company-license-overview {
         padding-right: 1rem;
         padding-left: 1rem;
+    }
+
+    .company-license-overview__top,
+    .groups-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .enterprise-plan-card {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .enterprise-plan-card__features {
+        display: grid;
     }
 }
 </style>

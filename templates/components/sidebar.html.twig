@@ -1,122 +1,109 @@
+{% set currentRoute = app.request.attributes.get('_route')|default('') %}
+{% set credentialsActive = currentRoute == 'app_credential' or currentRoute starts with 'credential_' %}
+{% set teamsActive = currentRoute starts with 'app_team_' %}
+{% set sharingActive = currentRoute starts with 'shared_access_' %}
+{% set secondaryNavigationActive = currentRoute in ['app_extention', 'app_generator', 'app_note', 'app_security_checker'] %}
+{% set mobileMoreActive = not (currentRoute == 'app_dashboard' or credentialsActive or teamsActive or sharingActive) %}
+
 <!-- === SIDEBAR === -->
-<aside class="sidebar" data-layout-target="sidebar">
+<aside class="sidebar sidebar--user" id="user-sidebar" data-layout-target="sidebar">
   <div class="sidebar-header">
     <div class="logo-container">
       {% include 'components/parts/logo.html.twig' %}
     </div>
   </div>
 
-  <nav class="sidebar-nav">
-    <div class="nav-section">
-      <div class="nav-section-title">
-        {{ 'sidebar.sections.main'|trans }}
-      </div>
-
+  <nav class="sidebar-nav" aria-label="{{ 'sidebar.navigation_aria'|trans }}">
+    <div class="nav-section nav-section--primary">
       <a href="{{ path('app_dashboard') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_dashboard' ? 'active' : '' }}">
+         class="nav-item {{ currentRoute == 'app_dashboard' ? 'active' : '' }}">
         <i class="fas fa-house"></i>
         <span>{{ 'sidebar.items.dashboard'|trans }}</span>
       </a>
 
-      <a href="{{ path('app_team_index') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_team_index' ? 'active' : '' }}">
-        <i class="fas fa-users"></i>
-        <span>{{ 'sidebar.items.teams'|trans }}</span>
-      </a>
-
       <a href="{{ path('app_credential') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_credential' ? 'active' : '' }}">
+         class="nav-item {{ credentialsActive ? 'active' : '' }}">
         <i class="fas fa-key"></i>
         <span>{{ 'sidebar.items.credentials'|trans }}</span>
         <span class="nav-item-badge" data-layout-target="passLength"></span>
       </a>
 
-      <a href="{{ path('app_sessions_manager') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_sessions_manager' ? 'active' : '' }}">
-        <i class="fas fa-display"></i>
-        <span>Sessions Manager</span>
-      </a>
-
       <a href="{{ path('shared_access_index') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'shared_access_index' ? 'active' : '' }}">
-        <i class="fas fa-share-alt"></i>
+         class="nav-item {{ sharingActive ? 'active' : '' }}">
+        <i class="fas fa-share-nodes"></i>
         <span>{{ 'sidebar.items.shared_access'|trans }}</span>
       </a>
 
-      <a href="{{ path('app_extention') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_extention' ? 'active' : '' }}">
-        <i class="fas fa-plug"></i>
-        <span>{{ 'sidebar.items.extension'|trans }}</span>
+      <a href="{{ path('app_team_index') }}"
+         class="nav-item {{ teamsActive ? 'active' : '' }}">
+        <i class="fas fa-building"></i>
+        <span>{{ 'sidebar.items.teams'|trans }}</span>
+      </a>
+
+      <a href="{{ path('app_sessions_manager') }}"
+         class="nav-item {{ currentRoute == 'app_sessions_manager' ? 'active' : '' }}">
+        <i class="fas fa-clock-rotate-left"></i>
+        <span>{{ 'sidebar.items.sessions'|trans }}</span>
       </a>
     </div>
 
-    <div class="nav-divider"></div>
+    <details class="sidebar-more" {{ secondaryNavigationActive ? 'open' : '' }}>
+      <summary class="nav-item sidebar-more__summary {{ secondaryNavigationActive ? 'has-active-child' : '' }}">
+        <i class="fas fa-grip"></i>
+        <span>{{ 'sidebar.items.more'|trans }}</span>
+        <i class="fas fa-chevron-down sidebar-more__chevron" aria-hidden="true"></i>
+      </summary>
 
-    <div class="nav-section">
-      <div class="nav-section-title">
-        {{ 'sidebar.sections.tools'|trans }}
+      <div class="sidebar-more__content">
+        <a href="{{ path('app_extention') }}"
+           class="nav-item nav-item--nested {{ currentRoute == 'app_extention' ? 'active' : '' }}">
+          <i class="fas fa-puzzle-piece"></i>
+          <span>{{ 'sidebar.items.extension'|trans }}</span>
+        </a>
+
+        {% if plan_has_feature(app.user, 'password_generator') %}
+          <a href="{{ path('app_generator') }}"
+             class="nav-item nav-item--nested {{ currentRoute == 'app_generator' ? 'active' : '' }}">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span>{{ 'sidebar.items.generator'|trans }}</span>
+          </a>
+        {% else %}
+          <div class="nav-item nav-item--nested nav-item-disabled">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span>{{ 'sidebar.items.generator'|trans }}</span>
+            <span class="nav-item-badge-pro">PRO</span>
+          </div>
+        {% endif %}
+
+        {% if plan_has_feature(app.user, 'secure_notes') %}
+          <a href="{{ path('app_note') }}"
+             class="nav-item nav-item--nested {{ currentRoute == 'app_note' ? 'active' : '' }}">
+            <i class="fas fa-note-sticky"></i>
+            <span>{{ 'sidebar.items.notes'|trans }}</span>
+          </a>
+        {% else %}
+          <div class="nav-item nav-item--nested nav-item-disabled">
+            <i class="fas fa-note-sticky"></i>
+            <span>{{ 'sidebar.items.notes'|trans }}</span>
+            <span class="nav-item-badge-pro">PRO</span>
+          </div>
+        {% endif %}
+
+        {% if plan_has_feature(app.user, 'security_checker') %}
+          <a href="{{ path('app_security_checker') }}"
+             class="nav-item nav-item--nested {{ currentRoute == 'app_security_checker' ? 'active' : '' }}">
+            <i class="fas fa-shield-heart"></i>
+            <span>{{ 'sidebar.items.security_checker'|trans }}</span>
+          </a>
+        {% else %}
+          <div class="nav-item nav-item--nested nav-item-disabled">
+            <i class="fas fa-shield-heart"></i>
+            <span>{{ 'sidebar.items.security_checker'|trans }}</span>
+            <span class="nav-item-badge-pro">PRO</span>
+          </div>
+        {% endif %}
       </div>
-
-      {% if plan_has_feature(app.user, 'password_generator') %}
-        <a href="{{ path('app_generator') }}"
-           class="nav-item {{ app.request.attributes.get('_route') == 'app_generator' ? 'active' : '' }}">
-          <i class="fas fa-wand-magic-sparkles"></i>
-          <span>{{ 'sidebar.items.generator'|trans }}</span>
-        </a>
-      {% else %}
-        <div class="nav-item nav-item-disabled">
-          <i class="fas fa-wand-magic-sparkles"></i>
-          <span>{{ 'sidebar.items.generator'|trans }}</span>
-          <span class="nav-item-badge-pro">PRO</span>
-        </div>
-      {% endif %}
-
-      {% if plan_has_feature(app.user, 'secure_notes') %}
-        <a href="{{ path('app_note') }}"
-           class="nav-item {{ app.request.attributes.get('_route') == 'app_note' ? 'active' : '' }}">
-          <i class="fas fa-note-sticky"></i>
-          <span>{{ 'sidebar.items.notes'|trans }}</span>
-        </a>
-      {% else %}
-        <div class="nav-item nav-item-disabled">
-          <i class="fas fa-note-sticky"></i>
-          <span>{{ 'sidebar.items.notes'|trans }}</span>
-          <span class="nav-item-badge-pro">PRO</span>
-        </div>
-      {% endif %}
-
-      {% if plan_has_feature(app.user, 'security_checker') %}
-        <a href="{{ path('app_security_checker') }}"
-           class="nav-item {{ app.request.attributes.get('_route') == 'app_security_checker' ? 'active' : '' }}">
-          <i class="fas fa-shield-heart"></i>
-          <span>{{ 'sidebar.items.security_checker'|trans }}</span>
-        </a>
-      {% else %}
-        <div class="nav-item nav-item-disabled">
-          <i class="fas fa-shield-heart"></i>
-          <span>{{ 'sidebar.items.security_checker'|trans }}</span>
-          <span class="nav-item-badge-pro">PRO</span>
-        </div>
-      {% endif %}
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">
-        {{ 'sidebar.sections.settings'|trans }}
-      </div>
-
-      <a href="{{ path('app_subscription') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_subscription' ? 'active' : '' }}">
-        <i class="fas fa-receipt"></i>
-        <span>{{ 'sidebar.items.subscription'|trans }}</span>
-      </a>
-
-      <a href="{{ path('app_settings') }}"
-         class="nav-item {{ app.request.attributes.get('_route') == 'app_settings' ? 'active' : '' }}">
-        <i class="fas fa-gear"></i>
-        <span>{{ 'sidebar.items.settings'|trans }}</span>
-      </a>
-    </div>
+    </details>
   </nav>
 
   <div class="sidebar-footer">
@@ -129,3 +116,43 @@
     </a>
   </div>
 </aside>
+
+<nav class="mobile-bottom-nav" aria-label="{{ 'sidebar.mobile.aria'|trans }}">
+  <a href="{{ path('app_dashboard') }}"
+     class="mobile-bottom-nav__item {{ currentRoute == 'app_dashboard' ? 'active' : '' }}"
+     {% if currentRoute == 'app_dashboard' %}aria-current="page"{% endif %}>
+    <i class="fas fa-house" aria-hidden="true"></i>
+    <span>{{ 'sidebar.mobile.home'|trans }}</span>
+  </a>
+
+  <a href="{{ path('app_credential') }}"
+     class="mobile-bottom-nav__item {{ credentialsActive ? 'active' : '' }}"
+     {% if credentialsActive %}aria-current="page"{% endif %}>
+    <i class="fas fa-key" aria-hidden="true"></i>
+    <span>{{ 'sidebar.mobile.vault'|trans }}</span>
+  </a>
+
+  <a href="{{ path('shared_access_index') }}"
+     class="mobile-bottom-nav__item {{ sharingActive ? 'active' : '' }}"
+     {% if sharingActive %}aria-current="page"{% endif %}>
+    <i class="fas fa-share-nodes" aria-hidden="true"></i>
+    <span>{{ 'sidebar.mobile.sharing'|trans }}</span>
+  </a>
+
+  <a href="{{ path('app_team_index') }}"
+     class="mobile-bottom-nav__item {{ teamsActive ? 'active' : '' }}"
+     {% if teamsActive %}aria-current="page"{% endif %}>
+    <i class="fas fa-building" aria-hidden="true"></i>
+    <span>{{ 'sidebar.mobile.teams'|trans }}</span>
+  </a>
+
+  <button type="button"
+          class="mobile-bottom-nav__item {{ mobileMoreActive ? 'active' : '' }}"
+          aria-controls="user-sidebar"
+          aria-expanded="false"
+          data-layout-target="mobileMenuButton"
+          data-action="click->layout#toggleSidebar">
+    <i class="fas fa-bars-staggered" aria-hidden="true"></i>
+    <span>{{ 'sidebar.mobile.more'|trans }}</span>
+  </button>
+</nav>

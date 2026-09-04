@@ -355,6 +355,8 @@ final class ApiSharedController extends AbstractController
             'domain' => $credential->getDomain(),
             'username' => $credential->getUsername(),
             'name' => $credential->getName(),
+            'createdAt' => $credential->getCreatedAt()?->format(DATE_ATOM),
+            'updatedAt' => $credential->getUpdatedAt()?->format(DATE_ATOM),
             'canRevealPassword' => $this->credentialAccessPolicy->canRevealPassword($user, $credential),
             'canEdit' => $this->credentialAccessPolicy->canEdit($user, $credential),
         ];
@@ -528,9 +530,63 @@ final class ApiSharedController extends AbstractController
                 'name' => $credential->getName(),
                 'domain' => $credential->getDomain(),
                 'username' => $credential->getUsername(),
+                'createdAt' => $credential->getCreatedAt()?->format(DATE_ATOM),
+                'updatedAt' => $credential->getUpdatedAt()?->format(DATE_ATOM),
                 'canRevealPassword' => true,
                 'canEdit' => true,
             ],
+        ]), $auth['issuedInstallationToken']);
+    }
+
+    #[Route('/extention/api/credentials/{id}/delete', name: 'api_credential_delete', methods: ['POST', 'OPTIONS'])]
+    public function deleteCredential(
+        Request $request,
+        int $id,
+        CredentialRepository $credentialRepository,
+        EntityManagerInterface $entityManager,
+    ): JsonResponse {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
+
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized('Token manquant ou invalide');
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
+
+        $credential = $credentialRepository->find($id);
+        if (!$credential instanceof Credential) {
+            return $this->withInstallationToken(
+                $this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND),
+                $auth['issuedInstallationToken'],
+            );
+        }
+
+        if (!$this->credentialAccessPolicy->canEdit($auth['user'], $credential)) {
+            return $this->withInstallationToken($this->json([
+                'error' => 'Seul le proprietaire peut supprimer cet identifiant.',
+                'code' => 'credential_delete_forbidden',
+            ], Response::HTTP_FORBIDDEN), $auth['issuedInstallationToken']);
+        }
+
+        $owner = $credential->getUser();
+        $wasPinned = $credential->getPinPosition() !== null;
+        $this->credentialManager->delete($credential);
+
+        if ($wasPinned && $owner instanceof User) {
+            $credentialRepository->compactPinPositionsForUser($owner);
+            $entityManager->flush();
+        }
+
+        return $this->withInstallationToken($this->json([
+            'success' => true,
+            'deletedId' => $id,
         ]), $auth['issuedInstallationToken']);
     }
 

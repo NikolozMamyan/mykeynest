@@ -135,7 +135,7 @@ final class OrganizationSeatManager
             throw new \LogicException('L’espace entreprise est suspendu.');
         }
         if (!in_array($role, [OrganizationRole::ADMIN, OrganizationRole::MEMBER], true)) {
-            throw new \InvalidArgumentException('Seuls les rôles administrateur et membre peuvent utiliser un siège.');
+            throw new \InvalidArgumentException('Seuls les rôles administrateur et membre peuvent utiliser une licence.');
         }
         if (!$this->canManage($organization, $invitedBy)) {
             throw new \DomainException('Seul un administrateur de l’entreprise peut inviter un nouveau membre.');
@@ -163,7 +163,7 @@ final class OrganizationSeatManager
         $summary = $this->getSeatSummary($organization);
         $existingUsesSeat = $existing?->consumesSeat() ?? false;
         if (!$existingUsesSeat && $summary['used'] >= $summary['purchased']) {
-            throw new \DomainException('Tous les sièges sont utilisés. Ajoutez un siège avant cette invitation.');
+            throw new \DomainException('Toutes les licences sont attribuées. Ajoutez une licence avant cette invitation.');
         }
 
         $membership = $existing ?? new OrganizationMember();
@@ -345,7 +345,7 @@ final class OrganizationSeatManager
         $summary = $this->getSeatSummary($organization);
         if ($quantity < $summary['used']) {
             throw new \DomainException(sprintf(
-                'Impossible de réduire à %d siège(s) : %d sont actuellement utilisés ou réservés.',
+                'Impossible de réduire à %d licence(s) : %d sont actuellement attribuées ou réservées.',
                 $quantity,
                 $summary['used'],
             ));

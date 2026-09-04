@@ -97,7 +97,7 @@ final class StripePlanCatalog
     ): array {
         if ($quantity < $this->getTeamMinimumSeats() || $quantity > $this->getTeamMaximumSeats()) {
             throw new \InvalidArgumentException(sprintf(
-                'La quantité doit être comprise entre %d et %d sièges.',
+                'La quantité doit être comprise entre %d et %d licences.',
                 $this->getTeamMinimumSeats(),
                 $this->getTeamMaximumSeats(),
             ));

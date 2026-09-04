@@ -85,6 +85,7 @@ class TeamPageController extends AbstractController
 
         $teams = $teamRepository->findByUser($user);
         $ownedTeamsCount = $teamRepository->count(['owner' => $user]);
+        $currentPlan = $this->subscriptionPlans->getPlanForUser($user);
         $organization = $this->organizationSeats->getOrganizationForUser($user);
         $canManageOrganization = $organization ? $this->organizationSeats->canManage($organization, $user) : false;
         $teamLimit = $canManageOrganization && $organization?->isActive()
@@ -95,12 +96,12 @@ class TeamPageController extends AbstractController
             $organizationInviteForm = $this->createForm(OrganizationInviteMemberType::class, null, [
                 'action' => $this->generateUrl('app_team_company_member_invite'),
                 'method' => 'POST',
-                'can_invite_admin' => $organization->getOwner()?->getId() === $user->getId(),
             ])->createView();
         }
 
         return $this->render('team/index.html.twig', [
             'teams' => $teams,
+            'currentPlan' => $currentPlan,
             'ownedTeamsCount' => $ownedTeamsCount,
             'teamLimit' => $teamLimit,
             'canCreateTeam' => $teamLimit === null || $ownedTeamsCount < $teamLimit,
@@ -187,7 +188,7 @@ class TeamPageController extends AbstractController
 
             $em->flush();
 
-            $this->addFlash('success', 'Equipe creee avec succes.');
+            $this->addFlash('success', 'Groupe créé avec succès.');
 
             return $this->redirectToRoute('app_team_index');
         }
@@ -334,7 +335,6 @@ class TeamPageController extends AbstractController
         $form = $this->createForm(OrganizationInviteMemberType::class, null, [
             'action' => $this->generateUrl('app_team_company_member_invite'),
             'method' => 'POST',
-            'can_invite_admin' => $organization->getOwner()?->getId() === $actor->getId(),
         ]);
         $form->handleRequest($request);
         if (!$form->isSubmitted() || !$form->isValid()) {
@@ -348,7 +348,7 @@ class TeamPageController extends AbstractController
             $result = $invitations->inviteEmployee(
                 $organization,
                 (string) $data['email'],
-                $data['role'],
+                OrganizationRole::MEMBER,
                 $actor,
             );
             $message = $result['pending']
@@ -455,7 +455,7 @@ class TeamPageController extends AbstractController
         try {
             $this->organizationSeats->assertQuantityCanBeReducedTo($organization, $quantity);
             $updatedQuantity = $stripeBilling->updateTeamSeatQuantity($owner, $quantity);
-            $this->addFlash('success', sprintf('Votre abonnement Team comprend maintenant %d sièges.', $updatedQuantity));
+            $this->addFlash('success', sprintf('Votre abonnement Team comprend maintenant %d licences.', $updatedQuantity));
         } catch (\LogicException|\RuntimeException $exception) {
             $this->addFlash('warning', $exception->getMessage());
         } catch (\Throwable $exception) {

@@ -47,10 +47,7 @@ final class ExtentionPageController extends AbstractController
         }
 
         return $this->noStore($this->render('extention/index.html.twig', [
-            'extentiotoken' => $user->getApiExtensionToken(),
             'chromeWebStoreUrl' => $this->chromeWebStoreUrl,
-            'isOnboarding' => (bool) $request->query->get('onboarding'),
-            'autoCopyToken' => false,
         ]));
     }
 

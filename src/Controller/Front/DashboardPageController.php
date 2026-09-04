@@ -43,6 +43,7 @@ final class DashboardPageController extends AbstractController
         $teamsCount = \count($ownedTeams);
 
         $sharedCount = (int) $em->getRepository(SharedAccess::class)->count(['owner' => $user]);
+        $currentPlan = $this->subscriptionPlans->getPlanForUser($user);
         $credentialLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS);
         $teamLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS);
         $shareLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_SHARES);
@@ -55,8 +56,6 @@ final class DashboardPageController extends AbstractController
                 'name' => $name,
                 'membersCount' => $team->getMembers()->count(),
                 'credentialsCount' => $team->getCredentials()->count(),
-                'roleLabel' => 'Propriétaire',
-                'roleClass' => 'owner',
                 'avatar' => mb_strtoupper(mb_substr(trim($name), 0, 2)),
             ];
         }
@@ -143,18 +142,6 @@ final class DashboardPageController extends AbstractController
             'total' => (int) ($counts['total'] ?? 0),
         ];
 
-        // -------------------------
-        // Deltas (si tu les as déjà dans une autre version)
-        // -> tu peux garder ton bloc "deltas" précédent.
-        // Pour ne pas te noyer ici, je laisse neutre :
-        // -------------------------
-        $deltas = [
-            'credentialsMonth' => 0,
-            'teamsMonth' => 0,
-            'sharesWeek' => 0,
-            'draftsMonth' => 0,
-        ];
-
         return $this->render('dashboard/index.html.twig', [
             'stats' => [
                 'credentials' => $credentialsCount,
@@ -162,7 +149,12 @@ final class DashboardPageController extends AbstractController
                 'shares' => $sharedCount,
                 'drafts' => $draftsCount,
             ],
-            'deltas' => $deltas,
+            'currentPlan' => $currentPlan,
+            'planUsage' => [
+                'credentials' => ['used' => $credentialsCount, 'limit' => $credentialLimit],
+                'shares' => ['used' => $sharedCount, 'limit' => $shareLimit],
+                'groups' => ['used' => $teamsCount, 'limit' => $teamLimit],
+            ],
             'planAccess' => [
                 'canCreateCredential' => $credentialLimit === null || $credentialsCount < $credentialLimit,
                 'canCreateTeam' => $teamLimit === null || $teamsCount < $teamLimit,

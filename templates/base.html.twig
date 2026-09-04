@@ -56,7 +56,8 @@
 
   {% set currentRoute = app.request.attributes.get('_route') %}
   {% set hideAppChrome = hideAppChrome|default(false) or currentRoute in ['app_pending_login'] %}
-  <body class="{{ hideAppChrome ? 'app-chrome-hidden' : '' }}" data-controller="layout pwa-install">
+  {% set hasUserNavigation = app.user and not hideAppChrome and is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
+  <body class="{{ hideAppChrome ? 'app-chrome-hidden' : '' }} {{ hasUserNavigation ? 'has-mobile-bottom-nav' : '' }}" data-controller="layout pwa-install">
 
     {# ===== Layout wrapper ===== #}
     <div class="app-shell">

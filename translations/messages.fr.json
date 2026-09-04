@@ -1,7 +1,7 @@
 {
   "breadcrumb": {
     "dashboard": "Tableau de bord",
-    "teams": "Équipes",
+    "teams": "Entreprise",
     "credentials": "Mots de passe",
     "new": "Nouveau",
     "shared_access": "Partages sécurisés",
@@ -195,6 +195,7 @@
     }
   },
   "sidebar": {
+    "navigation_aria": "Navigation de l’application",
     "sections": {
       "main": "Principal",
       "tools": "Outils",
@@ -202,8 +203,9 @@
     },
     "items": {
       "dashboard": "Tableau de bord",
-      "teams": "Équipes",
+      "teams": "Entreprise",
       "credentials": "Mots de passe",
+      "sessions": "Historique",
       "shared_access": "Partages sécurisés",
       "extension": "Extension navigateur",
       "generator": "Générateur",
@@ -211,7 +213,16 @@
       "security_checker": "Vérificateur de sécurité",
       "subscription": "Abonnements",
       "settings": "Paramètres",
+      "more": "Plus",
       "logout": "Déconnexion"
+    },
+    "mobile": {
+      "aria": "Navigation principale",
+      "home": "Accueil",
+      "vault": "Coffre",
+      "sharing": "Partage",
+      "teams": "Entreprise",
+      "more": "Plus"
     }
   },
   "landing": {
@@ -941,10 +952,77 @@
   },
   "extension": {
     "page": {
+      "meta_title": "Extension navigateur | MYKEYNEST",
+      "configuration": {
+        "eyebrow": "Préférences du navigateur",
+        "title": "Choisissez comment MYKEYNEST apparaît",
+        "subtitle": "Adaptez l’extension à votre façon de naviguer. Le changement est appliqué immédiatement dans ce navigateur.",
+        "connected": "Extension connectée",
+        "aria": "Mode d’affichage de l’extension",
+        "recommended": "Recommandé",
+        "local_note": "Ces préférences sont propres à cette installation de l’extension.",
+        "modes": {
+          "default": {
+            "title": "Ouverture classique",
+            "description": "MYKEYNEST ouvre sa fenêtre lorsque vous sélectionnez un champ de connexion."
+          },
+          "inline": {
+            "title": "Suggestion sous les champs",
+            "description": "Une suggestion discrète apparaît directement sous le champ actif, comme dans Dashlane."
+          },
+          "off": {
+            "title": "Mode discret",
+            "description": "Aucune fenêtre automatique. Seul un petit badge confirme qu’une page de connexion est détectée."
+          }
+        },
+        "order": {
+          "title": "Ordre des identifiants",
+          "description": "Choisissez comment organiser votre coffre dans l’extension.",
+          "aria": "Ordre d’affichage des identifiants",
+          "custom_hint": "En mode personnalisé, déplacez les identifiants et les sections Partagés ou Équipes directement dans l’extension.",
+          "modes": {
+            "recent": {
+              "title": "Plus récents",
+              "description": "Derniers ajoutés en premier"
+            },
+            "domain": {
+              "title": "Par domaine",
+              "description": "Classement alphabétique"
+            },
+            "custom": {
+              "title": "Personnalisé",
+              "description": "Votre ordre par glisser-déposer"
+            }
+          }
+        },
+        "exclusions": {
+          "title": "Sites exclus",
+          "description": "Masquez entièrement les suggestions et le badge MYKEYNEST sur les domaines de votre choix.",
+          "label": "URL ou domaine à exclure",
+          "placeholder": "exemple.com ou https://exemple.com",
+          "add": "Ajouter",
+          "empty": "Aucun site exclu pour cette installation.",
+          "note": "Un domaine exclu couvre également ses sous-domaines. L’association sécurisée avec MYKEYNEST reste active.",
+          "invalid": "Saisissez une URL ou un domaine valide.",
+          "remove": "Retirer"
+        }
+      },
+      "status": {
+        "checking": "Recherche de l’extension…",
+        "installed": "Extension détectée",
+        "not_found": "Extension non détectée",
+        "ready": "Préférences prêtes à être modifiées",
+        "saving": "Enregistrement…",
+        "saved": "Préférences enregistrées",
+        "save_error": "Impossible d’enregistrer. Rechargez l’extension puis réessayez.",
+        "update_required": "Mettez à jour l’extension pour activer ces préférences."
+      },
       "hero": {
+        "eyebrow": "Extension officielle Chrome",
         "title": "Extension navigateur",
-        "tagline": "Accédez à vos mots de passe directement depuis votre navigateur",
-        "download": "Télécharger l'extension"
+        "tagline": "Retrouvez votre coffre et connectez-vous en toute sécurité, sans quitter la page que vous consultez.",
+        "download": "Installer depuis Chrome Web Store",
+        "store_note": "Installation sécurisée depuis la boutique officielle Google Chrome."
       },
       "demo": {
         "window_title": "Installation de l'extension",
@@ -1101,9 +1179,29 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "hero": {
+      "eyebrow": "Votre espace sécurisé",
+      "greeting": "Bonjour",
+      "greeting_named": "Bonjour %name%",
+      "description": {
+        "free": "Retrouvez l'essentiel pour enregistrer, organiser et partager vos accès en toute sécurité.",
+        "pro": "Votre coffre est prêt : gérez vos accès sans limite et gardez un œil sur leur sécurité.",
+        "team": "Pilotez les accès de votre entreprise, vos groupes de partage et la sécurité de vos collaborateurs."
+      },
+      "add_credential": "Ajouter un identifiant",
+      "share_access": "Partager un accès"
+    },
+    "usage": {
+      "title": "Utilisation du plan",
+      "credentials": "Identifiants",
+      "shares": "Partages",
+      "groups": "Groupes",
+      "unlimited": "Illimité"
+    },
     "stats": {
       "credentials": "Identifiants",
-      "teams": "Équipes",
+      "teams": "Groupes",
       "active_shares": "Partages actifs",
       "drafts": "Brouillons",
       "change": {
@@ -1125,11 +1223,12 @@
       }
     },
     "teams": {
-      "title": "Mes équipes",
+      "title": "Mes groupes",
       "create": "Créer",
+      "owner": "Propriétaire",
       "empty": {
-        "title": "Aucune équipe",
-        "desc": "Crée ta première équipe pour partager en toute sécurité."
+        "title": "Aucun groupe",
+        "desc": "Créez votre premier groupe pour partager en toute sécurité."
       },
       "meta": {
         "members": "membres",
@@ -1139,9 +1238,17 @@
     "quick_actions": {
       "title": "Actions rapides",
       "new_credential": "Nouvel identifiant",
-      "invite_member": "Inviter un membre",
+      "new_credential_desc": "Enregistrer un nouvel accès",
       "share_access": "Partager un accès",
-      "create_team": "Créer une équipe"
+      "share_access_desc": "Donner un accès sécurisé",
+      "enterprise": "Entreprise",
+      "enterprise_desc": {
+        "free": "Créer et organiser vos groupes",
+        "pro": "Organiser vos groupes de partage",
+        "team": "Gérer les membres et les licences"
+      },
+      "extension": "Extension",
+      "extension_desc": "Configurer le remplissage automatique"
     },
     "drafts": {
       "title": "Brouillons en attente",
@@ -1264,12 +1371,12 @@
       "subtitle": "Choisissez les fonctionnalités adaptées à votre activité. Les paiements et factures sont sécurisés par Stripe.",
       "current_plan": "Abonnement actif",
       "company_access": "Accès fourni par votre entreprise",
-      "company_access_help": "Votre siège Team est géré par l’administrateur de votre entreprise.",
+      "company_access_help": "Votre licence Team est gérée par l’administrateur de votre entreprise.",
       "offers_eyebrow": "Offres mensuelles",
       "offers_title": "Choisissez PRO ou TEAM",
       "monthly_billing": "Facturation mensuelle · résiliable à tout moment",
       "active_badge": "Actif",
-      "company_badge": "Siège entreprise",
+      "company_badge": "Licence entreprise",
       "current_offer": "Votre offre actuelle",
       "included_in_team": "Inclus dans Team",
       "stripe_note": "Paiement sécurisé, factures et moyens de paiement gérés par Stripe."
@@ -1286,7 +1393,7 @@
       "cancel_error": "Impossible de programmer l’annulation pour le moment. Réessayez ou contactez le support.",
       "resumed": "Le renouvellement automatique de votre abonnement est réactivé.",
       "resume_error": "Impossible de réactiver le renouvellement pour le moment.",
-      "team_seats": "Nombre de sièges Team",
+      "team_seats": "Nombre de licences Team",
       "upgrade_team": "Passer à Team",
       "upgrade_confirm": "Confirmer le passage à Team ? Stripe facturera immédiatement la différence au prorata.",
       "upgrade_proration": "La différence est calculée et facturée immédiatement par Stripe.",
@@ -1311,7 +1418,7 @@
       "title": "Vous êtes abonné 🎉",
       "subtitle": "Merci pour votre confiance. Votre compte est actuellement en",
       "organization_title": "Accès Team activé",
-      "organization_subtitle": "Votre siège entreprise vous donne actuellement accès au plan",
+      "organization_subtitle": "Votre licence entreprise vous donne actuellement accès au plan",
       "plan": "Pro",
       "benefits": {
         "unlimited_shares": "Partages illimités",
@@ -1663,44 +1770,47 @@
     "hint": "Astuce : cliquez sur le bouton “+” pour changer votre avatar."
   },
   "teams": {
-    "page_title": "Mes équipes",
+    "page_title": "Entreprise | MYKEYNEST",
     "organization": {
       "eyebrow": "Espace entreprise",
       "title": "%name%",
       "active": "Actif",
       "suspended": "Suspendu",
-      "seats": "Sièges",
-      "used": "%used% / %purchased% utilisés",
+      "seats": "Licences",
+      "used": "%used% / %purchased% attribuées",
       "active_members": "%count% actifs",
       "pending_members": "%count% en attente",
-      "available_seats": "%count% disponibles",
+      "available_seats": "%count% disponible(s)",
       "guests": "%used% / %limit% invités externes",
-      "over_capacity": "Le nombre de membres dépasse les sièges achetés. Les invitations sont bloquées.",
+      "over_capacity": "Le nombre de membres dépasse les licences achetées. Les invitations sont temporairement bloquées.",
       "members_title": "Membres de l’entreprise",
       "directory_eyebrow": "Annuaire",
-      "capacity_title": "Utilisation des sièges",
+      "capacity_title": "Licences attribuées",
       "metric_active": "Membres actifs",
       "metric_pending": "En attente",
       "metric_available": "Disponibles",
       "invite_card_title": "Ajouter un collaborateur",
       "member_access_title": "Votre accès entreprise",
-      "member_access_help": "Votre siège active les fonctionnalités Team. Les administrateurs de l’entreprise gèrent les membres, les rôles et la facturation.",
+      "member_access_help": "Votre licence active les fonctionnalités Team. Les administrateurs de l’entreprise gèrent les membres, les rôles et la facturation.",
       "invite": {
-        "description": "Invitez ici les collaborateurs de l’entreprise. Chaque invitation réserve un siège, puis le collaborateur peut être ajouté gratuitement à plusieurs groupes.",
+        "description": "Saisissez simplement l’adresse du collaborateur. MYKEYNEST s’occupe de lui attribuer la licence.",
         "email_label": "Adresse e-mail du collaborateur",
         "email_placeholder": "collaborateur@entreprise.com",
         "role_label": "Rôle dans l’entreprise",
         "role_member": "Membre",
         "role_admin": "Administrateur",
-        "submit": "Inviter",
-        "invalid": "Vérifiez l’adresse e-mail et le rôle sélectionné.",
-        "success_pending": "Invitation envoyée. Le siège est réservé jusqu’à la création du compte.",
-        "success_active": "Le collaborateur a été ajouté à l’entreprise et son siège est actif.",
+        "submit": "Inviter et attribuer",
+        "auto_license": "1 licence sera attribuée automatiquement dès l’envoi.",
+        "role_after_invite": "Le rôle Membre est appliqué par défaut. Le propriétaire pourra ensuite le passer Administrateur.",
+        "no_license": "Toutes les licences sont déjà attribuées. Ajoutez-en une avant d’inviter un collaborateur.",
+        "invalid": "Vérifiez l’adresse e-mail saisie.",
+        "success_pending": "Invitation envoyée. Une licence est réservée jusqu’à la création du compte.",
+        "success_active": "Le collaborateur a été ajouté à l’entreprise et sa licence est active.",
         "mail_warning": "Le collaborateur a été ajouté, mais l’e-mail d’invitation n’a pas pu être envoyé.",
         "email_subject": "Invitation à rejoindre %company% sur MYKEYNEST",
         "email_eyebrow": "Invitation entreprise",
         "email_title": "Rejoignez %company% sur MYKEYNEST",
-        "email_body_pending": "Créez votre compte pour rejoindre l’espace de votre entreprise. Un siège vous est déjà réservé.",
+        "email_body_pending": "Créez votre compte pour rejoindre l’espace de votre entreprise. Une licence vous est déjà réservée.",
         "email_body_active": "Votre compte a été rattaché à l’espace de votre entreprise. Vous pouvez maintenant accéder aux fonctionnalités Team.",
         "email_role": "Rôle : %role%",
         "email_action_pending": "Créer mon compte",
@@ -1709,7 +1819,7 @@
         "admin_description_company": "Un collaborateur doit déjà appartenir à l’entreprise. Un externe reste invité de ce groupe uniquement.",
         "admin_description_personal": "Ajout direct ou invitation si le compte n’existe pas encore.",
         "admin_type_employee": "Collaborateur actif de l’entreprise",
-        "admin_type_guest": "Invité externe sans siège"
+        "admin_type_guest": "Invité externe sans licence"
       },
       "member_status_active": "Actif",
       "member_status_pending": "Invitation en attente",
@@ -1724,60 +1834,87 @@
       "invalid_csrf": "La vérification de sécurité a échoué.",
       "remove": "Retirer",
       "remove_confirm": "Retirer ce membre de l’entreprise et de toutes ses équipes ?",
-      "billing_title": "Adapter les sièges",
-      "billing_help": "Le propriétaire compte comme un siège. Stripe appliquera la proratisation.",
+      "billing_title": "Gérer les licences",
+      "billing_quantity": "Nombre total de licences",
+      "billing_help": "Le propriétaire utilise une licence. Stripe applique automatiquement la proratisation.",
       "billing_submit": "Mettre à jour",
-      "billing_error": "Stripe n’a pas pu modifier les sièges. Réessayez dans un instant.",
-      "workspace_note": "Un siège correspond à une personne. Les installations d’extension ne consomment pas de siège."
+      "billing_error": "Stripe n’a pas pu modifier les licences. Réessayez dans un instant.",
+      "add_one_license": "Ajouter 1 licence",
+      "add_license_confirm": "Ajouter une licence à votre abonnement Team ? Stripe appliquera la proratisation au mois en cours.",
+      "ask_owner_license": "Demandez au propriétaire de l’entreprise d’ajouter une licence.",
+      "maximum_reached": "La limite de %maximum% licences est atteinte.",
+      "workspace_note": "Une licence correspond à une personne. Les installations d’extension et les groupes ne consomment aucune licence supplémentaire."
+    },
+    "personal": {
+      "eyebrow": "Offre %plan%",
+      "free_title": "Vos groupes personnels, simplement",
+      "free_description": "Créez un groupe de partage avec votre offre actuelle. Passez à Team lorsque vous souhaitez administrer les accès de toute votre entreprise.",
+      "pro_title": "Votre collaboration Pro",
+      "pro_description": "Vos groupes personnels sont illimités. L’offre Team ajoute un annuaire d’entreprise, des licences centralisées et une gestion déléguée.",
+      "team_title": "Activation de votre espace Team",
+      "team_description": "Votre abonnement Team est actif. L’espace entreprise est en cours de synchronisation et apparaîtra ici automatiquement.",
+      "groups_limit": "%limit% groupe personnel inclus",
+      "groups_unlimited": "Groupes personnels illimités",
+      "centralized_members": "Annuaire centralisé avec Team",
+      "automatic_licenses": "Licences automatiques avec Team",
+      "discover_team": "Découvrir l’offre Team"
+    },
+    "groups": {
+      "eyebrow": "Collaboration",
+      "title": "Groupes de partage",
+      "description": "Organisez les identifiants par projet, service ou client sans consommer de licence supplémentaire.",
+      "count": "%count% groupe(s)"
     },
     "form": {
-      "name_label": "Nom de l’équipe",
+      "name_label": "Nom du groupe",
       "credentials_label": "Partager des identifiants existants (optionnel)",
       "select_credentials_label": "Sélectionner des identifiants"
     },
     "header": {
-      "title": "Mes équipes",
-      "subtitle": "Gérez vos équipes et collaborez efficacement",
-      "new_team": "Nouvelle équipe"
+      "title": "Entreprise",
+      "subtitle_personal": "Regroupez vos partages aujourd’hui et centralisez les accès lorsque votre équipe grandit.",
+      "subtitle_team": "Gérez les membres, les licences et les groupes de votre entreprise.",
+      "new_team": "Nouveau groupe",
+      "limit_hint": "La limite de groupes de votre offre est atteinte."
     },
     "empty": {
-      "title": "Aucune équipe pour le moment",
-      "description": "Créez votre première équipe pour commencer à collaborer",
-      "action": "Créer une équipe"
+      "title": "Aucun groupe pour le moment",
+      "description": "Créez votre premier groupe pour organiser et partager des identifiants.",
+      "action": "Créer un groupe"
     },
     "card": {
       "members": "membre",
       "members_plural": "membres",
-      "view": "Voir l'équipe",
+      "view": "Ouvrir le groupe",
       "leave": "Quitter",
-      "leave_confirm": "Voulez-vous vraiment quitter cette équipe ?",
+      "leave_confirm": "Voulez-vous vraiment quitter ce groupe ?",
       "owner_fallback": "N/A"
     },
     "show": {
-      "title": "Équipe %name%",
-      "back": "Retour aux équipes",
-      "delete_team": "Supprimer l'équipe",
+      "title": "Groupe %name%",
+      "back": "Retour à l’entreprise",
+      "delete_team": "Supprimer le groupe",
       "created_at": "Créée le %date%",
       "owner": "Propriétaire : %email%",
       "na": "N/A",
       "credentials": {
         "title": "Identifiants partagés",
         "add": "Ajouter",
-        "empty": "Aucun credential partagé avec cette équipe",
-        "remove_confirm": "Retirer ce credential de l'équipe ?",
+        "empty": "Aucun identifiant partagé avec ce groupe",
+        "remove_confirm": "Retirer cet identifiant du groupe ?",
         "remove_title": "Retirer ce credential",
         "modal": {
           "title": "Ajouter des credentials",
-          "help": "Sélectionnez les credentials à partager avec cette équipe",
+          "help": "Sélectionnez les identifiants à partager avec ce groupe",
           "cancel": "Annuler",
           "submit": "Ajouter les credentials"
         }
       },
       "members": {
-        "title": "Membres de l'équipe",
-        "empty": "Aucun membre dans cette équipe",
+        "title": "Membres du groupe",
+        "empty": "Aucun membre dans ce groupe",
         "joined_at": "Ajouté le %date%",
-        "remove_confirm": "Supprimer ce membre de l'équipe ?",
+        "remove_confirm": "Supprimer ce membre du groupe ?",
         "remove_title": "Supprimer ce membre",
         "add": {
           "title": "Ajouter un membre",
@@ -1785,9 +1922,9 @@
           "email_placeholder": "email@exemple.com",
           "email_label": "Adresse e-mail",
           "type_label": "Type d’accès",
-          "type_employee": "Collaborateur de l’entreprise · aucun siège supplémentaire",
+          "type_employee": "Collaborateur de l’entreprise · aucune licence supplémentaire",
           "type_guest": "Invité externe · accès limité",
-          "company_help": "Les collaborateurs s’invitent depuis l’espace entreprise, puis s’ajoutent aux groupes sans siège supplémentaire",
+          "company_help": "Les collaborateurs s’invitent depuis l’espace entreprise, puis s’ajoutent aux groupes sans licence supplémentaire",
           "role_label": "Rôle dans l’équipe",
           "role_member": "Membre",
           "role_admin": "Administrateur"
@@ -1795,21 +1932,21 @@
       }
     },
     "new": {
-      "page_title": "Nouvelle équipe",
+      "page_title": "Nouveau groupe",
       "back": "Retour",
       "header": {
-        "title": "Créer une nouvelle équipe",
-        "subtitle": "Commencez à collaborer en créant votre équipe"
+        "title": "Créer un nouveau groupe",
+        "subtitle": "Organisez les personnes et identifiants d’un projet dans un même espace."
       },
       "form": {
-        "submit_create_team": "Créer l'équipe",
-        "name_placeholder": "Ex: Équipe Marketing",
-        "credentials_help": "Sélectionnez les credentials à partager immédiatement avec cette équipe"
+        "submit_create_team": "Créer le groupe",
+        "name_placeholder": "Ex. Marketing",
+        "credentials_help": "Sélectionnez les identifiants à partager immédiatement avec ce groupe."
       }
     },
     "pro_banner": {
       "title": "Limite atteinte !",
-      "description": "Vous avez atteint la limite de %limit% équipes créées. Passez à PRO pour créer des équipes illimitées et collaborer sans restriction.",
+      "description": "Vous avez atteint la limite de %limit% groupe(s). Passez à PRO pour créer des groupes illimités.",
       "action": "Passer à PRO"
     }
   },

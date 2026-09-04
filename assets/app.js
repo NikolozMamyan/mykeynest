@@ -19,5 +19,6 @@ import './styles/components/ui-system.css';
 import './styles/pages/blog-index.css';
 import './styles/pages/auth-forms.css';
 import './styles/pages/reset-password.css';
+import './styles/pages/extension-settings.css';
 import './styles/pages/admin-emailing.css';
 import './styles/pages/admin-plans.css';

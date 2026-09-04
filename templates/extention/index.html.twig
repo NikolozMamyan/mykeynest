@@ -1,1365 +1,230 @@
 {% extends 'base.html.twig' %}
-{% block title %}Extension navigateur{% endblock %}
 
-{% block stylesheets %}
-{{ parent() }}
-<style>
-
-
-
-/* ——— Animations ——— */
-
-
-
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(5, 150, 105, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(5, 150, 105, 0.6); }
-}
-
-
-
-
-
-
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-
-/* ——— Layout ——— */
-.extension-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 20px;
-  animation: fadeIn 0.4s ease-out;
-}
-
-/* ——— Hero Section ——— */
-.hero-section {
-  text-align: center;
-  margin-bottom: 80px;
-  position: relative;
-}
-
-.onboarding-banner {
-  max-width: 840px;
-  margin: 0 auto 28px;
-  padding: 18px 22px;
-  border-radius: 18px;
-  border: 1px solid rgba(5, 150, 105, 0.18);
-  background: linear-gradient(135deg, rgba(240, 253, 244, 0.96) 0%, rgba(236, 253, 245, 0.96) 100%);
-  box-shadow: 0 12px 30px rgba(5, 150, 105, 0.08);
-}
-
-.onboarding-banner h2 {
-  margin: 0 0 8px;
-  font-size: 1.3rem;
-  color: var(--color-text-dark);
-}
-
-.onboarding-banner p {
-  margin: 0;
-  color: var(--color-text-medium);
-  line-height: 1.7;
-}
-
-.hero-icon-wrapper {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 30px;
-}
-
-.hero-icon {
-  width: 90px;
-  height: 90px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 2.5rem;
-  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
-
-  margin: 0 auto;
-}
-
-.icon-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
-  border: 3px solid var(--color-primary);
-  border-radius: 50%;
-  opacity: 0.3;
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.hero-section h1 {
-  font-size: 3.5rem;
-color:var(--color-text-dark);
-  margin-bottom: 20px;
-  font-weight: 800;
-  letter-spacing: -1px;
-}
-
-.hero-section .tagline {
-  font-size: 1.4rem;
-  color: var(--color-text-muted);
-  margin-bottom: 40px;
-  font-weight: 300;
-}
-
-.download-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
-color: var(--color-on-primary);
-  padding: 20px 50px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: 700;
-  box-shadow: 0 10px 30px rgba(5, 150, 105, 0.4);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  border: none;
-  cursor: pointer;
-}
-
-.download-btn:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: left 0.5s;
-}
-
-.download-btn:hover:before {
-  left: 100%;
-}
-
-.download-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 15px 40px rgba(5, 150, 105, 0.5);
-color: var(--color-on-primary);
-}
-
-.download-btn i {
-  font-size: 1.3rem;
-  animation: bounce 2s infinite;
-}
-
-.hero-actions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 14px;
-}
-
-.secondary-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px 28px;
-  border-radius: 50px;
-  border: 1px solid var(--color-border);
-  text-decoration: none;
-  color: var(--color-text-dark);
-  background: rgba(255,255,255,0.92);
-  font-weight: 700;
-  transition: all 0.25s ease;
-}
-
-.secondary-btn:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-/* ——— Cards ——— */
-.card {
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  overflow: hidden;
-  transition: all 0.3s ease;
-  animation: slideInUp 0.6s ease forwards;
-  opacity: 0;
-}
-
-.card:nth-child(1) { animation-delay: 0.1s; }
-.card:nth-child(2) { animation-delay: 0.2s; }
-.card:nth-child(3) { animation-delay: 0.3s; }
-
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-  border-color: var(--color-primary);
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: 24px 28px;
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.03) 0%, rgba(5, 150, 105, 0.01) 100%);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.card-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.3rem;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
-  flex-shrink: 0;
-  position: relative;
-}
-
-.card-icon:after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  border: 2px solid var(--color-primary);
-  animation: pulse-ring 2s infinite;
-}
-
-.card-title {
-  flex: 1;
-}
-
-.card-title h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: var(--color-text-dark);
-  font-weight: 800;
-  letter-spacing: -0.3px;
-}
-
-.card-title .helper {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  margin-top: 4px;
-  line-height: 1.4;
-}
-
-.card-body {
-  padding: 32px 28px;
-}
-
-/* ——— Demo Window (Computer Window) ——— */
-.demo-window {
-  background: #1e293b;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-  margin: 60px auto;
-
-  overflow: hidden;
-  transform: perspective(1000px) rotateX(2deg);
-  transition: transform 0.3s ease;
-}
-
-.demo-window:hover {
-  transform: perspective(1000px) rotateX(0deg) translateY(-5px);
-}
-
-.window-header {
-  background: linear-gradient(180deg, #2d3748 0%, #1e293b 100%);
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.window-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  transition: transform 0.2s;
-  cursor: pointer;
-}
-
-.window-dot:hover {
-  transform: scale(1.2);
-}
-
-.dot-red { background: #ff5f57; }
-.dot-yellow { background: #ffbd2e; }
-.dot-green { background: #28ca42; }
-
-.window-title {
-  flex: 1;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.window-content {
-  position: relative;
-}
-
-.screenshot-container {
-  position: relative;
-  width: 100%;
-  height: 620px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.screenshot {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0;
-  transition: opacity 0.8s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 80px;
-  color: white;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.7);
-}
-
-.screenshot.active {
-  opacity: 1;
-  z-index: 2; /* ↑ monte la slide active au-dessus des autres */
-}
-
-
-
-.screenshot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: 8px;
-}
-
-/* --- Affiche les icônes/texte par-dessus l'image --- */
-.screenshot-placeholder {
-  position: absolute;
-  top: 40px; /* rapproche le titre du haut */
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  z-index: 2;
-  color: #fff;
-  text-shadow: 0 3px 10px rgba(0,0,0,0.8);
-}
-
-.screenshot-placeholder-icon {
-  font-size: 3rem;
-  color: #10b981; /* vert vif */
-  margin-bottom: 10px;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
-}
-
-.screenshot::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.6) 0%,    /* assombrit le haut */
-    rgba(0, 0, 0, 0.3) 40%,
-    rgba(0, 0, 0, 0.15) 70%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  z-index: 1;
-}
-
-.screenshot-placeholder h3 {
-  font-size: 1.8rem;
-  color: #fff;
-  margin-bottom: 8px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  text-shadow: 0 3px 10px rgba(0,0,0,0.8);
-}
-
-
-.screenshot-placeholder p {
-  color: #e5e7eb;
-  font-size: 1.1rem;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-}
-
-.navigation-dots {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 10px;
-}
-
-.nav-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-text-muted);
-  opacity: 0.3;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.nav-dot.active {
-  width: 30px;
-  border-radius: 5px;
-  background: var(--color-primary);
-  opacity: 1;
-}
-
-.nav-dot:hover {
-  opacity: 0.6;
-  transform: scale(1.2);
-}
-
-/* ——— Steps Grid ——— */
-.steps-grid {
-  display: grid;
-  gap: 30px;
-  margin-top: 60px;
-}
-
-/* ——— Step Number Badge ——— */
-.step-number {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
-color: var(--color-on-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  font-weight: 800;
-  flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
-  position: relative;
-}
-
-.step-number:after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 2px solid var(--color-primary);
-  animation: pulse-ring 2s infinite;
-}
-
-/* ——— Browser Cards ——— */
-.browser-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-  margin-top: 24px;
-}
-
-.browser-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
-  padding: 24px;
-  border-radius: 12px;
-  border: 2px solid var(--color-border);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  animation: slideIn 0.5s ease forwards;
-  opacity: 0;
-}
-
-.browser-card:nth-child(1) { animation-delay: 0.1s; }
-.browser-card:nth-child(2) { animation-delay: 0.2s; }
-
-.browser-card:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.browser-card:hover:before {
-  transform: scaleX(1);
-}
-
-.browser-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--color-primary);
-  box-shadow: 0 12px 24px rgba(5, 150, 105, 0.15);
-}
-
-.browser-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.browser-icon {
-  font-size: 1.5rem;
-}
-
-.browser-card strong {
-  color: var(--color-text-dark);
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.browser-steps {
-  color: var(--color-text-medium);
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-.browser-steps code {
-  background: rgba(5, 150, 105, 0.1);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  color: var(--color-primary);
-  border: 1px solid rgba(5, 150, 105, 0.2);
-  font-weight: 600;
-  font-family: ui-monospace, 'SF Mono', monospace;
-}
-
-/* ——— Token Section ——— */
-.token-section {
-  background: linear-gradient(135deg, rgba(240, 253, 244, 0.9) 0%, rgba(236, 253, 245, 0.9) 100%);
-  backdrop-filter: blur(10px);
-  border: 2px solid var(--color-primary);
-  border-radius: 16px;
-  padding: 30px;
-  margin-top: 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.token-section:before {
-  content: '';
-  position: absolute;
-  font-size: 10rem;
-  right: -30px;
-  bottom: -30px;
-  opacity: 0.05;
-}
-
-.token-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.token-icon {
-  font-size: 1.5rem;
-  animation: float 3s ease-in-out infinite;
-}
-
-.token-label {
-  font-size: 1.1rem;
-  color: var(--color-text-dark);
-  font-weight: 700;
-}
-
-.token-display {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--color-white);
-  padding: 20px;
-  border-radius: 12px;
-  border: 2px solid rgba(5, 150, 105, 0.2);
-  transition: all 0.3s ease;
-}
-
-.token-display:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
-}
-
-.token-value {
-  flex: 1;
-  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
-  font-size: 1.05rem;
-  color: var(--color-text-medium);
-  letter-spacing: 2px;
-  user-select: all;
-  font-weight: 600;
-}
-
-.token-value.masked {
-  letter-spacing: 6px;
-  color: var(--color-text-muted);
-}
-
-.token-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.icon-btn {
-  background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-white) 100%);
-  border: 2px solid var(--color-border);
-  color: var(--color-text-medium);
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-}
-
-.icon-btn:hover {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #047857 100%);
-color: var(--color-on-primary);
-  border-color: var(--color-primary);
-  transform: scale(1.1) rotate(5deg);
-}
-
-.icon-btn.success {
-  background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
-color: var(--color-on-primary);
-  border-color: var(--color-success);
-  animation: success-pop 0.5s ease;
-}
-
-@keyframes success-pop {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-/* ——— Alerts ——— */
-.alert {
-  padding: 20px 24px;
-  border-radius: 12px;
-  margin-top: 20px;
-  font-size: 1rem;
-  display: flex;
-  align-items: start;
-  gap: 12px;
-  animation: slideInUp 0.5s ease;
-  line-height: 1.6;
-}
-
-.alert i {
-  font-size: 1.2rem;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.alert-info {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-left: 4px solid #3b82f6;
-  color: #1e40af;
-}
-
-.alert-warning {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-left: 4px solid var(--color-accent);
-  color: #92400e;
-}
-
-.alert strong {
-  font-weight: 700;
-}
-
-/* ——— Final Step ——— */
-.final-step {
-  background: linear-gradient(135deg, rgba(240, 253, 244, 0.8) 0%, rgba(236, 253, 245, 0.8) 100%);
-  border: 2px solid var(--color-primary);
-  padding: 32px;
-  border-radius: 16px;
-  margin-top: 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.final-step:before {
-  content: '🎉';
-  position: absolute;
-  font-size: 8rem;
-  right: -20px;
-  top: -20px;
-  opacity: 0.1;
-}
-
-.final-step-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.final-step-list li {
-  padding: 16px 0 16px 50px;
-  position: relative;
-  color: var(--color-text-medium);
-  font-size: 1.1rem;
-  line-height: 1.6;
-  transition: all 0.3s ease;
-}
-
-.final-step-list li:hover {
-  color: var(--color-text-dark);
-  transform: translateX(10px);
-}
-
-.final-step-list li:before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 16px;
-  width: 32px;
-  height: 32px;
-  background: var(--color-primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-}
-
-.final-step-list li:nth-child(1):before { content: "\f00c"; }
-.final-step-list li:nth-child(2):before { content: "\f00c"; }
-.final-step-list li:nth-child(3):before { content: "\f00c"; }
-
-/* ——— Divider ——— */
-.hr {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
-  margin: 32px 0;
-}
-
-/* ——— Toast Notifications ——— */
-.toast-wrap {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  z-index: 1200;
-}
-
-.toast {
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-success);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 16px 20px;
-  min-width: 320px;
-  color: var(--color-text-dark);
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: center;
-  animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: opacity 0.3s ease;
-}
-
-@keyframes toastSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.toast.error {
-  border-left-color: var(--color-danger-start);
-}
-
-.toast i {
-  width: 28px;
-  height: 28px;
-  background: var(--color-success);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 0.9rem;
-}
-
-.toast.error i {
-  background: var(--color-danger-start);
-}
-
-.toast-content {
-  flex: 1;
-}
-
-.toast .title {
-  font-weight: 700;
-  font-size: 0.95rem;
-  margin-bottom: 2px;
-}
-
-.toast .msg {
-  color: var(--color-text-medium);
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-[data-theme="dark"] .onboarding-banner {
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14) 0%, rgba(16, 185, 129, 0.08) 100%);
-  border-color: rgba(16, 185, 129, 0.24);
-}
-
-[data-theme="dark"] .secondary-btn {
-  background: rgba(15, 23, 42, 0.72);
-  border-color: var(--color-border);
-}
-
-[data-theme="dark"] .secondary-btn:hover {
-  background: rgba(5, 150, 105, 0.12);
-}
-
-[data-theme="dark"] .card-header {
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.12) 0%, rgba(5, 150, 105, 0.04) 100%);
-}
-
-[data-theme="dark"] .browser-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 41, 59, 0.78) 100%);
-}
-
-[data-theme="dark"] .browser-steps code {
-  background: rgba(16, 185, 129, 0.14);
-}
-
-[data-theme="dark"] .token-section {
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14) 0%, rgba(16, 185, 129, 0.08) 100%);
-}
-
-[data-theme="dark"] .icon-btn {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.94) 0%, rgba(15, 23, 42, 0.94) 100%);
-}
-
-[data-theme="dark"] .alert-info {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.14) 100%);
-  color: #bfdbfe;
-}
-
-[data-theme="dark"] .alert-warning {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.18) 100%);
-  color: #fde68a;
-}
-
-[data-theme="dark"] .final-step {
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.14) 0%, rgba(16, 185, 129, 0.08) 100%);
-}
-
-[data-theme="dark"] .toast {
-  box-shadow: 0 14px 28px rgba(2, 6, 23, 0.34);
-}
-
-/* ——— Responsive ——— */
-@media (max-width: 768px) {
-  .hero-section h1 {
-    font-size: 2.5rem;
-  }
-
-  .hero-section .tagline {
-    font-size: 1.1rem;
-  }
-
-  .demo-window {
-    transform: none;
-  }
-
-  .window-content {
-    padding: 20px;
-  }
-
-  .screenshot-container {
-    height: 300px;
-  }
-
-  .browser-list {
-    grid-template-columns: 1fr;
-  }
-
-  .token-display {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .token-actions {
-    justify-content: stretch;
-  }
-
-  .icon-btn {
-    flex: 1;
-  }
-
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .download-btn {
-    padding: 16px 32px;
-    font-size: 1rem;
-  }
-}
-</style>
-{% endblock %}
+{% block title %}{{ 'extension.page.meta_title'|trans }}{% endblock %}
 
 {% block body %}
-  <!-- ====== Hero Section ====== -->
-  <section class="hero-section">
-    <div class="hero-icon-wrapper">
-      <div class="icon-ring"></div>
-      <div class="hero-icon">
-        <i class="fa-solid fa-puzzle-piece"></i>
+<div class="extension-settings-page"
+     data-controller="extension-settings"
+     data-extension-settings-checking-value="{{ 'extension.page.status.checking'|trans|e('html_attr') }}"
+     data-extension-settings-installed-value="{{ 'extension.page.status.installed'|trans|e('html_attr') }}"
+     data-extension-settings-not-found-value="{{ 'extension.page.status.not_found'|trans|e('html_attr') }}"
+     data-extension-settings-ready-value="{{ 'extension.page.status.ready'|trans|e('html_attr') }}"
+     data-extension-settings-saving-value="{{ 'extension.page.status.saving'|trans|e('html_attr') }}"
+     data-extension-settings-saved-value="{{ 'extension.page.status.saved'|trans|e('html_attr') }}"
+     data-extension-settings-save-error-value="{{ 'extension.page.status.save_error'|trans|e('html_attr') }}"
+     data-extension-settings-update-required-value="{{ 'extension.page.status.update_required'|trans|e('html_attr') }}"
+     data-extension-settings-invalid-domain-value="{{ 'extension.page.configuration.exclusions.invalid'|trans|e('html_attr') }}"
+     data-extension-settings-remove-label-value="{{ 'extension.page.configuration.exclusions.remove'|trans|e('html_attr') }}">
+
+  <section class="extension-download-card" aria-labelledby="extension-page-title">
+    <div class="extension-download-card__content">
+      <span class="extension-kicker">
+        <span class="extension-kicker__dot"></span>
+        {{ 'extension.page.hero.eyebrow'|trans }}
+      </span>
+
+      <h1 id="extension-page-title">{{ 'extension.page.hero.title'|trans }}</h1>
+      <p>{{ 'extension.page.hero.tagline'|trans }}</p>
+
+      <div class="extension-download-card__actions">
+        <a href="{{ chromeWebStoreUrl }}" target="_blank" rel="noopener" class="extension-download-button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
+            <path d="M5 20h14" />
+          </svg>
+          {{ 'extension.page.hero.download'|trans }}
+        </a>
+
+        <span class="extension-detection-status" data-extension-settings-target="detection" aria-live="polite">
+          <span class="extension-detection-status__pulse"></span>
+          <span data-extension-settings-target="detectionLabel">{{ 'extension.page.status.checking'|trans }}</span>
+        </span>
       </div>
+
+      <small class="extension-download-card__note">{{ 'extension.page.hero.store_note'|trans }}</small>
     </div>
 
-    <h1>{{ 'extension.page.hero.title'|trans }}</h1>
-    {% if isOnboarding %}
-      <div class="onboarding-banner">
-        <h2><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i> Installation recommandee</h2>
-        <p>Votre compte est pret. Installez maintenant l extension Chrome MYKEYNEST puis revenez ici: votre token est deja disponible et peut etre copie automatiquement.</p>
+    <div class="extension-download-visual" aria-hidden="true">
+      <div class="extension-browser-shell">
+        <div class="extension-browser-shell__bar">
+          <span></span><span></span><span></span>
+          <div class="extension-browser-shell__address"></div>
+          <div class="extension-browser-shell__toolbar-mark">
+            {% include 'components/parts/_dot_mark.html.twig' with { extraClass: 'mkn-dotmark--extension' } only %}
+          </div>
+        </div>
+        <div class="extension-browser-shell__body">
+          <div class="extension-browser-shell__copy">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="extension-browser-shell__popup">
+            <div class="extension-browser-shell__popup-head">
+              {% include 'components/parts/_dot_mark.html.twig' with { extraClass: 'mkn-dotmark--extension-popup' } only %}
+              <strong>MYKEYNEST</strong>
+            </div>
+            <div class="extension-browser-shell__credential"><i></i><span></span></div>
+            <div class="extension-browser-shell__credential"><i></i><span></span></div>
+            <div class="extension-browser-shell__button"></div>
+          </div>
+        </div>
       </div>
-    {% endif %}
-
-    <p class="tagline">{{ 'extension.page.hero.tagline'|trans }}</p>
-
-    <div class="hero-actions">
-      <a href="{{ chromeWebStoreUrl }}" target="_blank" rel="noopener" class="download-btn">
-        <i class="fa-solid fa-download"></i>
-        {{ 'extension.page.hero.download'|trans }}
-      </a>
-
-      {% if isOnboarding %}
-        <a href="{{ path('app_credential') }}" class="secondary-btn">
-          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-          Passer a l application
-        </a>
-      {% endif %}
     </div>
   </section>
 
-    
-  <!-- ====== Steps Grid ====== -->
-  <div class="steps-grid">
-    <!-- Step 2 -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-number">1</div>
-        <div class="card-icon"><i class="fa-solid fa-key"></i></div>
-        <div class="card-title">
-          <h2>{{ 'extension.page.cards.api_key.title'|trans }}</h2>
-          <div class="helper">{{ 'extension.page.cards.api_key.helper'|trans }}</div>
-        </div>
+  <section class="extension-configuration" data-extension-settings-target="configuration" hidden aria-labelledby="extension-configuration-title">
+    <div class="extension-configuration__header">
+      <div>
+        <span class="extension-section-label">{{ 'extension.page.configuration.eyebrow'|trans }}</span>
+        <h2 id="extension-configuration-title">{{ 'extension.page.configuration.title'|trans }}</h2>
+        <p>{{ 'extension.page.configuration.subtitle'|trans }}</p>
       </div>
 
-      <div class="card-body" id="app-key">
-        <p style="color: var(--color-text-medium); margin-bottom: var(--spacing-lg); line-height: 1.6;">
-          {{ 'extension.page.cards.api_key.intro'|trans }}
-        </p>
-
-        <div class="token-section"
-             data-toast-success-title="{{ 'extension.page.toast.success_title'|trans|e('html_attr') }}"
-             data-toast-error-title="{{ 'extension.page.toast.error_title'|trans|e('html_attr') }}"
-             data-toast-copy-success="{{ 'extension.page.toast.copy_success'|trans|e('html_attr') }}"
-             data-toast-copy-error="{{ 'extension.page.toast.copy_error'|trans|e('html_attr') }}"
-             data-sim-close="{{ 'extension.page.toast.sim_close'|trans|e('html_attr') }}"
-             data-sim-minimize="{{ 'extension.page.toast.sim_minimize'|trans|e('html_attr') }}"
-             data-sim-fullscreen="{{ 'extension.page.toast.sim_fullscreen'|trans|e('html_attr') }}">
-
-          <div class="token-header">
-            <i class="fa-solid fa-shield-halved token-icon"></i>
-            <span class="token-label">{{ 'extension.page.cards.api_key.label'|trans }}</span>
-          </div>
-
-          <div class="token-display" {% if autoCopyToken %}data-autocopy="1"{% endif %}>
-            <div class="token-value masked" id="tokenValue" data-token="{{ extentiotoken }}">
-              ••••••••••••••••••••••••••••••••
-            </div>
-
-            <div class="token-actions">
-              <button class="icon-btn js-toggle-token"
-                      type="button"
-                      title="{{ 'extension.page.cards.api_key.buttons.toggle'|trans }}">
-                <i class="fa-solid fa-eye"></i>
-              </button>
-
-              <button class="icon-btn js-copy-token"
-                      type="button"
-                      title="{{ 'extension.page.cards.api_key.buttons.copy'|trans }}">
-                <i class="fa-solid fa-copy"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="alert alert-warning" style="margin-top: 20px;">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <div>
-              <strong>{{ 'extension.page.cards.api_key.warning.title'|trans }}</strong>
-              {{ 'extension.page.cards.api_key.warning.text'|trans }}
-            </div>
-          </div>
-        </div>
+      <div class="extension-installation-chip">
+        <span class="extension-installation-chip__check">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m5 10 3 3 7-7" /></svg>
+        </span>
+        <span>
+          <strong>{{ 'extension.page.configuration.connected'|trans }}</strong>
+          <small data-extension-settings-target="version">MYKEYNEST</small>
+        </span>
       </div>
     </div>
 
-    <!-- Step 3 -->
-    <div class="card">
-      <div class="card-header">
-        <div class="step-number">2</div>
-        <div class="card-icon"><i class="fa-solid fa-check-circle"></i></div>
-        <div class="card-title">
-          <h2>{{ 'extension.page.cards.configure.title'|trans }}</h2>
-          <div class="helper">{{ 'extension.page.cards.configure.helper'|trans }}</div>
-        </div>
+    <div class="extension-mode-grid" role="radiogroup" aria-label="{{ 'extension.page.configuration.aria'|trans }}">
+      <label class="extension-mode-card" data-extension-settings-target="card">
+        <input type="radio" name="extension-display-mode" value="default"
+               data-extension-settings-target="mode"
+               data-action="change->extension-settings#selectMode">
+        <span class="extension-mode-card__selector" aria-hidden="true"><i></i></span>
+        <span class="extension-mode-card__badge">{{ 'extension.page.configuration.recommended'|trans }}</span>
+        <span class="extension-mode-card__copy">
+          <strong>{{ 'extension.page.configuration.modes.default.title'|trans }}</strong>
+          <small>{{ 'extension.page.configuration.modes.default.description'|trans }}</small>
+        </span>
+
+        <span class="extension-preview extension-preview--default" aria-hidden="true">
+          <span class="extension-preview__browser-bar"><i></i><i></i><i></i><b></b></span>
+          <span class="extension-preview__page-lines"><i></i><i></i><i></i></span>
+          <span class="extension-preview__popup"><b><img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt=""></b><i></i><i></i><em></em></span>
+        </span>
+      </label>
+
+      <label class="extension-mode-card" data-extension-settings-target="card">
+        <input type="radio" name="extension-display-mode" value="inline"
+               data-extension-settings-target="mode"
+               data-action="change->extension-settings#selectMode">
+        <span class="extension-mode-card__selector" aria-hidden="true"><i></i></span>
+        <span class="extension-mode-card__copy">
+          <strong>{{ 'extension.page.configuration.modes.inline.title'|trans }}</strong>
+          <small>{{ 'extension.page.configuration.modes.inline.description'|trans }}</small>
+        </span>
+
+        <span class="extension-preview extension-preview--inline" aria-hidden="true">
+          <span class="extension-preview__browser-bar"><i></i><i></i><i></i><b></b></span>
+          <span class="extension-preview__form">
+            <i></i><i class="is-focused"><b><img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt=""></b></i>
+            <em><b><img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt=""></b><span></span><strong>&rarr;</strong></em>
+          </span>
+        </span>
+      </label>
+
+      <label class="extension-mode-card" data-extension-settings-target="card">
+        <input type="radio" name="extension-display-mode" value="off"
+               data-extension-settings-target="mode"
+               data-action="change->extension-settings#selectMode">
+        <span class="extension-mode-card__selector" aria-hidden="true"><i></i></span>
+        <span class="extension-mode-card__copy">
+          <strong>{{ 'extension.page.configuration.modes.off.title'|trans }}</strong>
+          <small>{{ 'extension.page.configuration.modes.off.description'|trans }}</small>
+        </span>
+
+        <span class="extension-preview extension-preview--off" aria-hidden="true">
+          <span class="extension-preview__browser-bar"><i></i><i></i><i></i><b></b></span>
+          <span class="extension-preview__quiet-page"><i></i><i></i><i></i></span>
+          <span class="extension-preview__quiet-badge"><b><img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt=""></b><i></i></span>
+        </span>
+      </label>
+    </div>
+
+    <div class="extension-order-panel">
+      <div class="extension-order-panel__intro">
+        <span class="extension-order-panel__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M8 6h12M8 12h9M8 18h6M4 5v14m0 0-2.5-2.5M4 19l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>
+          <strong>{{ 'extension.page.configuration.order.title'|trans }}</strong>
+          <small>{{ 'extension.page.configuration.order.description'|trans }}</small>
+        </span>
       </div>
 
-      <div class="card-body">
-        <p style="color: var(--color-text-medium); margin-bottom: var(--spacing-lg); line-height: 1.6;">
-          {{ 'extension.page.cards.configure.intro'|trans }}
-        </p>
-
-        <div class="final-step">
-          <ul class="final-step-list">
-            <li>{{ 'extension.page.cards.configure.list.l1'|trans }}</li>
-            <li>{{ 'extension.page.cards.configure.list.l2'|trans }}</li>
-            <li>{{ 'extension.page.cards.configure.list.l3'|trans }}</li>
-          </ul>
-        </div>
-
-        <div class="hr"></div>
-
-        <div style="text-align: center; padding: var(--spacing-lg) 0;">
-          <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%); border-radius: 12px; border: 2px dashed var(--color-primary);">
-            <i class="fa-solid fa-rocket" style="font-size: 1.5rem; color: var(--color-primary);"></i>
-            <span style="font-weight: 700; color: var(--color-text-dark); font-size: 1.1rem;">
-              {{ 'extension.page.cards.configure.ready'|trans }}
+      <div class="extension-order-options" role="radiogroup" aria-label="{{ 'extension.page.configuration.order.aria'|trans }}">
+        {% for mode in ['recent', 'domain', 'custom'] %}
+          <label class="extension-order-option" data-extension-settings-target="sortCard">
+            <input type="radio" name="extension-sort-mode" value="{{ mode }}"
+                   data-extension-settings-target="sort"
+                   data-action="change->extension-settings#selectSort">
+            <span class="extension-order-option__visual extension-order-option__visual--{{ mode }}" aria-hidden="true">
+              <i></i><i></i><i></i>
             </span>
-          </div>
-        </div>
+            <span>
+              <strong>{{ ('extension.page.configuration.order.modes.' ~ mode ~ '.title')|trans }}</strong>
+              <small>{{ ('extension.page.configuration.order.modes.' ~ mode ~ '.description')|trans }}</small>
+            </span>
+            <span class="extension-order-option__check" aria-hidden="true">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><path d="m4.5 9 3 3 6-6"/></svg>
+            </span>
+          </label>
+        {% endfor %}
       </div>
+
+      <p class="extension-order-panel__hint">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 5h9M7 10h9M7 15h9M3.5 5h.01M3.5 10h.01M3.5 15h.01" stroke-linecap="round"/></svg>
+        {{ 'extension.page.configuration.order.custom_hint'|trans }}
+      </p>
     </div>
 
-  </div>
-
-
-
-<!-- Toast Container -->
-<div class="toast-wrap" id="toastWrap"></div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // =========================================================
-  // I18N (strings depuis data-* sur .token-section)
-  // =========================================================
-  const tokenSection = document.querySelector('.token-section');
-  const i18n = {
-    toastSuccessTitle: tokenSection?.dataset.toastSuccessTitle || 'Success',
-    toastErrorTitle: tokenSection?.dataset.toastErrorTitle || 'Error',
-    copySuccess: tokenSection?.dataset.toastCopySuccess || 'Copied!',
-    copyError: tokenSection?.dataset.toastCopyError || 'Copy failed',
-    simClose: tokenSection?.dataset.simClose || 'Simulated close',
-    simMinimize: tokenSection?.dataset.simMinimize || 'Simulated minimize',
-    simFullscreen: tokenSection?.dataset.simFullscreen || 'Simulated fullscreen'
-  };
-
-  // =========================================================
-  // Toast Notifications
-  // =========================================================
-  function showToast(message, type = 'success') {
-    const toastWrap = document.getElementById('toastWrap');
-    if (!toastWrap) return;
-
-    // Supprimer les anciens toasts
-    toastWrap.querySelectorAll('.toast').forEach(t => t.remove());
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-
-    const icon = type === 'success'
-      ? '<i class="fa-solid fa-check"></i>'
-      : '<i class="fa-solid fa-xmark"></i>';
-
-    const title = type === 'success' ? i18n.toastSuccessTitle : i18n.toastErrorTitle;
-
-    toast.innerHTML = `
-      ${icon}
-      <div class="toast-content">
-        <div class="title">${title}</div>
-        <div class="msg">${message}</div>
+    <div class="extension-exclusions-panel">
+      <div class="extension-exclusions-panel__intro">
+        <span class="extension-order-panel__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.4 3.3 5.4 3.3 9S14.2 18.6 12 21M12 3C9.8 5.4 8.7 8.4 8.7 12s1.1 6.6 3.3 9"/>
+          </svg>
+        </span>
+        <span>
+          <strong>{{ 'extension.page.configuration.exclusions.title'|trans }}</strong>
+          <small>{{ 'extension.page.configuration.exclusions.description'|trans }}</small>
+        </span>
       </div>
-    `;
 
-    toastWrap.appendChild(toast);
+      <form class="extension-exclusions-form" data-action="submit->extension-settings#addExclusion">
+        <label class="sr-only" for="extension-excluded-domain">{{ 'extension.page.configuration.exclusions.label'|trans }}</label>
+        <input id="extension-excluded-domain"
+               type="text"
+               inputmode="url"
+               autocomplete="off"
+               placeholder="{{ 'extension.page.configuration.exclusions.placeholder'|trans }}"
+               data-extension-settings-target="exclusionInput">
+        <button type="submit" data-extension-settings-target="exclusionSubmit">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+          {{ 'extension.page.configuration.exclusions.add'|trans }}
+        </button>
+      </form>
 
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
+      <div class="extension-exclusions-list" data-extension-settings-target="exclusionsList"></div>
+      <p class="extension-exclusions-empty" data-extension-settings-target="exclusionsEmpty">
+        {{ 'extension.page.configuration.exclusions.empty'|trans }}
+      </p>
+      <p class="extension-exclusions-note">{{ 'extension.page.configuration.exclusions.note'|trans }}</p>
+    </div>
 
-  // =========================================================
-  // Token Management (Afficher/Masquer + Copier)
-  // =========================================================
-  let isTokenVisible = false;
-
-  function toggleToken(button) {
-    const tokenElement = document.getElementById('tokenValue');
-    if (!tokenElement) return;
-
-    const actualToken = tokenElement.getAttribute('data-token') || '';
-    const eyeIcon = button?.querySelector('i');
-
-    if (isTokenVisible) {
-      tokenElement.textContent = '••••••••••••••••••••••••••••••••';
-      tokenElement.classList.add('masked');
-      if (eyeIcon) eyeIcon.className = 'fa-solid fa-eye';
-    } else {
-      tokenElement.textContent = actualToken;
-      tokenElement.classList.remove('masked');
-      if (eyeIcon) eyeIcon.className = 'fa-solid fa-eye-slash';
-    }
-
-    isTokenVisible = !isTokenVisible;
-  }
-
-  function copyToken(button) {
-    const tokenElement = document.getElementById('tokenValue');
-    if (!tokenElement) return;
-
-    const actualToken = tokenElement.getAttribute('data-token') || '';
-    const copyIcon = button?.querySelector('i');
-
-    if (!actualToken) {
-      showToast(i18n.copyError, 'error');
-      return;
-    }
-
-    navigator.clipboard.writeText(actualToken).then(() => {
-      if (copyIcon) copyIcon.className = 'fa-solid fa-check';
-      if (button) button.classList.add('success');
-
-      showToast(i18n.copySuccess, 'success');
-
-      setTimeout(() => {
-        if (copyIcon) copyIcon.className = 'fa-solid fa-copy';
-        if (button) button.classList.remove('success');
-      }, 2000);
-    }).catch(err => {
-      console.error('Copy error:', err);
-      showToast(i18n.copyError, 'error');
-    });
-  }
-
-  // Bind buttons (tes boutons Twig doivent avoir ces classes)
-  const toggleBtn = document.querySelector('.js-toggle-token');
-  const copyBtn = document.querySelector('.js-copy-token');
-
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', function () {
-      toggleToken(this);
-    });
-  }
-
-  if (copyBtn) {
-    copyBtn.addEventListener('click', function () {
-      copyToken(this);
-    });
-  }
-
-  const autoCopyEnabled = document.querySelector('.token-display')?.dataset.autocopy === '1';
-  if (autoCopyEnabled && copyBtn) {
-    setTimeout(() => {
-      copyToken(copyBtn);
-    }, 700);
-  }
-
-  // =========================================================
-  // Screenshot Carousel
-  // =========================================================
-  let currentStep = 1;
-  const totalSteps = 3;
-
-  function showScreenshot(step) {
-    document.querySelectorAll('.screenshot').forEach(s => s.classList.remove('active'));
-    document.querySelector(`.screenshot[data-step="${step}"]`)?.classList.add('active');
-
-    document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
-    document.querySelector(`.nav-dot[data-step="${step}"]`)?.classList.add('active');
-
-    currentStep = step;
-  }
-
-  // Navigation par clic sur les dots
-  document.querySelectorAll('.nav-dot').forEach(dot => {
-    dot.addEventListener('click', function () {
-      const step = parseInt(this.getAttribute('data-step'), 10);
-      if (!Number.isNaN(step)) showScreenshot(step);
-    });
-  });
-
-  // Navigation automatique
-  let autoPlayInterval = setInterval(() => {
-    let nextStep = currentStep + 1;
-    if (nextStep > totalSteps) nextStep = 1;
-    showScreenshot(nextStep);
-  }, 5000);
-
-  // Pause au survol
-  const demoWindow = document.querySelector('.demo-window');
-  if (demoWindow) {
-    demoWindow.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
-    demoWindow.addEventListener('mouseleave', () => {
-      autoPlayInterval = setInterval(() => {
-        let nextStep = currentStep + 1;
-        if (nextStep > totalSteps) nextStep = 1;
-        showScreenshot(nextStep);
-      }, 5000);
-    });
-  }
-
-  // Navigation au clavier (optionnel : seulement si on n’est pas dans un input)
-  document.addEventListener('keydown', (e) => {
-    const tag = document.activeElement?.tagName?.toLowerCase();
-    if (tag === 'input' || tag === 'textarea') return;
-
-    if (e.key === 'ArrowLeft') {
-      let prevStep = currentStep - 1;
-      if (prevStep < 1) prevStep = totalSteps;
-      showScreenshot(prevStep);
-    } else if (e.key === 'ArrowRight') {
-      let nextStep = currentStep + 1;
-      if (nextStep > totalSteps) nextStep = 1;
-      showScreenshot(nextStep);
-    }
-  });
-
-  // =========================================================
-  // Scroll Animations (IntersectionObserver)
-  // =========================================================
-  const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-      }
-    });
-  }, observerOptions);
-
-  document.querySelectorAll('.card').forEach(card => observer.observe(card));
-
-  // =========================================================
-  // Parallax Effect sur l’icône hero
-  // =========================================================
-  document.addEventListener('mousemove', (e) => {
-    const heroIcon = document.querySelector('.hero-icon');
-    if (heroIcon && window.innerWidth > 768) {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
-      heroIcon.style.transform = `translate(${x}px, ${y}px)`;
-    }
-  });
-
-  // =========================================================
-  // Window Dots Interaction (avec i18n)
-  // =========================================================
-  document.querySelectorAll('.window-dot').forEach(dot => {
-    dot.addEventListener('click', function () {
-      if (this.classList.contains('dot-red')) {
-        showToast(i18n.simClose, 'error');
-      } else if (this.classList.contains('dot-yellow')) {
-        showToast(i18n.simMinimize, 'success');
-      } else if (this.classList.contains('dot-green')) {
-        showToast(i18n.simFullscreen, 'success');
-      }
-    });
-  });
-
-  // =========================================================
-  // Smooth Scroll to Steps (optionnel, tu peux décommenter)
-  // =========================================================
-  const downloadBtn = document.querySelector('.download-btn');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', function (e) {
-      // Si tu veux un scroll vers les étapes au lieu du téléchargement:
-      /*
-      e.preventDefault();
-      const stepsGrid = document.querySelector('.steps-grid');
-      if (stepsGrid) {
-        stepsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      */
-    });
-  }
-
-  // =========================================================
-  // Browser Cards Animation Stagger
-  // =========================================================
-  document.querySelectorAll('.browser-card').forEach((card, index) => {
-    card.style.animationDelay = `${index * 0.1}s`;
-  });
-
-  // =========================================================
-  // Hover effect sur les items finaux
-  // =========================================================
-  document.querySelectorAll('.final-step-list li').forEach(item => {
-    item.addEventListener('mouseenter', function () {
-      this.style.paddingLeft = '60px';
-    });
-    item.addEventListener('mouseleave', function () {
-      this.style.paddingLeft = '50px';
-    });
-  });
-});
-</script>
+    <div class="extension-configuration__footer">
+      <span class="extension-save-status" data-extension-settings-target="feedback" aria-live="polite">
+        {{ 'extension.page.status.ready'|trans }}
+      </span>
+      <span>{{ 'extension.page.configuration.local_note'|trans }}</span>
+    </div>
+  </section>
+</div>
 {% endblock %}
