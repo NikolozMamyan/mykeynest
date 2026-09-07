@@ -12,6 +12,7 @@ use App\Repository\UserRepository;
 use App\Service\EncryptionService;
 use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialManager;
+use App\Service\CredentialUrlPolicy;
 use App\Service\ExtensionClientManager;
 use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,6 +33,7 @@ final class ApiSharedController extends AbstractController
         private CredentialAccessPolicy $credentialAccessPolicy,
         private CredentialManager $credentialManager,
         private SubscriptionPlanService $subscriptionPlans,
+        private CredentialUrlPolicy $credentialUrls,
     ) {
     }
 
@@ -173,7 +175,8 @@ final class ApiSharedController extends AbstractController
 
         return $credentialDomain === $domain
             || str_ends_with($domain, '.' . $credentialDomain)
-            || str_ends_with($credentialDomain, '.' . $domain);
+            || str_ends_with($credentialDomain, '.' . $domain)
+            || ($domain !== '' && $this->credentialUrls->hostname($credential->getLoginUrl()) === $domain);
     }
 
     /**
@@ -353,6 +356,7 @@ final class ApiSharedController extends AbstractController
         $credentialPayload = fn(Credential $credential) => [
             'id' => $credential->getId(),
             'domain' => $credential->getDomain(),
+            'loginUrl' => $credential->getLoginUrl(),
             'username' => $credential->getUsername(),
             'name' => $credential->getName(),
             'createdAt' => $credential->getCreatedAt()?->format(DATE_ATOM),
@@ -402,6 +406,7 @@ final class ApiSharedController extends AbstractController
         );
 
         return $this->withInstallationToken($this->json([
+            'userId' => $user->getId(),
             'credentials' => $resultCredentials,
             'sharedAccess' => $resultSharedAccess,
             'teamSharedAccess' => $resultTeamSharedAccess,
@@ -429,6 +434,47 @@ final class ApiSharedController extends AbstractController
         return $this->credentialSecretResponse($id, $credentialRepository, $auth, true);
     }
 
+    #[Route('/extention/api/credentials/{id}/launch', name: 'api_credential_launch', methods: ['POST', 'OPTIONS'])]
+    public function launch(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
+    {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
+
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized();
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
+
+        $payload = json_decode($request->getContent(), true);
+        if (!is_array($payload) || !is_int($payload['userId'] ?? null) || $payload['userId'] !== $auth['user']->getId()) {
+            return $this->withInstallationToken($this->json(['code' => 'extension_account_mismatch'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
+        }
+
+        $credential = $credentialRepository->find($id);
+        if (!$credential instanceof Credential || !$this->credentialAccessPolicy->canAccess($auth['user'], $credential)) {
+            return $this->withInstallationToken($this->json(['code' => 'credential_access_denied'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
+        }
+
+        $url = $this->credentialUrls->normalize(is_string($payload['url'] ?? null) ? $payload['url'] : null);
+        if ($url === null || !$this->credentialUrls->allows($credential, $url)) {
+            return $this->withInstallationToken($this->json(['code' => 'credential_domain_mismatch'], Response::HTTP_UNPROCESSABLE_ENTITY), $auth['issuedInstallationToken']);
+        }
+
+        return $this->withInstallationToken($this->json([
+            'id' => $credential->getId(),
+            'username' => $credential->getUsername(),
+            'url' => $url,
+            'userId' => $auth['user']->getId(),
+        ]), $auth['issuedInstallationToken']);
+    }
+
     #[Route('/extention/api/credentials/{id}/autofill', name: 'api_credential_autofill', methods: ['POST', 'OPTIONS'])]
     public function autofill(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
     {
@@ -451,6 +497,13 @@ final class ApiSharedController extends AbstractController
             $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             return $this->badRequest('Corps JSON invalide');
+        }
+
+        if (!is_array($payload)) {
+            return $this->badRequest('Corps JSON invalide');
+        }
+        if (isset($payload['userId']) && $payload['userId'] !== $auth['user']->getId()) {
+            return $this->withInstallationToken($this->json(['code' => 'extension_account_mismatch'], Response::HTTP_CONFLICT), $auth['issuedInstallationToken']);
         }
 
         $domain = isset($payload['domain']) && is_string($payload['domain'])
@@ -733,6 +786,7 @@ final class ApiSharedController extends AbstractController
 
         return $this->withInstallationToken($this->json([
             'id' => $credential->getId(),
+            'username' => $credential->getUsername(),
             'password' => $password,
         ]), $auth['issuedInstallationToken']);
     }

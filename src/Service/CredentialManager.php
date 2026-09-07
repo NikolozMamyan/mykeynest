@@ -86,6 +86,13 @@ public function update(Credential $credential, string $decryptedPassword, string
 }
 
 
+    public function updateLoginUrl(Credential $credential, ?string $url): void
+    {
+        $credential->setLoginUrl($url);
+        $credential->setUpdatedAt(new \DateTimeImmutable());
+        $this->entityManager->flush();
+    }
+
     /**
      * Supprime un identifiant.
      */

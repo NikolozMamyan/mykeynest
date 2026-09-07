@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -28,6 +29,12 @@ class CredentialType extends AbstractType
             ->add('domain', TextType::class, [
                 'label' => 'Domaine',
                 'attr' => ['placeholder' => 'Ex : facebook.com'],
+            ])
+            ->add('loginUrl', UrlType::class, [
+                'label' => 'credential.index.launch.url_label',
+                'required' => false,
+                'default_protocol' => 'https',
+                'attr' => ['placeholder' => 'https://exemple.com/login', 'maxlength' => 2048],
             ])
             ->add('username', TextType::class, [
                 'label' => "Nom d'utilisateur",

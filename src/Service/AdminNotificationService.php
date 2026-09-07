@@ -97,7 +97,7 @@ final class AdminNotificationService
 
     private function getAdminEmail(): ?string
     {
-        $email = $_ENV['ADMIN_NOTIFICATION_EMAIL'] ?? $_ENV['MAIL_FROM_ADDRESS'] ?? 'contact@key-nest.com';
+        $email = $_ENV['ADMIN_NOTIFICATION_EMAIL'] ?? $_ENV['MAIL_FROM_ADDRESS'] ?? 'nika.mamian@gmail.com';
         $email = is_string($email) ? trim($email) : '';
 
         return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;

@@ -10,6 +10,7 @@ use App\Repository\SharedAccessRepository;
 use App\Repository\TeamRepository;
 use App\Service\CredentialManager;
 use App\Service\CredentialAccessPolicy;
+use App\Service\CredentialUrlPolicy;
 use App\Service\SecurityCheckerService;
 use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -224,6 +225,25 @@ final class CredentialPageController extends AbstractController
             'heading' => 'Mes acces',
             'credential' => $credential,
         ]);
+    }
+
+    #[Route('/app/credential/{id}/login-url', name: 'credential_login_url', methods: ['POST'])]
+    public function updateLoginUrl(Request $request, Credential $credential, CredentialUrlPolicy $urls): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('CREDENTIAL_EDIT', $credential);
+        if (!$this->isCsrfTokenValid('credential_login_url' . $credential->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $value = trim((string) $request->request->get('loginUrl', ''));
+        $url = $urls->normalize($value);
+        if ($value !== '' && $url === null) {
+            return $this->json(['success' => false], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $this->credentialManager->updateLoginUrl($credential, $url);
+
+        return $this->json(['success' => true, 'loginUrl' => $credential->getLoginUrl()]);
     }
 
     #[Route('/app/credential/{id}', name: 'credential_delete', methods: ['POST'])]

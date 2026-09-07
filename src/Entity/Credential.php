@@ -29,6 +29,12 @@ class Credential
     #[Assert\NotBlank(message: 'Le domaine est obligatoire')]
     private ?string $domain = null;
 
+    #[ORM\Column(length: 2048, nullable: true)]
+    #[Assert\Length(max: 2048)]
+    #[Assert\Url(protocols: ['https', 'http'], requireTld: false)]
+    #[Assert\Regex(pattern: '~^https?://[^/@\\\\\s]+(?:[/?#][^\\\\\s]*)?$~i')]
+    private ?string $loginUrl = null;
+
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le nom d\'utilisateur est obligatoire')]
     private ?string $username = null;
@@ -103,6 +109,18 @@ private ?int $pinPosition = null;
     public function getUsername(): ?string
     {
         return $this->username;
+    }
+
+    public function getLoginUrl(): ?string
+    {
+        return $this->loginUrl;
+    }
+
+    public function setLoginUrl(?string $loginUrl): static
+    {
+        $this->loginUrl = $loginUrl !== null && trim($loginUrl) !== '' ? trim($loginUrl) : null;
+
+        return $this;
     }
 
     public function setUsername(string $username): static
