@@ -472,6 +472,8 @@ final class ApiSharedController extends AbstractController
             'username' => $credential->getUsername(),
             'url' => $url,
             'userId' => $auth['user']->getId(),
+            'submitAfterFill' => !$this->credentialAccessPolicy->canRevealPassword($auth['user'], $credential),
+            'allowSubdomains' => $credential->getLoginUrl() === null,
         ]), $auth['issuedInstallationToken']);
     }
 

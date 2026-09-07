@@ -25,6 +25,7 @@ final class CredentialUrlPolicyTest extends TestCase
         return [
             ['javascript:alert(1)'],
             ['data:text/html,test'],
+            ['http://example.com/login'],
             ['https://user:password@example.com/login'],
             ['https://example.com\\@evil.test'],
             ["https://example.com/\nlogin"],
@@ -32,18 +33,35 @@ final class CredentialUrlPolicyTest extends TestCase
         ];
     }
 
-    public function testDomainAndExplicitSignInHostAreAllowedWithoutLookalikes(): void
+    public function testOnlyTheSavedSignInOriginIsAllowedWhenConfigured(): void
     {
         $urls = new CredentialUrlPolicy();
         $credential = (new Credential())->setDomain('example.com')->setLoginUrl('https://accounts.example.net/login');
         self::assertSame('https://example.com/login', $urls->normalize(' example.com/login '));
-        self::assertTrue($urls->allows($credential, 'https://www.example.com/login'));
-        self::assertTrue($urls->allows($credential, 'https://login.example.com/'));
         self::assertTrue($urls->allows($credential, 'https://accounts.example.net/step-two'));
+        self::assertTrue($urls->allows($credential, 'https://accounts.example.net:443/step-two'));
+        self::assertFalse($urls->allows($credential, 'https://example.com/login'));
+        self::assertFalse($urls->allows($credential, 'https://login.example.com/'));
         self::assertFalse($urls->allows($credential, 'https://example.com.evil.test'));
         self::assertFalse($urls->allows($credential, 'https://evil-example.com'));
         self::assertFalse($urls->allows($credential, 'http://accounts.example.net/'));
         self::assertFalse($urls->allows($credential, 'https://accounts.example.net:444/'));
+    }
+
+    public function testLegacyCredentialDomainAllowsSameSiteHttpsAndLocalDevelopment(): void
+    {
+        $urls = new CredentialUrlPolicy();
+        $credential = (new Credential())->setDomain('example.com');
+        self::assertTrue($urls->allows($credential, 'https://example.com/login'));
+        self::assertTrue($urls->allows($credential, 'https://www.example.com/login'));
+        self::assertTrue($urls->allows($credential, 'https://login.example.com/'));
+        self::assertFalse($urls->allows($credential, 'http://example.com/login'));
+        self::assertFalse($urls->allows($credential, 'https://example.com:444/login'));
+
+        $local = (new Credential())->setDomain('127.0.0.1:3000');
+        self::assertSame('http://127.0.0.1:3000/login', $urls->normalize('http://127.0.0.1:3000/login'));
+        self::assertTrue($urls->allows($local, 'http://127.0.0.1:3000/login'));
+        self::assertSame('http://localhost:8000/login', $urls->normalize('http://localhost:8000/login'));
     }
 
     public function testSavingAndClearingTheUrlPreserveTheEncryptedPassword(): void

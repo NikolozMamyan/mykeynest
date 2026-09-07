@@ -32,7 +32,7 @@ class Credential
     #[ORM\Column(length: 2048, nullable: true)]
     #[Assert\Length(max: 2048)]
     #[Assert\Url(protocols: ['https', 'http'], requireTld: false)]
-    #[Assert\Regex(pattern: '~^https?://[^/@\\\\\s]+(?:[/?#][^\\\\\s]*)?$~i')]
+    #[Assert\Regex(pattern: '~^(?:https://[^/@\\\\\s]+|http://(?:localhost|127\.0\.0\.1|\[::1\])(?::\d{1,5})?)(?:[/?#][^\\\\\s]*)?$~i')]
     private ?string $loginUrl = null;
 
     #[ORM\Column(length: 255)]

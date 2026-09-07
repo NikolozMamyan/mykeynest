@@ -19,9 +19,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class CredentialLaunchControllerTest extends KernelTestCase
 {
     /** @dataProvider launchCases */
-    public function testLaunchChecksAccountAccessAndDestination(int $expectedUser, bool $shared, string $url, int $status): void
+    public function testLaunchChecksAccountAccessDestinationAndSubmissionMode(int $expectedUser, bool $shared, bool $canRevealPassword, string $url, int $status, ?bool $submitAfterFill): void
     {
-        [$controller, $repository] = $this->controller($shared);
+        [$controller, $repository] = $this->controller($shared, $canRevealPassword);
         $response = $controller->launch($this->request(['userId' => $expectedUser, 'url' => $url]), 10, $repository);
         self::assertSame($status, $response->getStatusCode(), (string) $response->getContent());
         $data = json_decode((string) $response->getContent(), true);
@@ -29,17 +29,20 @@ final class CredentialLaunchControllerTest extends KernelTestCase
         if ($status === 200) {
             self::assertSame(10, $data['id']);
             self::assertSame('selected@example.test', $data['username']);
+            self::assertSame($submitAfterFill, $data['submitAfterFill']);
+            self::assertFalse($data['allowSubdomains']);
         }
     }
 
     public static function launchCases(): array
     {
         return [
-            'wrong MYKEYNEST account' => [2, true, 'https://example.com/login', 409],
-            'revoked access' => [1, false, 'https://example.com/login', 404],
-            'unrelated host' => [1, true, 'https://evil.test/login', 422],
-            'connection-only share' => [1, true, 'https://example.com/login', 200],
-            'saved sign-in host' => [1, true, 'https://accounts.example.net/login', 200],
+            'wrong MYKEYNEST account' => [2, true, false, 'https://accounts.example.net/login', 409, null],
+            'revoked access' => [1, false, false, 'https://accounts.example.net/login', 404, null],
+            'unrelated host' => [1, true, false, 'https://evil.test/login', 422, null],
+            'connection-only share' => [1, true, false, 'https://accounts.example.net/login', 200, true],
+            'full-access share' => [1, true, true, 'https://accounts.example.net/login', 200, false],
+            'credential domain is not used when a sign-in URL exists' => [1, true, false, 'https://example.com/login', 422, null],
         ];
     }
 
@@ -55,10 +58,12 @@ final class CredentialLaunchControllerTest extends KernelTestCase
         self::assertSame('selected@example.test', $data['username']);
     }
 
-    private function controller(bool $shared): array
+    private function controller(bool $shared, bool $canRevealPassword = false): array
     {
         self::bootKernel();
         $container = self::getContainer();
+        $em = $this->createMock(EntityManagerInterface::class);
+        $container->set(EntityManagerInterface::class, $em);
         $user = (new User())->setEmail('viewer@example.test');
         (new \ReflectionProperty(User::class, 'id'))->setValue($user, 1);
         $owner = (new User())->setEmail('owner@example.test')->setCredentialEncryptionKey('test-key');
@@ -68,8 +73,6 @@ final class CredentialLaunchControllerTest extends KernelTestCase
         $encryption->setKeyFromUserSecret('test-key');
         $credential->setPassword($encryption->encrypt('test-password'));
 
-        $em = $this->createMock(EntityManagerInterface::class);
-        $container->set(EntityManagerInterface::class, $em);
         $users = $this->createMock(UserRepository::class);
         $users->method('findOneBy')->willReturn($user);
         $container->set(UserRepository::class, $users);
@@ -80,7 +83,7 @@ final class CredentialLaunchControllerTest extends KernelTestCase
         $container->set(ExtensionClientRepository::class, $clients);
         $shares = $this->createMock(SharedAccessRepository::class);
         $shares->method('userHasAccessToCredential')->willReturn($shared);
-        $shares->method('userCanRevealPassword')->willReturn(false);
+        $shares->method('userCanRevealPassword')->willReturn($canRevealPassword);
         $container->set(SharedAccessRepository::class, $shares);
         $teams = $this->createMock(TeamRepository::class);
         $teams->method('userHasTeamAccessToCredential')->willReturn(false);
