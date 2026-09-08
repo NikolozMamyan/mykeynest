@@ -60,7 +60,11 @@ export default class extends Controller {
     if (this.hasLaunchDialogTarget && this.launchDialogTarget.open) {
       this.launchDialogTarget.close();
     }
+    if (this.hasQuickShareModalTarget && this.quickShareModalTarget.open) {
+      this.quickShareModalTarget.close();
+    }
     document.body.classList.remove("credential-launch-open");
+    document.body.classList.remove("quick-share-open");
   }
 
   siteUrl(value) {
@@ -349,14 +353,16 @@ export default class extends Controller {
     }
 
     const button = event.currentTarget;
+    this.quickShareModalTarget.querySelector("form")?.reset();
     this.quickShareCredentialIdTarget.value = button.dataset.credentialId ?? "";
     this.quickShareNameTarget.textContent = button.dataset.credentialName ?? "-";
     this.quickShareDomainTarget.textContent = button.dataset.credentialDomain ?? "-";
     this.quickShareInitialsTarget.textContent = button.dataset.credentialInitials ?? "--";
     this.quickShareEmailTarget.value = "";
 
-    this.quickShareModalTarget.classList.add("is-open");
-    this.quickShareModalTarget.setAttribute("aria-hidden", "false");
+    if (!this.quickShareModalTarget.open) {
+      this.quickShareModalTarget.showModal();
+    }
     document.body.classList.add("quick-share-open");
 
     window.setTimeout(() => this.quickShareEmailTarget.focus(), 0);
@@ -367,8 +373,28 @@ export default class extends Controller {
       return;
     }
 
-    this.quickShareModalTarget.classList.remove("is-open");
-    this.quickShareModalTarget.setAttribute("aria-hidden", "true");
+    if (this.quickShareModalTarget.open) {
+      this.quickShareModalTarget.close();
+    }
+  }
+
+  dismissQuickShare(event) {
+    if (event.target !== this.quickShareModalTarget) {
+      return;
+    }
+
+    const bounds = this.quickShareModalTarget.getBoundingClientRect();
+    const outside = event.clientX < bounds.left
+      || event.clientX > bounds.right
+      || event.clientY < bounds.top
+      || event.clientY > bounds.bottom;
+
+    if (outside) {
+      this.closeQuickShare();
+    }
+  }
+
+  quickShareClosed() {
     document.body.classList.remove("quick-share-open");
   }
 

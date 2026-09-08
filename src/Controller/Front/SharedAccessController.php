@@ -21,12 +21,14 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SharedAccessController extends AbstractController
 {
     public function __construct(
         private RateLimiterFactory $shareInvitationLimiter,
         private SubscriptionPlanService $subscriptionPlans,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -144,6 +146,12 @@ class SharedAccessController extends AbstractController
 
         if (!$owner) {
             throw $this->createAccessDeniedException();
+        }
+
+        if (!$this->isCsrfTokenValid('quick_share', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', $this->translator->trans('credential.index.quick_share.invalid_request'));
+
+            return $this->redirectToRoute('app_credential');
         }
 
         $credentialId = $request->request->getInt('credential_id');

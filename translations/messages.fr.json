@@ -859,12 +859,17 @@
         "open_hint": "Le site s’ouvre dans un nouvel onglet"
       },
       "quick_share": {
+        "eyebrow": "Partage sécurisé",
         "title": "Partager rapidement",
-        "subtitle": "Saisissez l'email du destinataire pour partager cet identifiant sans quitter la page.",
+        "subtitle": "Donnez accès à cet identifiant sans quitter votre coffre.",
         "close": "Fermer la fenêtre de partage",
+        "selected_credential": "Identifiant sélectionné",
+        "protected": "Identifiant protégé par MYKEYNEST",
         "email_label": "Email du destinataire",
         "email_placeholder": "exemple@domaine.com",
-        "email_hint": "La logique de partage habituelle sera appliquée : invitation, limites et notifications.",
+        "email_hint": "Le destinataire recevra une invitation s’il ne possède pas encore de compte.",
+        "security_hint": "Vous pourrez retirer cet accès à tout moment depuis la rubrique Partages.",
+        "invalid_request": "La demande de partage a expiré. Veuillez réessayer.",
         "cancel": "Annuler",
         "submit": "Partager l'accès"
       }
@@ -1125,8 +1130,12 @@
   },
   "note": {
     "index": {
+      "meta": {
+        "title": "Notes et tâches | MYKEYNEST"
+      },
       "header": {
-        "title": "Notes & Tâches",
+        "title": "Notes et tâches",
+        "subtitle": "Centralisez vos informations utiles, suivez les échéances et partagez les bonnes consignes avec les bonnes personnes.",
         "personal_workspace": "Espace personnel"
       },
       "actions": {
@@ -1134,9 +1143,38 @@
         "refresh": "Rafraîchir"
       },
       "workspace": {
+        "label": "Choisir un espace",
         "selector_personal": "Espace personnel"
       },
+      "stats": {
+        "label": "Résumé des notes",
+        "total": "Notes visibles",
+        "overdue": "En retard",
+        "due_soon": "À traiter sous 7 jours",
+        "completed": "Terminées"
+      },
+      "toolbar": {
+        "label": "Recherche et filtres"
+      },
+      "search": {
+        "label": "Rechercher une note",
+        "placeholder": "Rechercher par titre, contenu ou personne…"
+      },
+      "filters": {
+        "label": "Filtrer les notes",
+        "all": "Toutes",
+        "assigned": "À moi",
+        "overdue": "En retard",
+        "due_soon": "7 prochains jours"
+      },
+      "sort": {
+        "label": "Trier les notes",
+        "recent": "Plus récentes",
+        "due": "Par échéance",
+        "title": "Par titre"
+      },
       "board": {
+        "label": "Tableau des notes",
         "statuses": {
           "todo": "À faire",
           "in_progress": "En cours",
@@ -1155,7 +1193,8 @@
         },
         "assign": {
           "placeholder": "Assigner…",
-          "yourself": "Vous-même"
+          "yourself": "Vous-même",
+          "remove": "Retirer %email% de cette note"
         },
         "delete": {
           "confirm": "Supprimer cette note ?",
@@ -1163,19 +1202,79 @@
         },
         "empty_column": "Aucune note dans cette section"
       },
+      "card": {
+        "private": "Note personnelle",
+        "no_due_date": "Sans échéance",
+        "empty_content": "Aucun détail ajouté",
+        "overdue": "En retard",
+        "assigned_to_you": "À vous",
+        "characters": "caractères"
+      },
+      "permissions": {
+        "team_member": "Dans cet espace, le propriétaire crée et assigne les notes. Vous pouvez consulter vos notes assignées et faire évoluer leur statut."
+      },
+      "empty": {
+        "first_title": "Votre espace est prêt",
+        "first_text": "Créez une première note pour conserver une consigne, préparer une tâche ou suivre une échéance.",
+        "member_text": "Aucune note ne vous est assignée pour le moment.",
+        "no_results_title": "Aucune note trouvée",
+        "no_results_text": "Modifiez votre recherche ou retirez les filtres actifs.",
+        "reset": "Réinitialiser les filtres"
+      },
       "modal": {
         "title": "Créer une nouvelle note",
         "cancel": "Annuler",
-        "create": "Créer la note"
+        "create": "Créer la note",
+        "visibility_hint": "Visible uniquement par vous et les personnes assignées."
       },
       "details": {
         "open": "Voir le contenu",
+        "eyebrow": "Détail de la note",
         "content": "Contenu",
         "available": "Disponible",
         "empty": "Vide",
         "no_content": "Aucun contenu pour cette note.",
-        "close": "Fermer"
+        "close": "Fermer",
+        "edit": "Modifier la note",
+        "save": "Enregistrer",
+        "saving": "Enregistrement…",
+        "save_error": "Impossible d’enregistrer la note.",
+        "copy": "Copier le contenu",
+        "copied": "Contenu copié.",
+        "copy_error": "Impossible de copier le contenu."
       }
+    },
+    "form": {
+      "title": {
+        "label": "Titre",
+        "placeholder": "Ex. Codes de récupération du compte"
+      },
+      "content": {
+        "label": "Contenu",
+        "placeholder": "Ajoutez une consigne, une checklist, un lien ou toute information utile…"
+      },
+      "status": {
+        "label": "Statut initial"
+      },
+      "due_at": {
+        "label": "Échéance facultative"
+      }
+    },
+    "flash": {
+      "created": "La note a été créée.",
+      "invalid_request": "La demande a expiré. Veuillez réessayer.",
+      "invalid_status": "Le statut sélectionné est invalide.",
+      "status_updated": "Le statut de la note a été mis à jour.",
+      "select_user": "Sélectionnez une personne à assigner.",
+      "user_not_found": "Cette personne est introuvable.",
+      "invalid_assignee": "Cette personne ne fait pas partie de cet espace.",
+      "already_assigned": "Cette personne est déjà assignée.",
+      "assigned": "La note a été assignée.",
+      "unassigned": "La personne a été retirée de la note.",
+      "updated": "La note a été mise à jour.",
+      "invalid_content": "Ajoutez un titre valide de moins de 255 caractères.",
+      "invalid_due_date": "L’échéance sélectionnée est invalide.",
+      "deleted": "La note a été supprimée."
     }
   },
   "app_notifications": {

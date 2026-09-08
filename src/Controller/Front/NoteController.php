@@ -18,11 +18,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class NoteController extends AbstractController
 {
-    public function __construct(private readonly SubscriptionPlanService $subscriptionPlans)
-    {
+    public function __construct(
+        private readonly SubscriptionPlanService $subscriptionPlans,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     #[Route('/app/notes/{teamId?}', name: 'app_note', requirements: ['teamId' => '\d+'], methods: ['GET', 'POST'])]
@@ -39,6 +42,7 @@ final class NoteController extends AbstractController
         $this->denyUnlessSubscribed($user);
 
         $myTeams = $teams->createQueryBuilder('t')
+            ->select('DISTINCT t')
             ->leftJoin('t.members', 'm')
             ->where('t.owner = :u OR m.user = :u')
             ->setParameter('u', $user)
@@ -80,7 +84,7 @@ final class NoteController extends AbstractController
                 $notifier->notifyNoteCreated($note, $user);
             }
 
-            $this->addFlash('success', 'Note created successfully.');
+            $this->addFlash('success', $this->translator->trans('note.flash.created'));
 
             return $this->redirectToRoute('app_note', $teamId ? ['teamId' => $teamId] : []);
         }
@@ -104,6 +108,33 @@ final class NoteController extends AbstractController
             $grouped[$visibleNote->getStatus()->value][] = $visibleNote;
         }
 
+        $now = new \DateTimeImmutable();
+        $nextWeek = $now->modify('+7 days');
+        $stats = [
+            'total' => count($visibleNotes),
+            'done' => count($grouped[NoteStatus::DONE->value]),
+            'overdue' => 0,
+            'dueSoon' => 0,
+            'assignedToMe' => 0,
+        ];
+
+        foreach ($visibleNotes as $visibleNote) {
+            if ($visibleNote->isAssignedTo($user)) {
+                ++$stats['assignedToMe'];
+            }
+
+            $dueAt = $visibleNote->getDueAt();
+            if ($dueAt === null || $visibleNote->getStatus() === NoteStatus::DONE) {
+                continue;
+            }
+
+            if ($dueAt < $now) {
+                ++$stats['overdue'];
+            } elseif ($dueAt <= $nextWeek) {
+                ++$stats['dueSoon'];
+            }
+        }
+
         return $this->render('note/index.html.twig', [
             'team' => $team,
             'myTeams' => $myTeams,
@@ -112,6 +143,9 @@ final class NoteController extends AbstractController
             'notesByStatus' => $grouped,
             'isPersonalWorkspace' => $team === null,
             'canCreateNote' => $canCreateNote,
+            'noteStats' => $stats,
+            'now' => $now,
+            'nextWeek' => $nextWeek,
         ]);
     }
 
@@ -127,7 +161,7 @@ final class NoteController extends AbstractController
         $this->denyUnlessSubscribed($user);
 
         if (!$this->isCsrfTokenValid('status_note_' . $note->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'ERROR: Invalid CSRF token.');
+            $this->addFlash('error', $this->translator->trans('note.flash.invalid_request'));
 
             return $this->redirectBackToBoard($note);
         }
@@ -143,7 +177,7 @@ final class NoteController extends AbstractController
         $newStatus = NoteStatus::tryFrom($statusValue);
 
         if (!$newStatus) {
-            $this->addFlash('warning', 'Invalid status.');
+            $this->addFlash('error', $this->translator->trans('note.flash.invalid_status'));
 
             return $this->redirectBackToBoard($note);
         }
@@ -159,7 +193,7 @@ final class NoteController extends AbstractController
 
         $notifier->notifyStatusChanged($note, $user, $oldStatus->value, $newStatus->value);
 
-        $this->addFlash('success', 'Status updated.');
+        $this->addFlash('success', $this->translator->trans('note.flash.status_updated'));
 
         return $this->redirectBackToBoard($note);
     }
@@ -177,7 +211,7 @@ final class NoteController extends AbstractController
         $this->denyUnlessSubscribed($currentUser);
 
         if (!$this->isCsrfTokenValid('assign_note_' . $note->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'ERROR: Invalid CSRF token.');
+            $this->addFlash('error', $this->translator->trans('note.flash.invalid_request'));
 
             return $this->redirectBackToBoard($note);
         }
@@ -189,20 +223,26 @@ final class NoteController extends AbstractController
 
         $assigneeId = $request->request->get('assignee_id');
         if (!$assigneeId) {
-            $this->addFlash('warning', 'Please select a user.');
+            $this->addFlash('error', $this->translator->trans('note.flash.select_user'));
 
             return $this->redirectBackToBoard($note);
         }
 
         $assignee = $users->find((int) $assigneeId);
         if (!$assignee instanceof User) {
-            $this->addFlash('warning', 'User not found.');
+            $this->addFlash('error', $this->translator->trans('note.flash.user_not_found'));
+
+            return $this->redirectBackToBoard($note);
+        }
+
+        if (!$this->canAssignUser($note, $assignee, $currentUser)) {
+            $this->addFlash('error', $this->translator->trans('note.flash.invalid_assignee'));
 
             return $this->redirectBackToBoard($note);
         }
 
         if ($note->isAssignedTo($assignee)) {
-            $this->addFlash('info', 'Already assigned.');
+            $this->addFlash('success', $this->translator->trans('note.flash.already_assigned'));
 
             return $this->redirectBackToBoard($note);
         }
@@ -217,7 +257,7 @@ final class NoteController extends AbstractController
 
         $notifier->notifyNoteAssigned($note, $assignee, $currentUser);
 
-        $this->addFlash('success', 'Assigned.');
+        $this->addFlash('success', $this->translator->trans('note.flash.assigned'));
 
         return $this->redirectBackToBoard($note);
     }
@@ -252,7 +292,7 @@ final class NoteController extends AbstractController
             $em->flush();
 
             $notifier->notifyNoteUnassigned($note, $assignee, $user);
-            $this->addFlash('success', 'User unassigned successfully.');
+            $this->addFlash('success', $this->translator->trans('note.flash.unassigned'));
 
             break;
         }
@@ -285,6 +325,33 @@ final class NoteController extends AbstractController
         $newValue = null;
 
         switch ($field) {
+            case 'all':
+                $title = trim((string) $request->request->get('title', ''));
+                $content = trim((string) $request->request->get('content', ''));
+                $dueAtValue = trim((string) $request->request->get('dueAt', ''));
+
+                if ($title === '' || mb_strlen($title) > 255 || mb_strlen($content) > 50000) {
+                    return $this->json(['success' => false, 'error' => $this->translator->trans('note.flash.invalid_content')], Response::HTTP_UNPROCESSABLE_ENTITY);
+                }
+
+                try {
+                    $newDueAt = $dueAtValue !== '' ? new \DateTimeImmutable($dueAtValue) : null;
+                } catch (\Exception) {
+                    return $this->json(['success' => false, 'error' => $this->translator->trans('note.flash.invalid_due_date')], Response::HTTP_UNPROCESSABLE_ENTITY);
+                }
+
+                $hasChanged = $note->getTitle() !== $title
+                    || (string) $note->getContent() !== $content
+                    || $note->getDueAt()?->format('Y-m-d H:i') !== $newDueAt?->format('Y-m-d H:i');
+
+                if ($hasChanged) {
+                    $note->setTitle($title);
+                    $note->setContent($content !== '' ? $content : null);
+                    $note->setDueAt($newDueAt);
+                    $fieldLabel = 'details';
+                }
+                break;
+
             case 'title':
                 $fieldLabel = 'title';
                 $oldValue = $note->getTitle();
@@ -318,6 +385,10 @@ final class NoteController extends AbstractController
 
         $notifier->notifyNoteUpdated($note, $user, $fieldLabel, $oldValue, $newValue);
 
+        if ($field === 'all') {
+            $this->addFlash('success', $this->translator->trans('note.flash.updated'));
+        }
+
         return $this->json(['success' => true]);
     }
 
@@ -333,7 +404,7 @@ final class NoteController extends AbstractController
         $this->denyUnlessSubscribed($user);
 
         if (!$this->isCsrfTokenValid('delete_note_' . $note->getId(), (string) $request->request->get('_token'))) {
-            $this->addFlash('danger', 'ERROR: Invalid CSRF token.');
+            $this->addFlash('error', $this->translator->trans('note.flash.invalid_request'));
 
             return $this->redirectBackToBoard($note);
         }
@@ -353,7 +424,7 @@ final class NoteController extends AbstractController
             $notifier->notifyNoteDeleted($team, $user, $noteTitle);
         }
 
-        $this->addFlash('success', 'Note deleted.');
+        $this->addFlash('success', $this->translator->trans('note.flash.deleted'));
 
         return $this->redirectToRoute('app_note', $teamId ? ['teamId' => $teamId] : []);
     }
@@ -378,6 +449,22 @@ final class NoteController extends AbstractController
 
         foreach ($team->getMembers() as $member) {
             if ($member->getUser()?->getId() === $user->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function canAssignUser(Note $note, User $assignee, User $currentUser): bool
+    {
+        $team = $note->getTeam();
+        if ($team === null) {
+            return $assignee->getId() === $currentUser->getId();
+        }
+
+        foreach ($this->getTeamUsers($team) as $teamUser) {
+            if ($teamUser->getId() === $assignee->getId()) {
                 return true;
             }
         }

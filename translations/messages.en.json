@@ -811,12 +811,17 @@
         "open_hint": "The website opens in a new tab"
       },
       "quick_share": {
+        "eyebrow": "Secure sharing",
         "title": "Quick share",
-        "subtitle": "Enter the recipient email to share this credential without leaving the page.",
+        "subtitle": "Grant access to this credential without leaving your vault.",
         "close": "Close share dialog",
+        "selected_credential": "Selected credential",
+        "protected": "Credential protected by MYKEYNEST",
         "email_label": "Recipient email",
         "email_placeholder": "example@domain.com",
-        "email_hint": "The standard sharing flow will be applied: invitation, limits, and notifications.",
+        "email_hint": "The recipient will receive an invitation if they do not have an account yet.",
+        "security_hint": "You can revoke this access at any time from the Sharing section.",
+        "invalid_request": "The sharing request expired. Please try again.",
         "cancel": "Cancel",
         "submit": "Share access"
       }
@@ -1077,8 +1082,12 @@
   },
   "note": {
     "index": {
+      "meta": {
+        "title": "Notes and tasks | MYKEYNEST"
+      },
       "header": {
-        "title": "Notes & Tasks",
+        "title": "Notes and tasks",
+        "subtitle": "Keep useful information together, track deadlines and share the right instructions with the right people.",
         "personal_workspace": "Personal Workspace"
       },
       "actions": {
@@ -1086,9 +1095,38 @@
         "refresh": "Refresh"
       },
       "workspace": {
+        "label": "Choose a workspace",
         "selector_personal": "Personal Workspace"
       },
+      "stats": {
+        "label": "Notes summary",
+        "total": "Visible notes",
+        "overdue": "Overdue",
+        "due_soon": "Due within 7 days",
+        "completed": "Completed"
+      },
+      "toolbar": {
+        "label": "Search and filters"
+      },
+      "search": {
+        "label": "Search notes",
+        "placeholder": "Search by title, content or person…"
+      },
+      "filters": {
+        "label": "Filter notes",
+        "all": "All",
+        "assigned": "Assigned to me",
+        "overdue": "Overdue",
+        "due_soon": "Next 7 days"
+      },
+      "sort": {
+        "label": "Sort notes",
+        "recent": "Most recent",
+        "due": "By due date",
+        "title": "By title"
+      },
       "board": {
+        "label": "Notes board",
         "statuses": {
           "todo": "To Do",
           "in_progress": "In Progress",
@@ -1107,7 +1145,8 @@
         },
         "assign": {
           "placeholder": "Assign…",
-          "yourself": "Yourself"
+          "yourself": "Yourself",
+          "remove": "Remove %email% from this note"
         },
         "delete": {
           "confirm": "Delete this note?",
@@ -1115,19 +1154,79 @@
         },
         "empty_column": "No notes in this section"
       },
+      "card": {
+        "private": "Personal note",
+        "no_due_date": "No due date",
+        "empty_content": "No details added",
+        "overdue": "Overdue",
+        "assigned_to_you": "Assigned to you",
+        "characters": "characters"
+      },
+      "permissions": {
+        "team_member": "The workspace owner creates and assigns notes. You can review your assigned notes and update their status."
+      },
+      "empty": {
+        "first_title": "Your workspace is ready",
+        "first_text": "Create your first note to keep instructions, prepare a task or track a deadline.",
+        "member_text": "No note is assigned to you yet.",
+        "no_results_title": "No notes found",
+        "no_results_text": "Change your search or remove the active filters.",
+        "reset": "Reset filters"
+      },
       "modal": {
         "title": "Create New Note",
         "cancel": "Cancel",
-        "create": "Create Note"
+        "create": "Create Note",
+        "visibility_hint": "Visible only to you and assigned people."
       },
       "details": {
         "open": "View content",
+        "eyebrow": "Note details",
         "content": "Content",
         "available": "Available",
         "empty": "Empty",
         "no_content": "No content for this note.",
-        "close": "Close"
+        "close": "Close",
+        "edit": "Edit note",
+        "save": "Save",
+        "saving": "Saving…",
+        "save_error": "Unable to save the note.",
+        "copy": "Copy content",
+        "copied": "Content copied.",
+        "copy_error": "Unable to copy the content."
       }
+    },
+    "form": {
+      "title": {
+        "label": "Title",
+        "placeholder": "E.g. Account recovery codes"
+      },
+      "content": {
+        "label": "Content",
+        "placeholder": "Add instructions, a checklist, a link or any useful information…"
+      },
+      "status": {
+        "label": "Initial status"
+      },
+      "due_at": {
+        "label": "Optional due date"
+      }
+    },
+    "flash": {
+      "created": "The note was created.",
+      "invalid_request": "The request expired. Please try again.",
+      "invalid_status": "The selected status is invalid.",
+      "status_updated": "The note status was updated.",
+      "select_user": "Select a person to assign.",
+      "user_not_found": "This person could not be found.",
+      "invalid_assignee": "This person does not belong to this workspace.",
+      "already_assigned": "This person is already assigned.",
+      "assigned": "The note was assigned.",
+      "unassigned": "The person was removed from the note.",
+      "updated": "The note was updated.",
+      "invalid_content": "Add a valid title shorter than 255 characters.",
+      "invalid_due_date": "The selected due date is invalid.",
+      "deleted": "The note was deleted."
     }
   },
   "app_notifications": {

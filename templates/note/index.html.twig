@@ -1,1172 +1,310 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Notes & Tasks{% endblock %}
+{% block title %}{{ 'note.index.meta.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{{ asset('styles/pages/note-board.css') }}">
+{% endblock %}
 
 {% block body %}
-  <style>
-    /* ============================================
-       Monday.com inspired design system
-    ============================================ */
-    
-    :root {
-      --note-header-height: 120px;
-      --board-gap: 16px;
-      --column-min-width: 320px;
-      --row-height: 56px;
-    }
-
-    /* Page Layout */
-    .notes-container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .notes-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid var(--color-border);
-    }
-
-    .header-left {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .header-title {
-      font-size: clamp(24px, 3vw, 36px);
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      margin: 0 0 8px 0;
-      background: linear-gradient(135deg, var(--color-text-dark), var(--color-primary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .header-subtitle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--color-text-muted);
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .workspace-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: var(--color-bg-hover);
-      border: 1px solid var(--color-border);
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--color-primary), #10b981);
-      color: white;
-      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
-    }
-
-    .btn-secondary {
-      background: var(--color-bg-hover);
-      color: var(--color-text-dark);
-      border: 1px solid var(--color-border);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: rgba(226, 232, 240, 1);
-    }
-
-    [data-theme="dark"] .btn-secondary {
-      background: rgba(30, 41, 59, 0.6);
-      border-color: rgba(51, 65, 85, 0.8);
-    }
-
-    .btn-icon {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      display: grid;
-      place-items: center;
-    }
-
-    /* Team Selector */
-    .team-selector {
-      min-width: 200px;
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-hover);
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      outline: none;
-    }
-
-    .team-selector:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-    }
-
-    /* Flash Messages */
-    .flash-container {
-      margin-bottom: 20px;
-    }
-
-    .flash {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-    }
-
-    .flash.success {
-      background: rgba(5, 150, 105, 0.1);
-      border: 1px solid rgba(5, 150, 105, 0.3);
-      color: var(--color-primary);
-    }
-
-    .flash.danger {
-      background: rgba(220, 38, 38, 0.1);
-      border: 1px solid rgba(220, 38, 38, 0.3);
-      color: #dc2626;
-    }
-
-    .flash.warning {
-      background: rgba(245, 158, 11, 0.1);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      color: #f59e0b;
-    }
-
-    /* Board Layout */
-    .board {
-      display: flex;
-      flex-direction: column;
-      gap: var(--board-gap);
-    }
-
-    .board-column {
-      background: rgba(255, 255, 255, 0.8);
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-
-    [data-theme="dark"] .board-column {
-      background: rgba(15, 23, 42, 0.6);
-      border-color: rgba(51, 65, 85, 0.8);
-    }
-
-    .column-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      border-bottom: 2px solid var(--color-border);
-      background: rgba(255, 255, 255, 0.5);
-    }
-
-    [data-theme="dark"] .column-header {
-      background: rgba(15, 23, 42, 0.4);
-      border-bottom-color: rgba(51, 65, 85, 0.8);
-    }
-
-    .column-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 900;
-      font-size: 16px;
-      letter-spacing: -0.01em;
-    }
-
-    .column-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 28px;
-      height: 28px;
-      padding: 0 8px;
-      border-radius: 6px;
-      font-weight: 900;
-      font-size: 12px;
-    }
-
-    .badge-todo {
-      background: rgba(59, 130, 246, 0.15);
-      color: #2563eb;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    .badge-progress {
-      background: rgba(245, 158, 11, 0.15);
-      color: #d97706;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .badge-done {
-      background: rgba(5, 150, 105, 0.15);
-      color: var(--color-primary);
-      border: 1px solid rgba(5, 150, 105, 0.3);
-    }
-
-    /* Table */
-    .notes-table {
-      width: 100%;
-    }
-
-    .table-header {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr 1.5fr;
-      gap: 12px;
-      padding: 12px 20px;
-      background: rgba(255, 255, 255, 0.7);
-      border-bottom: 1px solid var(--color-border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    [data-theme="dark"] .table-header {
-      background: rgba(15, 23, 42, 0.8);
-      border-bottom-color: rgba(51, 65, 85, 0.8);
-    }
-
-    .table-header-cell {
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-text-muted);
-    }
-
-    .table-body {
-      max-height: 60vh;
-      overflow-y: auto;
-    }
-
-    .note-row {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr 1.5fr;
-      gap: 12px;
-      align-items: center;
-      padding: 12px 20px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
-      transition: background 0.15s ease;
-      min-height: var(--row-height);
-    }
-
-    .note-row:hover {
-      background: rgba(5, 150, 105, 0.04);
-    }
-
-    [data-theme="dark"] .note-row {
-      border-bottom-color: rgba(51, 65, 85, 0.5);
-    }
-
-    [data-theme="dark"] .note-row:hover {
-      background: rgba(5, 150, 105, 0.08);
-    }
-
-    .cell {
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Note Title */
-    .note-title-cell {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-    }
-
-    .note-open-trigger {
-      width: 100%;
-      padding: 0;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      text-align: left;
-      color: inherit;
-    }
-
-    .note-title-text {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--color-text-dark);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100%;
-    }
-
-    .note-description {
-      font-size: 12px;
-      color: var(--color-text-muted);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      width: 100%;
-    }
-
-    .note-open-hint {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--color-primary);
-    }
-
-    /* Assignees */
-    .assignees-cell {
-      position: relative;
-    }
-
-    .assignee-avatars {
-      display: flex;
-      align-items: center;
-    }
-
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      font-size: 12px;
-      border: 2px solid white;
-      background: linear-gradient(135deg, var(--color-primary), #10b981);
-      color: white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      position: relative;
-    }
-
-    [data-theme="dark"] .avatar {
-      border-color: rgba(15, 23, 42, 0.8);
-    }
-
-    .avatar + .avatar {
-      margin-left: -10px;
-    }
-
-    .avatar-more {
-      background: rgba(148, 163, 184, 0.2);
-      color: var(--color-text-medium);
-      border-color: var(--color-border);
-    }
-
-    .unassigned-badge {
-      padding: 6px 10px;
-      border-radius: 6px;
-      background: var(--color-bg-hover);
-      border: 1px dashed var(--color-border);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--color-text-muted);
-    }
-
-    /* Progress Bar */
-    .progress-cell {
-      gap: 10px;
-    }
-
-    .progress-bar {
-      flex: 1;
-      height: 8px;
-      background: rgba(148, 163, 184, 0.2);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--color-primary), #10b981);
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
-
-    .progress-text {
-      font-weight: 900;
-      font-size: 12px;
-      color: var(--color-text-muted);
-      min-width: 40px;
-      text-align: right;
-    }
-
-    /* Status Dropdown */
-    .status-select {
-      width: 100%;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-hover);
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      outline: none;
-    }
-
-    .status-select:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-    }
-
-    /* Due Date */
-    .due-date {
-      font-weight: 700;
-      font-size: 13px;
-      color: var(--color-text-medium);
-    }
-
-    .due-date.overdue {
-      color: #dc2626;
-    }
-
-    /* Actions */
-    .actions-cell {
-      justify-content: flex-end;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-hover);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      color: var(--color-text-medium);
-    }
-
-    .action-btn:hover {
-      background: white;
-      border-color: var(--color-primary);
-      color: var(--color-primary);
-      transform: scale(1.05);
-    }
-
-    .action-btn.danger:hover {
-      border-color: #dc2626;
-      color: #dc2626;
-    }
-
-    /* Assign Dropdown */
-    .assign-dropdown {
-      position: relative;
-    }
-
-    .assign-select {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-hover);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* Empty State */
-    .empty-state {
-      padding: 60px 20px;
-      text-align: center;
-      color: var(--color-text-muted);
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      opacity: 0.3;
-      margin-bottom: 16px;
-    }
-
-    .empty-state p {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* Modal */
-    .modal {
-      border: none;
-      border-radius: 16px;
-      margin:auto;
-      padding: 0;
-      width: min(700px, calc(100vw - 40px));
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      background: white;
-      max-height: 90vh;
-      overflow: hidden;
-    }
-
-    [data-theme="dark"] .modal {
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(51, 65, 85, 0.8);
-    }
-
-    .modal::backdrop {
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .modal-title {
-      font-size: 20px;
-      color: var(--color-text-dark);
-      font-weight: 900;
-      margin: 0;
-    }
-
-    .modal-body {
-      padding: 24px;
-      overflow-y: auto;
-      max-height: calc(90vh - 140px);
-    }
-
-    .modal-footer {
-      padding: 16px 24px;
-      border-top: 1px solid var(--color-border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      background: var(--color-bg-hover);
-    }
-
-    /* Form */
-    .form-grid {
-      display: grid;
-      gap: 20px;
-    }
-
-    .form-field label {
-      display: block;
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 8px;
-      color: var(--color-text-dark);
-    }
-
-    .form-field input,
-    .form-field textarea,
-    .form-field select {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--color-border);
-      background: var(--color-bg-hover);
-      font-size: 14px;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .form-field input:focus,
-    .form-field textarea:focus,
-    .form-field select:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-    }
-
-    .form-field textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .note-detail-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .note-detail-card {
-      padding: 14px;
-      border-radius: 12px;
-      background: var(--color-bg-hover);
-      border: 1px solid var(--color-border);
-    }
-
-    .note-detail-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--color-text-muted);
-    }
-
-    .note-detail-value {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--color-text-dark);
-      word-break: break-word;
-    }
-
-    .note-detail-content {
-      padding: 18px;
-      border-radius: 14px;
-      background: var(--color-bg-hover);
-      border: 1px solid var(--color-border);
-      color: var(--color-text-dark);
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .note-detail-empty {
-      color: var(--color-text-muted);
-      font-style: italic;
-    }
-
-    /* Responsive */
-@media (max-width: 1024px) {
-.table-header,
-.note-row {
-grid-template-columns: 2fr 1fr 1fr 1.2fr;
-}
-  .table-header-cell:nth-child(3),
-  .cell:nth-child(3),
-  .table-header-cell:nth-child(5),
-  .cell:nth-child(5) {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .notes-container {
-    padding: 16px 12px 24px;
-  }
-
-  .notes-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .header-actions {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .team-selector,
-  .btn {
-    width: 100%;
-  }
-
-  .btn-icon {
-    width: 100%;
-  }
-
-  .table-header {
-    display: none;
-  }
-
-  .table-body {
-    max-height: none;
-    padding: 10px;
-  }
-
-  .note-row {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 16px;
-    border: 1px solid var(--color-border);
-    border-radius: 14px;
-    margin-bottom: 10px;
-    background: rgba(255, 255, 255, 0.92);
-  }
-
-  .cell {
-    width: 100%;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .cell::before {
-    content: attr(data-label);
-    flex: 0 0 96px;
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-  }
-
-  .note-title-cell::before {
-    display: none;
-  }
-
-  .actions-cell {
-    justify-content: flex-start;
-  }
-
-  .status-select,
-  .assign-select {
-    width: 100%;
-  }
-
-  .modal {
-    width: min(100vw - 24px, 700px);
-  }
-
-  .modal-header,
-  .modal-body,
-  .modal-footer {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .modal-footer {
-    flex-direction: column-reverse;
-  }
-
-  .note-detail-grid {
-    grid-template-columns: 1fr;
-  }
-
-  [data-theme="dark"] .note-row {
-    background: rgba(15, 23, 42, 0.9);
-  }
-}
-  </style>
- <div class="notes-container">
-  <!-- Header -->
-  <div class="notes-header">
-    <div class="header-left">
-      <h1 class="header-title">
-        <i class="fa-solid fa-clipboard-check"></i>
-        {{ 'note.index.header.title'|trans }}
-      </h1>
-
-      <div class="header-subtitle">
-        {% if isPersonalWorkspace %}
-          <span class="workspace-badge">
-            <i class="fa-solid fa-user"></i>
-            {{ 'note.index.header.personal_workspace'|trans }}
-          </span>
-        {% else %}
-          <span class="workspace-badge">
-            <i class="fa-solid fa-users"></i>
-            {{ team.name }}
-          </span>
+  {% set statusConfig = {
+    'todo': { title: ('note.index.board.statuses.todo'|trans), class: 'todo' },
+    'in_progress': { title: ('note.index.board.statuses.in_progress'|trans), class: 'in-progress' },
+    'done': { title: ('note.index.board.statuses.done'|trans), class: 'done' }
+  } %}
+
+  <div
+    class="notes-page"
+    data-controller="note-board"
+    data-note-board-open-create-value="{{ (form.vars.submitted and not form.vars.valid) ? 'true' : 'false' }}"
+    data-note-board-copy-success-value="{{ 'note.index.details.copied'|trans|e('html_attr') }}"
+    data-note-board-copy-error-value="{{ 'note.index.details.copy_error'|trans|e('html_attr') }}"
+    data-note-board-saving-value="{{ 'note.index.details.saving'|trans|e('html_attr') }}"
+    data-note-board-save-error-value="{{ 'note.index.details.save_error'|trans|e('html_attr') }}"
+  >
+    <header class="notes-hero">
+      <div class="notes-hero__copy">
+        <span class="notes-eyebrow">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          {{ isPersonalWorkspace ? ('note.index.header.personal_workspace'|trans) : team.name }}
+        </span>
+        <h1 class="notes-title">{{ 'note.index.header.title'|trans }}</h1>
+        <p class="notes-subtitle">{{ 'note.index.header.subtitle'|trans }}</p>
+      </div>
+
+      <div class="notes-hero__actions">
+        <label class="notes-workspace">
+          <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+          <span class="sr-only">{{ 'note.index.workspace.label'|trans }}</span>
+          <select data-action="change->note-board#navigateWorkspace" aria-label="{{ 'note.index.workspace.label'|trans }}">
+            <option value="{{ path('app_note') }}" {{ isPersonalWorkspace ? 'selected' : '' }}>{{ 'note.index.workspace.selector_personal'|trans }}</option>
+            {% for workspaceTeam in myTeams %}
+              <option value="{{ path('app_note', { teamId: workspaceTeam.id }) }}" {{ team and workspaceTeam.id == team.id ? 'selected' : '' }}>{{ workspaceTeam.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        {% if canCreateNote %}
+          <button type="button" class="notes-primary-action" data-action="click->note-board#openCreate">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>{{ 'note.index.actions.new_note'|trans }}
+          </button>
         {% endif %}
       </div>
-    </div>
+    </header>
 
-    <div class="header-actions">
-      <select class="team-selector" onchange="location.href=this.value">
-        <option value="{{ path('app_note') }}" {{ isPersonalWorkspace ? 'selected' : '' }}>
-          {{ 'note.index.workspace.selector_personal'|trans }}
-        </option>
-        {% for t in myTeams %}
-          <option value="{{ path('app_note', { teamId: t.id }) }}" {{ team and t.id == team.id ? 'selected' : '' }}>
-            {{ t.name }}
-          </option>
-        {% endfor %}
-      </select>
-
-      {% if canCreateNote %}
-        <button class="btn btn-primary" onclick="document.getElementById('noteModal').showModal()">
-          <i class="fa-solid fa-plus"></i>
-          {{ 'note.index.actions.new_note'|trans }}
-        </button>
-      {% endif %}
-
-      <button class="btn btn-secondary btn-icon"
-              onclick="location.reload()"
-              title="{{ 'note.index.actions.refresh'|trans }}">
-        <i class="fa-solid fa-rotate"></i>
+    <section class="notes-summary" aria-label="{{ 'note.index.stats.label'|trans }}">
+      <button type="button" class="notes-summary-card" data-note-board-target="filter" data-filter="all" data-action="click->note-board#setFilter" aria-pressed="false">
+        <span class="notes-summary-card__icon"><i class="fa-regular fa-note-sticky" aria-hidden="true"></i></span>
+        <strong>{{ noteStats.total }}</strong><span>{{ 'note.index.stats.total'|trans }}</span>
       </button>
-    </div>
-  </div>
+      <button type="button" class="notes-summary-card notes-summary-card--danger" data-note-board-target="filter" data-filter="overdue" data-action="click->note-board#setFilter" aria-pressed="false">
+        <span class="notes-summary-card__icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+        <strong>{{ noteStats.overdue }}</strong><span>{{ 'note.index.stats.overdue'|trans }}</span>
+      </button>
+      <button type="button" class="notes-summary-card notes-summary-card--warning" data-note-board-target="filter" data-filter="soon" data-action="click->note-board#setFilter" aria-pressed="false">
+        <span class="notes-summary-card__icon"><i class="fa-regular fa-calendar" aria-hidden="true"></i></span>
+        <strong>{{ noteStats.dueSoon }}</strong><span>{{ 'note.index.stats.due_soon'|trans }}</span>
+      </button>
+      <div class="notes-summary-card notes-summary-card--success">
+        <span class="notes-summary-card__icon"><i class="fa-solid fa-check" aria-hidden="true"></i></span>
+        <strong>{{ noteStats.done }}</strong><span>{{ 'note.index.stats.completed'|trans }}</span>
+      </div>
+    </section>
 
-  <!-- Flash Messages -->
-  {% if app.flashes|length > 0 %}
-    <div class="flash-container">
-      {% for label, messages in app.flashes %}
-        {% for message in messages %}
-          <div class="flash {{ label }}">
-            <i class="fa-solid fa-{{ label == 'success' ? 'circle-check' : (label == 'danger' ? 'circle-exclamation' : 'triangle-exclamation') }}"></i>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endfor %}
-    </div>
-  {% endif %}
+    {% if not canCreateNote %}
+      <div class="notes-permission-hint" role="note">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>{{ 'note.index.permissions.team_member'|trans }}</span>
+      </div>
+    {% endif %}
 
-  <!-- Board -->
-  <div class="board">
-    {% set statusConfig = {
-      'todo': { title: ('note.index.board.statuses.todo'|trans), icon: 'circle', badge: 'badge-todo' },
-      'in_progress': { title: ('note.index.board.statuses.in_progress'|trans), icon: 'spinner', badge: 'badge-progress' },
-      'done': { title: ('note.index.board.statuses.done'|trans), icon: 'circle-check', badge: 'badge-done' }
-    } %}
+    <section class="notes-toolbar" aria-label="{{ 'note.index.toolbar.label'|trans }}">
+      <label class="notes-search">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <span class="sr-only">{{ 'note.index.search.label'|trans }}</span>
+        <input type="search" autocomplete="off" placeholder="{{ 'note.index.search.placeholder'|trans }}" data-note-board-target="search" data-action="input->note-board#search">
+        <kbd>/</kbd>
+      </label>
 
-    {% for statusKey, config in statusConfig %}
-      <div class="board-column">
-        <div class="column-header">
-          <div class="column-title">
-            <i class="fa-solid fa-{{ config.icon }}"></i>
-            {{ config.title }}
-            <span class="column-badge {{ config.badge }}">
-              {{ notesByStatus[statusKey]|length }}
-            </span>
-          </div>
-        </div>
+      <div class="notes-filters" role="group" aria-label="{{ 'note.index.filters.label'|trans }}">
+        <button type="button" class="notes-filter is-active" data-note-board-target="filter" data-filter="all" data-action="click->note-board#setFilter" aria-pressed="true">{{ 'note.index.filters.all'|trans }}</button>
+        <button type="button" class="notes-filter" data-note-board-target="filter" data-filter="assigned" data-action="click->note-board#setFilter" aria-pressed="false">{{ 'note.index.filters.assigned'|trans }} <span>{{ noteStats.assignedToMe }}</span></button>
+        <button type="button" class="notes-filter" data-note-board-target="filter" data-filter="overdue" data-action="click->note-board#setFilter" aria-pressed="false">{{ 'note.index.filters.overdue'|trans }}</button>
+        <button type="button" class="notes-filter" data-note-board-target="filter" data-filter="soon" data-action="click->note-board#setFilter" aria-pressed="false">{{ 'note.index.filters.due_soon'|trans }}</button>
+      </div>
 
-        {% if notesByStatus[statusKey]|length > 0 %}
-          <div class="notes-table">
-            <div class="table-header">
-              <div class="table-header-cell">{{ 'note.index.board.table.task'|trans }}</div>
-              <div class="table-header-cell">{{ 'note.index.board.table.assigned'|trans }}</div>
-              <div class="table-header-cell">{{ 'note.index.board.table.progress'|trans }}</div>
-              <div class="table-header-cell">{{ 'note.index.board.table.status'|trans }}</div>
-              <div class="table-header-cell">{{ 'note.index.board.table.due_date'|trans }}</div>
-              <div class="table-header-cell" style="text-align: right;">
-                {{ 'note.index.board.table.actions'|trans }}
-              </div>
-            </div>
+      <label class="notes-sort">
+        <i class="fa-solid fa-arrow-down-wide-short" aria-hidden="true"></i>
+        <span class="sr-only">{{ 'note.index.sort.label'|trans }}</span>
+        <select data-note-board-target="sort" data-action="change->note-board#sort" aria-label="{{ 'note.index.sort.label'|trans }}">
+          <option value="recent">{{ 'note.index.sort.recent'|trans }}</option>
+          <option value="due">{{ 'note.index.sort.due'|trans }}</option>
+          <option value="title">{{ 'note.index.sort.title'|trans }}</option>
+        </select>
+      </label>
+    </section>
 
-            <div class="table-body">
+    {% if noteStats.total > 0 %}
+      <section class="notes-board" data-note-board-target="board" aria-label="{{ 'note.index.board.label'|trans }}">
+        {% for statusKey, config in statusConfig %}
+          <section class="notes-column notes-column--{{ config.class }}" data-note-board-target="column" data-status="{{ statusKey }}">
+            <header class="notes-column__header">
+              <h2 class="notes-column__title"><span class="notes-column__dot" aria-hidden="true"></span>{{ config.title }}</h2>
+              <span class="notes-column__count" data-note-board-target="columnCount">{{ notesByStatus[statusKey]|length }}</span>
+            </header>
+
+            <div class="notes-column__body">
               {% for note in notesByStatus[statusKey] %}
-                {% set isOwner = (note.createdBy and note.createdBy.id == app.user.id) %}
+                {% set isOwner = note.createdBy and note.createdBy.id == app.user.id %}
                 {% set isAssignee = note.isAssignedTo(app.user) %}
-                {% set canSee = isOwner or isAssignee %}
+                {% set isOverdue = note.dueAt and note.dueAt < now and statusKey != 'done' %}
+                {% set isDueSoon = note.dueAt and note.dueAt >= now and note.dueAt <= nextWeek and statusKey != 'done' %}
+                {% set searchText = note.title ~ ' ' ~ (note.content ?? '') ~ ' ' ~ (note.createdBy.email ?? '') %}
+                {% for assignment in note.assignments %}{% set searchText = searchText ~ ' ' ~ assignment.assignee.email %}{% endfor %}
 
-                {% if canSee %}
-                  <div class="note-row">
-                    <!-- Title -->
-                    <div class="cell note-title-cell" data-label="{{ 'note.index.board.table.task'|trans }}">
-                      <button
-                        type="button"
-                        class="note-open-trigger"
-                        onclick="openNoteDetails(this)"
-                        data-note-title="{{ note.title|e('html_attr') }}"
-                        data-note-content="{{ (note.content ?? '')|e('html_attr') }}"
-                        data-note-status="{{ config.title|e('html_attr') }}"
-                        data-note-due="{{ note.dueAt ? note.dueAt|date('d/m/Y H:i') : '-' }}"
-                      >
-                        <div class="note-title-text" title="{{ note.title }}">
-                          {{ note.title }}
-                        </div>
-                        {% if note.content %}
-                          <div class="note-description">
-                            {{ note.content|u.truncate(80, '...') }}
-                          </div>
-                        {% endif %}
-                        <span class="note-open-hint">
-                          <i class="fa-solid fa-expand"></i>
-                          {{ 'note.index.details.open'|trans }}
-                        </span>
-                      </button>
-                    </div>
+                <article
+                  class="note-card {{ isOverdue ? 'note-card--overdue' : (isDueSoon ? 'note-card--soon' : '') }}"
+                  data-note-board-target="card"
+                  data-status="{{ statusKey }}"
+                  data-assigned="{{ isAssignee ? '1' : '0' }}"
+                  data-due="{{ note.dueAt ? note.dueAt|date('U') : '' }}"
+                  data-updated="{{ note.updatedAt ? note.updatedAt|date('U') : '' }}"
+                  data-title="{{ note.title|lower|e('html_attr') }}"
+                  data-search="{{ searchText|e('html_attr') }}"
+                  data-note-title="{{ note.title|e('html_attr') }}"
+                  data-note-content="{{ (note.content ?? '')|e('html_attr') }}"
+                  data-empty-content="{{ 'note.index.details.no_content'|trans|e('html_attr') }}"
+                  data-note-status-label="{{ config.title|e('html_attr') }}"
+                  data-note-due-label="{{ note.dueAt ? note.dueAt|date('d/m/Y H:i') : ('note.index.card.no_due_date'|trans) }}"
+                  data-note-due-input="{{ note.dueAt ? note.dueAt|date('Y-m-d\\TH:i') : '' }}"
+                  data-note-owner="{{ (note.createdBy.email ?? '')|e('html_attr') }}"
+                  data-note-can-edit="{{ isOwner ? '1' : '0' }}"
+                  data-note-update-url="{{ isOwner ? path('app_note_update', { id: note.id }) : '' }}"
+                  data-note-update-token="{{ isOwner ? csrf_token('update_note_' ~ note.id) : '' }}"
+                >
+                  <div class="note-card__top">
+                    <span class="note-card__scope">
+                      <i class="fa-solid {{ note.team ? 'fa-building' : 'fa-user-shield' }}" aria-hidden="true"></i>
+                      <span>{{ note.team ? note.team.name : ('note.index.card.private'|trans) }}</span>
+                    </span>
+                    {% if isOwner %}
+                      <form method="post" action="{{ path('app_note_delete', { id: note.id }) }}" data-action="submit->note-board#confirmDelete" data-confirm="{{ 'note.index.board.delete.confirm'|trans|e('html_attr') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_note_' ~ note.id) }}">
+                        <button type="submit" class="notes-icon-action notes-icon-action--danger" title="{{ 'note.index.board.delete.title'|trans }}" aria-label="{{ 'note.index.board.delete.title'|trans }}"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
+                      </form>
+                    {% endif %}
+                  </div>
 
-                    <!-- Assigned -->
-                    <div class="cell assignees-cell" data-label="{{ 'note.index.board.table.assigned'|trans }}">
+                  <button type="button" class="note-card__open" data-action="click->note-board#openDetails" aria-label="{{ 'note.index.details.open'|trans }} — {{ note.title }}">
+                    <h3 class="note-card__title">{{ note.title }}</h3>
+                    {% if note.content %}
+                      <p class="note-card__description">{{ note.content|u.truncate(180, '…') }}</p>
+                    {% else %}
+                      <p class="note-card__empty-copy">{{ 'note.index.card.empty_content'|trans }}</p>
+                    {% endif %}
+                  </button>
+
+                  <div class="note-card__meta">
+                    {% if note.dueAt %}
+                      <span class="note-meta-chip {{ isOverdue ? 'note-meta-chip--danger' : (isDueSoon ? 'note-meta-chip--warning' : '') }}">
+                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>{% if isOverdue %}{{ 'note.index.card.overdue'|trans }} · {% endif %}{{ note.dueAt|date('d/m') }}
+                      </span>
+                    {% endif %}
+                    {% if isAssignee %}<span class="note-meta-chip note-meta-chip--mine"><i class="fa-solid fa-user-check" aria-hidden="true"></i>{{ 'note.index.card.assigned_to_you'|trans }}</span>{% endif %}
+                    {% if note.content %}<span class="note-meta-chip"><i class="fa-solid fa-align-left" aria-hidden="true"></i>{{ note.content|length }} {{ 'note.index.card.characters'|trans }}</span>{% endif %}
+                  </div>
+
+                  <div class="note-card__people">
+                    <div class="note-avatars" aria-label="{{ 'note.index.board.table.assigned'|trans }}">
                       {% if note.assignments|length > 0 %}
-                        <div class="assignee-avatars">
-                          {% for assignment in note.assignments|slice(0, 3) %}
-                            <img class="avatar-img"
-               src="{{ assignment.assignee.avatar ? asset('uploads/avatars/' ~ assignment.assignee.avatar) : asset('images/avatar-default.png') }}"
-               alt="{{ 'header.profile.avatar_alt'|trans }}">
-               {# {{assignment.assignee.email }} #}
-                          {% endfor %}
-                          {% if note.assignments|length > 3 %}
-                            <div class="avatar avatar-more">+{{ note.assignments|length - 3 }}</div>
+                        {% for assignment in note.assignments|slice(0, 4) %}
+                          {% if isOwner %}
+                            <form method="post" action="{{ path('app_note_unassign', { id: note.id, userId: assignment.assignee.id }) }}">
+                              <input type="hidden" name="_token" value="{{ csrf_token('unassign_note_' ~ note.id) }}">
+                              <button type="submit" class="note-avatar note-avatar--removable" title="{{ 'note.index.board.assign.remove'|trans({ '%email%': assignment.assignee.email }) }}" aria-label="{{ 'note.index.board.assign.remove'|trans({ '%email%': assignment.assignee.email }) }}">
+                                {% if assignment.assignee.avatar %}<img src="{{ asset('uploads/avatars/' ~ assignment.assignee.avatar) }}" alt="">{% else %}{{ assignment.assignee.email|first|upper }}{% endif %}
+                              </button>
+                            </form>
+                          {% else %}
+                            <span class="note-avatar" title="{{ assignment.assignee.email }}">
+                              {% if assignment.assignee.avatar %}<img src="{{ asset('uploads/avatars/' ~ assignment.assignee.avatar) }}" alt="{{ assignment.assignee.email }}">{% else %}{{ assignment.assignee.email|first|upper }}{% endif %}
+                            </span>
                           {% endif %}
-                        </div>
+                        {% endfor %}
+                        {% if note.assignments|length > 4 %}<span class="note-avatar">+{{ note.assignments|length - 4 }}</span>{% endif %}
                       {% else %}
-                        <span class="unassigned-badge">
-                          {{ 'note.index.board.badges.unassigned'|trans }}
-                        </span>
+                        <span class="note-avatar note-avatar--empty">{{ 'note.index.board.badges.unassigned'|trans }}</span>
                       {% endif %}
                     </div>
 
-                    <!-- Progress -->
-                    <div class="cell progress-cell" data-label="{{ 'note.index.board.table.progress'|trans }}">
-                      {% set progress = statusKey == 'todo' ? 20 : (statusKey == 'in_progress' ? 60 : 100) %}
-                      <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ progress }}%"></div>
-                      </div>
-                      <span class="progress-text">{{ progress }}%</span>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="cell" data-label="{{ 'note.index.board.table.status'|trans }}">
-                      {% if isOwner or isAssignee %}
-                        <form method="post" action="{{ path('app_note_status', { id: note.id }) }}" style="width: 100%;">
-                          <input type="hidden" name="_token" value="{{ csrf_token('status_note_' ~ note.id) }}">
-                          <select name="status" class="status-select" onchange="this.form.submit()">
-                            <option value="todo" {{ statusKey == 'todo' ? 'selected' : '' }}>
-                              {{ 'note.index.board.statuses.todo'|trans }}
-                            </option>
-                            <option value="in_progress" {{ statusKey == 'in_progress' ? 'selected' : '' }}>
-                              {{ 'note.index.board.statuses.in_progress'|trans }}
-                            </option>
-                            <option value="done" {{ statusKey == 'done' ? 'selected' : '' }}>
-                              {{ 'note.index.board.statuses.done'|trans }}
-                            </option>
+                    <div class="note-card__controls">
+                      {% if isOwner %}
+                        <form method="post" action="{{ path('app_note_assign', { id: note.id }) }}">
+                          <input type="hidden" name="_token" value="{{ csrf_token('assign_note_' ~ note.id) }}">
+                          <select name="assignee_id" class="note-assign-select" data-action="change->note-board#submitSelect" aria-label="{{ 'note.index.board.assign.placeholder'|trans }}">
+                            <option value="">{{ 'note.index.board.assign.placeholder'|trans }}</option>
+                            {% if not team %}
+                              {% if not note.isAssignedTo(app.user) %}<option value="{{ app.user.id }}">{{ 'note.index.board.assign.yourself'|trans }}</option>{% endif %}
+                            {% else %}
+                              {% for teamUser in teamUsers %}{% if not note.isAssignedTo(teamUser) %}<option value="{{ teamUser.id }}">{{ teamUser.email|split('@')[0] }}</option>{% endif %}{% endfor %}
+                            {% endif %}
                           </select>
                         </form>
-                      {% else %}
-                        <span class="unassigned-badge">{{ note.status.value }}</span>
                       {% endif %}
-                    </div>
 
-                    <!-- Due Date -->
-                    <div class="cell" data-label="{{ 'note.index.board.table.due_date'|trans }}">
-                      {% if note.dueAt %}
-                        {% set isOverdue = note.dueAt < date() and statusKey != 'done' %}
-                        <span class="due-date {{ isOverdue ? 'overdue' : '' }}">
-                          <i class="fa-solid fa-calendar"></i>
-                          {{ note.dueAt|date('M d') }}
-                        </span>
-                      {% else %}
-                        <span class="due-date">—</span>
-                      {% endif %}
-                    </div>
-
-                    <!-- Actions (Owner only) -->
-                    <div class="cell actions-cell" data-label="{{ 'note.index.board.table.actions'|trans }}">
-                      {% if isOwner %}
-                        {% if (teamUsers|length > 0 or not team) %}
-                          <form method="post" action="{{ path('app_note_assign', { id: note.id }) }}" class="assign-dropdown">
-                            <input type="hidden" name="_token" value="{{ csrf_token('assign_note_' ~ note.id) }}">
-                            <select name="assignee_id" class="assign-select" onchange="this.form.submit()">
-                              <option value="">{{ 'note.index.board.assign.placeholder'|trans }}</option>
-                              {% if not team %}
-                                <option value="{{ app.user.id }}">{{ 'note.index.board.assign.yourself'|trans }}</option>
-                              {% else %}
-                                {% for user in teamUsers %}
-                                  <option value="{{ user.id }}">{{ user.email|split('@')[0] }}</option>
-                                {% endfor %}
-                              {% endif %}
-                            </select>
-                          </form>
-                        {% endif %}
-
-                        <form method="post"
-                              action="{{ path('app_note_delete', { id: note.id }) }}"
-                              onsubmit="return confirm('{{ 'note.index.board.delete.confirm'|trans }}')">
-                          <input type="hidden" name="_token" value="{{ csrf_token('delete_note_' ~ note.id) }}">
-                          <button type="submit"
-                                  class="action-btn danger"
-                                  title="{{ 'note.index.board.delete.title'|trans }}">
-                            <i class="fa-solid fa-trash"></i>
-                          </button>
-                        </form>
-                      {% else %}
-                        <span></span>
-                      {% endif %}
+                      <form method="post" action="{{ path('app_note_status', { id: note.id }) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('status_note_' ~ note.id) }}">
+                        <select name="status" class="note-status-select" data-action="change->note-board#submitSelect" aria-label="{{ 'note.index.board.table.status'|trans }}">
+                          {% for value, statusConfigItem in statusConfig %}<option value="{{ value }}" {{ statusKey == value ? 'selected' : '' }}>{{ statusConfigItem.title }}</option>{% endfor %}
+                        </select>
+                      </form>
                     </div>
                   </div>
-                {% endif %}
+                </article>
               {% endfor %}
+
+              <div class="notes-column-empty"><div><i class="fa-solid fa-wind" aria-hidden="true"></i><p>{{ 'note.index.board.empty_column'|trans }}</p></div></div>
             </div>
-          </div>
-        {% else %}
-          <div class="empty-state">
-            <i class="fa-solid fa-inbox"></i>
-            <p>{{ 'note.index.board.empty_column'|trans }}</p>
-          </div>
-        {% endif %}
+          </section>
+        {% endfor %}
+      </section>
+
+      <div class="notes-no-results" data-note-board-target="noResults" hidden>
+        <span class="notes-no-results__icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></span>
+        <h2>{{ 'note.index.empty.no_results_title'|trans }}</h2>
+        <p>{{ 'note.index.empty.no_results_text'|trans }}</p>
+        <button type="button" class="notes-secondary-action" data-action="click->note-board#resetFilters">{{ 'note.index.empty.reset'|trans }}</button>
       </div>
-    {% endfor %}
-  </div>
-</div>
-
-<dialog id="noteDetailsModal" class="modal">
-  <div class="modal-header">
-    <h2 class="modal-title" id="noteDetailsTitle"></h2>
-    <button type="button" class="action-btn" onclick="closeNoteDetails()">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-  </div>
-
-  <div class="modal-body">
-    <div class="note-detail-grid">
-      <div class="note-detail-card">
-        <span class="note-detail-label">{{ 'note.index.board.table.status'|trans }}</span>
-        <div class="note-detail-value" id="noteDetailsStatus"></div>
+    {% else %}
+      <div class="notes-no-results">
+        <span class="notes-no-results__icon"><i class="fa-regular fa-note-sticky" aria-hidden="true"></i></span>
+        <h2>{{ 'note.index.empty.first_title'|trans }}</h2>
+        <p>{{ canCreateNote ? ('note.index.empty.first_text'|trans) : ('note.index.empty.member_text'|trans) }}</p>
+        {% if canCreateNote %}<button type="button" class="notes-primary-action" data-action="click->note-board#openCreate"><i class="fa-solid fa-plus" aria-hidden="true"></i>{{ 'note.index.actions.new_note'|trans }}</button>{% endif %}
       </div>
-      <div class="note-detail-card">
-        <span class="note-detail-label">{{ 'note.index.board.table.due_date'|trans }}</span>
-        <div class="note-detail-value" id="noteDetailsDue"></div>
-      </div>
-      <div class="note-detail-card">
-        <span class="note-detail-label">{{ 'note.index.details.content'|trans }}</span>
-        <div class="note-detail-value" id="noteDetailsContentState"></div>
-      </div>
-    </div>
+    {% endif %}
 
-    <div class="note-detail-content" id="noteDetailsContent"></div>
-  </div>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" onclick="closeNoteDetails()">
-      {{ 'note.index.details.close'|trans }}
-    </button>
-  </div>
-</dialog>
-
-{% if canCreateNote %}
-  <!-- Create Note Modal -->
-  <dialog id="noteModal" class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title">{{ 'note.index.modal.title'|trans }}</h2>
-      <button class="action-btn" onclick="document.getElementById('noteModal').close()">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      {{ form_start(form) }}
-        <div class="form-grid">
-          <div class="form-field">
-            {{ form_label(form.title) }}
-            {{ form_widget(form.title) }}
-            {{ form_errors(form.title) }}
-          </div>
-
-          <div class="form-field">
-            {{ form_label(form.content) }}
-            {{ form_widget(form.content) }}
-            {{ form_errors(form.content) }}
-          </div>
-
-          <div class="form-field">
-            {{ form_label(form.status) }}
-            {{ form_widget(form.status) }}
-            {{ form_errors(form.status) }}
-          </div>
-
-          <div class="form-field">
-            {{ form_label(form.dueAt) }}
-            {{ form_widget(form.dueAt) }}
-            {{ form_errors(form.dueAt) }}
-          </div>
+    <dialog class="notes-dialog" data-note-board-target="detailsModal" data-action="click->note-board#closeOnBackdrop">
+      <header class="notes-dialog__header">
+        <div class="notes-dialog__heading"><span class="notes-dialog__eyebrow">{{ 'note.index.details.eyebrow'|trans }}</span><h2 class="notes-dialog__title" data-note-board-target="detailsTitle"></h2></div>
+        <div class="notes-dialog__header-actions">
+          <button type="button" class="notes-icon-action" data-note-board-target="editButton" data-action="click->note-board#enterEdit" aria-label="{{ 'note.index.details.edit'|trans }}"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></button>
+          <button type="button" class="notes-icon-action" data-action="click->note-board#closeDetails" aria-label="{{ 'note.index.details.close'|trans }}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </div>
-      {{ form_end(form) }}
-    </div>
+      </header>
+      <div class="notes-dialog__body">
+        <div class="notes-dialog__view">
+          <div class="notes-dialog__meta">
+            <span class="note-meta-chip"><i class="fa-solid fa-bars-progress" aria-hidden="true"></i><span data-note-board-target="detailsStatus"></span></span>
+            <span class="note-meta-chip"><i class="fa-regular fa-calendar" aria-hidden="true"></i><span data-note-board-target="detailsDue"></span></span>
+            <span class="note-meta-chip"><i class="fa-regular fa-user" aria-hidden="true"></i><span data-note-board-target="detailsOwner"></span></span>
+          </div>
+          <div class="notes-dialog__content" data-note-board-target="detailsContent"></div>
+        </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="document.getElementById('noteModal').close()">
-        {{ 'note.index.modal.cancel'|trans }}
-      </button>
-      <button class="btn btn-primary" onclick="document.querySelector('#noteModal form').submit()">
-        <i class="fa-solid fa-check"></i>
-        {{ 'note.index.modal.create'|trans }}
-      </button>
-    </div>
-  </dialog>
-  {% endif %}
-<script>
-  const noteDetailsModal = document.getElementById('noteDetailsModal');
-  const noteDetailsTitle = document.getElementById('noteDetailsTitle');
-  const noteDetailsStatus = document.getElementById('noteDetailsStatus');
-  const noteDetailsDue = document.getElementById('noteDetailsDue');
-  const noteDetailsContent = document.getElementById('noteDetailsContent');
-  const noteDetailsContentState = document.getElementById('noteDetailsContentState');
+        <form class="notes-dialog__edit" data-note-board-target="editForm" data-action="submit->note-board#saveDetails" hidden>
+          <div class="notes-form-field"><label for="note-edit-title">{{ 'note.form.title.label'|trans }}</label><input id="note-edit-title" type="text" maxlength="255" required data-note-board-target="editTitle"></div>
+          <div class="notes-form-field"><label for="note-edit-content">{{ 'note.form.content.label'|trans }}</label><textarea id="note-edit-content" rows="8" maxlength="50000" data-note-board-target="editContent"></textarea></div>
+          <div class="notes-form-field"><label for="note-edit-due">{{ 'note.form.due_at.label'|trans }}</label><input id="note-edit-due" type="datetime-local" data-note-board-target="editDue"></div>
+        </form>
+      </div>
+      <footer class="notes-dialog__footer">
+        <span class="notes-copy-feedback" data-note-board-target="copyFeedback editFeedback" role="status"></span>
+        <div class="notes-dialog__view-actions">
+          <button type="button" class="notes-secondary-action" data-note-board-target="copyButton" data-action="click->note-board#copyDetails"><i class="fa-regular fa-copy" aria-hidden="true"></i>{{ 'note.index.details.copy'|trans }}</button>
+          <button type="button" class="notes-primary-action" data-action="click->note-board#closeDetails">{{ 'note.index.details.close'|trans }}</button>
+        </div>
+        <div class="notes-dialog__edit-actions" hidden>
+          <button type="button" class="notes-secondary-action" data-action="click->note-board#cancelEdit">{{ 'note.index.modal.cancel'|trans }}</button>
+          <button type="submit" class="notes-primary-action" data-note-board-target="saveButton" data-action="click->note-board#submitEdit"><i class="fa-solid fa-check" aria-hidden="true"></i>{{ 'note.index.details.save'|trans }}</button>
+        </div>
+      </footer>
+    </dialog>
 
-  function escapeHtml(value) {
-    return value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  function openNoteDetails(button) {
-    const title = button.dataset.noteTitle || '';
-    const content = button.dataset.noteContent || '';
-    const status = button.dataset.noteStatus || '';
-    const due = button.dataset.noteDue || '-';
-
-    noteDetailsTitle.textContent = title;
-    noteDetailsStatus.textContent = status;
-    noteDetailsDue.textContent = due;
-
-    if (content.trim()) {
-      noteDetailsContent.innerHTML = escapeHtml(content).replace(/\n/g, '<br>');
-      noteDetailsContent.classList.remove('note-detail-empty');
-      noteDetailsContentState.textContent = '{{ "note.index.details.available"|trans|e("js") }}';
-    } else {
-      noteDetailsContent.textContent = '{{ "note.index.details.no_content"|trans|e("js") }}';
-      noteDetailsContent.classList.add('note-detail-empty');
-      noteDetailsContentState.textContent = '{{ "note.index.details.empty"|trans|e("js") }}';
-    }
-
-    noteDetailsModal.showModal();
-  }
-
-  function closeNoteDetails() {
-    noteDetailsModal.close();
-  }
-</script>
+    {% if canCreateNote %}
+      <dialog class="notes-dialog" data-note-board-target="createModal" data-action="click->note-board#closeOnBackdrop">
+        {{ form_start(form, { attr: { class: 'notes-create-form' } }) }}
+          <header class="notes-dialog__header">
+            <div class="notes-dialog__heading"><span class="notes-dialog__eyebrow">{{ isPersonalWorkspace ? ('note.index.header.personal_workspace'|trans) : team.name }}</span><h2 class="notes-dialog__title">{{ 'note.index.modal.title'|trans }}</h2></div>
+            <button type="button" class="notes-icon-action" data-action="click->note-board#closeCreate" aria-label="{{ 'note.index.modal.cancel'|trans }}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+          </header>
+          <div class="notes-dialog__body">
+            <div class="notes-form-grid">
+              <div class="notes-form-field notes-form-field--wide">{{ form_label(form.title) }}{{ form_widget(form.title, { attr: { placeholder: ('note.form.title.placeholder'|trans) } }) }}<div class="notes-form-errors">{{ form_errors(form.title) }}</div></div>
+              <div class="notes-form-field notes-form-field--wide">{{ form_label(form.content) }}{{ form_widget(form.content, { attr: { placeholder: ('note.form.content.placeholder'|trans) } }) }}<div class="notes-form-errors">{{ form_errors(form.content) }}</div></div>
+              <div class="notes-form-field">{{ form_label(form.status) }}{{ form_widget(form.status) }}<div class="notes-form-errors">{{ form_errors(form.status) }}</div></div>
+              <div class="notes-form-field">{{ form_label(form.dueAt) }}{{ form_widget(form.dueAt) }}<div class="notes-form-errors">{{ form_errors(form.dueAt) }}</div></div>
+            </div>
+            {{ form_rest(form) }}
+          </div>
+          <footer class="notes-dialog__footer">
+            <span class="notes-copy-feedback"><i class="fa-solid fa-lock" aria-hidden="true"></i> {{ 'note.index.modal.visibility_hint'|trans }}</span>
+            <div>
+              <button type="button" class="notes-secondary-action" data-action="click->note-board#closeCreate">{{ 'note.index.modal.cancel'|trans }}</button>
+              <button type="submit" class="notes-primary-action"><i class="fa-solid fa-check" aria-hidden="true"></i>{{ 'note.index.modal.create'|trans }}</button>
+            </div>
+          </footer>
+        {{ form_end(form, { render_rest: false }) }}
+      </dialog>
+    {% endif %}
+  </div>
 {% endblock %}
