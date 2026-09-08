@@ -71,12 +71,25 @@ final class CredentialUrlPolicyTest extends TestCase
         $encryption = $this->createMock(EncryptionService::class);
         $encryption->expects(self::never())->method('encrypt');
         $encryption->expects(self::never())->method('decrypt');
-        $manager = new CredentialManager($encryption, $em);
+        $manager = new CredentialManager($encryption, $em, new CredentialUrlPolicy());
         $credential = (new Credential())->setPassword('encrypted-password');
         $manager->updateLoginUrl($credential, 'https://example.com/login');
         self::assertSame('https://example.com/login', $credential->getLoginUrl());
         $manager->updateLoginUrl($credential, null);
         self::assertNull($credential->getLoginUrl());
         self::assertSame('encrypted-password', $credential->getPassword());
+    }
+
+    public function testSiteInputExtractsTheDomainAndKeepsOnlyAUsefulLaunchPage(): void
+    {
+        $urls = new CredentialUrlPolicy();
+
+        self::assertSame(['domain' => 'example.com', 'loginUrl' => null], $urls->parseSite('www.example.com'));
+        self::assertSame(
+            ['domain' => 'accounts.example.com', 'loginUrl' => 'https://accounts.example.com/sign-in?source=app'],
+            $urls->parseSite('https://accounts.example.com/sign-in?source=app'),
+        );
+        self::assertSame('https://accounts.example.com/sign-in', $urls->loginPage('https://accounts.example.com/sign-in?token=secret#step'));
+        self::assertNull($urls->parseSite('javascript:alert(1)'));
     }
 }

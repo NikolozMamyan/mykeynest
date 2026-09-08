@@ -3,18 +3,24 @@
 namespace App\Form;
 
 use App\Entity\Credential;
-use App\Entity\Team;
-use App\Repository\TeamRepository;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Service\CredentialUrlPolicy;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CredentialType extends AbstractType
 {
+    public function __construct(private readonly CredentialUrlPolicy $credentialUrls)
+    {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var \App\Entity\User|null $user */
@@ -27,14 +33,19 @@ class CredentialType extends AbstractType
                 'attr' => ['placeholder' => 'Ex : Gmail, Facebook, etc.'],
             ])
             ->add('domain', TextType::class, [
-                'label' => 'Domaine',
-                'attr' => ['placeholder' => 'Ex : facebook.com'],
+                'label' => 'credential.form.site.label',
+                'attr' => ['placeholder' => 'credential.form.site.placeholder'],
+                'constraints' => [
+                    new Callback(function (mixed $value, ExecutionContextInterface $context): void {
+                        if (!is_string($value) || $this->credentialUrls->parseSite($value) === null) {
+                            $context->buildViolation('credential.form.site.invalid')->addViolation();
+                        }
+                    }),
+                ],
             ])
-            ->add('loginUrl', UrlType::class, [
+            ->add('loginUrl', HiddenType::class, [
                 'label' => 'credential.index.launch.url_label',
                 'required' => false,
-                'default_protocol' => 'https',
-                'attr' => ['placeholder' => 'https://exemple.com/login', 'maxlength' => 2048],
             ])
             ->add('username', TextType::class, [
                 'label' => "Nom d'utilisateur",
@@ -48,6 +59,26 @@ class CredentialType extends AbstractType
                     'placeholder' => $isEdit ? 'Laissez vide pour conserver le mot de passe actuel' : '********'
                 ],
             ]);
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
+            $data = $event->getData();
+            if (!is_array($data)) {
+                return;
+            }
+
+            $site = $this->credentialUrls->parseSite(is_string($data['domain'] ?? null) ? $data['domain'] : null);
+            if ($site === null) {
+                return;
+            }
+
+            $data['domain'] = $site['domain'];
+            if ($site['loginUrl'] !== null) {
+                $data['loginUrl'] = $site['loginUrl'];
+            } else {
+                $data['loginUrl'] = '';
+            }
+            $event->setData($data);
+        });
 
         // if ($user) {
         //     $builder->add('teams', EntityType::class, [

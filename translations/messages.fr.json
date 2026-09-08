@@ -756,6 +756,14 @@
     "restricted_message": "Vous n’avez pas l’autorisation d’afficher ce mot de passe. Connexion possible via l’extension MYKEYNEST."
   },
   "credential": {
+    "form": {
+      "site": {
+        "label": "Site ou application",
+        "placeholder": "Ex. netflix.com",
+        "help": "Saisissez simplement le site. Vous pouvez aussi coller sa page de connexion : MYKEYNEST configurera le reste automatiquement.",
+        "invalid": "Saisissez un domaine ou une adresse HTTPS valide."
+      }
+    },
     "index": {
       "meta": {
         "title": "Gestionnaire de mots de passe"
@@ -843,13 +851,14 @@
         "opened": "Site ouvert. L’extension remplira les champs de connexion détectés.",
         "launch_error": "L’ouverture n’a pas pu être confirmée. Vérifiez vos onglets avant de réessayer.",
         "extension_account_mismatch": "Reconnectez l’extension au compte MYKEYNEST actuellement ouvert.",
-        "credential_domain_mismatch": "Cette adresse ne correspond pas au site du compte. Son propriétaire peut enregistrer une nouvelle adresse de connexion.",
+        "credential_domain_mismatch": "Ce site ne correspond pas à l’identifiant sélectionné. Vérifiez le site associé au compte.",
         "credential_access_denied": "L’accès à cet identifiant n’est plus disponible. Actualisez la page.",
         "domain_excluded": "Ce site est exclu du remplissage dans les réglages de l’extension.",
         "open_site": "Ouvrir le site",
         "eyebrow": "Votre raccourci de connexion",
         "title": "Connexion rapide",
         "description": "Le bon site, le bon compte. Tout est à portée de clic.",
+        "destination_hint": "MYKEYNEST ouvre automatiquement la meilleure page de connexion connue pour ce compte.",
         "close": "Fermer la fenêtre de connexion rapide",
         "url_label": "Adresse de connexion",
         "url_hint": "Précisez la page de connexion. Vous pouvez mémoriser cette adresse si le compte vous appartient.",

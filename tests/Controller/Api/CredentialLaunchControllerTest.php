@@ -30,6 +30,7 @@ final class CredentialLaunchControllerTest extends KernelTestCase
             self::assertSame(10, $data['id']);
             self::assertSame('selected@example.test', $data['username']);
             self::assertSame($submitAfterFill, $data['submitAfterFill']);
+            self::assertFalse($data['rememberLoginUrl']);
             self::assertFalse($data['allowSubdomains']);
         }
     }
@@ -58,15 +59,35 @@ final class CredentialLaunchControllerTest extends KernelTestCase
         self::assertSame('selected@example.test', $data['username']);
     }
 
-    private function controller(bool $shared, bool $canRevealPassword = false): array
+    public function testOwnerCanAutomaticallyRememberASanitizedLoginPage(): void
     {
+        [$controller, $repository, $credential] = $this->controller(false, true, true);
+        $credential->setLoginUrl(null);
+        $response = $controller->rememberLoginUrl(
+            $this->request(['url' => 'https://login.example.com/sign-in?token=secret#step']),
+            10,
+            $repository,
+        );
+
+        self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+        self::assertSame(
+            'https://login.example.com/sign-in',
+            json_decode((string) $response->getContent(), true)['loginUrl'],
+        );
+    }
+
+    private function controller(bool $shared, bool $canRevealPassword = false, bool $ownerAccess = false): array
+    {
+        self::ensureKernelShutdown();
         self::bootKernel();
         $container = self::getContainer();
         $em = $this->createMock(EntityManagerInterface::class);
         $container->set(EntityManagerInterface::class, $em);
         $user = (new User())->setEmail('viewer@example.test');
         (new \ReflectionProperty(User::class, 'id'))->setValue($user, 1);
-        $owner = (new User())->setEmail('owner@example.test')->setCredentialEncryptionKey('test-key');
+        $owner = $ownerAccess
+            ? $user->setCredentialEncryptionKey('test-key')
+            : (new User())->setEmail('owner@example.test')->setCredentialEncryptionKey('test-key');
         $credential = (new Credential())->setUser($owner)->setDomain('example.com')->setLoginUrl('https://accounts.example.net/login')->setUsername('selected@example.test');
         (new \ReflectionProperty(Credential::class, 'id'))->setValue($credential, 10);
         $encryption = $container->get(EncryptionService::class);
@@ -91,7 +112,7 @@ final class CredentialLaunchControllerTest extends KernelTestCase
         $repository = $this->createMock(CredentialRepository::class);
         $repository->method('find')->willReturn($credential);
 
-        return [$container->get(ApiSharedController::class), $repository];
+        return [$container->get(ApiSharedController::class), $repository, $credential];
     }
 
     private function request(array $payload): Request

@@ -473,6 +473,7 @@ final class ApiSharedController extends AbstractController
             'url' => $url,
             'userId' => $auth['user']->getId(),
             'submitAfterFill' => !$this->credentialAccessPolicy->canRevealPassword($auth['user'], $credential),
+            'rememberLoginUrl' => $this->credentialAccessPolicy->canEdit($auth['user'], $credential),
             'allowSubdomains' => $credential->getLoginUrl() === null,
         ]), $auth['issuedInstallationToken']);
     }
@@ -516,6 +517,48 @@ final class ApiSharedController extends AbstractController
         }
 
         return $this->credentialSecretResponse($id, $credentialRepository, $auth, false, $domain);
+    }
+
+    #[Route('/extention/api/credentials/{id}/login-url', name: 'api_credential_login_url', methods: ['POST', 'OPTIONS'])]
+    public function rememberLoginUrl(Request $request, int $id, CredentialRepository $credentialRepository): JsonResponse
+    {
+        if ($pf = $this->preflight($request)) {
+            return $pf;
+        }
+
+        $auth = $this->authenticate($request);
+        if (!$auth) {
+            return $this->unauthorized();
+        }
+        if (isset($auth['rate_limited'])) {
+            return $auth['rate_limited'];
+        }
+        if (isset($auth['response'])) {
+            return $auth['response'];
+        }
+
+        $credential = $credentialRepository->find($id);
+        if (!$credential instanceof Credential || !$this->credentialAccessPolicy->canEdit($auth['user'], $credential)) {
+            return $this->withInstallationToken($this->json(['code' => 'credential_access_denied'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
+        }
+        if ($credential->getLoginUrl() !== null) {
+            return $this->withInstallationToken($this->json(['success' => true, 'loginUrl' => $credential->getLoginUrl()]), $auth['issuedInstallationToken']);
+        }
+
+        try {
+            $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $this->badRequest('Corps JSON invalide');
+        }
+
+        $url = $this->credentialUrls->loginPage(is_array($payload) && is_string($payload['url'] ?? null) ? $payload['url'] : null);
+        if ($url === null || !$this->credentialUrls->allows($credential, $url)) {
+            return $this->withInstallationToken($this->json(['code' => 'credential_domain_mismatch'], Response::HTTP_UNPROCESSABLE_ENTITY), $auth['issuedInstallationToken']);
+        }
+
+        $this->credentialManager->updateLoginUrl($credential, $url);
+
+        return $this->withInstallationToken($this->json(['success' => true, 'loginUrl' => $url]), $auth['issuedInstallationToken']);
     }
 
     #[Route('/extention/api/credentials/{id}/update', name: 'api_credential_update', methods: ['POST', 'OPTIONS'])]

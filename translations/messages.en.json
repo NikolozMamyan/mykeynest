@@ -708,6 +708,14 @@
     "restricted_message": "You are not allowed to view this password. You can still sign in through the MYKEYNEST extension."
   },
   "credential": {
+    "form": {
+      "site": {
+        "label": "Website or app",
+        "placeholder": "e.g. netflix.com",
+        "help": "Simply enter the website. You can also paste its sign-in page and MYKEYNEST will configure the rest automatically.",
+        "invalid": "Enter a valid domain or HTTPS address."
+      }
+    },
     "index": {
       "meta": {
         "title": "Password Manager"
@@ -795,13 +803,14 @@
         "opened": "Website opened. The extension will fill any detected sign-in fields.",
         "launch_error": "The opening could not be confirmed. Check your tabs before trying again.",
         "extension_account_mismatch": "Reconnect the extension to the MYKEYNEST account currently open.",
-        "credential_domain_mismatch": "This address does not match the account website. Its owner can save a new sign-in address.",
+        "credential_domain_mismatch": "This website does not match the selected credential. Check the website linked to the account.",
         "credential_access_denied": "Access to this credential is no longer available. Refresh the page.",
         "domain_excluded": "This website is excluded from autofill in the extension settings.",
         "open_site": "Open website",
         "eyebrow": "Your sign-in shortcut",
         "title": "Quick sign-in",
         "description": "The right website, the right account. Just a click away.",
+        "destination_hint": "MYKEYNEST automatically opens the best known sign-in page for this account.",
         "close": "Close quick sign-in",
         "url_label": "Sign-in address",
         "url_hint": "Enter the sign-in page. You can save this address if you own the account.",

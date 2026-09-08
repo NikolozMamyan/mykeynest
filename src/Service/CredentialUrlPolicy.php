@@ -6,6 +6,55 @@ use App\Entity\Credential;
 
 final class CredentialUrlPolicy
 {
+    /**
+     * @return array{domain: string, loginUrl: ?string}|null
+     */
+    public function parseSite(?string $value): ?array
+    {
+        $raw = trim($value ?? '');
+        $url = $this->normalize($raw);
+        if ($url === null) {
+            return null;
+        }
+
+        $host = $this->hostname($url);
+        if ($host === '') {
+            return null;
+        }
+
+        $parts = parse_url($url);
+        $path = is_array($parts) ? (string) ($parts['path'] ?? '') : '';
+        $hasDedicatedPage = ($path !== '' && $path !== '/')
+            || isset($parts['query'])
+            || isset($parts['fragment'])
+            || (isset($parts['port']) && $this->effectivePort($url) !== 443);
+
+        return [
+            'domain' => $host,
+            'loginUrl' => $hasDedicatedPage ? $url : null,
+        ];
+    }
+
+    public function loginPage(?string $value): ?string
+    {
+        $url = $this->normalize($value);
+        if ($url === null) {
+            return null;
+        }
+
+        $parts = parse_url($url);
+        if (!is_array($parts)) {
+            return null;
+        }
+
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        $host = (string) ($parts['host'] ?? '');
+        $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+        $path = (string) ($parts['path'] ?? '/');
+
+        return sprintf('%s://%s%s%s', $scheme, $host, $port, $path === '' ? '/' : $path);
+    }
+
     public function normalize(?string $value): ?string
     {
         $value = trim($value ?? '');

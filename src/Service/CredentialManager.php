@@ -10,7 +10,8 @@ final class CredentialManager
 {
     public function __construct(
         private EncryptionService $encryptionService,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private CredentialUrlPolicy $credentialUrls,
     ) {}
 
     private function configureEncryptionForWrite(User $user): void
@@ -125,9 +126,14 @@ public function decryptPassword(Credential $credential): string
      */
     private function normalizeDomain(Credential $credential): void
     {
-        $domain = $credential->getDomain();
-        $domain = preg_replace(['#^https?://#', '#^www\.#'], '', $domain);
-        $domain = rtrim($domain, '/');
-        $credential->setDomain($domain);
+        $site = $this->credentialUrls->parseSite($credential->getDomain());
+        if ($site === null) {
+            throw new \InvalidArgumentException('Site ou application invalide.');
+        }
+
+        $credential->setDomain($site['domain']);
+        if ($credential->getLoginUrl() === null && $site['loginUrl'] !== null) {
+            $credential->setLoginUrl($site['loginUrl']);
+        }
     }
 }

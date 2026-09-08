@@ -18,13 +18,10 @@ export default class extends Controller {
     "launchInitial",
     "launchUrl",
     "launchLink",
-    "launchError",
     "launchState",
     "launchDescription",
     "launchFill",
     "launchFeedback",
-    "launchSave",
-    "launchSaveFeedback",
     "launchExtension",
   ];
 
@@ -103,8 +100,6 @@ export default class extends Controller {
     this.launchInitialTarget.textContent = this.launchNameTarget.textContent.trim().slice(0, 1).toUpperCase();
     const siteLink = card.querySelector("[data-site-domain]");
     this.launchUrlTarget.value = this.siteUrl(siteLink.dataset.loginUrl || siteLink.dataset.siteDomain) || "";
-    this.launchSaveTarget.hidden = !card.dataset.saveUrl;
-    this.launchSaveFeedbackTarget.textContent = "";
     this.launchFeedbackTarget.textContent = "";
     this.updateLaunchUrl();
     this.launchDialogTarget.showModal();
@@ -129,8 +124,6 @@ export default class extends Controller {
 
   updateLaunchUrl() {
     const url = this.siteUrl(this.launchUrlTarget.value);
-    this.launchErrorTarget.hidden = Boolean(url);
-    this.launchUrlTarget.setAttribute("aria-invalid", String(!url));
     this.launchLinkTarget.setAttribute("aria-disabled", String(!url));
     if (url) {
       this.launchLinkTarget.href = url;
@@ -138,14 +131,11 @@ export default class extends Controller {
       this.launchLinkTarget.removeAttribute("href");
     }
     this.launchFillTarget.disabled = !url || this.extensionState !== "ready" || this.launchBusy === true;
-    this.launchSaveTarget.disabled = (!url && this.launchUrlTarget.value.trim() !== "") || this.savingLoginUrl === true;
-    this.launchSaveFeedbackTarget.textContent = "";
   }
 
   openLaunchSite(event) {
     if (!this.siteUrl(this.launchUrlTarget.value)) {
       event.preventDefault();
-      this.launchUrlTarget.focus();
     }
   }
 
@@ -204,35 +194,6 @@ export default class extends Controller {
       button.querySelector(".credential-launch-badge").textContent = this.launchMessagesValue.ready;
     });
     this.updateLaunchUrl();
-  }
-
-  async saveLoginUrl() {
-    if (!this.launchCard?.dataset.saveUrl || this.savingLoginUrl) return;
-    const card = this.launchCard;
-    this.savingLoginUrl = true;
-    this.launchSaveTarget.disabled = true;
-    this.launchSaveFeedbackTarget.textContent = this.launchMessagesValue.saving;
-    try {
-      const response = await fetch(card.dataset.saveUrl, {
-        method: "POST",
-        headers: { Accept: "application/json" },
-        body: new URLSearchParams({ loginUrl: this.launchUrlTarget.value.trim(), _token: card.dataset.saveToken }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.success) throw new Error("Unable to save URL");
-      const link = card.querySelector("[data-site-domain]");
-      link.dataset.loginUrl = data.loginUrl || "";
-      this.initializeSiteLinks();
-      if (this.launchCard !== card || !this.element.isConnected) return;
-      this.launchUrlTarget.value = this.siteUrl(data.loginUrl || link.dataset.siteDomain) || "";
-      this.updateLaunchUrl();
-      this.launchSaveFeedbackTarget.textContent = this.launchMessagesValue.saved;
-    } catch {
-      if (this.launchCard === card) this.launchSaveFeedbackTarget.textContent = this.launchMessagesValue.save_error;
-    } finally {
-      this.savingLoginUrl = false;
-      this.launchSaveTarget.disabled = false;
-    }
   }
 
   async launchAndFill() {
