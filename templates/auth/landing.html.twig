@@ -1,11 +1,11 @@
 ﻿{% extends 'base_auth.html.twig' %}
 
-{% block title %}{{ app.request.locale == 'en' ? 'SMB Cybersecurity Solution & Enterprise Password Manager | MYKEYNEST' : 'Cybersécurité PME & gestionnaire de mots de passe entreprise | MYKEYNEST' }}{% endblock %}
-{% block description %}{{ app.request.locale == 'en' ? 'MYKEYNEST helps SMBs secure passwords, reduce phishing risk, protect access, and improve cybersecurity with an enterprise password manager, audit tools, and practical guidance.' : 'MYKEYNEST aide les PME à sécuriser les mots de passe, réduire le risque phishing, protéger les accès et renforcer la cybersécurité avec un gestionnaire de mots de passe entreprise, des outils d audit et un accompagnement concret.' }}{% endblock %}
-{% block og_title %}{{ app.request.locale == 'en' ? 'SMB Cybersecurity Solution & Enterprise Password Manager | MYKEYNEST' : 'Cybersécurité PME & gestionnaire de mots de passe entreprise | MYKEYNEST' }}{% endblock %}
-{% block og_description %}{{ app.request.locale == 'en' ? 'Secure passwords, protect accounts, and give your SMB a practical cybersecurity baseline with MYKEYNEST.' : 'Sécurisez les mots de passe, protégez les comptes et donnez à votre PME un socle de cybersécurité concret avec MYKEYNEST.' }}{% endblock %}
-{% block twitter_title %}{{ app.request.locale == 'en' ? 'SMB Cybersecurity Solution & Enterprise Password Manager | MYKEYNEST' : 'Cybersécurité PME & gestionnaire de mots de passe entreprise | MYKEYNEST' }}{% endblock %}
-{% block twitter_description %}{{ app.request.locale == 'en' ? 'Enterprise password manager, phishing awareness, security audit, and access protection for SMBs.' : 'Gestionnaire de mots de passe entreprise, sensibilisation phishing, audit cybersécurité et protection des accès pour PME.' }}{% endblock %}
+{% block title %}{{ app.request.locale == 'en' ? 'Share team access without revealing passwords | MYKEYNEST' : 'Partagez les accès sans révéler les mots de passe | MYKEYNEST' }}{% endblock %}
+{% block description %}{{ app.request.locale == 'en' ? 'MYKEYNEST helps SMBs and agencies centralize credentials, control sharing, and fill sign-in forms from the browser extension.' : 'MYKEYNEST aide les PME et agences à centraliser leurs identifiants, contrôler les partages et remplir les connexions depuis l’extension navigateur.' }}{% endblock %}
+{% block og_title %}{{ app.request.locale == 'en' ? 'Share team access without revealing passwords | MYKEYNEST' : 'Partagez les accès sans révéler les mots de passe | MYKEYNEST' }}{% endblock %}
+{% block og_description %}{{ app.request.locale == 'en' ? 'Centralize business credentials and decide how each teammate or external collaborator can use them.' : 'Centralisez les identifiants de l’entreprise et choisissez comment chaque collaborateur ou prestataire peut les utiliser.' }}{% endblock %}
+{% block twitter_title %}{{ app.request.locale == 'en' ? 'Controlled access sharing for SMBs | MYKEYNEST' : 'Partage d’accès contrôlé pour PME | MYKEYNEST' }}{% endblock %}
+{% block twitter_description %}{{ app.request.locale == 'en' ? 'Password management, controlled sharing, and browser autofill for teams.' : 'Gestion des mots de passe, partage contrôlé et auto-remplissage pour les équipes.' }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/landing.css') }}">
@@ -28,7 +28,7 @@
         <a href="{{ path('show_register') }}" class="btn btn-primary btn-lg btn-w" aria-label="{{ 'landing.hero.cta_start_aria'|trans }}">
           <i class="fas fa-rocket" aria-hidden="true"></i> {{ 'landing.hero.cta_start'|trans }}
         </a>
-        <a href="#features" class="btn btn-outline btn-lg btn-w">{{ 'landing.hero.cta_discover'|trans }}</a>
+        <a href="#how-it-works" class="btn btn-outline btn-lg btn-w">{{ 'landing.hero.cta_discover'|trans }}</a>
       </div>
       <p class="hero-hint"><i class="fas fa-circle-check"></i> {{ 'landing.hero.hint'|trans }}</p>
       <div class="trust" aria-label="{{ 'landing.hero.trust_aria'|trans }}">
@@ -39,7 +39,7 @@
     </div>
 
     <div class="hero-vis" aria-hidden="true">
-      <div class="sec-pill"><i class="fas fa-shield-check"></i> Coffre-fort AES-256</div>
+      <div class="sec-pill"><i class="fas fa-shield-check"></i> {{ app.request.locale == 'en' ? 'Encrypted vault' : 'Coffre-fort chiffré' }}</div>
       <div class="vault">
         <div class="vault-bar">
           <div class="vdots"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div>
@@ -47,7 +47,7 @@
         </div>
         <div class="vault-search">
           <i class="fas fa-magnifying-glass"></i>
-          <input type="text" placeholder="Rechercher un acces" tabindex="-1" readonly>
+          <input type="text" placeholder="{{ app.request.locale == 'en' ? 'Search an access' : 'Rechercher un accès' }}" tabindex="-1" readonly>
         </div>
         <div class="cred-list">
           <div class="cred">
@@ -82,9 +82,9 @@
           </div>
         </div>
         <div class="hash-badge">
-          <span style="color:#64748b;">HASH</span>
-          <span>0x8f2a-c3e1</span>
-          <span class="hash-ok"><i class="fas fa-circle-check"></i> OK</span>
+          <span style="color:#64748b;">{{ app.request.locale == 'en' ? 'ACCESS' : 'ACCÈS' }}</span>
+          <span>{{ app.request.locale == 'en' ? 'Guest' : 'Invité' }}</span>
+          <span class="hash-ok"><i class="fas fa-circle-check"></i> {{ app.request.locale == 'en' ? 'AUTHORIZED' : 'AUTORISÉ' }}</span>
         </div>
       </div>
     </div>
@@ -94,15 +94,15 @@
 {# STRIP #}
 <div class="strip" aria-hidden="true">
   <div class="strip-inner">
-    <div class="s-item"><i class="fas fa-certificate"></i> AES-256</div>
+    <div class="s-item"><i class="fas fa-certificate"></i> {{ app.request.locale == 'en' ? 'Encrypted credentials' : 'Identifiants chiffrés' }}</div>
     <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-fingerprint"></i> Installation Hashee</div>
+    <div class="s-item"><i class="fas fa-user-shield"></i> {{ app.request.locale == 'en' ? 'Controlled sharing' : 'Partage contrôlé' }}</div>
     <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-euro-sign"></i> Donnees en Europe</div>
+    <div class="s-item"><i class="fas fa-puzzle-piece"></i> {{ app.request.locale == 'en' ? 'Browser extension' : 'Extension navigateur' }}</div>
     <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-user-shield"></i> {{ 'landing.hero.trust.zeroknowledge'|trans }}</div>
+    <div class="s-item"><i class="fas fa-building-user"></i> {{ app.request.locale == 'en' ? 'Team management' : 'Gestion d’équipe' }}</div>
     <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-check-double"></i> RGPD</div>
+    <div class="s-item"><i class="fas fa-check-double"></i> {{ app.request.locale == 'en' ? 'Access revocation' : 'Révocation des accès' }}</div>
   </div>
 </div>
 
@@ -138,21 +138,20 @@
       <div class="terminal" aria-hidden="true">
         <div class="t-bar">
           <div class="t-dots"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>
-          <span class="t-title">mykeynest - registre de confiance</span>
+          <span class="t-title">{{ app.request.locale == 'en' ? 'mykeynest - access manager' : 'mykeynest - gestion des accès' }}</span>
         </div>
         <div class="t-body">
-          <div class="tl"><span class="tp">$</span><span class="tc">verify_install --id 0x8f2a</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">ID_INSTALL&nbsp; : 0x8f2a...c3e1</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">HASH_STATUS : SIGNED & VERIFIED &#10003;</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">INTEGRITY&nbsp;&nbsp; : PASS</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tc">check_access --user collaborator</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">CREDENTIAL&nbsp; : ENCRYPTED</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">SHARE_MODE&nbsp; : SIGN-IN ONLY</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">EXTENSION&nbsp;&nbsp; : ASSOCIATED &#10003;</span></div>
           <br>
-          <div class="tl"><span class="tp">$</span><span class="tc">simulate_attack --replay-hash</span></div>
-          <div class="tl"><span class="tp"> </span><span class="te">ERROR : HASH_MISMATCH - Access denied</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tw">ALERT : Unauthorized attempt logged</span></div>
-          <div class="tl"><span class="tp"> </span><span class="te">VAULT : LOCKED - Session terminated</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tc">revoke_access --user collaborator</span></div>
+          <div class="tl"><span class="tp"> </span><span class="te">ACCESS&nbsp;&nbsp; : REVOKED</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tw">SESSION : CLOSED</span></div>
           <br>
           <div class="tl"><span class="tp">$</span><span class="tc">status</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tok">âœ“ Vault secure. Zero data exposed.</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tok">&#10003; OWNER CONTROL RETAINED</span></div>
         </div>
         <div class="t-chain">
           <div class="tnode"><i class="fas fa-puzzle-piece"></i></div>
@@ -180,6 +179,8 @@
     </div>
 
     {% set landingFreePlan = subscription_plan('free') %}
+    {% set landingProPlan = subscription_plan('pro') %}
+    {% set landingTeamPlan = subscription_plan('team') %}
     <div class="p-grid">
       <div class="p-card">
         <div class="p-card-head">
@@ -193,9 +194,9 @@
         <ul class="p-feats">
           <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ landingFreePlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
           <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ landingFreePlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
-          <li><span class="p-feature-icon"><i class="fas fa-wand-magic-sparkles"></i></span><b>{{ 'landing.pricing.showcase.features.generator'|trans }}</b><i class="fas fa-check p-yes"></i></li>
+          <li{% if not landingFreePlan.features.password_generator %} class="p-disabled"{% endif %}><span class="p-feature-icon"><i class="fas fa-wand-magic-sparkles"></i></span><b>{{ 'landing.pricing.showcase.features.generator'|trans }}</b><i class="fas {{ landingFreePlan.features.password_generator ? 'fa-check p-yes' : 'fa-minus' }}"></i></li>
           <li class="p-disabled"><span class="p-feature-icon"><i class="fas fa-mobile-screen"></i></span><b>{{ 'landing.pricing.showcase.features.two_factor'|trans }}</b><i class="fas fa-minus"></i></li>
-          <li class="p-disabled"><span class="p-feature-icon"><i class="fas fa-shield-halved"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><i class="fas fa-minus"></i></li>
+          <li{% if not landingFreePlan.features.security_checker %} class="p-disabled"{% endif %}><span class="p-feature-icon"><i class="fas fa-shield-halved"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><i class="fas {{ landingFreePlan.features.security_checker ? 'fa-check p-yes' : 'fa-minus' }}"></i></li>
         </ul>
       </div>
 
@@ -210,8 +211,8 @@
         </div>
         <p class="p-included"><i class="fas fa-user"></i> {{ 'landing.pricing.showcase.pro.included'|trans }}</p>
         <ul class="p-feats">
-          <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
-          <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ landingProPlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ landingProPlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
           <li><span class="p-feature-icon"><i class="fas fa-mobile-screen"></i></span><b>{{ 'landing.pricing.showcase.features.two_factor'|trans }}</b><i class="fas fa-check p-yes"></i></li>
           <li><span class="p-feature-icon"><i class="fas fa-shield-halved"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><span>{{ 'landing.pricing.showcase.pro.audit'|trans }}</span></li>
           <li><span class="p-feature-icon"><i class="fas fa-headset"></i></span><b>{{ 'landing.pricing.showcase.features.support'|trans }}</b><span>{{ 'landing.pricing.showcase.pro.support'|trans }}</span></li>
@@ -228,8 +229,8 @@
         </div>
         <p class="p-included"><i class="fas fa-users"></i> {{ 'landing.pricing.showcase.team.included'|trans }}</p>
         <ul class="p-feats">
-          <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
-          <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ 'landing.pricing.showcase.unlimited'|trans }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-key"></i></span><b>{{ 'landing.pricing.showcase.features.passwords'|trans }}</b><span>{{ landingTeamPlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
+          <li><span class="p-feature-icon"><i class="fas fa-share-nodes"></i></span><b>{{ 'landing.pricing.showcase.features.shares'|trans }}</b><span>{{ landingTeamPlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</span></li>
           <li><span class="p-feature-icon"><i class="fas fa-user-shield"></i></span><b>{{ 'landing.pricing.showcase.features.admin'|trans }}</b><i class="fas fa-check p-yes"></i></li>
           <li><span class="p-feature-icon"><i class="fas fa-file-shield"></i></span><b>{{ 'landing.pricing.showcase.features.audit'|trans }}</b><span>{{ 'landing.pricing.showcase.team.audit'|trans }}</span></li>
           <li><span class="p-feature-icon"><i class="fas fa-headset"></i></span><b>{{ 'landing.pricing.showcase.features.support'|trans }}</b><span>{{ 'landing.pricing.showcase.team.support'|trans }}</span></li>
@@ -246,13 +247,13 @@
         <table class="pricing-table">
           <thead><tr><th>{{ 'landing.pricing.showcase.comparison.feature'|trans }}</th><th>Starter</th><th>Pro</th><th>Team</th></tr></thead>
           <tbody>
-            <tr><th>{{ 'landing.pricing.showcase.comparison.passwords'|trans }}</th><td>{{ landingFreePlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td></tr>
-            <tr><th>{{ 'landing.pricing.showcase.comparison.shares'|trans }}</th><td>{{ landingFreePlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td><td>{{ 'landing.pricing.showcase.unlimited'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.passwords'|trans }}</th><td>{{ landingFreePlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ landingProPlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ landingTeamPlan.limits.credentials ?? ('landing.pricing.showcase.unlimited'|trans) }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.shares'|trans }}</th><td>{{ landingFreePlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ landingProPlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</td><td>{{ landingTeamPlan.limits.shares ?? ('landing.pricing.showcase.unlimited'|trans) }}</td></tr>
             <tr><th>{{ 'landing.pricing.showcase.comparison.two_factor'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td><i class="fas fa-check p-yes"></i></td><td><i class="fas fa-check p-yes"></i></td></tr>
-            <tr><th>{{ 'landing.pricing.showcase.comparison.audit'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td>{{ 'landing.pricing.showcase.pro.audit'|trans }}</td><td>{{ 'landing.pricing.showcase.team.audit'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.audit'|trans }}</th><td><i class="fas {{ landingFreePlan.features.security_checker ? 'fa-check p-yes' : 'fa-minus p-no' }}"></i></td><td>{{ 'landing.pricing.showcase.pro.audit'|trans }}</td><td>{{ 'landing.pricing.showcase.team.audit'|trans }}</td></tr>
             <tr><th>{{ 'landing.pricing.showcase.comparison.support'|trans }}</th><td>{{ 'landing.pricing.showcase.starter.support'|trans }}</td><td>{{ 'landing.pricing.showcase.pro.support'|trans }}</td><td>{{ 'landing.pricing.showcase.team.support'|trans }}</td></tr>
-            <tr><th>{{ 'landing.pricing.showcase.comparison.onboarding'|trans }}</th><td>{{ 'landing.pricing.showcase.starter.onboarding'|trans }}</td><td>{{ 'landing.pricing.showcase.pro.onboarding'|trans }}</td><td>{{ 'landing.pricing.showcase.team.onboarding'|trans }}</td></tr>
-            <tr><th>{{ 'landing.pricing.showcase.comparison.phishing'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td>{{ 'landing.pricing.showcase.pro.phishing'|trans }}</td><td>{{ 'landing.pricing.showcase.team.phishing'|trans }}</td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.secure_notes'|trans }}</th><td><i class="fas {{ landingFreePlan.features.secure_notes ? 'fa-check p-yes' : 'fa-minus p-no' }}"></i></td><td><i class="fas {{ landingProPlan.features.secure_notes ? 'fa-check p-yes' : 'fa-minus p-no' }}"></i></td><td><i class="fas {{ landingTeamPlan.features.secure_notes ? 'fa-check p-yes' : 'fa-minus p-no' }}"></i></td></tr>
+            <tr><th>{{ 'landing.pricing.showcase.comparison.credential_import'|trans }}</th><td><i class="fas {{ landingFreePlan.features.credential_import ? 'fa-check p-yes' : 'fa-minus p-no' }}"></i></td><td><i class="fas {{ landingProPlan.features.credential_import ? 'fa-check p-yes' : 'fa-minus p-no' }}"></i></td><td><i class="fas {{ landingTeamPlan.features.credential_import ? 'fa-check p-yes' : 'fa-minus p-no' }}"></i></td></tr>
             <tr><th>{{ 'landing.pricing.showcase.comparison.admin'|trans }}</th><td><i class="fas fa-minus p-no"></i></td><td><i class="fas fa-minus p-no"></i></td><td>{{ 'landing.pricing.showcase.team.admin'|trans }}</td></tr>
           </tbody>
         </table>
@@ -347,12 +348,12 @@
         <div class="fc wide">
           <div class="fci"><i class="fas fa-bolt"></i></div>
           <div class="fc-bdy"><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n">2s</span><span class="fc-stat-l">connexion</span></div>
+          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-puzzle-piece"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'extension' : 'extension' }}</span></div>
         </div>
         <div class="fc wide accent">
           <div class="fci"><i class="fas fa-share-nodes"></i></div>
           <div class="fc-bdy"><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n">E2E</span><span class="fc-stat-l">chiffre</span></div>
+          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-user-shield"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'controlled' : 'contrôlé' }}</span></div>
         </div>
       </div>
     </div>

@@ -28,8 +28,10 @@
     ] %}
     {% set isSensitiveAuthRoute = currentRoute in sensitiveAuthRoutes %}
     {% set analyticsExcludedRoutes = sensitiveAuthRoutes|merge(['legal_privacy']) %}
-    {% set legacyMetaHead = block('meta_description')|trim %}
-    {% set canonicalUrl = block('canonical_url')|trim %}
+    {% set legacyMetaHead %}{% block meta_description %}{% endblock %}{% endset %}
+    {% set legacyMetaHead = legacyMetaHead|trim %}
+    {% set canonicalUrl %}{% block canonical_url %}{% endblock %}{% endset %}
+    {% set canonicalUrl = canonicalUrl|trim %}
     {% if canonicalUrl is empty %}
       {% if isSensitiveAuthRoute and currentRoute %}
         {% set canonicalUrl = url(currentRoute, routeParams) %}
@@ -72,7 +74,8 @@
       {{ legacyMetaHead|raw }}
     {% else %}
       <meta name="description" content="{% block description %}Securisez vos mots de passe et vos acces avec MYKEYNEST. Chiffrement AES-256, synchronisation multi-appareils et partage securise.{% endblock %}" />
-      {% set keywords = block('keywords')|trim %}
+      {% set keywords %}{% block keywords %}{% endblock %}{% endset %}
+      {% set keywords = keywords|trim %}
       {% if keywords is not empty %}
         <meta name="keywords" content="{{ keywords }}" />
       {% endif %}
@@ -192,7 +195,3 @@
     {% include './components/parts/_toasts.html.twig' %}
   </body>
 </html>
-
-{% block meta_description %}{% endblock %}
-{% block canonical_url %}{% endblock %}
-{% block keywords %}{% endblock %}

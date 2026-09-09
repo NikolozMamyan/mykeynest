@@ -60,7 +60,7 @@
   },
   "support_chat": {
     "title": "MYKEYNEST",
-    "status": "Online - reply within 24h",
+    "status": "Email support",
     "intro": "Hello. I am Nikoloz, your advisor. Tell me what you want to build or improve.",
     "project_question": "What type of request do you have in mind?",
     "email_placeholder": "Your email",
@@ -244,23 +244,23 @@
       "pricing": "Pricing",
       "install_hybrid_app": "Install on mobile",
       "login": "Log in",
-      "free_trial": "Free trial",
+      "free_trial": "Create an account",
       "language": "Language"
     },
     "hero": {
-      "eyebrow": "AES-256 · Access controls · GDPR",
-      "title_before": "Manage your team's passwords and access,",
-      "title_highlight": "in one secure place",
-      "subtitle": "MYKEYNEST is a password and access management solution for SMBs, agencies, and teams. AES-256 encryption, secure sharing, security audit, and auto-fill.",
-      "hint": "Start for free · No credit card",
+      "eyebrow": "Access management for SMBs and agencies",
+      "title_before": "Share access with your team,",
+      "title_highlight": "without handing over passwords",
+      "subtitle": "Centralize company credentials, decide who can use them, and simplify sign-in with the MYKEYNEST browser extension.",
+      "hint": "Free account · No credit card",
       "cta_start": "Get started for free",
       "cta_start_aria": "Create a free account on MYKEYNEST",
-      "cta_discover": "Learn more",
-      "trust_aria": "MYKEYNEST security guarantees",
+      "cta_discover": "See how it works",
+      "trust_aria": "MYKEYNEST protection features",
       "trust": {
         "aes": "AES-256 encryption",
-        "zeroknowledge": "Controlled access",
-        "hashed": "Hashed & signed installation"
+        "zeroknowledge": "Per-user permissions",
+        "hashed": "Account-linked extension"
       },
       "mock": {
         "gmail": "Gmail",
@@ -270,58 +270,58 @@
     },
     "features": {
       "label": "Features",
-      "title": "Secure password and access management",
-      "subtitle": "Everything your team needs to protect credentials, share access securely, and stay in control every day.",
+      "title": "Practical access management for everyday work",
+      "subtitle": "Save credentials, organize them, and share them according to your team’s needs.",
       "cards": {
         "e2e_title": "AES-256 encryption",
         "e2e_text": "Stored credentials are encrypted with AES-256 and returned only to authorized users.",
-        "hashed_title": "Hashed & signed installation",
-        "hashed_text": "Every deployment generates a unique cryptographic fingerprint. If the code is modified or copied, access is instantly revoked.",
-        "hashed_tag": "New",
+        "hashed_title": "Extension linked to your account",
+        "hashed_text": "Each authorized installation is linked to your account and can be reviewed or revoked from MYKEYNEST.",
+        "hashed_tag": "Control",
         "generator_title": "Password generator",
         "generator_text": "Create strong and unique passwords in one click for all your accounts.",
         "share_title": "Secure sharing",
-        "share_text": "Share your credentials securely with your family or team.",
-        "audit_title": "Security audit",
-        "audit_text": "Identify weak, reused, or compromised passwords to better protect them.",
+        "share_text": "Give access to a teammate or contractor and decide whether they can view the password or only sign in.",
+        "audit_title": "Password analysis",
+        "audit_text": "Find weak, reused, or overdue passwords so you can prioritize updates.",
         "autofill_title": "Auto-fill",
-        "autofill_text": "Log in automatically to your favorite sites using the browser extension.",
+        "autofill_text": "Fill compatible sign-in forms from the browser extension.",
         "twofactor_title": "Session Management",
         "twofactor_text": "Manage and secure your account's active sessions."
       }
     },
     "how": {
-      "label": "Simple et efficace",
-      "title": "Comment MYKEYNEST aide votre équipe",
-      "subtitle": "Centralisez vos mots de passe, partagez les accès et gardez le contrôle en trois étapes.",
+      "label": "Simple to get started",
+      "title": "Organize your access in three steps",
+      "subtitle": "A straightforward flow to save, use, and share your team’s credentials.",
       "demo": {
         "eyebrow": "Video demo",
-        "title": "Watch the product first, then move through the setup steps",
-        "text": "This short walkthrough gives visitors a concrete view of MYKEYNEST in action before the implementation steps below. The goal is simple: make the product tangible first, then explain the method.",
+        "title": "See how MYKEYNEST works",
+        "text": "This short demo presents the vault, access sharing, and browser extension in a practical workflow.",
         "iframe_title": "MYKEYNEST demo video"
       },
       "steps": {
-        "s1_title": "Créez votre espace sécurisé",
-        "s1_text": "Inscrivez votre équipe et créez votre mot de passe maître pour accéder à votre coffre-fort sécurisé.",
-        "s2_title": "Ajoutez et organisez vos accès",
-        "s2_text": "Importez vos identifiants, classez-les et partagez les accès en toute sécurité selon vos besoins.",
-        "s3_title": "Accédez partout, en toute sécurité",
-        "s3_text": "Retrouvez vos mots de passe et accès sur tous vos appareils grâce à la synchronisation sécurisée."
+        "s1_title": "Create your workspace",
+        "s1_text": "Open a free account and install the extension in your browser.",
+        "s2_title": "Add your credentials",
+        "s2_text": "Import a compatible file or save access details as you work.",
+        "s3_title": "Use and share access",
+        "s3_text": "Fill sign-in forms from the extension and assign suitable permissions to each person."
       }
     },
     "security": {
-      "label": "Unbreakable security",
-      "title": "You alone control access",
-      "intro": "Every MYKEYNEST extension installation generates a unique cryptographic fingerprint (hash). Access is strictly tied to your instance — impossible to impersonate, even with your credentials.",
+      "label": "Access protection",
+      "title": "Stay in control of shared credentials",
+      "intro": "MYKEYNEST combines credential encryption, sharing permissions, and extension installation management. You can grant access and revoke it when it is no longer needed.",
       "points": {
-        "p1_title": "Hardware Signature",
-        "p1_text": "Access is tied to your specific instance. An attacker on another device is blocked even with your credentials.",
-        "p2_title": "Integrity Proof",
-        "p2_text": "If the extension is modified or tampered with, the hash changes instantly and access is revoked.",
-        "p3_title": "Trust Registry",
-        "p3_text": "Only integrity proofs are recorded server-side — never sensitive data itself.",
-        "p4_title": "Complete Audit Logs",
-        "p4_text": "Every access attempt is logged with a cryptographic timestamp for your security audits."
+        "p1_title": "Encrypted credentials",
+        "p1_text": "Vault secrets are encrypted at rest, and communication with the service uses HTTPS.",
+        "p2_title": "Sharing permissions",
+        "p2_text": "The owner selects recipients and can allow full viewing or limit usage to signing in through the extension.",
+        "p3_title": "Manageable installations",
+        "p3_text": "Installations linked to the account are visible in the application and can be revoked.",
+        "p4_title": "Sessions under control",
+        "p4_text": "The session manager lets you review active sessions and close those that are no longer needed."
       }
     },
     "pricing": {
@@ -341,7 +341,7 @@
           "shares": "Secure shares",
           "generator": "Generator & autofill",
           "two_factor": "2FA authentication",
-          "audit": "Security audit",
+          "audit": "Password analysis",
           "support": "Support",
           "admin": "Centralized administration"
         },
@@ -357,13 +357,13 @@
         "pro": {
           "eyebrow": "To move forward",
           "name": "Pro",
-          "target": "SMBs with 1 to 5 people that want to secure every access.",
+          "target": "Independent professionals who want every feature on their account.",
           "cta": "Choose Pro",
           "included": "1 user account included",
-          "audit": "Standard",
-          "support": "Priority support",
-          "onboarding": "Self-service + guide",
-          "phishing": "Self-paced training"
+          "audit": "Included",
+          "support": "Email support",
+          "onboarding": "Guides included",
+          "phishing": "Not included"
         },
         "team": {
           "eyebrow": "For teams",
@@ -372,23 +372,25 @@
           "cta": "Choose Team",
           "aria": "Choose the Team plan",
           "included": "6 users minimum · adjustable quantity",
-          "audit": "Enhanced + monthly report",
-          "support": "Dedicated named contact",
-          "onboarding": "Guided video onboarding",
-          "phishing": "Live team session",
-          "admin": "Role-based access management"
+          "audit": "Included",
+          "support": "Email support",
+          "onboarding": "Centralized member management",
+          "phishing": "Not included",
+          "admin": "Members, licenses and roles"
         },
         "comparison": {
           "eyebrow": "Full comparison",
-          "title": "The right level of support, with no surprises",
+          "title": "Compare the included features",
           "feature": "Feature",
           "passwords": "Passwords",
           "shares": "Shares",
           "two_factor": "2FA authentication",
-          "audit": "Security audit",
+          "audit": "Password analysis",
           "support": "Support",
-          "onboarding": "Onboarding",
-          "phishing": "Team phishing awareness",
+          "onboarding": "Guidance",
+          "phishing": "Phishing training",
+          "secure_notes": "Secure notes",
+          "credential_import": "CSV import",
           "admin": "Centralized administration"
         }
       },
@@ -414,10 +416,10 @@
           "pro_1": "Unlimited passwords",
           "pro_2": "Unlimited sharing",
           "pro_3": "2FA authentication",
-          "pro_4": "Security audit",
+          "pro_4": "Password analysis",
           "pro_5": "Secure notes",
-          "pro_6": "Priority support",
-          "pro_7": "Hashed & signed installation",
+          "pro_6": "Email support",
+          "pro_7": "Account-linked extension",
           "pro_8": "All features"
         }
       }
@@ -425,7 +427,7 @@
     "contact": {
       "label": "Contact",
       "title": "Get in touch",
-      "subtitle": "A question or an issue? Our team is here to help. We reply within 24 hours.",
+      "subtitle": "Have a question about the product, extension, or subscription? Send us a message using this form.",
       "form": {
         "title": "Send us a message",
         "subtitle": "Fields marked with * are required",
@@ -446,9 +448,9 @@
         "email_title": "Email",
         "support_title": "Support",
         "support_text": "Email support",
-        "support_time": "A personalized response based on the nature of your request",
-        "hours_title": "Hours",
-        "hours_text": "Mon - Fri: 9am - 6pm<br>Sat - Sun: 10am - 4pm"
+        "support_time": "A response suited to your request",
+        "hours_title": "Availability",
+        "hours_text": "Support from Monday to Friday"
       }
     },
     "faq": {
@@ -457,15 +459,15 @@
       "subtitle": "Everything you need to know before getting started.",
       "items": {
         "q1": "What is a password manager?",
-        "a1": "It is a tool that stores and encrypts all your credentials in a secure digital vault. MYKEYNEST uses AES-256 encryption, the same standard used by banks.",
-        "q2": "Are my data really secure?",
-        "a2": "Stored credentials are encrypted with AES-256. Access is protected by account authentication, permissions and extension security controls.",
+        "a1": "It is a tool that centralizes credentials in an encrypted vault so you can find, organize, and share them with authorized people.",
+        "q2": "How are my credentials protected?",
+        "a2": "Vault secrets are encrypted at rest, communications use HTTPS, and access depends on account authentication and permissions.",
         "q3": "Is the free plan really free?",
         "a3": "Yes, no credit card required. You can use MYKEYNEST for free with basic features. The Pro plan unlocks advanced features.",
         "q4": "Can I use MYKEYNEST on multiple devices?",
-        "a4": "Yes, your passwords are automatically synchronized across all your devices: computer, smartphone, and tablet.",
-        "q5": "What is a hashed installation and how does it protect me?",
-        "a5": "Every MYKEYNEST extension installation generates a unique cryptographic fingerprint tied to your instance. If an attacker tries to reuse your credentials on another device, the hash won't match and access is denied. If the extension is modified or corrupted, the integrity check fails and the vault locks automatically.",
+        "a4": "The vault is available through the web application on compatible devices. Autofill requires the MYKEYNEST extension in a supported browser.",
+        "q5": "How is the extension linked to my account?",
+        "a5": "After installation, the extension is linked to your account during onboarding. You can then review and revoke that installation from the application.",
         "q6": "What happens if I forget my master password?",
         "a6": "Use the “Forgot password” flow from the sign-in page. A reset link is sent to the email address associated with the account after the security checks.",
         "q7": "Is MYKEYNEST GDPR compliant?",
@@ -477,7 +479,7 @@
     "cta": {
       "title": "Ready to secure your team's access?",
       "subtitle": "Centralize passwords, share access securely, and stay in control with MYKEYNEST.",
-      "note": "14-day free trial · No credit card required · Cancel anytime",
+      "note": "Free account · No credit card · Optional subscription",
       "start": "Get started for free",
       "login": "Log in"
     },
@@ -510,12 +512,12 @@
   "auth": {
     "login": {
       "hero": {
-        "title": "Password Manager",
-        "subtitle": "Secure all your passwords in one place. Simple, safe, and accessible everywhere.",
+        "title": "Your access in one workspace",
+        "subtitle": "Find your credentials in the web application and use the extension in supported browsers.",
         "features": {
           "f1": "AES-256-GCM encryption",
-          "f2": "Instant sync",
-          "f3": "Available on all your devices"
+          "f2": "Permission-based sharing",
+          "f3": "Browser extension"
         }
       },
       "form": {
@@ -533,11 +535,11 @@
     "register": {
       "hero": {
         "title": "Join us",
-        "subtitle": "Create your account and start securing your passwords in minutes.",
+        "subtitle": "Create your account to save, organize, and use your credentials with MYKEYNEST.",
         "features": {
           "f1": "Free to get started",
-          "f2": "2-minute setup",
-          "f3": "Maximum security guaranteed"
+          "f2": "Guided setup flow",
+          "f3": "Manageable permissions and sessions"
         }
       },
       "form": {
@@ -2317,8 +2319,8 @@
           "description": "Create passwords in a fraction of a second, without registration, without limits and completely free."
         },
         {
-          "title": "100% private",
-          "description": "Everything happens in your browser. No data is sent to our servers. Your passwords remain fully confidential."
+          "title": "Generated in your browser",
+          "description": "Generation happens locally on this page, and the generated password is not sent to our servers."
         },
         {
           "title": "Customizable",
@@ -2335,12 +2337,12 @@
       ]
     },
     "seo": {
-      "title": "How to create a truly secure password?",
+      "title": "How to create a strong password?",
       "intro": "Online account security starts with long, unique and random passwords. Our free generator uses the browser’s Web Crypto API to create each combination.",
       "good_password_title": "Characteristics of a strong password",
       "good_password_text": "A secure password should combine several essential elements. It should be long enough (at least 12 characters), mix different character types (uppercase, lowercase, numbers and symbols), and above all be unique for each account.",
       "why_generator_title": "Why use a password generator?",
-      "why_generator_text": "Human-created passwords are often predictable and vulnerable. Our tool generates completely random passwords that provide optimal protection against brute-force attacks and hacking attempts. Each generated password is unique and cryptographically secure.",
+      "why_generator_text": "Manually chosen passwords are often more predictable. The generator uses the browser’s Web Crypto API to produce a random combination based on the selected length and character options.",
       "tips_title": "Tips for managing your passwords",
       "tips": [
         "Use a different password for each important account",
@@ -2351,7 +2353,7 @@
         "Never share your passwords via email or SMS"
       ],
       "tech_title": "The technology behind our generator",
-      "tech_text": "Our generator uses your browser’s native Web Crypto API to produce truly random numbers. Unlike classic pseudo-random generators, this method guarantees maximum entropy and professional-grade cryptographic security."
+      "tech_text": "The generator uses crypto.getRandomValues(), provided by the browser’s Web Crypto API, and then selects characters according to your options. Length remains an important factor in password strength."
     },
     "cta": {
       "title": "Ready to secure your accounts?",
@@ -2573,56 +2575,56 @@
   "business": {
     "solution": {
       "meta": {
-        "title": "SMB Cybersecurity Solution, Enterprise Password Manager & Audit | MYKEYNEST",
-        "description": "Cybersecurity solution for SMBs: enterprise password manager, SMB cybersecurity audit, phishing awareness, GDPR-minded security practices, and practical support from €6.99/user/month.",
+        "title": "Password and access management for SMBs | MYKEYNEST",
+        "description": "MYKEYNEST helps SMBs and agencies centralize credentials, share controlled access, and manage company members from one workspace.",
         "keywords": "SMB cybersecurity solution, SMB IT security, enterprise password manager, business password manager, secure passwords for SMBs, SMB cybersecurity audit, IT security audit for SMBs, ransomware protection for SMBs, phishing awareness, GDPR compliance for SMBs"
       },
       "schema": {
-        "name": "MYKEYNEST — SMB Cybersecurity Solution",
-        "description": "Password management software for SMBs with maintenance, employee training and security audit included."
+        "name": "MYKEYNEST — Access management for SMBs",
+        "description": "Password and access management software for SMBs, with controlled sharing, a browser extension, and member management."
       },
       "hero": {
         "eyebrow": "Enterprise solution",
-        "h1_before": "Cybersecurity solution for SMBs with",
-        "h1_highlight": "password management",
-        "h1_after": "and support included",
-        "subtitle": "Protect your business from day one. Software, maintenance, training and audit — all in one simple, affordable package.",
+        "h1_before": "Centralize your SMB credentials and",
+        "h1_highlight": "control access",
+        "h1_after": "for every teammate",
+        "subtitle": "Save business passwords, share them with the appropriate permission level, and remove access when it is no longer needed.",
         "cta_primary": "Start for free",
         "cta_secondary": "Request an audit",
         "trust": {
           "no_commitment": "No commitment",
-          "setup": "Setup within 24h",
-          "support": "Support included"
+          "setup": "Browser extension",
+          "support": "Email support"
         }
       },
       "pillars": {
         "eyebrow": "What's included",
-        "title": "A 360° solution for your SMB",
-        "subtitle": "Software, services and human support: everything you need to secure your business without hiring an in-house expert.",
+        "title": "The essential features for organizing access",
+        "subtitle": "A shared vault, clear permissions, and a browser extension to reduce day-to-day password exchanges.",
         "software": {
-          "title": "🔐 Software",
+          "title": "🔐 Vault and credentials",
           "item1": "AES-256 encryption",
-          "item2": "Per-user access controls",
-          "item3": "Secure sharing between team members",
-          "item4": "Built-in security audit"
+          "item2": "Per-user permissions",
+          "item3": "Group organization",
+          "item4": "Secure notes depending on the plan"
         },
         "maintenance": {
-          "title": "🛠 Included maintenance",
-          "item1": "Dedicated technical support",
-          "item2": "Tracked support based on priority",
-          "item3": "Guided updates"
+          "title": "🧩 Browser extension",
+          "item1": "Autofill on compatible sign-in forms",
+          "item2": "Linked installation management",
+          "item3": "Website exclusion list"
         },
         "training": {
-          "title": "🧑‍🏫 Employee training",
-          "item1": "Phishing awareness",
-          "item2": "Password best practices",
-          "item3": "Internal security procedures"
+          "title": "👥 Sharing and collaboration",
+          "item1": "Full access or sign-in only",
+          "item2": "Individual and group sharing",
+          "item3": "Access revocation"
         },
         "audit": {
-          "title": "🧪 Security audit",
-          "item1": "Remote audit",
-          "item2": "On-site physical audit",
-          "item3": "Detailed vulnerability report"
+          "title": "📊 Monitoring and analysis",
+          "item1": "Weak or reused password detection",
+          "item2": "Active session review",
+          "item3": "Browser extension installation tracking"
         }
       },
       "privacy_text": "European hosting, encrypted storage and documented privacy controls.",
@@ -2641,28 +2643,28 @@
       },
       "pricing": {
         "eyebrow": "Transparent pricing",
-        "title": "One honest price, everything included",
+        "title": "A simple monthly Pro plan",
         "unit": "per user / month, no commitment",
         "badge": "Clear pricing for SMBs",
-        "description": "A straightforward offer combining the software, support and stated guidance without misleading price comparisons.",
+        "description": "The Pro plan unlocks advanced features for one account. The Team plan adds company licenses and administration.",
         "cta": "Get started now",
         "feature1": "Unlimited passwords",
         "feature2": "Unlimited sharing",
         "feature3": "2FA authentication",
-        "feature4": "Built-in security audit",
-        "feature5": "Employee training",
-        "feature6": "Priority support"
+        "feature4": "Password analysis",
+        "feature5": "Secure notes",
+        "feature6": "Email support"
       },
       "cta": {
-        "title": "Ready to secure your SMB?",
-        "subtitle": "Join MYKEYNEST and protect your business data today.",
-        "primary": "Free trial — no credit card",
+        "title": "Ready to take control of your access?",
+        "subtitle": "Create a free account, add your first credentials, and see how the extension works.",
+        "primary": "Create a free account",
         "secondary": "Contact our team"
       },
       "demo": {
         "eyebrow": "Demo",
-        "title": "A quick walkthrough to make the solution tangible",
-        "text": "Instead of staying at a high-level promise, this sequence shows the product with enough realism to understand how MYKEYNEST fits into the day-to-day workflow of an SMB.",
+        "title": "See MYKEYNEST in action",
+        "text": "This demo presents the vault and the main actions available for managing team credentials.",
         "cta": "View the dedicated password manager page",
         "iframe_title": "MYKEYNEST demo walkthrough"
       }
@@ -2670,7 +2672,7 @@
     "password_manager": {
       "meta": {
         "title": "Enterprise Password Manager for SMBs | MYKEYNEST",
-        "description": "Secure your SMB access with an enterprise password manager built for secure sharing, access audits, compliance, and phishing risk reduction.",
+        "description": "Centralize your SMB credentials, share controlled access, and use autofill with the MYKEYNEST browser extension.",
         "keywords": "enterprise password manager, business password manager, SMB password manager, secure passwords for SMBs, password sharing for teams, access audit business"
       },
       "breadcrumb": {
@@ -2684,16 +2686,16 @@
         "h1_before": "An",
         "h1_highlight": "enterprise password manager",
         "h1_after": "built for SMBs and teams",
-        "subtitle": "Centralize business passwords, share access without friction, reduce phishing risk, and keep clear visibility on who can access what.",
+        "subtitle": "Centralize business passwords, decide who can use each access, and remove permissions that are no longer needed.",
         "pill1": "Secure access sharing",
-        "pill2": "Audit and traceability",
-        "pill3": "SMB cybersecurity baseline",
+        "pill2": "Sharing permissions",
+        "pill3": "Member management",
         "cta_primary": "Try MYKEYNEST",
         "cta_secondary": "Compare solutions",
         "console_1": "vault_status : encrypted / team-ready",
         "console_2": "policy_audit : weak passwords flagged",
         "console_3": "share_status : access granted with trace",
-        "console_4": "risk_reduction : phishing surface reduced"
+        "console_4": "access_status : owner controlled"
       },
       "why": {
         "title": "Why an SMB needs an enterprise password manager",
@@ -2707,11 +2709,11 @@
           "text": "SMBs need to hand over access quickly without exposing accounts. Secure sharing avoids sensitive credentials being sent through unsafe channels."
         },
         "card3": {
-          "title": "SMB cybersecurity often starts with access control",
-          "text": "A compromised account often opens the door to phishing, fraud, or ransomware. An enterprise password manager helps secure this first critical layer."
+          "title": "Access should follow people joining and leaving",
+          "text": "A centralized view makes it easier to grant access to a new member and remove it when a working relationship ends."
         },
         "band_title": "In practice",
-        "band_text": "If you are looking for a practical way to secure SMB passwords without deploying a heavy stack, this page answers that exact need."
+        "band_text": "MYKEYNEST brings the vault, sharing, browser extension, and member management into one interface."
       },
       "features": {
         "title": "What a good business password manager should actually cover",
@@ -2720,7 +2722,7 @@
           "title": "Credential protection",
           "item1": "Strong encryption for business passwords",
           "item2": "Detection of weak or reused passwords",
-          "item3": "Reduced risk from compromised accounts"
+          "item3": "Identification of passwords that should be updated"
         },
         "card2": {
           "title": "Secure sharing between teammates",
@@ -2729,10 +2731,10 @@
           "item3": "Simpler revocation and rotation of access"
         },
         "card3": {
-          "title": "Audit, compliance, and control",
-          "item1": "Traceability of usage and shared access",
-          "item2": "A stronger base for GDPR and internal procedures",
-          "item3": "Better password hygiene across the SMB"
+          "title": "Organization and monitoring",
+          "item1": "Visibility over shares and groups",
+          "item2": "Members, licenses, and roles with the Team plan",
+          "item3": "Session and installation management"
         }
       },
       "steps": {
@@ -2748,11 +2750,11 @@
         },
         "step3": {
           "title": "Define sharing and rotation rules",
-          "text": "Decide who can view, share, or rotate access in order to reduce gray areas and single-person dependencies."
+          "text": "Decide who receives each access and whether they can view the secret or only sign in through the extension."
         },
         "step4": {
-          "title": "Train the team on the right habits",
-          "text": "Pair the password manager with practical rules: unique passwords, phishing awareness, MFA, and timely access removal."
+          "title": "Review permissions regularly",
+          "text": "Remove unnecessary access, close old sessions, and update passwords identified by the analysis."
         }
       },
       "links": {
@@ -2761,7 +2763,7 @@
         "solution": {
           "label": "Solution",
           "title": "Explore the SMB cybersecurity solution",
-          "text": "The broader view: passwords, support, training, and audit in a single offer."
+          "text": "Explore the vault, controlled sharing, browser extension, and company management features."
         },
         "comparatif": {
           "label": "Comparison",
@@ -2771,7 +2773,7 @@
         "audit": {
           "label": "Audit",
           "title": "Audit your access and risks",
-          "text": "Complement password management with an SMB cybersecurity audit and phishing awareness."
+          "text": "Discover separately scoped audit and awareness services available on request."
         }
       },
       "cta": {
@@ -2782,18 +2784,18 @@
       },
       "demo": {
         "eyebrow": "Product demo",
-        "title": "See MYKEYNEST in a realistic product-like environment",
-        "text": "This walkthrough shows how to centralize access, share a credential properly, and keep operational visibility without adding friction to the team's day-to-day work.",
-        "point1": "Quickly show product value to a decision-maker or team.",
-        "point2": "Project a concrete workflow around secure sharing and traceability.",
-        "point3": "Support the sales narrative with a more credible visual proof point.",
+        "title": "See the vault and access sharing in action",
+        "text": "This demo shows how to save a credential, organize it, and share it with a team member.",
+        "point1": "Explore how the vault is organized.",
+        "point2": "See the available sharing options.",
+        "point3": "Understand the role of the browser extension.",
         "iframe_title": "MYKEYNEST demo video"
       }
     },
     "comparatif": {
       "meta": {
-        "title": "Best Enterprise Password Manager? MYKEYNEST vs Bitwarden vs 1Password",
-        "description": "Enterprise password manager comparison for SMBs: MYKEYNEST vs Bitwarden vs 1Password. Compare pricing, security, audit, support, and training to choose the best password manager for your business.",
+        "title": "Password manager comparison: MYKEYNEST, Bitwarden, and 1Password",
+        "description": "Compare MYKEYNEST, Bitwarden, and 1Password on published pricing, encryption, 2FA, password analysis, and support.",
         "keywords": "best password manager, enterprise password manager comparison, enterprise password manager, business password manager, SMB password manager, MYKEYNEST vs Bitwarden, MYKEYNEST vs 1Password, secure passwords for SMBs"
       },
       "schema": {
@@ -2807,22 +2809,22 @@
         "current": "Comparison"
       },
       "hero": {
-        "eyebrow": "Objective comparison",
+        "eyebrow": "Comparison guide",
         "h1_vs": "vs",
         "h1_and": "and",
         "h1_suffix": "which solution for your SMB?",
-        "subtitle": "Factual comparison of features, pricing and included services. To help you make an informed decision.",
-        "disclaimer": "Public data — indicative prices checked in 08/2026. Verify official pricing before purchasing."
+        "subtitle": "An overview of published features and pricing to help you identify what to verify for your organization.",
+        "disclaimer": "Offers may change. Review the official links below the table before making a decision."
       },
       "summary": {
         "title": "The right choice depends on how your team works",
         "description": "This table compares offers designed for teams. It does not replace an assessment of your security, administration and support requirements.",
-        "point1": "MYKEYNEST focuses on simple adoption, controlled sharing and French-language support.",
-        "point2": "Bitwarden and 1Password offer longer-established ecosystems and documented zero-knowledge architectures.",
+        "point1": "MYKEYNEST focuses on simple adoption, controlled sharing, and support in French and English.",
+        "point2": "Bitwarden and 1Password offer established plans whose features and terms should be checked on their official pages.",
         "point3": "Compare total cost, seat requirements and the services actually included in the selected plan."
       },
       "methodology": {
-        "text": "Method: pre-tax monthly prices based on annual billing for competitors. Official sources checked in August 2026:"
+        "text": "Method: indicative pre-tax monthly prices. Check current terms and pricing with the official sources:"
       },
       "table": {
         "eyebrow": "Comparison table",
@@ -2832,62 +2834,61 @@
         "badge_recommended": "Recommended",
         "cat_pricing": "💰 Pricing",
         "cat_security": "🔐 Security",
-        "cat_services": "🛠 Included services",
+        "cat_services": "💬 Support",
         "row": {
           "price_per_user": "Price / user / month",
-          "price_per_user_sub": "Team / SMB plan",
-          "free_trial": "Free trial",
+          "price_per_user_sub": "Team plan · 6 seats minimum",
+          "free_trial": "Entry option",
           "aes256": "AES-256 encryption",
-          "zero_knowledge": "Zero-knowledge architecture",
           "2fa": "2FA authentication",
-          "audit": "Security audit",
-          "audit_sub": "Weak / compromised password detection",
+          "audit": "Password analysis",
+          "audit_sub": "Weak or reused password detection",
           "maintenance": "Included technical maintenance",
           "maintenance_sub": "Support & guided updates",
           "training": "Employee training",
           "training_sub": "Phishing awareness & best practices",
           "security_audit": "On-site security audit",
           "security_audit_sub": "Vulnerability report",
-          "support": "Continuous support",
+          "support": "Support channel",
           "french_support": "French-language support"
         }
       },
       "why": {
         "eyebrow": "Why choose MYKEYNEST",
         "title": "4 reasons to choose us",
-        "subtitle": "Beyond price, assess deployment simplicity, support and the actual needs of your SMB.",
+        "subtitle": "Beyond price, assess ease of use, permissions, and the actual needs of your team.",
         "price": {
           "title": "Straightforward pricing",
-          "desc": "At €6.99/user/month, MYKEYNEST remains competitive for SMBs that want software, support, and guidance in one offer."
+          "desc": "Pro and Team pricing is displayed clearly, with monthly billing and a six-license minimum for Team."
         },
         "maintenance": {
-          "title": "Maintenance included",
-          "desc": "No unanswered support tickets. Our team handles technical maintenance and guides you through every update."
+          "title": "Controlled sharing",
+          "desc": "The owner can grant full access or limit a recipient to signing in through the extension."
         },
         "training": {
-          "title": "Training included",
-          "desc": "Your employees are trained in security best practices: phishing, passwords, and internal procedures."
+          "title": "Company management",
+          "desc": "The Team plan adds members, licenses, and roles for managing access from one workspace."
         },
         "french": {
-          "title": "French team",
-          "desc": "French-language support and a team based in France, so you can work with people who understand your context."
+          "title": "Support in French and English",
+          "desc": "You can contact MYKEYNEST by email with questions about the product, extension, or subscription."
         }
       },
       "cta": {
-        "title": "Convinced? Try for free.",
-        "subtitle": "Start without a credit card. Switch to the business plan when you're ready.",
-        "button": "Free trial — no commitment"
+        "title": "Want to try MYKEYNEST?",
+        "subtitle": "Create a free account without a credit card, then choose a paid plan only if it fits your needs.",
+        "button": "Create a free account"
       }
     },
     "audit": {
       "meta": {
         "title": "SMB Cybersecurity Audit, Phishing Awareness & Employee Training | MYKEYNEST",
-        "description": "Remote or on-site cybersecurity audit for SMBs, phishing awareness, ransomware risk reduction, and employee cybersecurity training with a vulnerability report and remediation roadmap.",
+        "description": "Cybersecurity audit and awareness services for SMBs, with scope, deliverables, and schedule agreed before the engagement.",
         "keywords": "SMB cybersecurity audit, IT security audit for SMBs, SMB cybersecurity, ransomware protection for SMBs, ransomware solution for SMBs, employee cybersecurity training, business phishing awareness, how to prevent phishing in business, SMB vulnerability report, cybersecurity provider for SMBs"
       },
       "schema": {
         "name": "SMB Cybersecurity Audit & Training",
-        "description": "Cybersecurity audit and employee training service for SMBs. Remote or on-site audit, vulnerability report and phishing awareness."
+        "description": "Cybersecurity audit and awareness services for SMBs, scoped according to the customer’s environment and needs."
       },
       "breadcrumb": {
         "aria": "Breadcrumb",
@@ -2898,14 +2899,14 @@
       "hero": {
         "eyebrow": "Audit & Training",
         "h1_highlight": "Cybersecurity Audit & Training",
-        "h1_suffix": "to protect your SMB",
+        "h1_suffix": "adapted to your SMB context",
         "subtitle": "Identify fragile access, prioritize fixes and give your teams practical habits for handling phishing and everyday mistakes.",
         "pill1": "SMB cybersecurity audit",
         "pill2": "Employee training",
         "pill3": "Phishing awareness"
       },
       "summary": {
-        "title": "An actionable assessment, not a decorative report",
+        "title": "A scoped, actionable assessment",
         "description": "The engagement is scoped around your environment, tools and the risks that matter to your business.",
         "point1": "The scope is agreed with your point of contact before any analysis.",
         "point2": "Findings are ranked by severity and paired with practical actions.",
@@ -2930,19 +2931,19 @@
       "services": {
         "eyebrow": "Our services",
         "title": "Two complementary services",
-        "subtitle": "The audit identifies your vulnerabilities, training protects your teams. Together, they form your cybersecurity shield.",
+        "subtitle": "Audit and awareness services are adapted to the scope agreed with your company before the engagement begins.",
         "audit": {
           "title": "Security audit",
-          "desc": "Complete analysis of your infrastructure to identify vulnerabilities before they are exploited.",
-          "item1": "Remote audit (network, password policies)",
-          "item2": "On-site physical audit if needed",
+          "desc": "Analysis of the agreed scope to identify the practices and vulnerabilities that should be addressed first.",
+          "item1": "Remote analysis according to the defined scope",
+          "item2": "On-site work when included in the proposal",
           "item3": "Detailed vulnerability report with priorities",
           "item4": "Personalized remediation plan"
         },
         "training": {
           "title": "Employee training",
-          "desc": "Your teams are your first line of defense. We train them to recognize and avoid the most common threats.",
-          "item1": "Phishing awareness (simulations included)",
+          "desc": "Sessions adapted to the audience to explain common risks and expected practices.",
+          "item1": "Phishing awareness",
           "item2": "Password best practices",
           "item3": "Internal security procedures",
           "item4": "Interactive workshop (in-person or remote)"
@@ -2954,7 +2955,7 @@
         "subtitle": "From first contact to final report, here's how we work with your SMB.",
         "step1": {
           "title": "Contact & initial assessment",
-          "desc": "A 30-minute call to understand your context, challenges and define the scope of the engagement."
+          "desc": "An initial conversation to understand your context, challenges, and define the scope of the engagement."
         },
         "step2": {
           "title": "Security audit",
@@ -2974,7 +2975,7 @@
         "title": "Your questions about the audit",
         "q1": {
           "question": "How long does an audit take?",
-          "answer": "A remote audit typically takes 2 to 3 business days. An on-site audit spans half a day to a full day depending on the size of your organisation. The report is delivered within 5 days of the engagement."
+          "answer": "Duration depends on the scope, the number of systems involved, and the delivery format. The schedule and review date are specified in the proposal before work begins."
         },
         "q2": {
           "question": "Do I need MYKEYNEST to benefit from the audit?",
@@ -2982,16 +2983,16 @@
         },
         "q3": {
           "question": "Is the training suitable for non-technical employees?",
-          "answer": "Absolutely. Our training is designed for non-technical profiles: sales, HR, accounting… We use real-world examples from your sector to maximise understanding and retention."
+          "answer": "Yes. Content can be adapted to non-technical roles such as sales, HR, or accounting teams, according to the agreed scope."
         },
         "q4": {
           "question": "What is the cost of an audit?",
-          "answer": "The price varies depending on the scope and size of your company. Contact us for a free personalised quote. As a MYKEYNEST Pro customer, you benefit from a built-in software security audit at no extra cost."
+          "answer": "Pricing depends on the scope and size of the company. A proposal specifies the included work and deliverables. The password analysis available in MYKEYNEST is separate from a professional audit."
         }
       },
       "cta": {
         "title": "Ready to audit your security?",
-        "subtitle": "Contact us for a free 30-minute initial assessment.",
+        "subtitle": "Contact us to define the scope and receive a suitable proposal.",
         "primary": "Request a quote",
         "secondary": "See the full solution"
       }

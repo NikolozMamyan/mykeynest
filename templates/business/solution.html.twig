@@ -121,22 +121,22 @@
     <p class="hero-sub">{{ 'business.solution.hero.subtitle'|trans }}</p>
 
     {# Stat strip #}
-    <div class="hero-stats" aria-label="Chiffres cles">
+    <div class="hero-stats" aria-label="{{ isEn ? 'Key product information' : 'Informations clés du produit' }}">
       <div class="hero-stat">
         <div class="hero-stat-num">AES-256</div>
-        <div class="hero-stat-label">Chiffrement</div>
+        <div class="hero-stat-label">{{ isEn ? 'Encryption at rest' : 'Chiffrement au repos' }}</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-num">0</div>
-        <div class="hero-stat-label">Donnees lisibles</div>
+        <div class="hero-stat-num">FR / EN</div>
+        <div class="hero-stat-label">{{ isEn ? 'Interface' : 'Interface' }}</div>
       </div>
       <div class="hero-stat">
         <div class="hero-stat-num">6,99€</div>
-        <div class="hero-stat-label">/ utilisateur / mois</div>
+        <div class="hero-stat-label">{{ isEn ? 'Pro plan / month' : 'Plan Pro / mois' }}</div>
       </div>
       <div class="hero-stat">
-        <div class="hero-stat-num">100%</div>
-        <div class="hero-stat-label">Europeen</div>
+        <div class="hero-stat-num">6+</div>
+        <div class="hero-stat-label">{{ isEn ? 'Team licenses' : 'Licences Team' }}</div>
       </div>
     </div>
 
@@ -160,15 +160,15 @@
 
 <section class="wrap" aria-labelledby="solution-summary-title" style="padding: 2rem 0 0;">
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:24px;padding:1.5rem 1.75rem;">
-    <div class="shead-eye" style="margin-bottom:0.75rem;"><i class="fas fa-bolt"></i> {{ isEn ? 'Quick summary' : 'Resume rapide' }}</div>
-    <h2 id="solution-summary-title" style="margin-bottom:0.75rem;">{{ isEn ? 'What this page answers' : 'Ce que cette page explique' }}</h2>
+    <div class="shead-eye" style="margin-bottom:0.75rem;"><i class="fas fa-bolt"></i> {{ isEn ? 'At a glance' : 'En bref' }}</div>
+    <h2 id="solution-summary-title" style="margin-bottom:0.75rem;">{{ isEn ? 'Manage company access from one workspace' : 'Gérez les accès de l’entreprise depuis un seul espace' }}</h2>
     <p style="margin-bottom:1rem;color:#475569;">
-      {{ isEn ? 'This page is designed for SMBs evaluating an enterprise password manager, practical cybersecurity support, employee onboarding, and day-to-day IT security guidance.' : 'Cette page s adresse aux PME qui cherchent un gestionnaire de mots de passe entreprise, un accompagnement cybersécurité PME, de la formation équipes et un cadre de sécurité informatique simple au quotidien.' }}
+      {{ isEn ? 'MYKEYNEST helps SMBs and agencies organize credentials, share access with the right people, and use them from the browser extension.' : 'MYKEYNEST aide les PME et agences à organiser leurs identifiants, à attribuer les bons accès et à les utiliser depuis l’extension navigateur.' }}
     </p>
     <ul style="margin:0 0 1rem 1.25rem;color:#334155;line-height:1.7;">
-      <li>{{ isEn ? 'MYKEYNEST combines password management, maintenance, employee training, and SMB cybersecurity audit support in one offer.' : 'MYKEYNEST combine gestion des mots de passe, maintenance, formation collaborateurs et audit cybersécurité PME dans une seule offre.' }}</li>
-      <li>{{ isEn ? 'The offer targets SMBs, agencies, and teams that need a practical cybersecurity baseline, phishing awareness, and secure password policies without building it in-house.' : 'L offre vise les PME, agences et equipes qui veulent un socle cybersécurité concret, de la sensibilisation phishing et des politiques de mots de passe sûres sans recruter une équipe interne.' }}</li>
-      <li>{{ isEn ? 'Use the comparison and audit pages below if you need vendor evaluation or a services-first entry point.' : 'Utilisez ensuite le comparatif et la page audit si vous avez besoin d une aide au choix ou d une entree orientee services.' }}</li>
+      <li>{{ isEn ? 'Store and organize business credentials in an encrypted vault.' : 'Enregistrez et organisez les identifiants professionnels dans un coffre chiffré.' }}</li>
+      <li>{{ isEn ? 'Choose between full access and sign-in-only sharing for external collaborators.' : 'Choisissez entre un accès complet et une connexion uniquement pour les collaborateurs externes.' }}</li>
+      <li>{{ isEn ? 'Manage company members, licenses, roles, sessions, and extension installations.' : 'Gérez les membres, licences, rôles, sessions et installations de l’extension.' }}</li>
     </ul>
     <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
       <a href="{{ path('business_comparatif', localeParams) }}" class="btn btn-outline">{{ isEn ? 'See the comparison' : 'Voir le comparatif' }}</a>
@@ -181,15 +181,15 @@
 {# ======================== STATS BAND ======================== #}
 <div class="stats-band" aria-hidden="true">
   <div class="stats-band-inner">
-    <div class="sb-item"><i class="fas fa-certificate"></i> AES-256</div>
+    <div class="sb-item"><i class="fas fa-certificate"></i> {{ isEn ? 'Encrypted credentials' : 'Identifiants chiffrés' }}</div>
     <div class="sb-div"></div>
-    <div class="sb-item"><i class="fas fa-fingerprint"></i> Installation Hashee</div>
+    <div class="sb-item"><i class="fas fa-share-nodes"></i> {{ isEn ? 'Controlled sharing' : 'Partage contrôlé' }}</div>
     <div class="sb-div"></div>
-    <div class="sb-item"><i class="fas fa-euro-sign"></i> Donnees en Europe</div>
+    <div class="sb-item"><i class="fas fa-puzzle-piece"></i> {{ isEn ? 'Browser extension' : 'Extension navigateur' }}</div>
     <div class="sb-div"></div>
     <div class="sb-item"><i class="fas fa-user-shield"></i> {{ 'business.solution.pillars.software.item2'|trans }}</div>
     <div class="sb-div"></div>
-    <div class="sb-item"><i class="fas fa-check-double"></i> Conformite RGPD</div>
+    <div class="sb-item"><i class="fas fa-user-minus"></i> {{ isEn ? 'Access revocation' : 'Révocation des accès' }}</div>
   </div>
 </div>
 
@@ -251,45 +251,45 @@
   </div>
 </section>
 
-{# ======================== SPLIT ? INSTALLATION HASHEE ======================== #}
+{# ======================== ACCESS CONTROL ======================== #}
 <section class="split-section">
   <div class="split-inner">
     <div class="split-text">
       <div class="shead">
-        <div class="shead-eye"><i class="fas fa-fingerprint"></i> Securite inviolable</div>
-        <h2>Vous seul controlez l'acces</h2>
-        <p>Chaque deploiement MykeyNest genere une empreinte cryptographique unique. L'acces est verrouille a votre instance, impossible a usurper, meme avec les bons identifiants.</p>
+        <div class="shead-eye"><i class="fas fa-fingerprint"></i> {{ isEn ? 'Access control' : 'Contrôle des accès' }}</div>
+        <h2>{{ isEn ? 'Keep control when credentials are shared' : 'Gardez le contrôle lorsque vous partagez un identifiant' }}</h2>
+        <p>{{ isEn ? 'Select who can use each credential, choose the appropriate access mode, and revoke access from the application when needed.' : 'Sélectionnez qui peut utiliser chaque identifiant, choisissez le niveau d’accès adapté et révoquez-le depuis l’application lorsque nécessaire.' }}</p>
       </div>
 
       <div class="split-pts">
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-fingerprint"></i></div>
           <div class="split-pt-body">
-            <b>Signature Materielle</b>
-            <p>Acces strictement lie a votre instance. Un attaquant sur un autre poste est bloque meme avec vos codes.</p>
+            <b>{{ isEn ? 'Encrypted storage' : 'Stockage chiffré' }}</b>
+            <p>{{ isEn ? 'Vault secrets are encrypted at rest and communications use HTTPS.' : 'Les secrets du coffre sont chiffrés au repos et les communications utilisent HTTPS.' }}</p>
           </div>
         </div>
 
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-link-slash"></i></div>
           <div class="split-pt-body">
-            <b>Preuve d'Integrite</b>
-            <p>Si l'extension est modifiee ou falsifiee, le hash change instantanement et l'acces est revoque.</p>
+            <b>{{ isEn ? 'Account-linked extension' : 'Extension associée au compte' }}</b>
+            <p>{{ isEn ? 'Authorized installations can be reviewed and revoked from the application.' : 'Les installations autorisées peuvent être consultées et révoquées depuis l’application.' }}</p>
           </div>
         </div>
 
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-shield-halved"></i></div>
           <div class="split-pt-body">
-            <b>Logs d'Audit Complets</b>
-            <p>Chaque tentative d'acces est tracee avec horodatage cryptographique pour vos audits de conformite.</p>
+            <b>{{ isEn ? 'Sharing permissions' : 'Permissions de partage' }}</b>
+            <p>{{ isEn ? 'Grant full access or limit a recipient to signing in through the extension.' : 'Accordez un accès complet ou limitez le destinataire à la connexion via l’extension.' }}</p>
           </div>
         </div>
 
         <div class="split-pt">
           <div class="split-pt-ico"><i class="fas fa-check-double"></i></div>
           <div class="split-pt-body">
-            <b>Conformite RGPD native</b>
+            <b>{{ isEn ? 'Documented privacy' : 'Confidentialité documentée' }}</b>
             <p>{{ 'business.solution.privacy_text'|trans }}</p>
           </div>
         </div>
@@ -297,30 +297,30 @@
     </div>
 
     <div class="split-visual">
-      <div class="split-badge"><i class="fas fa-shield-halved"></i> Installation verifiee</div>
+      <div class="split-badge"><i class="fas fa-shield-halved"></i> {{ isEn ? 'Access managed' : 'Accès géré' }}</div>
       <div class="split-card">
         <div class="split-card-header">
           <div class="sc-dots"><div class="sc-dot"></div><div class="sc-dot"></div><div class="sc-dot"></div></div>
-          <span class="sc-title">mykeynest - audit de securite</span>
+          <span class="sc-title">mykeynest - access control</span>
         </div>
 
         <div class="sc-body">
-          <div class="tl"><span class="tp">$</span><span class="tc">verify_install --id 0x8f2a</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">HASH_STATUS&nbsp;&nbsp;: SIGNED <i class="fas fa-check"></i></span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">OWNER_KEY&nbsp;&nbsp;&nbsp;&nbsp;: USER_STRICT</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">INTEGRITY&nbsp;&nbsp;&nbsp;&nbsp;: PASS</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tc">check_access --user collaborator</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">CREDENTIAL&nbsp;: ENCRYPTED <i class="fas fa-check"></i></span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">SHARE_MODE&nbsp;: SIGN-IN ONLY</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tv">EXTENSION&nbsp;&nbsp;: ASSOCIATED</span></div>
           <br>
-          <div class="tl"><span class="tp">$</span><span class="tc">simulate_attack</span></div>
-          <div class="tl"><span class="tp"> </span><span class="te">HASH_MISMATCH - denied</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tw">VAULT : LOCKED</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tc">revoke_access --user collaborator</span></div>
+          <div class="tl"><span class="tp"> </span><span class="te">ACCESS : REVOKED</span></div>
+          <div class="tl"><span class="tp"> </span><span class="tw">SESSION : CLOSED</span></div>
           <br>
-          <div class="tl"><span class="tp">$</span><span class="tok"><i class="fas fa-check"></i> Zero data exposed.</span></div>
+          <div class="tl"><span class="tp">$</span><span class="tok"><i class="fas fa-check"></i> OWNER CONTROL RETAINED</span></div>
         </div>
 
         <div class="sc-score">
           <div class="sc-score-top">
-            <span class="sc-score-label">Score de securite</span>
-            <span class="sc-score-val">A+</span>
+            <span class="sc-score-label">{{ isEn ? 'Access status' : 'État de l’accès' }}</span>
+            <span class="sc-score-val">{{ isEn ? 'Active' : 'Actif' }}</span>
           </div>
           <div class="sc-score-bar"><div class="sc-score-fill"></div></div>
         </div>
@@ -429,7 +429,7 @@
               <i class="fas fa-rocket"></i> {{ 'business.solution.pricing.cta'|trans }}
             </a>
             <a href="mailto:contact@key-nest.com" class="btn btn-outline">
-              <i class="fas fa-envelope"></i> Contacter l'equipe
+              <i class="fas fa-envelope"></i> {{ isEn ? 'Contact the team' : 'Contacter l’équipe' }}
             </a>
           </div>
         </div>
@@ -450,8 +450,8 @@
 </section>
 
 {% include 'components/seo/_internal_links.html.twig' with {
-  sectionTitle: isEn ? 'Next pages to keep evaluating the offer' : 'Pages suivantes pour continuer l evaluation',
-  sectionSubtitle: isEn ? 'This solution page should lead visitors to deeper comparison, product detail, support content, and cybersecurity services instead of ending the journey here.' : 'Cette page solution doit envoyer le visiteur vers plus de comparaison, plus de detail produit, plus de contenu support et plus de services cybersécurité au lieu de terminer le parcours ici.',
+  sectionTitle: isEn ? 'Learn more about MYKEYNEST' : 'En savoir plus sur MYKEYNEST',
+  sectionSubtitle: isEn ? 'Explore the product, compare available solutions, or find practical answers in the help center.' : 'Découvrez le produit, comparez les solutions disponibles ou trouvez des réponses pratiques dans le centre d’aide.',
   links: [
     {
       route: 'business_password_manager',
@@ -467,7 +467,7 @@
       icon: 'fa-solid fa-scale-balanced',
       label: isEn ? 'Competitive view' : 'Vue concurrentielle',
       title: isEn ? 'Compare MYKEYNEST to other password managers' : 'Comparer MYKEYNEST aux autres gestionnaires de mots de passe',
-      text: isEn ? 'Useful for prospects already comparing Dashlane, Bitwarden, or 1Password.' : 'Utile pour les prospects deja en comparaison avec Dashlane, Bitwarden ou 1Password.'
+      text: isEn ? 'Compare the published features and pricing of the different solutions.' : 'Comparez les fonctionnalités et tarifs publiés des différentes solutions.'
     },
     {
       route: 'business_audit',
@@ -475,7 +475,7 @@
       icon: 'fa-solid fa-shield-virus',
       label: isEn ? 'Human risk' : 'Risque humain',
       title: isEn ? 'See the cybersecurity audit and awareness offer' : 'Voir l offre audit cybersécurité et sensibilisation',
-      text: isEn ? 'Bridge product interest with phishing reduction, training, and remediation support.' : 'Faites le lien entre l interet produit et la reduction du phishing, la formation et l accompagnement remediation.'
+      text: isEn ? 'Discover the separately scoped audit and awareness services.' : 'Découvrez les prestations d’audit et de sensibilisation proposées séparément sur devis.'
     },
     {
       route: 'app_help_center',
@@ -483,7 +483,7 @@
       icon: 'fa-solid fa-book-open',
       label: isEn ? 'Help center' : 'Centre d aide',
       title: isEn ? 'Visit the documentation and setup articles' : 'Consulter la documentation et les guides de mise en place',
-      text: isEn ? 'Guide prospects toward practical answers without losing them in navigation.' : 'Guidez les prospects vers des reponses pratiques sans les perdre dans la navigation.'
+      text: isEn ? 'Find setup instructions and answers to common product questions.' : 'Retrouvez les instructions de mise en place et les réponses aux questions fréquentes.'
     }
   ]
 } only %}
@@ -504,7 +504,7 @@
             <i class="fas fa-envelope"></i> {{ 'business.solution.cta.secondary'|trans }}
           </a>
         </div>
-        <p class="cta-note"><i class="fas fa-circle-check"></i> Essai gratuit 14 jours - Sans carte bancaire - RGPD compliant</p>
+        <p class="cta-note"><i class="fas fa-circle-check"></i> {{ isEn ? 'Free account · No credit card · Optional subscription' : 'Compte gratuit · Sans carte bancaire · Abonnement optionnel' }}</p>
       </div>
     </div>
   </div>

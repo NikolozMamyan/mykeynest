@@ -274,8 +274,8 @@
         </div>
 
         {% include 'components/seo/_internal_links.html.twig' with {
-          sectionTitle: isEn ? 'Useful pages after the audit offer' : 'Pages utiles apres l offre audit',
-          sectionSubtitle: isEn ? 'This page should connect service-oriented visitors to the product, the broader solution, the help center, and educational content instead of leaving them at a dead end.' : 'Cette page doit reconnecter les visiteurs orientes services vers le produit, la solution globale, le centre d aide et les contenus educatifs au lieu de les laisser en impasse.',
+          sectionTitle: isEn ? 'Explore MYKEYNEST resources' : 'Explorer les ressources MYKEYNEST',
+          sectionSubtitle: isEn ? 'Discover the product, review access-management features, or find practical guidance in the help center.' : 'Découvrez le produit, consultez les fonctions de gestion des accès ou trouvez des conseils pratiques dans le centre d’aide.',
           links: [
             {
               route: 'business_password_manager',
@@ -283,15 +283,15 @@
               icon: 'fa-solid fa-key',
               label: isEn ? 'Password manager' : 'Gestionnaire',
               title: isEn ? 'See the enterprise password manager for SMB teams' : 'Voir le gestionnaire de mots de passe entreprise pour equipes PME',
-              text: isEn ? 'Useful when audit findings lead to stronger access control and password hygiene needs.' : 'Utile lorsque les constats d audit conduisent a renforcer le controle des acces et l hygiene des mots de passe.'
+              text: isEn ? 'Centralize credentials and manage sharing permissions for SMB teams.' : 'Centralisez les identifiants et gérez les permissions de partage des équipes PME.'
             },
             {
               route: 'business_solution',
               params: localeParams,
               icon: 'fa-solid fa-layer-group',
               label: isEn ? 'Full offer' : 'Offre complete',
-              title: isEn ? 'Review the full SMB cybersecurity solution' : 'Relire la solution cybersécurité complete pour PME',
-              text: isEn ? 'Connect services, software, support, and onboarding in one commercial path.' : 'Reliez services, logiciel, support et onboarding dans un seul parcours commercial.'
+              title: isEn ? 'Review access management for SMBs' : 'Découvrir la gestion des accès pour PME',
+              text: isEn ? 'Explore the vault, browser extension, controlled sharing, and company management.' : 'Découvrez le coffre, l’extension navigateur, le partage contrôlé et la gestion de l’entreprise.'
             },
             {
               route: 'app_help_center',
@@ -299,15 +299,15 @@
               icon: 'fa-solid fa-book-open',
               label: isEn ? 'Documentation' : 'Documentation',
               title: isEn ? 'Read the help center and practical implementation guides' : 'Lire le centre d aide et les guides pratiques de mise en place',
-              text: isEn ? 'Answer operational questions before the prospect leaves the site.' : 'Repondez aux questions operationnelles avant que le prospect ne quitte le site.'
+              text: isEn ? 'Find setup instructions and answers to common questions.' : 'Retrouvez les instructions de configuration et les réponses aux questions fréquentes.'
             },
             {
               route: 'blog_index',
               params: { _locale: app.request.locale },
               icon: 'fa-solid fa-newspaper',
               label: isEn ? 'Blog' : 'Blog',
-              title: isEn ? 'Open the cybersecurity blog and educational articles' : 'Ouvrir le blog cybersécurité et les articles educatifs',
-              text: isEn ? 'Keep top-of-funnel visitors engaged with phishing, policy, and password-security content.' : 'Gardez engages les visiteurs haut de funnel avec des contenus sur le phishing, les politiques et la securite des mots de passe.'
+              title: isEn ? 'Read practical password and access articles' : 'Lire les articles pratiques sur les mots de passe et les accès',
+              text: isEn ? 'Find guidance on passwords, phishing, sharing, and account security.' : 'Retrouvez des conseils sur les mots de passe, le phishing, le partage et la sécurité des comptes.'
             }
           ]
         } only %}

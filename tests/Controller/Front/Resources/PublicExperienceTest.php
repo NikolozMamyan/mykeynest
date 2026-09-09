@@ -7,6 +7,31 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class PublicExperienceTest extends WebTestCase
 {
+    public function testLandingFocusesOnControlledAccessWithoutUnsupportedClaims(): void
+    {
+        self::bootKernel();
+        $projectDir = self::getContainer()->getParameter('kernel.project_dir');
+        $translations = json_decode(
+            file_get_contents($projectDir.'/translations/messages.fr.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+
+        self::assertSame('Partagez les accès de votre équipe,', $translations['landing']['hero']['title_before']);
+        self::assertSame('sans transmettre les mots de passe', $translations['landing']['hero']['title_highlight']);
+        self::assertSame('Voir comment ça marche', $translations['landing']['hero']['cta_discover']);
+
+        $publicCopy = json_encode([
+            $translations['landing'],
+            $translations['business'],
+        ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        self::assertStringNotContainsString('Sécurité inviolable', $publicCopy);
+        self::assertStringNotContainsString('Essai gratuit 14 jours', $publicCopy);
+        self::assertStringNotContainsString('rapport mensuel', $publicCopy);
+        self::assertStringNotContainsString('interlocuteur nommé', $publicCopy);
+    }
+
     /**
      * @dataProvider publicPageProvider
      */
@@ -93,9 +118,30 @@ final class PublicExperienceTest extends WebTestCase
         $crawler = $client->request('GET', '/comparatif-password-manager-entreprise');
 
         self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.cmp-th-mykeynest', '5,49€');
+        self::assertStringContainsString('6 licences minimum', $crawler->filter('.cmp-table')->text());
+        self::assertStringNotContainsString('Architecture zero-knowledge', $crawler->filter('.cmp-table')->text());
         self::assertSame(1, $crawler->filter('a[href="https://bitwarden.com/pricing/business/"]')->count());
         self::assertSame(1, $crawler->filter('a[href="https://1password.com/pricing/business"]')->count());
         self::assertSelectorTextContains('.cmp-methodology', 'Sources officielles');
+    }
+
+    public function testAuditSeoMetadataIsNotRenderedInThePageBody(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/audit-cybersecurite-pme');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(1, $crawler->filter('head meta[name="keywords"]')->count());
+        self::assertSame(1, $crawler->filter('head link[rel="canonical"]')->count());
+        self::assertStringNotContainsString(
+            'audit sécurité informatique PME',
+            $crawler->filter('body')->text()
+        );
+        self::assertStringNotContainsString(
+            '/audit-cybersecurite-pmeaudit',
+            $crawler->filter('body')->text()
+        );
     }
 
     public function testPasswordResetRequestUsesTheProfessionalLocalizedLayout(): void

@@ -111,7 +111,7 @@
                             <div class="cmp-th-logo">
                                 <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" class="cmp-th-brand-mark" alt="" aria-hidden="true">
                                 MYKEYNEST
-                                <span class="cmp-th-price">6,99€</span>
+                                <span class="cmp-th-price">5,49€</span>
                             </div>
                         </th>
                         <th class="cmp-th" scope="col">
@@ -135,15 +135,15 @@
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.price_per_user'|trans }}<small>{{ 'business.comparatif.table.row.price_per_user_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-th-price">6,99€</span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-th-price">5,49€</span></td>
                         <td class="cmp-td-val"><span class="cmp-val-text">4 $US / utilisateur</span></td>
                         <td class="cmp-td-val"><span class="cmp-val-text">8,99 $US / utilisateur</span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.free_trial'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-val-text">{{ isEn ? 'Free account' : 'Compte gratuit' }}</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'See official offer' : 'Voir l’offre officielle' }}</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'See official offer' : 'Voir l’offre officielle' }}</span></td>
                     </tr>
 
                     {# Securite #}
@@ -157,12 +157,6 @@
                         <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
                     </tr>
                     <tr>
-                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.zero_knowledge'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                    </tr>
-                    <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.2fa'|trans }}</td>
                         <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
                         <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
@@ -171,43 +165,19 @@
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.audit'|trans }}<small>{{ 'business.comparatif.table.row.audit_sub'|trans }}</small></td>
                         <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'Depends on plan' : 'Selon l’offre' }}</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'Depends on plan' : 'Selon l’offre' }}</span></td>
                     </tr>
 
-                    {# Services inclus #}
+                    {# Support #}
                     <tr class="cmp-row-category">
                         <td class="cmp-td-category-label" colspan="4">{{ 'business.comparatif.table.cat_services'|trans }}</td>
                     </tr>
                     <tr>
-                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.maintenance'|trans }}<small>{{ 'business.comparatif.table.row.maintenance_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
-                    </tr>
-                    <tr>
-                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.training'|trans }}<small>{{ 'business.comparatif.table.row.training_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
-                    </tr>
-                    <tr>
-                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.security_audit'|trans }}<small>{{ 'business.comparatif.table.row.security_audit_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
-                    </tr>
-                    <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.support'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-partial"><i class="fa-solid fa-minus"></i></span></td>
-                    </tr>
-                    <tr>
-                        <td class="cmp-td-feature">{{ 'business.comparatif.table.row.french_support'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-no"><i class="fa-solid fa-xmark"></i></span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-val-text">{{ isEn ? 'Email · French and English' : 'E-mail · français et anglais' }}</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'See official offer' : 'Voir l’offre officielle' }}</span></td>
+                        <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'See official offer' : 'Voir l’offre officielle' }}</span></td>
                     </tr>
                 </tbody>
             </table>
@@ -249,15 +219,15 @@
         </div>
 
         {% include 'components/seo/_internal_links.html.twig' with {
-          sectionTitle: isEn ? 'Useful next steps after the comparison' : 'Etapes utiles apres le comparatif',
-          sectionSubtitle: isEn ? 'Once a visitor compares vendors, the best path is to send them toward the product page, practical cybersecurity services, documentation, and educational content.' : 'Quand un visiteur compare les fournisseurs, le meilleur parcours consiste a l envoyer vers la page produit, les services cybersécurité concrets, la documentation et les contenus educatifs.',
+          sectionTitle: isEn ? 'Continue your evaluation' : 'Poursuivre votre évaluation',
+          sectionSubtitle: isEn ? 'Review the product in detail, discover the separately scoped audit services, or read practical guidance.' : 'Consultez le produit en détail, découvrez les prestations d’audit proposées séparément ou lisez les guides pratiques.',
           links: [
             {
               route: 'business_password_manager',
               params: localeParams,
               icon: 'fa-solid fa-key',
               label: isEn ? 'Product detail' : 'Detail produit',
-              title: isEn ? 'Review the enterprise password manager page' : 'Relire la page gestionnaire de mots de passe entreprise',
+              title: isEn ? 'Review the enterprise password manager' : 'Découvrir le gestionnaire de mots de passe entreprise',
               text: isEn ? 'Go deeper on access control, sharing, and operational fit for SMB teams.' : 'Approfondissez le controle des acces, le partage et l adequation operationnelle pour les equipes PME.'
             },
             {
@@ -265,24 +235,24 @@
               params: localeParams,
               icon: 'fa-solid fa-layer-group',
               label: isEn ? 'Full solution' : 'Solution complete',
-              title: isEn ? 'See how the software and the services work together' : 'Voir comment le logiciel et les services fonctionnent ensemble',
-              text: isEn ? 'Useful when the buyer evaluates more than a password vault alone.' : 'Utile quand l acheteur evalue plus qu un simple coffre-fort de mots de passe.'
+              title: isEn ? 'See access management for SMBs' : 'Voir la gestion des accès pour PME',
+              text: isEn ? 'Explore the vault, browser extension, sharing permissions, and company management.' : 'Découvrez le coffre, l’extension navigateur, les permissions de partage et la gestion de l’entreprise.'
             },
             {
               route: 'business_audit',
               params: localeParams,
               icon: 'fa-solid fa-shield-virus',
               label: isEn ? 'Cyber services' : 'Services cyber',
-              title: isEn ? 'Explore audit, awareness, and phishing-risk reduction' : 'Explorer audit, sensibilisation et reduction du risque phishing',
-              text: isEn ? 'Move from product comparison to broader cybersecurity support.' : 'Passez du comparatif produit a un accompagnement cybersécurité plus large.'
+              title: isEn ? 'Explore audit and awareness services' : 'Explorer les prestations d’audit et de sensibilisation',
+              text: isEn ? 'Services are scoped separately with each customer and are available on request.' : 'Les prestations sont cadrées séparément avec chaque client et proposées sur devis.'
             },
             {
               route: 'blog_index',
               params: { _locale: app.request.locale },
               icon: 'fa-solid fa-newspaper',
               label: isEn ? 'Educational content' : 'Contenus educatifs',
-              title: isEn ? 'Read the cybersecurity blog for SMB buyers' : 'Lire le blog cybersécurité pour acheteurs PME',
-              text: isEn ? 'Use supporting articles to keep commercial comparison pages connected to top-of-funnel content.' : 'Utilisez les articles de support pour relier les pages comparatives aux contenus haut de funnel.'
+              title: isEn ? 'Read practical password and access articles' : 'Lire les articles pratiques sur les mots de passe et les accès',
+              text: isEn ? 'Find guidance on passwords, phishing, sharing, and account security.' : 'Retrouvez des conseils sur les mots de passe, le phishing, le partage et la sécurité des comptes.'
             }
           ]
         } only %}
