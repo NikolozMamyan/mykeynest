@@ -24,6 +24,7 @@
 
       <a href="{{ path('app_credential') }}"
          data-turbo="true" data-turbo-action="advance"
+         data-navigation-paths="{{ path('app_credential') }},{{ path('credential_import') }}"
          class="nav-item {{ credentialsActive ? 'active' : '' }}">
         <i class="fas fa-key"></i>
         <span>{{ 'sidebar.items.credentials'|trans }}</span>
@@ -137,6 +138,7 @@
 
   <a href="{{ path('app_credential') }}"
      data-turbo="true" data-turbo-action="advance"
+     data-navigation-paths="{{ path('app_credential') }},{{ path('credential_import') }}"
      class="mobile-bottom-nav__item {{ credentialsActive ? 'active' : '' }}"
      {% if credentialsActive %}aria-current="page"{% endif %}>
     <i class="fas fa-key" aria-hidden="true"></i>

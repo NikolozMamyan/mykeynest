@@ -12,7 +12,8 @@
     "security_checker": "Vérificateur de sécurité",
     "settings": "Paramètres",
     "subscription": "Abonnements",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "import": "Importer"
   },
   "admin_subscription_billing": {
     "seats": "%quantity% siège(s)",
@@ -772,6 +773,102 @@
         "placeholder": "Ex. netflix.com",
         "help": "Saisissez simplement le site. Vous pouvez aussi coller sa page de connexion : MYKEYNEST configurera le reste automatiquement.",
         "invalid": "Saisissez un domaine ou une adresse HTTPS valide."
+      }
+    },
+    "import": {
+      "meta_title": "Importer mes identifiants",
+      "back": "Retour à mes identifiants",
+      "eyebrow": "Migration sécurisée",
+      "title": "Importez vos mots de passe simplement",
+      "subtitle": "Sélectionnez un export CSV : MYKEYNEST contrôle son format, évite les doublons et chiffre chaque mot de passe avant de l’enregistrer.",
+      "steps": {
+        "aria": "Étapes de l’import",
+        "prepare": { "title": "Préparer", "text": "Exportez ou téléchargez l’exemple" },
+        "select": { "title": "Sélectionner", "text": "Choisissez votre fichier CSV" },
+        "import": { "title": "Terminer", "text": "Vérifiez le récapitulatif" }
+      },
+      "format": {
+        "title": "Préparez votre fichier",
+        "subtitle": "Utilisez notre modèle ou un export compatible.",
+        "columns_aria": "Colonnes CSV reconnues",
+        "optional": "facultatif"
+      },
+      "example": {
+        "preview": "Aperçu du fichier",
+        "table_aria": "Exemple d’une ligne CSV",
+        "account": "Compte démo",
+        "download": "Télécharger le fichier d’exemple",
+        "download_hint": "Une ligne prête à remplacer par vos données"
+      },
+      "sources": {
+        "label": "Exports reconnus",
+        "list": "Chrome, Firefox, Bitwarden, 1Password, LastPass, Dashlane et le modèle MYKEYNEST. Séparateurs virgule, point-virgule ou tabulation."
+      },
+      "upload": {
+        "title": "Sélectionnez votre export",
+        "subtitle": "Le fichier est contrôlé avant que l’import soit autorisé.",
+        "choose": "Choisir un fichier CSV",
+        "drop": "ou déposez-le directement dans cette zone",
+        "constraints": "CSV · 5 Mo maximum · UTF-8 recommandé",
+        "remove": "Retirer le fichier sélectionné",
+        "submit": "Vérifier et importer",
+        "submitting": "Import sécurisé en cours…"
+      },
+      "capacity": {
+        "unlimited": "Votre offre autorise un nombre illimité d’identifiants.",
+        "remaining": "%remaining% emplacement(s) disponible(s) sur %limit%.",
+        "full_title": "Votre coffre a atteint sa limite",
+        "full_text": "Votre offre autorise actuellement %limit% identifiants.",
+        "upgrade": "Voir les offres"
+      },
+      "security": {
+        "title": "Un fichier sensible à supprimer après l’import",
+        "text": "Un export CSV contient les mots de passe en clair. MYKEYNEST les chiffre à l’enregistrement, mais pensez à supprimer le fichier de votre appareil une fois l’opération terminée."
+      },
+      "client": {
+        "invalid_type": "Sélectionnez un fichier portant l’extension .csv.",
+        "too_large": "Ce fichier dépasse la taille maximale de %size% Mo.",
+        "invalid_columns": "Colonnes non reconnues. Utilisez un export compatible ou téléchargez notre exemple.",
+        "file_ready": "Format reconnu. Le fichier est prêt à être importé."
+      },
+      "errors": {
+        "unavailable": "L’import CSV n’est pas disponible avec votre offre.",
+        "invalid_csrf": "Votre session a expiré. Rechargez la page puis réessayez.",
+        "limit_reached": "Vous avez atteint la limite de %limit% identifiants de votre offre.",
+        "no_file": "Sélectionnez un fichier CSV valide.",
+        "invalid_type": "Le fichier sélectionné doit être au format CSV.",
+        "too_large": "Le fichier ne doit pas dépasser %size% Mo.",
+        "unreadable": "Le fichier n’a pas pu être lu. Exportez-le à nouveau puis réessayez.",
+        "empty": "Le fichier CSV est vide.",
+        "missing_columns": "Colonnes obligatoires introuvables : %columns%. Utilisez un export compatible ou le fichier d’exemple."
+      },
+      "results": {
+        "imported": "%domain% · %username% a été chiffré et importé.",
+        "duplicate": "%domain% · %username% existe déjà dans votre coffre.",
+        "missing_fields": "Le site, l’identifiant ou le mot de passe est vide.",
+        "invalid_site": "L’adresse « %site% » n’est pas reconnue comme un site valide.",
+        "too_long": "Le nom, le domaine ou l’identifiant dépasse la longueur autorisée.",
+        "limit_reached": "Import arrêté : la limite de %limit% identifiants est atteinte.",
+        "too_many_rows": "Import arrêté après %limit% lignes pour protéger votre compte.",
+        "write_error": "Cette ligne n’a pas pu être enregistrée."
+      },
+      "result_page": {
+        "meta_title": "Résultat de l’import",
+        "eyebrow": "Import terminé",
+        "title": "Vos identifiants sont prêts",
+        "empty_title": "Aucun identifiant importé",
+        "subtitle": "Consultez le bilan ci-dessous. Aucun doublon n’a été ajouté à votre coffre.",
+        "summary_aria": "Résumé de l’import",
+        "imported": "Importés",
+        "skipped": "Ignorés",
+        "failed": "À corriger",
+        "details": "Détail des lignes",
+        "details_hint": "Les mots de passe ne sont jamais affichés dans ce rapport.",
+        "processed": "%count% ligne(s) analysée(s)",
+        "line": "Ligne %line%",
+        "no_detail": "Aucune ligne exploitable n’a été trouvée.",
+        "open_vault": "Voir mes identifiants",
+        "new_import": "Importer un autre fichier"
       }
     },
     "index": {

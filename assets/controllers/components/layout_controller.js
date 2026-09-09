@@ -182,12 +182,13 @@ export default class extends Controller {
     let bestMatch = ""
 
     links.forEach((link) => {
-      const path = this.linkPath(link)
-      if (path && this.pathMatches(currentPath, path) && path.length > bestMatch.length) bestMatch = path
+      this.navigationPaths(link).forEach((path) => {
+        if (path && this.pathMatches(currentPath, path) && path.length > bestMatch.length) bestMatch = path
+      })
     })
 
     links.forEach((link) => {
-      const active = this.linkPath(link) === bestMatch
+      const active = this.navigationPaths(link).includes(bestMatch)
       link.classList.toggle("active", active)
       if (active) link.setAttribute("aria-current", "page")
       else link.removeAttribute("aria-current")
@@ -212,6 +213,13 @@ export default class extends Controller {
     } catch {
       return ""
     }
+  }
+
+  navigationPaths(link) {
+    const configuredPaths = link.dataset.navigationPaths
+    if (!configuredPaths) return [this.linkPath(link)]
+
+    return configuredPaths.split(",").map((path) => this.normalizePath(path.trim())).filter(Boolean)
   }
 
   normalizePath(path) {

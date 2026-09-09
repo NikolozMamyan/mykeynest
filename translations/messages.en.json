@@ -12,7 +12,8 @@
     "security_checker": "Security checker",
     "settings": "Settings",
     "subscription": "Subscriptions",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "import": "Import"
   },
   "admin_subscription_billing": {
     "seats": "%quantity% seat(s)",
@@ -724,6 +725,102 @@
         "placeholder": "e.g. netflix.com",
         "help": "Simply enter the website. You can also paste its sign-in page and MYKEYNEST will configure the rest automatically.",
         "invalid": "Enter a valid domain or HTTPS address."
+      }
+    },
+    "import": {
+      "meta_title": "Import my credentials",
+      "back": "Back to my credentials",
+      "eyebrow": "Secure migration",
+      "title": "Import your passwords with ease",
+      "subtitle": "Select a CSV export. MYKEYNEST checks its format, prevents duplicates, and encrypts every password before saving it.",
+      "steps": {
+        "aria": "Import steps",
+        "prepare": { "title": "Prepare", "text": "Export or download the example" },
+        "select": { "title": "Select", "text": "Choose your CSV file" },
+        "import": { "title": "Finish", "text": "Review the summary" }
+      },
+      "format": {
+        "title": "Prepare your file",
+        "subtitle": "Use our template or a compatible export.",
+        "columns_aria": "Recognized CSV columns",
+        "optional": "optional"
+      },
+      "example": {
+        "preview": "File preview",
+        "table_aria": "Example CSV row",
+        "account": "Demo account",
+        "download": "Download the example file",
+        "download_hint": "One row ready to replace with your data"
+      },
+      "sources": {
+        "label": "Recognized exports",
+        "list": "Chrome, Firefox, Bitwarden, 1Password, LastPass, Dashlane, and the MYKEYNEST template. Comma, semicolon, and tab delimiters are supported."
+      },
+      "upload": {
+        "title": "Select your export",
+        "subtitle": "The file is checked before importing is enabled.",
+        "choose": "Choose a CSV file",
+        "drop": "or drop it directly into this area",
+        "constraints": "CSV · 5 MB maximum · UTF-8 recommended",
+        "remove": "Remove selected file",
+        "submit": "Check and import",
+        "submitting": "Secure import in progress…"
+      },
+      "capacity": {
+        "unlimited": "Your plan allows unlimited credentials.",
+        "remaining": "%remaining% slot(s) available out of %limit%.",
+        "full_title": "Your vault has reached its limit",
+        "full_text": "Your current plan allows %limit% credentials.",
+        "upgrade": "View plans"
+      },
+      "security": {
+        "title": "Delete this sensitive file after importing",
+        "text": "A CSV export contains passwords in plain text. MYKEYNEST encrypts them when saving, but you should delete the file from your device once the import is complete."
+      },
+      "client": {
+        "invalid_type": "Select a file with a .csv extension.",
+        "too_large": "This file exceeds the %size% MB size limit.",
+        "invalid_columns": "Columns not recognized. Use a compatible export or download our example.",
+        "file_ready": "Format recognized. The file is ready to import."
+      },
+      "errors": {
+        "unavailable": "CSV import is not available with your plan.",
+        "invalid_csrf": "Your session has expired. Reload the page and try again.",
+        "limit_reached": "You have reached your plan limit of %limit% credentials.",
+        "no_file": "Select a valid CSV file.",
+        "invalid_type": "The selected file must be in CSV format.",
+        "too_large": "The file must not exceed %size% MB.",
+        "unreadable": "The file could not be read. Export it again and retry.",
+        "empty": "The CSV file is empty.",
+        "missing_columns": "Required columns not found: %columns%. Use a compatible export or the example file."
+      },
+      "results": {
+        "imported": "%domain% · %username% was encrypted and imported.",
+        "duplicate": "%domain% · %username% already exists in your vault.",
+        "missing_fields": "The website, username, or password is empty.",
+        "invalid_site": "“%site%” is not recognized as a valid website.",
+        "too_long": "The name, domain, or username exceeds the allowed length.",
+        "limit_reached": "Import stopped: the %limit% credential limit was reached.",
+        "too_many_rows": "Import stopped after %limit% rows to protect your account.",
+        "write_error": "This row could not be saved."
+      },
+      "result_page": {
+        "meta_title": "Import result",
+        "eyebrow": "Import complete",
+        "title": "Your credentials are ready",
+        "empty_title": "No credentials imported",
+        "subtitle": "Review the summary below. No duplicate was added to your vault.",
+        "summary_aria": "Import summary",
+        "imported": "Imported",
+        "skipped": "Skipped",
+        "failed": "Needs attention",
+        "details": "Row details",
+        "details_hint": "Passwords are never displayed in this report.",
+        "processed": "%count% row(s) analyzed",
+        "line": "Row %line%",
+        "no_detail": "No usable row was found.",
+        "open_vault": "View my credentials",
+        "new_import": "Import another file"
       }
     },
     "index": {

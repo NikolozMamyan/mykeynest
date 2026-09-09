@@ -20,6 +20,7 @@ import './styles/components/navigation-loading.css';
 import './styles/pages/blog-index.css';
 import './styles/pages/auth-forms.css';
 import './styles/pages/reset-password.css';
+import './styles/pages/credential-import.css';
 import './styles/pages/extension-settings.css';
 import './styles/pages/admin-emailing.css';
 import './styles/pages/admin-plans.css';

@@ -60,6 +60,17 @@ class CredentialRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return list<array{domain: string, username: string}> */
+    public function findIdentityPairsByUser(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.domain AS domain', 'c.username AS username')
+            ->andWhere('c.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
 public function countByUser($user): int
 {
     return $this->createQueryBuilder('c')

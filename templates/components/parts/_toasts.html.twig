@@ -33,4 +33,36 @@
       <div class="toast__bar" aria-hidden="true"></div>
     </div>
   {% endfor %}
+
+  {% for message in app.flashes('warning') %}
+    <div class="toast toast--warning"
+         role="alert"
+         data-duration="6000"
+         data-action="mouseenter->toasts#pause mouseleave->toasts#resume">
+      <div class="toast__icon" aria-hidden="true">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div class="toast__content">{{ message }}</div>
+      <button class="toast__close" type="button" aria-label="Fermer" data-action="click->toasts#close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="toast__bar" aria-hidden="true"></div>
+    </div>
+  {% endfor %}
+
+  {% for message in app.flashes('info') %}
+    <div class="toast toast--info"
+         role="status"
+         data-duration="5200"
+         data-action="mouseenter->toasts#pause mouseleave->toasts#resume">
+      <div class="toast__icon" aria-hidden="true">
+        <i class="fa-solid fa-circle-info"></i>
+      </div>
+      <div class="toast__content">{{ message }}</div>
+      <button class="toast__close" type="button" aria-label="Fermer" data-action="click->toasts#close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="toast__bar" aria-hidden="true"></div>
+    </div>
+  {% endfor %}
 </div>

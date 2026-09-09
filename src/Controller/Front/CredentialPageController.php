@@ -8,6 +8,7 @@ use App\Form\CredentialType;
 use App\Repository\CredentialRepository;
 use App\Repository\SharedAccessRepository;
 use App\Repository\TeamRepository;
+use App\Service\CredentialCsvImporter;
 use App\Service\CredentialManager;
 use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialUrlPolicy;
@@ -15,11 +16,14 @@ use App\Service\SecurityCheckerService;
 use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CredentialPageController extends AbstractController
 {
@@ -378,13 +382,16 @@ final class CredentialPageController extends AbstractController
     }
 
     #[Route('/app/import/pass', name: 'credential_import', methods: ['GET', 'POST'])]
-    public function importCredentials(Request $request): Response
+    public function importCredentials(
+        Request $request,
+        CredentialCsvImporter $csvImporter,
+        TranslatorInterface $translator,
+    ): Response
     {
-        $results = [];
         $user = $this->getAuthenticatedUser();
 
         if (!$this->subscriptionPlans->hasFeature($user, SubscriptionPlanService::FEATURE_CREDENTIAL_IMPORT)) {
-            $this->addFlash('warning', 'L’import CSV n’est pas disponible avec votre plan.');
+            $this->addFlash('warning', $translator->trans('credential.import.errors.unavailable'));
 
             return $this->redirectToRoute('app_credential');
         }
@@ -392,134 +399,99 @@ final class CredentialPageController extends AbstractController
         $credentialLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS);
         $existingCredentialCount = $this->credentialRepository->count(['user' => $user]);
 
-        if ($request->isMethod('POST') && $credentialLimit !== null && $existingCredentialCount >= $credentialLimit) {
-            $this->addFlash('warning', sprintf('Limite atteinte : %d identifiants maximum avec votre plan.', $credentialLimit));
-
-            return $this->redirectToRoute('app_credential');
-        }
-
         if ($request->isMethod('POST')) {
-            $file = $request->files->get('csv_file');
+            if (!$this->isCsrfTokenValid('credential_csv_import', $request->request->getString('_token'))) {
+                $this->addFlash('error', $translator->trans('credential.import.errors.invalid_csrf'));
 
-            if (!$file) {
-                $this->addFlash('error', 'Aucun fichier envoye.');
+                return $this->redirectToRoute('credential_import');
+            }
+
+            if ($credentialLimit !== null && $existingCredentialCount >= $credentialLimit) {
+                $this->addFlash('warning', $translator->trans('credential.import.errors.limit_reached', [
+                    '%limit%' => $credentialLimit,
+                ]));
+
+                return $this->redirectToRoute('credential_import');
+            }
+
+            $file = $request->files->get('csv_file');
+            if (!$file instanceof UploadedFile || !$file->isValid()) {
+                $this->addFlash('error', $translator->trans('credential.import.errors.no_file'));
 
                 return $this->redirectToRoute('credential_import');
             }
 
             if (strtolower((string) $file->getClientOriginalExtension()) !== 'csv') {
-                $this->addFlash('error', 'Le fichier doit etre un CSV.');
+                $this->addFlash('error', $translator->trans('credential.import.errors.invalid_type'));
 
                 return $this->redirectToRoute('credential_import');
             }
 
-            $handle = fopen($file->getRealPath(), 'r');
-            if ($handle === false) {
-                $this->addFlash('error', 'Impossible d ouvrir le fichier.');
+            if (($file->getSize() ?? 0) > CredentialCsvImporter::MAX_FILE_SIZE) {
+                $this->addFlash('error', $translator->trans('credential.import.errors.too_large', ['%size%' => 5]));
 
                 return $this->redirectToRoute('credential_import');
             }
 
-            $firstLine = fgets($handle);
-            if ($firstLine === false) {
-                fclose($handle);
-                $this->addFlash('error', 'CSV vide.');
+            $result = $csvImporter->import(
+                $file->getPathname(),
+                $user,
+                $credentialLimit,
+                $existingCredentialCount,
+            );
+
+            if ($result['fatal'] !== null) {
+                $this->addFlash('error', $translator->trans(
+                    $result['fatal']['key'],
+                    $result['fatal']['parameters'],
+                ));
 
                 return $this->redirectToRoute('credential_import');
             }
-            rewind($handle);
 
-            $separator = str_contains($firstLine, ';') ? ';' : ',';
-
-            $header = fgetcsv($handle, 0, $separator);
-            if ($header === false) {
-                fclose($handle);
-                $this->addFlash('error', 'Impossible de lire l entete du CSV.');
-
-                return $this->redirectToRoute('credential_import');
-            }
-
-            $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $header[0]);
-            $header = array_map(fn ($value) => strtolower(trim((string) $value)), $header);
-            $map = array_flip($header);
-
-            $required = ['name', 'domain', 'username', 'password'];
-            foreach ($required as $column) {
-                if (!isset($map[$column])) {
-                    fclose($handle);
-                    $this->addFlash('error', "Colonne manquante dans le CSV : $column");
-
-                    return $this->redirectToRoute('credential_import');
-                }
-            }
-
-            $imported = 0;
-            $lineNumber = 1;
-
-            while (($data = fgetcsv($handle, 0, $separator)) !== false) {
-                $lineNumber++;
-
-                if ($credentialLimit !== null && ($existingCredentialCount + $imported) >= $credentialLimit) {
-                    $results[] = sprintf('Import arrêté : limite de %d identifiants atteinte.', $credentialLimit);
-                    break;
-                }
-
-                if (count($data) === 1 && trim((string) $data[0]) === '') {
-                    continue;
-                }
-
-                $name = trim((string) ($data[$map['name']] ?? ''));
-                $domain = trim((string) ($data[$map['domain']] ?? ''));
-                $username = trim((string) ($data[$map['username']] ?? ''));
-                $password = (string) ($data[$map['password']] ?? '');
-
-                if ($name === '' || $domain === '' || $username === '' || $password === '') {
-                    $results[] = "Ligne $lineNumber : champs manquants -> ignoree";
-                    continue;
-                }
-
-                $exists = $this->credentialRepository->findOneBy([
-                    'user' => $user,
-                    'domain' => $domain,
-                    'username' => $username,
-                ]);
-
-                if ($exists) {
-                    $results[] = "Ligne $lineNumber : deja existant ($domain / $username) -> ignore";
-                    continue;
-                }
-
-                try {
-                    $credential = new Credential();
-                    $credential
-                        ->setName($name)
-                        ->setDomain($domain)
-                        ->setUsername($username)
-                        ->setPassword($password);
-
-                    $this->credentialManager->create($credential, $user);
-
-                    $imported++;
-                    $results[] = "Ligne $lineNumber : cree ($domain / $username)";
-                } catch (\Throwable $exception) {
-                    $results[] = "Ligne $lineNumber : erreur ({$exception->getMessage()})";
-                }
-            }
-
-            fclose($handle);
-
-            if ($imported > 0) {
+            if ($result['imported'] > 0) {
                 $this->checker->buildReportAndNotify($user, SecurityCheckerService::ROTATION_DAYS_DEFAULT);
             }
 
+            foreach ($result['items'] as &$item) {
+                $item['message'] = $translator->trans($item['key'], $item['parameters']);
+            }
+            unset($item);
+
             return $this->render('credential/import_results.html.twig', [
-                'results' => $results,
-                'imported' => $imported,
+                'result' => $result,
             ]);
         }
 
         return $this->render('credential/import.html.twig', [
-            'heading' => 'Importer des acces',
+            'credentialLimit' => $credentialLimit,
+            'existingCredentialCount' => $existingCredentialCount,
+            'remainingCredentialCount' => $credentialLimit === null
+                ? null
+                : max(0, $credentialLimit - $existingCredentialCount),
+            'maxFileSize' => CredentialCsvImporter::MAX_FILE_SIZE,
+        ]);
+    }
+
+    #[Route('/app/import/pass/example.csv', name: 'credential_import_example', methods: ['GET'])]
+    public function downloadImportExample(Request $request): Response
+    {
+        $this->getAuthenticatedUser();
+        $isFrench = str_starts_with(strtolower($request->getLocale()), 'fr');
+        $example = $isFrench
+            ? "Compte de démonstration,https://example.com/connexion,utilisateur@example.com,Exemple-ChangezMoi-2026!"
+            : "Demo account,https://example.com/login,user@example.com,Example-ChangeMe-2026!";
+        $content = "\xEF\xBB\xBFname,domain,username,password\r\n{$example}\r\n";
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            'mykeynest-import-example.csv',
+        );
+
+        return new Response($content, Response::HTTP_OK, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => $disposition,
+            'Cache-Control' => 'private, no-store',
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 

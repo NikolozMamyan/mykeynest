@@ -93,6 +93,21 @@ class BreadcrumbsExtension extends AbstractExtension
                 ],
             ],
 
+            'credential_import' => [
+                $dashboard,
+                [
+                    'label' => 'breadcrumb.credentials',
+                    'icon'  => 'fas fa-key',
+                    'url'   => $this->urlGenerator->generate('app_credential'),
+                ],
+                [
+                    'label'  => 'breadcrumb.import',
+                    'icon'   => 'fas fa-file-import',
+                    'url'    => $this->urlGenerator->generate('credential_import'),
+                    'active' => true,
+                ],
+            ],
+
             'app_notifications' => [
                 $dashboard,
                 [

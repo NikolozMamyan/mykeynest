@@ -23,6 +23,7 @@ import SupportChatController from "./support_chat_controller.js";
 import ExtensionSettingsController from "./pages/extension_settings_controller.js";
 import AdminManualSubscriptionController from "./admin_manual_subscription_controller.js";
 import NoteBoardController from "./pages/note_board_controller.js";
+import CredentialImportController from "./pages/credential_import_controller.js";
 
 
 
@@ -52,3 +53,4 @@ application.register("support-chat", SupportChatController);
 application.register("extension-settings", ExtensionSettingsController);
 application.register("admin-manual-subscription", AdminManualSubscriptionController);
 application.register("note-board", NoteBoardController);
+application.register("credential-import", CredentialImportController);
