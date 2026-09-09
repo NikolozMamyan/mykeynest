@@ -1,800 +1,15 @@
 {% extends 'base.html.twig' %}
-{% block title %}Générateur de mots de passe{% endblock %}
+
+{% block title %}{{ 'generator.meta_title'|trans }}{% endblock %}
 
 {% block stylesheets %}
-{{ parent() }}
-<style>
-/* ——— Variables & Base ——— */
-:root {
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-}
-
-/* ——— Layout ——— */
-.page-wrapper {
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: var(--spacing-xl);
-  margin: 0 auto;
-  animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 1050px) { 
-  .page-wrapper { grid-template-columns: 1fr; } 
-}
-
-/* ——— Cards ——— */
-.card {
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  overflow: hidden;
-  transition: box-shadow 0.3s ease;
-}
-
-.card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24px 28px;
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.03) 0%, rgba(5, 150, 105, 0.01) 100%);
-  border-bottom: 1px solid var(--color-border);
-  gap: var(--spacing-md);
-}
-
-.card-header-left {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.card-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
-}
-
-.card-header h1,
-.card-header h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: var(--color-text-dark);
-  font-weight: 800;
-  letter-spacing: -0.3px;
-}
-
-.card-body {
-  padding: 28px;
-}
-
-.helper {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  margin-top: 4px;
-  line-height: 1.4;
-}
-
-/* ——— Password Output ——— */
-.password-output-wrapper {
-  position: relative;
-}
-
-.password-output {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  background: var(--background-gradient);
-  border: 2px dashed rgba(5, 150, 105, 0.2);
-  border-radius: 14px;
-  padding: 24px 20px;
-  font-size: 1.45rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
-  user-select: all;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.password-output::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(5, 150, 105, 0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.password-output.generated::before {
-  left: 100%;
-}
-
-.password-output:hover {
-  border-color: rgba(5, 150, 105, 0.4);
-  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.05);
-}
-
-.password-output .mono {
-  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
-  flex: 1;
-  text-align: center;
-  min-height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.password-actions {
-  display: flex;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-/* ——— Buttons ——— */
-.btn {
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  padding: 11px 16px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  background: var(--color-bg-light);
-  color: var(--color-text-dark);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-green);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
-}
-
-
-.btn-ghost {
-  background: transparent;
-  border-color: transparent;
-}
-
-.btn-ghost:hover {
-  background: var(--color-bg-light);
-}
-
-.btn-danger {
-  border-color: transparent;
-  background: linear-gradient(135deg, var(--color-danger-start), var(--color-danger-end));
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
-}
-
-.btn-danger:hover {
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
-}
-
-.btn-icon {
-  padding: 10px 12px;
-  border-radius: 10px;
-  min-width: 40px;
-}
-
-.btn-icon-danger {
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: #fee2e2;
-  border-color: #fecaca;
-  color: #b91c1c;
-}
-
-.btn-icon-danger:hover {
-  background: #fecaca;
-  transform: translateY(-1px);
-}
-
-/* ——— Divider ——— */
-.hr {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
-  margin: 24px 0;
-}
-
-/* ——— Controls ——— */
-.length-control {
-  background: var(--color-bg-light);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: var(--spacing-lg);
-}
-
-.length-control label {
-  display: block;
-  font-weight: 700;
-  color: var(--color-text-dark);
-  margin-bottom: var(--spacing-sm);
-  font-size: 0.95rem;
-}
-
-.range-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.range-wrap input[type="range"] {
-  flex: 1;
-  height: 6px;
-  border-radius: 10px;
-  background: #e5e7eb;
-  outline: none;
-  -webkit-appearance: none;
-}
-
-.range-wrap input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
-  transition: all 0.2s ease;
-}
-
-.range-wrap input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
-}
-
-.range-wrap input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
-}
-
-.badge {
-  padding: 8px 14px;
-  border-radius: 10px;
-  background: white;
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-  min-width: 48px;
-  text-align: center;
-}
-
-.controls {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-}
-
-@media (max-width: 700px) {
-  .controls { grid-template-columns: 1fr; }
-}
-
-.field {
-  background: var(--color-bg-light);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 16px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-md);
-  transition: all 0.2s ease;
-}
-
-.field:hover {
-  border-color: rgba(5, 150, 105, 0.3);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.05);
-}
-
-.field label {
-  font-weight: 700;
-  color: var(--color-text-medium);
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-/* ——— Switch ——— */
-.switch {
-  --h: 30px;
-  width: 54px;
-  height: var(--h);
-  border-radius: 999px;
-  background: #e5e7eb;
-  position: relative;
-  cursor: pointer;
-  flex-shrink: 0;
-  border: 1px solid var(--color-border);
-  transition: all 0.3s ease;
-}
-
-.switch input {
-  display: none;
-}
-
-.switch .dot {
-  position: absolute;
-  top: 50%;
-  left: 3px;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: white;
-  border: 1px solid var(--color-border);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.switch input:checked + .dot {
-  left: 27px;
-  background: white;
-  border-color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
-}
-
-.switch:has(input:checked) {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  border-color: var(--color-primary);
-}
-
-/* ——— Strength Meter ——— */
-.strength-section {
-  margin-top: var(--spacing-lg);
-  padding: 20px;
-  background: var(--color-bg-light);
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
-}
-
-.meter {
-  height: 12px;
-  border-radius: 10px;
-  background: #eef2f7;
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-  position: relative;
-}
-
-.meter > div {
-  height: 100%;
-  width: 0%;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 10px;
-  position: relative;
-  overflow: hidden;
-}
-
-.meter > div::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.meter.weak > div {
-  background: linear-gradient(135deg, #fecaca, #f87171);
-}
-
-.meter.medium > div {
-  background: linear-gradient(135deg, #fde68a, #f59e0b);
-}
-
-.meter.strong > div {
-  background: linear-gradient(135deg, #bbf7d0, #10b981);
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-}
-
-.meter-label {
-  display: flex;
-  justify-content: space-between;
-  color: var(--color-text-medium);
-  font-size: 0.9rem;
-  margin-top: 10px;
-  font-weight: 600;
-}
-
-.meter-label span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* ——— History ——— */
-.switcher {
-  display: flex;
-  background: var(--color-bg-light);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  overflow: hidden;
-  padding: 3px;
-}
-
-.switcher button {
-  flex: 1;
-  padding: 8px 16px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: var(--color-text-medium);
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.switcher button:hover:not(.active) {
-  background: rgba(5, 150, 105, 0.05);
-  color: var(--color-text-dark);
-}
-
-.switcher button.active {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #059669 100%);
-  color: white;
-  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-}
-
-.history-body {
-  height: 520px;
-  display: flex;
-  flex-direction: column;
-}
-
-#passwordList {
-  flex: 1 1 auto;
-  overflow: auto;
-  padding-right: 4px;
-}
-
-#passwordList::-webkit-scrollbar {
-  width: 8px;
-}
-
-#passwordList::-webkit-scrollbar-track {
-  background: var(--color-bg-light);
-  border-radius: 10px;
-}
-
-#passwordList::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 10px;
-}
-
-#passwordList::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
-}
-
-#historyHint {
-  flex: 0 0 auto;
-  margin-top: var(--spacing-md);
-}
-
-.password-item {
-  background: var(--color-bg-light);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-sm);
-  transition: all 0.2s ease;
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.password-item:hover {
-  border-color: rgba(5, 150, 105, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transform: translateX(2px);
-}
-
-.password-item .mono {
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 0.95rem;
-  color: var(--color-text-dark);
-  font-weight: 600;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.item-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-/* ——— Modals ——— */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(8px);
-  animation: fadeInBackdrop 0.2s ease-out;
-}
-
-@keyframes fadeInBackdrop {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal {
-  width: 520px;
-  max-width: 95%;
-  margin:200px auto;
-  background: white;
-  border-radius: 16px;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.modal header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--color-bg-light);
-}
-
-.modal header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--color-text-dark);
-}
-
-.modal .content {
-  padding: 24px;
-
-}
-
-.modal .content .form-group {
-  margin-bottom: 18px;
-}
-
-.modal .content .form-group:last-child {
-  margin-bottom: 0;
-}
-
-.modal .content label {
-  display: block;
-  font-weight: 700;
-  color: var(--color-text-dark);
-  margin-bottom: 8px;
-  font-size: 0.9rem;
-}
-
-.modal .content input {
-  width: 100%;
-  padding: 12px 14px;
-  margin-top: 15px;
-  border-radius: 7px;
-  border: 1px solid var(--color-border);
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.modal .content input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
-}
-
-.modal footer {
-  padding: 16px 24px;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-sm);
-  background: var(--color-bg-light);
-}
-
-/* ——— Toasts ——— */
-.toast-wrap {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  z-index: 1200;
-}
-
-.toast {
-  background: var( --color-bg-light);
-  border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-success);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 14px 16px;
-  min-width: 300px;
-  color: var(--color-text-dark);
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: flex-start;
-  animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transition: opacity 0.3s ease;
-}
-
-@keyframes toastSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.toast.error {
-  border-left-color: var(--color-danger-start);
-}
-
-.toast .title {
-  font-weight: 800;
-  font-size: 0.95rem;
-  margin-bottom: 2px;
-}
-
-.toast .msg {
-  color: var(--color-text-medium);
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-/* ——— Utilities ——— */
-.text-center {
-  text-align: center;
-}
-
-.muted {
-  color: var(--color-text-light);
-}
-
-:focus-visible {
-  outline: 3px solid rgba(5, 150, 105, 0.4);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
-/* ——— Responsive ——— */
-@media (max-width: 700px) {
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
-  }
-  
-  .header-actions {
-    width: 100%;
-  }
-  
-  .switcher {
-    flex: 1;
-  }
-  
-  .password-output {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-  
-  .password-actions {
-    width: 100%;
-  }
-  
-  .password-actions .btn {
-    flex: 1;
-  }
-}
-</style>
+  <link rel="stylesheet" href="{{ asset('styles/pages/password-generator.css') }}">
 {% endblock %}
 
 {% block body %}
 <div
-  class="page-wrapper"
+  class="generator-page"
   data-controller="generator"
-
   data-generator-t-options-title-value="{{ 'generator.toast.options'|trans }}"
   data-generator-t-choose-one-type-value="{{ 'generator.toast.choose_one_type'|trans }}"
   data-generator-t-copied-title-value="{{ 'generator.toast.copied_title'|trans }}"
@@ -807,285 +22,152 @@
   data-generator-t-name-required-msg-value="{{ 'generator.toast.name_required_msg'|trans }}"
   data-generator-t-error-title-value="{{ 'generator.toast.error_title'|trans }}"
   data-generator-t-save-failed-value="{{ 'generator.toast.save_failed'|trans }}"
+  data-generator-t-draft-title-value="{{ 'generator.toast.draft_title'|trans }}"
+  data-generator-t-draft-saved-value="{{ 'generator.toast.draft_saved'|trans }}"
   data-generator-t-converted-title-value="{{ 'generator.toast.converted_title'|trans }}"
   data-generator-t-converted-msg-value="{{ 'generator.toast.converted_msg'|trans }}"
   data-generator-t-failed-value="{{ 'generator.toast.failed'|trans }}"
   data-generator-t-network-error-title-value="{{ 'generator.toast.network_error_title'|trans }}"
   data-generator-t-network-error-msg-value="{{ 'generator.toast.network_error_msg'|trans }}"
   data-generator-t-load-error-value="{{ 'generator.toast.load_error'|trans }}"
-
   data-generator-t-loading-value="{{ 'generator.list.loading'|trans }}"
   data-generator-t-empty-drafts-value="{{ 'generator.list.empty_drafts'|trans }}"
   data-generator-t-empty-recents-value="{{ 'generator.list.empty_recents'|trans }}"
-
   data-generator-t-entropy-empty-value="{{ 'generator.entropy_empty'|trans }}"
   data-generator-t-strength-empty-value="{{ 'generator.strength_empty'|trans }}"
-  data-generator-t-entropy-template-value="{{ 'generator.entropy'|trans({'%bits%':'__BITS__'}) }}"
-  data-generator-t-strength-template-value="{{ 'generator.strength'|trans({'%label%':'__LABEL__'}) }}"
+  data-generator-t-entropy-template-value="{{ 'generator.entropy'|trans({'%bits%': '__BITS__'}) }}"
+  data-generator-t-strength-template-value="{{ 'generator.strength'|trans({'%label%': '__LABEL__'}) }}"
   data-generator-t-strength-strong-value="{{ 'generator.strength_labels.strong'|trans }}"
   data-generator-t-strength-medium-value="{{ 'generator.strength_labels.medium'|trans }}"
   data-generator-t-strength-weak-value="{{ 'generator.strength_labels.weak'|trans }}"
+  data-generator-t-copy-value="{{ 'generator.copy'|trans }}"
+  data-generator-t-save-current-value="{{ 'generator.save_current'|trans }}"
+  data-generator-t-convert-value="{{ 'generator.convert'|trans }}"
 >
-
-
-    <!-- ====== Generator ====== -->
-  <section class="card">
-    <div class="card-header">
-      <div class="card-header-left">
-        <div class="card-icon"><i class="fa-solid fa-key"></i></div>
-        <div>
-          <h1>{{ 'generator.title'|trans }}</h1>
-          <div class="helper">{{ 'generator.subtitle'|trans }}</div>
-        </div>
-      </div>
+  <header class="generator-hero">
+    <div class="generator-hero__icon" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+    <div class="generator-hero__copy">
+      <span class="generator-eyebrow">{{ 'generator.eyebrow'|trans }}</span>
+      <h1>{{ 'generator.title'|trans }}</h1>
+      <p>{{ 'generator.subtitle'|trans }}</p>
     </div>
+    <div class="generator-private-badge">
+      <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+      <span><strong>{{ 'generator.private_badge.title'|trans }}</strong>{{ 'generator.private_badge.text'|trans }}</span>
+    </div>
+  </header>
 
-    <div class="card-body">
-      <div class="password-output-wrapper">
-        <div class="password-output" aria-live="polite" data-generator-target="outputContainer">
-          <span class="mono" data-generator-target="output"></span>
-          <div class="password-actions">
-            <button
-              class="btn btn-icon"
-              title="{{ 'generator.copy'|trans }}"
-              aria-label="{{ 'generator.copy'|trans }}"
-              data-action="click->generator#copyPassword"
-            >
-              <i class="fa-solid fa-copy"></i>
-            </button>
+  <div class="generator-layout">
+    <main class="generator-panel generator-panel--builder">
+      <div class="generator-panel__heading">
+        <div><span class="generator-step">01</span><h2>{{ 'generator.output.title'|trans }}</h2></div>
+        <span class="generator-local-pill"><i class="fa-solid fa-lock" aria-hidden="true"></i> {{ 'generator.output.local'|trans }}</span>
+      </div>
 
-            <button class="btn btn-primary" data-action="click->generator#generatePassword">
-              <i class="fa-solid fa-bolt"></i> {{ 'generator.generate'|trans }}
-            </button>
-          </div>
+      <div class="generator-output" data-generator-target="outputContainer">
+        <span class="generator-output__label">{{ 'generator.output.label'|trans }}</span>
+        <output class="generator-output__value" data-generator-target="output" aria-live="polite"></output>
+        <div class="generator-output__actions">
+          <button type="button" class="generator-icon-button" title="{{ 'generator.regenerate'|trans }}" aria-label="{{ 'generator.regenerate'|trans }}" data-action="click->generator#generatePassword"><i class="fa-solid fa-rotate" aria-hidden="true"></i></button>
+          <button type="button" class="generator-button generator-button--primary" data-action="click->generator#copyPassword"><i class="fa-regular fa-copy" aria-hidden="true"></i><span data-generator-target="copyLabel">{{ 'generator.copy'|trans }}</span></button>
         </div>
       </div>
 
-      <div class="hr"></div>
-
-      <div class="length-control">
-        <label for="gen-length">{{ 'generator.password_length'|trans }}</label>
-        <div class="range-wrap">
-          <input
-            id="gen-length"
-            type="range"
-            min="8"
-            max="64"
-            value="12"
-            data-generator-target="lengthInput"
-            data-action="input->generator#updateLength"
-          >
-          <span class="badge" data-generator-target="lengthValue">12</span>
-        </div>
+      <div class="generator-strength">
+        <div class="generator-strength__top"><span id="strengthLabel">{{ 'generator.strength_empty'|trans }}</span><span id="entropyLabel">{{ 'generator.entropy_empty'|trans }}</span></div>
+        <div class="generator-meter" data-generator-target="meter" role="progressbar" aria-label="{{ 'generator.strength_meter'|trans }}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div></div></div>
       </div>
 
-      <div class="controls">
-        <div class="field">
-          <label>{{ 'generator.uppercase'|trans }}</label>
-          <label class="switch">
-            <input type="checkbox" checked data-generator-target="uppercase">
-            <span class="dot"></span>
+      <section class="generator-presets" aria-labelledby="generator-presets-title">
+        <div class="generator-section-heading">
+          <div><span class="generator-step">02</span><h2 id="generator-presets-title">{{ 'generator.presets.title'|trans }}</h2></div>
+          <p>{{ 'generator.presets.help'|trans }}</p>
+        </div>
+        <div class="generator-preset-list">
+          <button type="button" class="generator-preset" data-preset="balanced" data-action="click->generator#applyPreset"><i class="fa-solid fa-feather" aria-hidden="true"></i><span><strong>{{ 'generator.presets.balanced.title'|trans }}</strong><small>{{ 'generator.presets.balanced.text'|trans }}</small></span></button>
+          <button type="button" class="generator-preset is-active" data-preset="strong" data-action="click->generator#applyPreset"><i class="fa-solid fa-shield" aria-hidden="true"></i><span><strong>{{ 'generator.presets.strong.title'|trans }}</strong><small>{{ 'generator.presets.strong.text'|trans }}</small></span></button>
+          <button type="button" class="generator-preset" data-preset="maximum" data-action="click->generator#applyPreset"><i class="fa-solid fa-fingerprint" aria-hidden="true"></i><span><strong>{{ 'generator.presets.maximum.title'|trans }}</strong><small>{{ 'generator.presets.maximum.text'|trans }}</small></span></button>
+        </div>
+      </section>
+
+      <section class="generator-customize" aria-labelledby="generator-customize-title">
+        <div class="generator-section-heading">
+          <div><span class="generator-step">03</span><h2 id="generator-customize-title">{{ 'generator.customize.title'|trans }}</h2></div>
+          <p>{{ 'generator.customize.help'|trans }}</p>
+        </div>
+
+        <div class="generator-length">
+          <div><label for="gen-length">{{ 'generator.password_length'|trans }}</label><small>{{ 'generator.length_help'|trans }}</small></div>
+          <input class="generator-length__number" type="number" min="8" max="64" value="20" inputmode="numeric" aria-label="{{ 'generator.password_length'|trans }}" data-generator-target="lengthNumber" data-action="change->generator#updateLengthFromNumber">
+          <input id="gen-length" class="generator-range" type="range" min="8" max="64" value="20" data-generator-target="lengthInput" data-action="input->generator#updateLength">
+          <span class="generator-length__value" data-generator-target="lengthValue">20</span>
+        </div>
+
+        <div class="generator-options">
+          {% set options = [
+            {target: 'uppercase', icon: 'A', label: 'generator.uppercase'},
+            {target: 'lowercase', icon: 'a', label: 'generator.lowercase'},
+            {target: 'numbers', icon: '12', label: 'generator.numbers'},
+            {target: 'symbols', icon: '#', label: 'generator.symbols'}
+          ] %}
+          {% for option in options %}
+            <label class="generator-option">
+              <span class="generator-option__icon" aria-hidden="true">{{ option.icon }}</span><span>{{ option.label|trans }}</span>
+              <input type="checkbox" checked data-generator-target="{{ option.target }}" data-action="change->generator#optionChanged"><span class="generator-switch" aria-hidden="true"></span>
+            </label>
+          {% endfor %}
+          <label class="generator-option generator-option--wide">
+            <span class="generator-option__icon" aria-hidden="true"><i class="fa-solid fa-eye-slash"></i></span>
+            <span><strong>{{ 'generator.ambiguous.title'|trans }}</strong><small>{{ 'generator.ambiguous.text'|trans }}</small></span>
+            <input type="checkbox" checked data-generator-target="ambiguous" data-action="change->generator#optionChanged"><span class="generator-switch" aria-hidden="true"></span>
           </label>
         </div>
+      </section>
 
-        <div class="field">
-          <label>{{ 'generator.lowercase'|trans }}</label>
-          <label class="switch">
-            <input type="checkbox" checked data-generator-target="lowercase">
-            <span class="dot"></span>
-          </label>
-        </div>
-
-        <div class="field">
-          <label>{{ 'generator.numbers'|trans }}</label>
-          <label class="switch">
-            <input type="checkbox" checked data-generator-target="numbers">
-            <span class="dot"></span>
-          </label>
-        </div>
-
-        <div class="field">
-          <label>{{ 'generator.symbols'|trans }}</label>
-          <label class="switch">
-            <input type="checkbox" checked data-generator-target="symbols">
-            <span class="dot"></span>
-          </label>
-        </div>
+      <div class="generator-primary-actions">
+        <button type="button" class="generator-button generator-button--generate" data-action="click->generator#generatePassword"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>{{ 'generator.generate'|trans }}</button>
+        <button type="button" class="generator-button generator-button--secondary" data-action="click->generator#openSaveCurrent"><i class="fa-regular fa-bookmark" aria-hidden="true"></i>{{ 'generator.save_current'|trans }}</button>
       </div>
+    </main>
 
-      <div class="strength-section">
-        <div class="meter" data-generator-target="meter"><div></div></div>
-        <div class="meter-label">
-          <span id="entropyLabel">
-            <i class="fa-solid fa-shield-halved"></i> {{ 'generator.entropy_empty'|trans }}
-          </span>
-          <span id="strengthLabel">{{ 'generator.strength_empty'|trans }}</span>
-        </div>
+    <aside class="generator-panel generator-panel--history">
+      <div class="generator-panel__heading generator-panel__heading--history">
+        <div><span class="generator-step">{{ 'generator.history.eyebrow'|trans }}</span><h2>{{ 'generator.history.title'|trans }}</h2></div>
+        <button type="button" class="generator-icon-button generator-icon-button--danger" title="{{ 'generator.history.delete_all'|trans }}" aria-label="{{ 'generator.history.delete_all'|trans }}" data-generator-target="historyClear" data-action="click->generator#confirmClearAll"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
       </div>
-    </div>
-  </section>
-
-  <!-- ====== Historique ====== -->
-  <aside class="card">
-    <div class="card-header">
-      <div class="card-header-left">
-        <div class="card-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-        <div>
-          <h2>{{ 'generator.history.title'|trans }}</h2>
-          <div class="helper">{{ 'generator.history.subtitle'|trans }}</div>
-        </div>
+      <p class="generator-history-intro">{{ 'generator.history.subtitle'|trans }}</p>
+      <div class="generator-tabs" role="tablist" aria-label="{{ 'generator.history.title'|trans }}">
+        <button type="button" class="active" role="tab" aria-selected="true" data-action="click->generator#showRecents">{{ 'generator.history.tabs.recents'|trans }}</button>
+        <button type="button" role="tab" aria-selected="false" data-action="click->generator#showDrafts">{{ 'generator.history.tabs.drafts'|trans }}</button>
       </div>
+      <div class="generator-history-list" data-generator-target="list"></div>
+      <div class="generator-security-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p><strong>{{ 'generator.history.note_title'|trans }}</strong>{{ 'generator.history.tooltip'|trans }}</p></div>
+    </aside>
+  </div>
 
-      <div class="header-actions">
-        <div class="switcher" role="tablist" aria-label="{{ 'generator.history.title'|trans }}">
-          <button class="active" data-action="click->generator#showRecents">
-            {{ 'generator.history.tabs.recents'|trans }}
-          </button>
-          <button data-action="click->generator#showDrafts">
-            {{ 'generator.history.tabs.drafts'|trans }}
-          </button>
-        </div>
+  <div class="generator-toast-wrap" data-generator-target="toastWrap" aria-live="polite" aria-atomic="true"></div>
 
-        <button
-          class="btn btn-icon btn-icon-danger"
-          title="{{ 'generator.history.delete_all'|trans }}"
-          aria-label="{{ 'generator.history.delete_all'|trans }}"
-          data-action="click->generator#confirmClearAll"
-        >
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </div>
-    </div>
-
-    <style>
-      .info-hover {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 6px;
-        cursor: default;
-      }
-
-      .info-hover .tooltip {
-        visibility: hidden;
-        opacity: 0;
-        position: absolute;
-        bottom: 130%;
-        left: 60%;
-        transform: translateX(-50%);
-        width: 280px;
-        background: var(--color-white);
-        color: var(--color-text-dark);
-        text-align: center;
-        font-size: 0.85rem;
-        line-height: 1.4;
-        border-radius: 8px;
-        border: 1px solid var(--color-border);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        padding: 10px 12px;
-        transition: opacity 0.2s ease, visibility 0.2s ease;
-        z-index: 2000;
-      }
-
-      .info-hover .tooltip::after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        left: 95%;
-        transform: translateX(-50%);
-        border-width: 6px;
-        border-style: solid;
-        border-color: #fff transparent transparent transparent;
-        filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
-      }
-
-      .info-hover:hover .tooltip {
-        visibility: visible;
-        opacity: 1;
-      }
-    </style>
-
-    <div class="card-body history-body">
-      <p class="helper text-center info-hover" aria-label="info">
-        <i class="fa-solid fa-info-circle"></i>
-        <span class="tooltip">{{ 'generator.history.tooltip'|trans }}</span>
-      </p>
-
-      <div data-generator-target="list"></div>
-    </div>
-  </aside>
-
-  <!-- Toasts -->
-  <div class="toast-wrap" data-generator-target="toastWrap" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- Modales -->
-  <div class="modal-backdrop" id="saveModal" hidden>
-    <div class="modal">
-      <header>
-        <h3><i class="fa-solid fa-floppy-disk"></i> {{ 'generator.modals.save.title'|trans }}</h3>
-      </header>
-
-      <div class="content">
-        <input
-          type="text"
-          placeholder="{{ 'generator.modals.save.placeholder'|trans }}"
-          data-generator-target="saveName"
-        >
-      </div>
-
-      <footer>
-        <button class="btn" data-action="click->generator#closeModal">
-          {{ 'generator.modals.save.cancel'|trans }}
-        </button>
-        <button class="btn btn-primary" data-action="click->generator#saveDraft">
-          {{ 'generator.modals.save.confirm'|trans }}
-        </button>
-      </footer>
+  <div class="generator-modal-backdrop" id="saveModal" hidden data-action="click->generator#closeOnBackdrop">
+    <div class="generator-modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
+      <div class="generator-modal__icon"><i class="fa-regular fa-bookmark" aria-hidden="true"></i></div><h3 id="save-modal-title">{{ 'generator.modals.save.title'|trans }}</h3><p>{{ 'generator.modals.save.text'|trans }}</p>
+      <label for="draft-name">{{ 'generator.modals.save.label'|trans }}</label><input id="draft-name" type="text" maxlength="120" placeholder="{{ 'generator.modals.save.placeholder'|trans }}" data-generator-target="saveName" data-action="keydown.enter->generator#saveDraft">
+      <div class="generator-modal__actions"><button type="button" class="generator-button generator-button--secondary" data-action="click->generator#closeModal">{{ 'generator.modals.save.cancel'|trans }}</button><button type="button" class="generator-button generator-button--primary" data-action="click->generator#saveDraft">{{ 'generator.modals.save.confirm'|trans }}</button></div>
     </div>
   </div>
 
-  <div class="modal-backdrop" id="convertModal" hidden>
-    <div class="modal">
-      <header>
-        <h3><i class="fa-solid fa-right-long"></i> {{ 'generator.modals.convert.title'|trans }}</h3>
-      </header>
-
-      <div class="content">
-        <input type="text" placeholder="{{ 'generator.modals.convert.name'|trans }}" data-generator-target="credName">
-        <input type="text" placeholder="{{ 'generator.modals.convert.domain'|trans }}" data-generator-target="credDomain">
-        <input type="text" placeholder="{{ 'generator.modals.convert.username'|trans }}" data-generator-target="credUsername">
-      </div>
-
-      <footer>
-        <button class="btn" data-action="click->generator#closeModal">
-          {{ 'generator.modals.convert.cancel'|trans }}
-        </button>
-        <button class="btn btn-primary" data-action="click->generator#convertDraft">
-          {{ 'generator.modals.convert.confirm'|trans }}
-        </button>
-      </footer>
+  <div class="generator-modal-backdrop" id="convertModal" hidden data-action="click->generator#closeOnBackdrop">
+    <div class="generator-modal" role="dialog" aria-modal="true" aria-labelledby="convert-modal-title">
+      <div class="generator-modal__icon"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i></div><h3 id="convert-modal-title">{{ 'generator.modals.convert.title'|trans }}</h3><p>{{ 'generator.modals.convert.text'|trans }}</p>
+      <label>{{ 'generator.modals.convert.name'|trans }}<input type="text" data-generator-target="credName"></label><label>{{ 'generator.modals.convert.domain'|trans }}<input type="text" inputmode="url" data-generator-target="credDomain"></label><label>{{ 'generator.modals.convert.username'|trans }}<input type="text" autocomplete="username" data-generator-target="credUsername"></label>
+      <div class="generator-modal__actions"><button type="button" class="generator-button generator-button--secondary" data-action="click->generator#closeModal">{{ 'generator.modals.convert.cancel'|trans }}</button><button type="button" class="generator-button generator-button--primary" data-action="click->generator#convertDraft">{{ 'generator.modals.convert.confirm'|trans }}</button></div>
     </div>
   </div>
 
-  <div class="modal-backdrop" id="confirmModal" hidden>
-    <div class="modal">
-      <header>
-        <h3><i class="fa-solid fa-triangle-exclamation"></i> {{ 'generator.modals.confirm_clear.title'|trans }}</h3>
-      </header>
-
-      <div class="content">
-        <p>{{ 'generator.modals.confirm_clear.text'|trans }}</p>
-      </div>
-
-      <footer>
-        <button class="btn" data-action="click->generator#closeModal">
-          {{ 'generator.modals.confirm_clear.cancel'|trans }}
-        </button>
-        <button class="btn btn-danger" data-action="click->generator#clearAllRecents">
-          {{ 'generator.modals.confirm_clear.confirm'|trans }}
-        </button>
-      </footer>
+  <div class="generator-modal-backdrop" id="confirmModal" hidden data-action="click->generator#closeOnBackdrop">
+    <div class="generator-modal" role="alertdialog" aria-modal="true" aria-labelledby="clear-modal-title">
+      <div class="generator-modal__icon generator-modal__icon--danger"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div><h3 id="clear-modal-title">{{ 'generator.modals.confirm_clear.title'|trans }}</h3><p>{{ 'generator.modals.confirm_clear.text'|trans }}</p>
+      <div class="generator-modal__actions"><button type="button" class="generator-button generator-button--secondary" data-action="click->generator#closeModal">{{ 'generator.modals.confirm_clear.cancel'|trans }}</button><button type="button" class="generator-button generator-button--danger" data-action="click->generator#clearAllRecents">{{ 'generator.modals.confirm_clear.confirm'|trans }}</button></div>
     </div>
   </div>
+</div>
 {% endblock %}

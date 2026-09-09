@@ -30,8 +30,8 @@ class CredentialRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->orderBy('pin_sort', 'ASC')
             ->addOrderBy('c.pinPosition', 'ASC')
-            ->addOrderBy('c.domain', 'ASC')
-            ->addOrderBy('c.name', 'ASC')
+            ->addOrderBy('c.createdAt', 'DESC')
+            ->addOrderBy('c.id', 'DESC')
             ->getQuery()
             ->getResult();
     }

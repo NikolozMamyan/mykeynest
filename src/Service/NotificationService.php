@@ -7,12 +7,15 @@ use App\Entity\User;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class NotificationService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private NotificationRepository $notificationRepository,
+        private CacheInterface $cache,
         private ?LoggerInterface $logger = null
     ) {}
 
@@ -44,6 +47,7 @@ public function createNotification(
 
             $this->entityManager->persist($notification);
             $this->entityManager->flush();
+            $this->invalidateUnreadCount($user);
 
             $this->logger?->info('Notification created', [
                 'user_id' => $user->getId(),
@@ -95,6 +99,7 @@ public function createNotification(
 
             $this->entityManager->persist($notification);
             $this->entityManager->flush();
+            $this->invalidateUnreadCount($user);
 
             $this->logger?->info('Entity notification created', [
                 'user_id' => $user->getId(),
@@ -121,6 +126,7 @@ public function createNotification(
     {
         try {
             $count = 0;
+            $recipients = [];
             
             foreach ($users as $user) {
                 if (!$user instanceof User) {
@@ -137,10 +143,16 @@ public function createNotification(
                     ->setIcon($icon);
 
                 $this->entityManager->persist($notification);
+                if ($user->getId() !== null) {
+                    $recipients[$user->getId()] = $user;
+                }
                 $count++;
             }
 
             $this->entityManager->flush();
+            foreach ($recipients as $recipient) {
+                $this->invalidateUnreadCount($recipient);
+            }
 
             $this->logger?->info('Batch notifications created', [
                 'count' => $count,
@@ -168,6 +180,7 @@ public function createNotification(
 
             $notification->markAsRead();
             $this->entityManager->flush();
+            $this->invalidateUnreadCount($notification->getUser());
 
             $this->logger?->debug('Notification marked as read', [
                 'notification_id' => $notification->getId()
@@ -188,15 +201,23 @@ public function createNotification(
     {
         try {
             $count = 0;
+            $recipients = [];
             foreach ($notifications as $notification) {
                 if ($notification instanceof Notification && !$notification->isRead()) {
                     $notification->markAsRead();
+                    $user = $notification->getUser();
+                    if ($user instanceof User && $user->getId() !== null) {
+                        $recipients[$user->getId()] = $user;
+                    }
                     $count++;
                 }
             }
 
             if ($count > 0) {
                 $this->entityManager->flush();
+                foreach ($recipients as $recipient) {
+                    $this->invalidateUnreadCount($recipient);
+                }
                 
                 $this->logger?->info('Multiple notifications marked as read', [
                     'count' => $count
@@ -217,6 +238,7 @@ public function createNotification(
     {
         try {
             $count = $this->notificationRepository->markAllAsReadByUser($user);
+            $this->invalidateUnreadCount($user);
             
             $this->logger?->info('All notifications marked as read', [
                 'user_id' => $user->getId(),
@@ -239,12 +261,14 @@ public function createNotification(
     public function deleteNotification(Notification $notification): void
     {
         try {
+            $user = $notification->getUser();
             $this->entityManager->remove($notification);
             $this->entityManager->flush();
+            $this->invalidateUnreadCount($user);
 
             $this->logger?->info('Notification deleted', [
                 'notification_id' => $notification->getId(),
-                'user_id' => $notification->getUser()->getId()
+                'user_id' => $user?->getId()
             ]);
         } catch (\Exception $e) {
             $this->logger?->error('Failed to delete notification', [
@@ -262,8 +286,13 @@ public function createNotification(
     {
         try {
             $count = 0;
+            $recipients = [];
             foreach ($notifications as $notification) {
                 if ($notification instanceof Notification) {
+                    $user = $notification->getUser();
+                    if ($user instanceof User && $user->getId() !== null) {
+                        $recipients[$user->getId()] = $user;
+                    }
                     $this->entityManager->remove($notification);
                     $count++;
                 }
@@ -271,6 +300,9 @@ public function createNotification(
 
             if ($count > 0) {
                 $this->entityManager->flush();
+                foreach ($recipients as $recipient) {
+                    $this->invalidateUnreadCount($recipient);
+                }
                 
                 $this->logger?->info('Multiple notifications deleted', [
                     'count' => $count
@@ -293,6 +325,7 @@ public function createNotification(
     {
         try {
             $count = $this->notificationRepository->deleteAllByUser($user);
+            $this->invalidateUnreadCount($user);
             
             $this->logger?->info('All notifications deleted for user', [
                 'user_id' => $user->getId(),
@@ -315,7 +348,11 @@ public function createNotification(
     public function getUnreadCount(User $user): int
     {
         try {
-            return $this->notificationRepository->countUnreadByUser($user);
+            return (int) $this->cache->get($this->unreadCountCacheKey($user), function (ItemInterface $item) use ($user): int {
+                $item->expiresAfter(300);
+
+                return $this->notificationRepository->countUnreadByUser($user);
+            });
         } catch (\Exception $e) {
             $this->logger?->error('Failed to get unread count', [
                 'user_id' => $user->getId(),
@@ -461,5 +498,19 @@ public function createNotification(
             ]);
             return [];
         }
+    }
+
+    private function invalidateUnreadCount(?User $user): void
+    {
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $this->cache->delete($this->unreadCountCacheKey($user));
+    }
+
+    private function unreadCountCacheKey(User $user): string
+    {
+        return 'notification_unread_count.user.'.($user->getId() ?? 0);
     }
 }

@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'app_notifications.page.meta_title'|trans }}{% endblock %}
+
+{% block page_styles %}
+  <link rel="stylesheet" href="{{ asset('styles/pages/notifications.css') }}">
+{% endblock %}
+
+{% block body %}
+  {% set typeIcons = {
+    info: 'fa-circle-info',
+    success: 'fa-circle-check',
+    warning: 'fa-triangle-exclamation',
+    error: 'fa-circle-xmark'
+  } %}
+
+  <div class="notification-center">
+    {% for type, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="notification-center__flash notification-center__flash--{{ type }}" role="status">
+          <i class="fa-solid {{ type == 'success' ? 'fa-circle-check' : 'fa-circle-exclamation' }}" aria-hidden="true"></i>
+          <span>{{ message|trans }}</span>
+        </div>
+      {% endfor %}
+    {% endfor %}
+
+    <header class="notification-center__hero">
+      <div class="notification-center__heading">
+        <span class="notification-center__eyebrow">
+          <i class="fa-regular fa-bell" aria-hidden="true"></i>
+          {{ 'app_notifications.page.eyebrow'|trans }}
+        </span>
+        <h1>{{ 'app_notifications.page.title'|trans }}</h1>
+        <p>{{ 'app_notifications.page.subtitle'|trans }}</p>
+      </div>
+
+      <div class="notification-center__summary" aria-label="{{ 'app_notifications.page.summary_aria'|trans }}">
+        <span><strong>{{ notifications|length }}</strong>{{ 'app_notifications.page.total'|trans }}</span>
+        {% if unreadCount > 0 %}
+          <span class="notification-center__new"><strong>{{ unreadCount }}</strong>{{ unreadCount == 1 ? ('app_notifications.page.new_one'|trans) : ('app_notifications.page.new_many'|trans) }}</span>
+        {% else %}
+          <span class="notification-center__up-to-date"><i class="fa-solid fa-check" aria-hidden="true"></i>{{ 'app_notifications.page.up_to_date'|trans }}</span>
+        {% endif %}
+      </div>
+    </header>
+
+    {% if notifications is not empty %}
+      <div class="notification-center__toolbar">
+        <div>
+          <h2>{{ 'app_notifications.page.activity_title'|trans }}</h2>
+          <p>{{ 'app_notifications.page.activity_subtitle'|trans }}</p>
+        </div>
+        <form method="post" action="{{ path('app_notifications_delete_all') }}" onsubmit="return confirm('{{ 'app_notifications.page.delete_all_confirm'|trans|e('js') }}')">
+          <input type="hidden" name="_token" value="{{ csrf_token('delete_all_notifications') }}">
+          <button type="submit" class="notification-center__clear">
+            <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+            {{ 'app_notifications.page.delete_all'|trans }}
+          </button>
+        </form>
+      </div>
+
+      <section class="notification-center__list" aria-label="{{ 'app_notifications.page.list_aria'|trans }}">
+        {% for notification in notifications %}
+          {% set notificationType = notification.type in ['info', 'success', 'warning', 'error'] ? notification.type : 'info' %}
+          {% set notificationIcon = notification.icon ?: ('fa-solid ' ~ typeIcons[notificationType]) %}
+
+          <article class="notification-center__item notification-center__item--{{ notificationType }} {{ notification.isRead ? '' : 'is-new' }}">
+            <div class="notification-center__icon" aria-hidden="true">
+              <i class="{{ notificationIcon }}"></i>
+            </div>
+
+            <div class="notification-center__content">
+              <div class="notification-center__item-heading">
+                <h3>{{ notification.title|trans }}</h3>
+                {% if not notification.isRead %}
+                  <span class="notification-center__new-label">{{ 'app_notifications.page.new_label'|trans }}</span>
+                {% endif %}
+                {% if notification.priority == 'high' %}
+                  <span class="notification-center__priority">{{ 'app_notifications.page.priority'|trans }}</span>
+                {% endif %}
+              </div>
+
+              {% if notification.message %}
+                <p>{{ notification.message|trans }}</p>
+              {% endif %}
+
+              <time datetime="{{ notification.createdAt ? notification.createdAt|date('c') : '' }}">
+                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                {{ notification.createdAt ? notification.createdAt|date('d/m/Y · H:i') : '' }}
+              </time>
+            </div>
+
+            <div class="notification-center__actions">
+              {% if notification.actionUrl and (notification.actionUrl == '/app' or notification.actionUrl starts with '/app/') %}
+                <a href="{{ notification.actionUrl }}"
+                   class="notification-center__open"
+                   data-turbo="true" data-turbo-action="advance">
+                  <span>{{ 'app_notifications.page.open'|trans }}</span>
+                  <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
+              {% endif %}
+
+              <form method="post"
+                    action="{{ path('app_notification_delete', { id: notification.id }) }}"
+                    onsubmit="return confirm('{{ 'app_notifications.page.delete_confirm'|trans|e('js') }}')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_notification_' ~ notification.id) }}">
+                <button type="submit" class="notification-center__delete" title="{{ 'app_notifications.page.delete'|trans }}" aria-label="{{ 'app_notifications.page.delete'|trans }}">
+                  <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                </button>
+              </form>
+            </div>
+          </article>
+        {% endfor %}
+      </section>
+    {% else %}
+      <section class="notification-center__empty">
+        <div class="notification-center__empty-icon"><i class="fa-regular fa-bell-slash" aria-hidden="true"></i></div>
+        <h2>{{ 'app_notifications.page.empty_title'|trans }}</h2>
+        <p>{{ 'app_notifications.page.empty_text'|trans }}</p>
+        <a href="{{ path('app_dashboard') }}" data-turbo="true" data-turbo-action="advance">
+          {{ 'app_notifications.page.back_dashboard'|trans }}
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

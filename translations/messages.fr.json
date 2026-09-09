@@ -11,7 +11,8 @@
     "notes": "Notes sécurisées",
     "security_checker": "Vérificateur de sécurité",
     "settings": "Paramètres",
-    "subscription": "Abonnements"
+    "subscription": "Abonnements",
+    "notifications": "Notifications"
   },
   "admin_subscription_billing": {
     "seats": "%quantity% siège(s)",
@@ -156,11 +157,20 @@
     "notifications": {
       "aria": "Notifications",
       "title": "Notifications",
+      "subtitle": "Les activités importantes de votre espace",
+      "filters_aria": "Filtrer les notifications",
+      "filters": {
+        "all": "Toutes",
+        "unread": "Non lues"
+      },
       "mark_all_read": "Marquer lu",
       "loading": "Chargement...",
       "loading_list": "Chargement des notifications...",
       "load_error": "Erreur de chargement",
       "empty": "Aucune notification pour le moment",
+      "empty_unread": "Vous avez tout lu",
+      "new": "Nouvelle notification",
+      "view_all": "Ouvrir le centre de notifications",
       "marking": "Marquage...",
       "marked": "Marqué !",
       "error": "Erreur",
@@ -773,7 +783,11 @@
         "subtitle": "Gérez vos mots de passe en toute sécurité"
       },
       "search": {
-        "placeholder": "Rechercher par nom, domaine ou identifiant..."
+        "placeholder": "Rechercher par nom, domaine, identifiant ou propriétaire...",
+        "aria": "Rechercher dans les identifiants",
+        "clear": "Effacer la recherche",
+        "help": "Recherche instantanée, même sans accents · raccourci /",
+        "results": "Résultats : %count%"
       },
       "actions": {
         "add": "Ajouter un identifiant",
@@ -1287,6 +1301,34 @@
     }
   },
   "app_notifications": {
+    "page": {
+      "meta_title": "Notifications | MYKEYNEST",
+      "eyebrow": "Centre de notifications",
+      "title": "Vos notifications",
+      "subtitle": "Retrouvez les événements importants liés à vos accès, vos partages et votre entreprise.",
+      "summary_aria": "Résumé des notifications",
+      "total": "au total",
+      "new_one": "nouvelle à l’ouverture",
+      "new_many": "nouvelles à l’ouverture",
+      "up_to_date": "Tout est à jour",
+      "activity_title": "Activité récente",
+      "activity_subtitle": "Les 50 notifications les plus récentes sont conservées dans cette vue.",
+      "delete_all": "Tout supprimer",
+      "delete_all_confirm": "Supprimer définitivement toutes vos notifications ?",
+      "list_aria": "Liste des notifications",
+      "new_label": "Nouveau",
+      "priority": "Prioritaire",
+      "open": "Consulter",
+      "delete": "Supprimer cette notification",
+      "delete_confirm": "Supprimer définitivement cette notification ?",
+      "empty_title": "Vous êtes à jour",
+      "empty_text": "Les nouvelles activités importantes apparaîtront ici.",
+      "back_dashboard": "Retour au tableau de bord",
+      "flash_deleted": "La notification a été supprimée.",
+      "flash_not_found": "Cette notification n’existe plus.",
+      "flash_all_deleted": "Toutes les notifications ont été supprimées.",
+      "flash_expired": "La demande a expiré. Veuillez réessayer."
+    },
     "shared_access": {
       "shared_single_title": "Identifiant partage avec vous",
       "shared_multiple_title": "Identifiants partages avec vous",
@@ -1430,15 +1472,22 @@
     }
   },
   "generator": {
-    "title": "Générateur",
-    "subtitle": "Créez un mot de passe fort et enregistrez-le.",
+    "meta_title": "Générateur de mots de passe sécurisé",
+    "eyebrow": "Outil de sécurité",
+    "title": "Créez un mot de passe vraiment solide",
+    "subtitle": "Choisissez un niveau, ajustez les options si nécessaire, puis copiez ou enregistrez le résultat dans votre coffre.",
     "copy": "Copier",
+    "regenerate": "Générer une autre proposition",
+    "save_current": "Enregistrer dans mes brouillons",
+    "convert": "Ajouter à mes identifiants",
     "generate": "Générer",
     "password_length": "Longueur du mot de passe",
+    "length_help": "16 caractères ou plus sont recommandés",
     "uppercase": "Majuscules (A-Z)",
     "lowercase": "Minuscules (a-z)",
     "numbers": "Chiffres (0-9)",
     "symbols": "Symboles (!@#$...)",
+    "strength_meter": "Niveau de robustesse du mot de passe",
     "entropy": "Entropie : %bits% bits",
     "entropy_empty": "Entropie : —",
     "strength": "Force : %label%",
@@ -1448,25 +1497,63 @@
       "medium": "Moyenne",
       "weak": "Faible"
     },
+    "private_badge": {
+      "title": "Génération locale",
+      "text": "Le mot de passe est créé sur cet appareil."
+    },
+    "output": {
+      "title": "Votre mot de passe",
+      "label": "Proposition sécurisée",
+      "local": "Créé sur cet appareil"
+    },
+    "presets": {
+      "title": "Choisissez un niveau",
+      "help": "Un réglage prêt à l'emploi en un clic.",
+      "balanced": {
+        "title": "Équilibré",
+        "text": "16 caractères, facile à saisir"
+      },
+      "strong": {
+        "title": "Renforcé",
+        "text": "20 caractères, recommandé"
+      },
+      "maximum": {
+        "title": "Maximum",
+        "text": "32 caractères, protection élevée"
+      }
+    },
+    "customize": {
+      "title": "Personnalisez",
+      "help": "Adaptez le résultat aux règles du site."
+    },
+    "ambiguous": {
+      "title": "Éviter les caractères ambigus",
+      "text": "Retire O, 0, I, l et 1 pour faciliter la saisie."
+    },
     "history": {
+      "eyebrow": "Votre session",
       "title": "Historique",
-      "subtitle": "Gérez vos mots de passe",
+      "subtitle": "Retrouvez les dernières propositions ou vos brouillons chiffrés.",
       "tabs": {
         "recents": "Récents",
         "drafts": "Enregistrés"
       },
-      "tooltip": "Vous pouvez transformer vos brouillons en mots de passe permanents dans votre coffre — simples à retrouver et protégés.",
+      "note_title": "Confidentialité maîtrisée",
+      "tooltip": "Les récents restent uniquement dans cette session. Les brouillons enregistrés sont chiffrés et peuvent être ajoutés à votre coffre.",
       "delete_all": "Tout supprimer"
     },
     "modals": {
       "save": {
         "title": "Enregistrer",
+        "text": "Donnez un nom clair à ce brouillon pour le retrouver facilement.",
+        "label": "Nom du brouillon",
         "placeholder": "Nom du brouillon",
         "cancel": "Annuler",
         "confirm": "Enregistrer"
       },
       "convert": {
-        "title": "Convertir",
+        "title": "Ajouter à mes identifiants",
+        "text": "Complétez les informations du compte. Le mot de passe du brouillon sera ajouté automatiquement.",
         "name": "Nom",
         "domain": "Domaine",
         "username": "Identifiant",
@@ -1481,9 +1568,9 @@
       }
     },
     "list": {
-      "empty_recents": "Aucun mot de passe",
+      "empty_recents": "Vos prochains mots de passe générés apparaîtront ici pendant cette session.",
       "loading": "Chargement...",
-      "empty_drafts": "Aucun brouillon"
+      "empty_drafts": "Vous n'avez encore enregistré aucun brouillon."
     },
     "toast": {
       "options": "Options",

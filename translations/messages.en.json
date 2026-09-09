@@ -11,7 +11,8 @@
     "notes": "Secure notes",
     "security_checker": "Security checker",
     "settings": "Settings",
-    "subscription": "Subscriptions"
+    "subscription": "Subscriptions",
+    "notifications": "Notifications"
   },
   "admin_subscription_billing": {
     "seats": "%quantity% seat(s)",
@@ -156,11 +157,20 @@
     "notifications": {
       "aria": "Notifications",
       "title": "Notifications",
+      "subtitle": "Important activity in your workspace",
+      "filters_aria": "Filter notifications",
+      "filters": {
+        "all": "All",
+        "unread": "Unread"
+      },
       "mark_all_read": "Mark as read",
       "loading": "Loading...",
       "loading_list": "Loading notifications...",
       "load_error": "Loading failed",
       "empty": "No notifications yet",
+      "empty_unread": "You're all caught up",
+      "new": "New notification",
+      "view_all": "Open notification center",
       "marking": "Marking...",
       "marked": "Marked!",
       "error": "Error",
@@ -725,7 +735,11 @@
         "subtitle": "Manage your passwords securely"
       },
       "search": {
-        "placeholder": "Search by name, domain, or username..."
+        "placeholder": "Search by name, domain, username, or owner...",
+        "aria": "Search credentials",
+        "clear": "Clear search",
+        "help": "Instant, accent-insensitive search · shortcut /",
+        "results": "Results: %count%"
       },
       "actions": {
         "add": "Add a credential",
@@ -1239,6 +1253,34 @@
     }
   },
   "app_notifications": {
+    "page": {
+      "meta_title": "Notifications | MYKEYNEST",
+      "eyebrow": "Notification center",
+      "title": "Your notifications",
+      "subtitle": "Keep track of important activity involving your access, shares, and company.",
+      "summary_aria": "Notification summary",
+      "total": "in total",
+      "new_one": "new when opened",
+      "new_many": "new when opened",
+      "up_to_date": "Everything is up to date",
+      "activity_title": "Recent activity",
+      "activity_subtitle": "Your 50 most recent notifications are available in this view.",
+      "delete_all": "Delete all",
+      "delete_all_confirm": "Permanently delete all your notifications?",
+      "list_aria": "Notification list",
+      "new_label": "New",
+      "priority": "Priority",
+      "open": "View",
+      "delete": "Delete this notification",
+      "delete_confirm": "Permanently delete this notification?",
+      "empty_title": "You're all caught up",
+      "empty_text": "New important activity will appear here.",
+      "back_dashboard": "Back to dashboard",
+      "flash_deleted": "The notification was deleted.",
+      "flash_not_found": "This notification no longer exists.",
+      "flash_all_deleted": "All notifications were deleted.",
+      "flash_expired": "The request expired. Please try again."
+    },
     "shared_access": {
       "shared_single_title": "Credential shared with you",
       "shared_multiple_title": "Credentials shared with you",
@@ -1382,15 +1424,22 @@
     }
   },
   "generator": {
-    "title": "Generator",
-    "subtitle": "Create a strong password and save it.",
+    "meta_title": "Secure password generator",
+    "eyebrow": "Security tool",
+    "title": "Create a genuinely strong password",
+    "subtitle": "Choose a security level, adjust the options if needed, then copy or save the result to your vault.",
     "copy": "Copy",
+    "regenerate": "Generate another suggestion",
+    "save_current": "Save to my drafts",
+    "convert": "Add to my credentials",
     "generate": "Generate",
     "password_length": "Password length",
+    "length_help": "16 characters or more is recommended",
     "uppercase": "Uppercase (A-Z)",
     "lowercase": "Lowercase (a-z)",
     "numbers": "Numbers (0-9)",
     "symbols": "Symbols (!@#$...)",
+    "strength_meter": "Password strength level",
     "entropy": "Entropy: %bits% bits",
     "entropy_empty": "Entropy: —",
     "strength": "Strength: %label%",
@@ -1400,25 +1449,63 @@
       "medium": "Medium",
       "weak": "Weak"
     },
+    "private_badge": {
+      "title": "Local generation",
+      "text": "The password is created on this device."
+    },
+    "output": {
+      "title": "Your password",
+      "label": "Secure suggestion",
+      "local": "Created on this device"
+    },
+    "presets": {
+      "title": "Choose a level",
+      "help": "A ready-to-use setting in one click.",
+      "balanced": {
+        "title": "Balanced",
+        "text": "16 characters, easy to type"
+      },
+      "strong": {
+        "title": "Strong",
+        "text": "20 characters, recommended"
+      },
+      "maximum": {
+        "title": "Maximum",
+        "text": "32 characters, high protection"
+      }
+    },
+    "customize": {
+      "title": "Customize",
+      "help": "Adapt the result to the website's rules."
+    },
+    "ambiguous": {
+      "title": "Avoid ambiguous characters",
+      "text": "Removes O, 0, I, l and 1 to make typing easier."
+    },
     "history": {
+      "eyebrow": "Your session",
       "title": "History",
-      "subtitle": "Manage your passwords",
+      "subtitle": "Find your latest suggestions or encrypted drafts.",
       "tabs": {
         "recents": "Recents",
         "drafts": "Saved"
       },
-      "tooltip": "You can convert your drafts into permanent passwords in your vault — easy to find and protected.",
+      "note_title": "Privacy under control",
+      "tooltip": "Recent suggestions remain in this session only. Saved drafts are encrypted and can be added to your vault.",
       "delete_all": "Delete all"
     },
     "modals": {
       "save": {
         "title": "Save",
+        "text": "Give this draft a clear name so you can find it easily.",
+        "label": "Draft name",
         "placeholder": "Draft name",
         "cancel": "Cancel",
         "confirm": "Save"
       },
       "convert": {
-        "title": "Convert",
+        "title": "Add to my credentials",
+        "text": "Complete the account information. The draft password will be added automatically.",
         "name": "Name",
         "domain": "Domain",
         "username": "Username",
@@ -1433,9 +1520,9 @@
       }
     },
     "list": {
-      "empty_recents": "No password",
+      "empty_recents": "Your next generated passwords will appear here for this session.",
       "loading": "Loading...",
-      "empty_drafts": "No drafts"
+      "empty_drafts": "You have not saved any drafts yet."
     },
     "toast": {
       "options": "Options",

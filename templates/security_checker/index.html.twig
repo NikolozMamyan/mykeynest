@@ -1206,11 +1206,9 @@
     }
 
     // Optionnel : clic sur le mot de passe pour copier
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.password-text').forEach((element) => {
-        element.addEventListener('click', () => {
-          copyPassword(element.id);
-        });
+    document.querySelectorAll('.password-text').forEach((element) => {
+      element.addEventListener('click', () => {
+        copyPassword(element.id);
       });
     });
   </script>

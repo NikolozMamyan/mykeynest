@@ -1,3 +1,4 @@
+import { session as turboSession, setProgressBarDelay } from '@hotwired/turbo';
 import './bootstrap.js';
 import './styles/global.css';
 import './styles/auth.css';
@@ -15,6 +16,7 @@ import './styles/components/header.css';
 import './styles/components/breadcrumb.css';
 import './styles/components/app-ui.css';
 import './styles/components/ui-system.css';
+import './styles/components/navigation-loading.css';
 import './styles/pages/blog-index.css';
 import './styles/pages/auth-forms.css';
 import './styles/pages/reset-password.css';
@@ -22,3 +24,8 @@ import './styles/pages/extension-settings.css';
 import './styles/pages/admin-emailing.css';
 import './styles/pages/admin-plans.css';
 import './styles/layouts/admin-layout.css';
+
+// Keep classic navigation as the safe default. Only links explicitly marked
+// with data-turbo="true" (the user sidebar) use partial navigation.
+turboSession.drive = false;
+setProgressBarDelay(2147483647);

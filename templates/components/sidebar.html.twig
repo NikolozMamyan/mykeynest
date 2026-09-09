@@ -6,7 +6,7 @@
 {% set mobileMoreActive = not (currentRoute == 'app_dashboard' or credentialsActive or teamsActive or sharingActive) %}
 
 <!-- === SIDEBAR === -->
-<aside class="sidebar sidebar--user" id="user-sidebar" data-layout-target="sidebar">
+<aside class="sidebar sidebar--user" id="user-sidebar" data-turbo-permanent data-layout-target="sidebar">
   <div class="sidebar-header">
     <div class="logo-container">
       {% include 'components/parts/logo.html.twig' %}
@@ -16,12 +16,14 @@
   <nav class="sidebar-nav" aria-label="{{ 'sidebar.navigation_aria'|trans }}">
     <div class="nav-section nav-section--primary">
       <a href="{{ path('app_dashboard') }}"
+         data-turbo="true" data-turbo-action="advance"
          class="nav-item {{ currentRoute == 'app_dashboard' ? 'active' : '' }}">
         <i class="fas fa-house"></i>
         <span>{{ 'sidebar.items.dashboard'|trans }}</span>
       </a>
 
       <a href="{{ path('app_credential') }}"
+         data-turbo="true" data-turbo-action="advance"
          class="nav-item {{ credentialsActive ? 'active' : '' }}">
         <i class="fas fa-key"></i>
         <span>{{ 'sidebar.items.credentials'|trans }}</span>
@@ -29,18 +31,21 @@
       </a>
 
       <a href="{{ path('shared_access_index') }}"
+         data-turbo="true" data-turbo-action="advance"
          class="nav-item {{ sharingActive ? 'active' : '' }}">
         <i class="fas fa-share-nodes"></i>
         <span>{{ 'sidebar.items.shared_access'|trans }}</span>
       </a>
 
       <a href="{{ path('app_team_index') }}"
+         data-turbo="true" data-turbo-action="advance"
          class="nav-item {{ teamsActive ? 'active' : '' }}">
         <i class="fas fa-building"></i>
         <span>{{ 'sidebar.items.teams'|trans }}</span>
       </a>
 
       <a href="{{ path('app_sessions_manager') }}"
+         data-turbo="true" data-turbo-action="advance"
          class="nav-item {{ currentRoute == 'app_sessions_manager' ? 'active' : '' }}">
         <i class="fas fa-clock-rotate-left"></i>
         <span>{{ 'sidebar.items.sessions'|trans }}</span>
@@ -56,6 +61,7 @@
 
       <div class="sidebar-more__content">
         <a href="{{ path('app_extention') }}"
+           data-turbo="true" data-turbo-action="advance"
            class="nav-item nav-item--nested {{ currentRoute == 'app_extention' ? 'active' : '' }}">
           <i class="fas fa-puzzle-piece"></i>
           <span>{{ 'sidebar.items.extension'|trans }}</span>
@@ -63,6 +69,7 @@
 
         {% if plan_has_feature(app.user, 'password_generator') %}
           <a href="{{ path('app_generator') }}"
+             data-turbo="true" data-turbo-action="advance"
              class="nav-item nav-item--nested {{ currentRoute == 'app_generator' ? 'active' : '' }}">
             <i class="fas fa-wand-magic-sparkles"></i>
             <span>{{ 'sidebar.items.generator'|trans }}</span>
@@ -77,6 +84,7 @@
 
         {% if plan_has_feature(app.user, 'secure_notes') %}
           <a href="{{ path('app_note') }}"
+             data-turbo="true" data-turbo-action="advance"
              class="nav-item nav-item--nested {{ currentRoute == 'app_note' ? 'active' : '' }}">
             <i class="fas fa-note-sticky"></i>
             <span>{{ 'sidebar.items.notes'|trans }}</span>
@@ -91,6 +99,7 @@
 
         {% if plan_has_feature(app.user, 'security_checker') %}
           <a href="{{ path('app_security_checker') }}"
+             data-turbo="true" data-turbo-action="advance"
              class="nav-item nav-item--nested {{ currentRoute == 'app_security_checker' ? 'active' : '' }}">
             <i class="fas fa-shield-heart"></i>
             <span>{{ 'sidebar.items.security_checker'|trans }}</span>
@@ -117,8 +126,9 @@
   </div>
 </aside>
 
-<nav class="mobile-bottom-nav" aria-label="{{ 'sidebar.mobile.aria'|trans }}">
+<nav class="mobile-bottom-nav" id="mobile-bottom-navigation" data-turbo-permanent aria-label="{{ 'sidebar.mobile.aria'|trans }}">
   <a href="{{ path('app_dashboard') }}"
+     data-turbo="true" data-turbo-action="advance"
      class="mobile-bottom-nav__item {{ currentRoute == 'app_dashboard' ? 'active' : '' }}"
      {% if currentRoute == 'app_dashboard' %}aria-current="page"{% endif %}>
     <i class="fas fa-house" aria-hidden="true"></i>
@@ -126,6 +136,7 @@
   </a>
 
   <a href="{{ path('app_credential') }}"
+     data-turbo="true" data-turbo-action="advance"
      class="mobile-bottom-nav__item {{ credentialsActive ? 'active' : '' }}"
      {% if credentialsActive %}aria-current="page"{% endif %}>
     <i class="fas fa-key" aria-hidden="true"></i>
@@ -133,6 +144,7 @@
   </a>
 
   <a href="{{ path('shared_access_index') }}"
+     data-turbo="true" data-turbo-action="advance"
      class="mobile-bottom-nav__item {{ sharingActive ? 'active' : '' }}"
      {% if sharingActive %}aria-current="page"{% endif %}>
     <i class="fas fa-share-nodes" aria-hidden="true"></i>
@@ -140,6 +152,7 @@
   </a>
 
   <a href="{{ path('app_team_index') }}"
+     data-turbo="true" data-turbo-action="advance"
      class="mobile-bottom-nav__item {{ teamsActive ? 'active' : '' }}"
      {% if teamsActive %}aria-current="page"{% endif %}>
     <i class="fas fa-building" aria-hidden="true"></i>

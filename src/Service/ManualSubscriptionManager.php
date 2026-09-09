@@ -131,7 +131,10 @@ final class ManualSubscriptionManager
         if (!$previousOwner instanceof User) {
             throw new \LogicException('Le propriétaire actuel est introuvable.');
         }
-        if ($previousOwner === $newOwner || $previousOwner->getId() === $newOwner->getId()) {
+        $samePersistedUser = $previousOwner->getId() !== null
+            && $newOwner->getId() !== null
+            && $previousOwner->getId() === $newOwner->getId();
+        if ($previousOwner === $newOwner || $samePersistedUser) {
             throw new \DomainException('Cet utilisateur est déjà propriétaire de l’entreprise.');
         }
 

@@ -8,6 +8,7 @@ use App\Entity\Credential;
 use App\Entity\DraftPassword;
 use App\Entity\SharedAccess;
 use App\Service\SecurityCheckerService;
+use App\Service\CredentialCountProvider;
 use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +23,7 @@ final class DashboardPageController extends AbstractController
         private readonly SecurityCheckerService $securityCheckerService,
         private readonly CacheInterface $cache,
         private readonly SubscriptionPlanService $subscriptionPlans,
+        private readonly CredentialCountProvider $credentialCounts,
     ) {}
 
     #[Route('/app/dashboard', name: 'app_dashboard')]
@@ -36,7 +38,7 @@ final class DashboardPageController extends AbstractController
         // -------------------------
         // Stats (comme tu as déjà)
         // -------------------------
-        $credentialsCount = (int) $em->getRepository(Credential::class)->count(['user' => $user]);
+        $credentialsCount = $this->credentialCounts->getForUser($user);
         $draftsCount      = (int) $em->getRepository(DraftPassword::class)->count(['user' => $user]);
 
         $ownedTeams = $em->getRepository(Team::class)->findBy(['owner' => $user], ['createdAt' => 'DESC']);

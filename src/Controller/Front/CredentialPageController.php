@@ -79,7 +79,7 @@ final class CredentialPageController extends AbstractController
     ): Response {
         $user = $this->getAuthenticatedUser();
         $credentials = $credentialRepository->findByUser($user);
-        $sharedAccesses = $sharedAccessRepository->findBy(['guest' => $user]);
+        $sharedAccesses = $sharedAccessRepository->findSharedWith($user);
         $teams = $teamRepository->findTeamWithCredentialsByUser($user);
         $credentialLimit = $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS);
 
@@ -122,17 +122,31 @@ final class CredentialPageController extends AbstractController
             }
         }
 
+        $teamSharedCredentials = array_values(array_map(
+            static function (array $entry): array {
+                $entry['teams'] = array_values($entry['teams']);
+
+                return $entry;
+            },
+            $teamSharedCredentials
+        ));
+
+        usort(
+            $teamSharedCredentials,
+            static function (array $left, array $right): int {
+                $dateComparison = ($right['credential']->getCreatedAt()?->getTimestamp() ?? 0)
+                    <=> ($left['credential']->getCreatedAt()?->getTimestamp() ?? 0);
+
+                return $dateComparison !== 0
+                    ? $dateComparison
+                    : ($right['credential']->getId() ?? 0) <=> ($left['credential']->getId() ?? 0);
+            }
+        );
+
         return $this->render('credential/index.html.twig', [
             'credentials' => $credentials,
             'sharedAccesses' => $sharedAccesses,
-            'teamSharedCredentials' => array_values(array_map(
-                static function (array $entry): array {
-                    $entry['teams'] = array_values($entry['teams']);
-
-                    return $entry;
-                },
-                $teamSharedCredentials
-            )),
+            'teamSharedCredentials' => $teamSharedCredentials,
             'heading' => 'Mes acces',
             'credentialLimit' => $credentialLimit,
             'canCreateCredential' => $credentialLimit === null || count($credentials) < $credentialLimit,

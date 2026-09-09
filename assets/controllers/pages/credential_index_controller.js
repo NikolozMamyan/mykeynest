@@ -31,7 +31,12 @@ export default class extends Controller {
     this.activeFilter = this.element.querySelector(".filter-tab.active")?.dataset.filter ?? "all";
     this.searchInput = this.element.querySelector("#searchInput");
     this.noResults = this.element.querySelector("#noResults");
+    this.noResultsClear = this.element.querySelector("#noResultsClear");
+    this.searchClear = this.element.querySelector("#searchClear");
+    this.searchMeta = this.element.querySelector("#searchMeta");
     this.searchTimer = null;
+    this.handleSearchShortcut = this.handleSearchShortcut.bind(this);
+    document.addEventListener("keydown", this.handleSearchShortcut);
     this.faviconCache = this.readFaviconCache();
     this.initializeFavicons();
     this.initializeSiteLinks();
@@ -47,6 +52,7 @@ export default class extends Controller {
   disconnect() {
     window.clearTimeout(this.searchTimer);
     window.clearTimeout(this.extensionRetryTimer);
+    document.removeEventListener("keydown", this.handleSearchShortcut);
     window.removeEventListener("message", this.handleExtensionMessage);
     window.removeEventListener("focus", this.handleExtensionFocus);
     this.extensionRequests.forEach(({ reject, timeout }) => {
@@ -225,7 +231,7 @@ export default class extends Controller {
 
   search() {
     window.clearTimeout(this.searchTimer);
-    this.searchTimer = window.setTimeout(() => this.applySearch(), 250);
+    this.searchTimer = window.setTimeout(() => this.applySearch(), 140);
   }
 
   setFilter(event) {
@@ -327,6 +333,25 @@ export default class extends Controller {
     document.body.classList.add("quick-share-open");
 
     window.setTimeout(() => this.quickShareEmailTarget.focus(), 0);
+  }
+
+  clearSearch(event) {
+    event?.preventDefault();
+    window.clearTimeout(this.searchTimer);
+    if (this.searchInput) {
+      this.searchInput.value = "";
+      this.searchInput.focus();
+    }
+    this.applySearch();
+  }
+
+  handleSearchShortcut(event) {
+    const tagName = event.target?.tagName?.toLowerCase();
+    const isTyping = tagName === "input" || tagName === "textarea" || event.target?.isContentEditable;
+    if (event.key === "/" && !isTyping && this.searchInput) {
+      event.preventDefault();
+      this.searchInput.focus();
+    }
   }
 
   closeQuickShare() {
@@ -467,12 +492,10 @@ export default class extends Controller {
       return 1;
     }
 
-    const domainCompare = (left.dataset.domain || "").localeCompare(right.dataset.domain || "");
-    if (domainCompare !== 0) {
-      return domainCompare;
-    }
+    const createdCompare = Number(right.dataset.createdAt || 0) - Number(left.dataset.createdAt || 0);
+    if (createdCompare !== 0) return createdCompare;
 
-    return (left.dataset.name || "").localeCompare(right.dataset.name || "");
+    return Number(right.dataset.credentialId || 0) - Number(left.dataset.credentialId || 0);
   }
 
   readPinPosition(card) {
@@ -486,16 +509,19 @@ export default class extends Controller {
   }
 
   applySearch() {
-    const query = this.searchInput?.value.toLowerCase().trim() ?? "";
+    const query = this.normalizeSearchText(this.searchInput?.value ?? "");
+    const tokens = query.split(/\s+/u).filter(Boolean);
     const cards = this.element.querySelectorAll(".cred-card");
     let visible = 0;
 
     cards.forEach((card) => {
       const inFilter = this.activeFilter === "all" || card.dataset.section === this.activeFilter;
-      const inSearch = !query
-        || (card.dataset.name || "").includes(query)
-        || (card.dataset.domain || "").includes(query)
-        || (card.dataset.username || "").includes(query);
+      const haystack = this.normalizeSearchText(card.dataset.search || [
+        card.dataset.name,
+        card.dataset.domain,
+        card.dataset.username,
+      ].join(" "));
+      const inSearch = tokens.length === 0 || tokens.every((token) => haystack.includes(token));
 
       const show = inFilter && inSearch;
       card.style.display = show ? "" : "none";
@@ -517,5 +543,27 @@ export default class extends Controller {
     if (this.noResults) {
       this.noResults.style.display = visible === 0 ? "block" : "none";
     }
+
+    if (this.noResultsClear) {
+      this.noResultsClear.hidden = tokens.length === 0;
+    }
+
+    if (this.searchClear) {
+      this.searchClear.hidden = tokens.length === 0;
+    }
+
+    if (this.searchMeta) {
+      this.searchMeta.textContent = tokens.length === 0
+        ? this.searchMeta.dataset.idleText
+        : this.searchMeta.dataset.resultsTemplate.replace("__COUNT__", String(visible));
+    }
+  }
+
+  normalizeSearchText(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/gu, "")
+      .toLocaleLowerCase()
+      .trim();
   }
 }

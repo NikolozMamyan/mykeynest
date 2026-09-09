@@ -3,6 +3,8 @@
     loading_list: 'header.notifications.loading_list'|trans,
     load_error: 'header.notifications.load_error'|trans,
     empty: 'header.notifications.empty'|trans,
+    empty_unread: 'header.notifications.empty_unread'|trans,
+    new: 'header.notifications.new'|trans,
     marking: 'header.notifications.marking'|trans,
     marked: 'header.notifications.marked'|trans,
     error: 'header.notifications.error'|trans,
@@ -26,8 +28,9 @@
   }
 } %}
 
-<header class="header_top"
+<header class="header_top" id="app-header" data-turbo-permanent
         data-controller="header"
+        data-header-user-id-value="{{ app.user.id }}"
         data-header-translations-value="{{ headerTranslations|json_encode|e('html_attr') }}">
   <button class="burger-btn"
           aria-label="{{ 'header.burger_aria'|trans }}"
@@ -46,18 +49,26 @@
       <button class="notification-btn"
               type="button"
               aria-label="{{ 'header.notifications.aria'|trans }}"
+              aria-expanded="false"
+              aria-controls="header-notification-panel"
               data-header-target="notificationButton"
               data-action="click->header#toggleNotifications">
         <i class="far fa-bell"></i>
         <span class="notification-badge" data-header-target="notificationBadge"></span>
       </button>
 
-      <div class="notification-panel" data-header-target="notificationPanel">
+      <div class="notification-panel"
+           id="header-notification-panel"
+           role="dialog"
+           aria-label="{{ 'header.notifications.title'|trans }}"
+           data-header-target="notificationPanel">
         <div class="notification-panel-header">
-          <div class="notification-panel-title">
-            <i class="fas fa-bell"></i>
-            {{ 'header.notifications.title'|trans }}
-            <span class="notification-count-badge" data-header-target="notificationCount">0</span>
+          <div>
+            <div class="notification-panel-title">
+              {{ 'header.notifications.title'|trans }}
+              <span class="notification-count-badge" data-header-target="notificationCount">0</span>
+            </div>
+            <p class="notification-panel-subtitle">{{ 'header.notifications.subtitle'|trans }}</p>
           </div>
 
           <button class="mark-all-read"
@@ -69,16 +80,42 @@
           </button>
         </div>
 
-        <div class="notification-list" data-header-target="notificationList">
-          <div class="notification-empty">
-            <div class="notification-empty-icon">
-              <i class="fas fa-bell-slash"></i>
-            </div>
-            <div class="notification-empty-text">
-              {{ 'header.notifications.loading'|trans }}
-            </div>
+        <div class="notification-toolbar">
+          <div class="notification-filters" role="tablist" aria-label="{{ 'header.notifications.filters_aria'|trans }}">
+            <button type="button"
+                    class="notification-filter active"
+                    role="tab"
+                    aria-selected="true"
+                    data-filter="all"
+                    data-header-target="notificationFilter"
+                    data-action="click->header#filterNotifications">
+              {{ 'header.notifications.filters.all'|trans }}
+            </button>
+            <button type="button"
+                    class="notification-filter"
+                    role="tab"
+                    aria-selected="false"
+                    data-filter="unread"
+                    data-header-target="notificationFilter"
+                    data-action="click->header#filterNotifications">
+              {{ 'header.notifications.filters.unread'|trans }}
+              <span data-header-target="notificationUnreadTabCount">0</span>
+            </button>
           </div>
         </div>
+
+        <div class="notification-list" data-header-target="notificationList">
+          <div class="notification-skeleton-list" aria-label="{{ 'header.notifications.loading'|trans }}">
+            {% for i in 1..3 %}
+              <div class="notification-skeleton"><span></span><div><i></i><i></i><i></i></div></div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <a href="{{ path('app_notifications') }}" class="notification-panel-footer" data-turbo="true" data-turbo-action="advance">
+          {{ 'header.notifications.view_all'|trans }}
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
       </div>
     </div>
 

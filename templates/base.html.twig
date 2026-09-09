@@ -7,6 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="turbo-cache-control" content="no-cache" />
 
     <link rel="icon" href="{{ asset('favicon.ico') }}?v=4" sizes="any" />
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}?v=4" />
@@ -57,7 +58,9 @@
   {% set currentRoute = app.request.attributes.get('_route') %}
   {% set hideAppChrome = hideAppChrome|default(false) or currentRoute in ['app_pending_login'] %}
   {% set hasUserNavigation = app.user and not hideAppChrome and is_granted('ROLE_USER') and not is_granted('ROLE_ADMIN') %}
-  <body class="{{ hideAppChrome ? 'app-chrome-hidden' : '' }} {{ hasUserNavigation ? 'has-mobile-bottom-nav' : '' }} {{ app.user and is_granted('ROLE_ADMIN') ? 'has-admin-navigation' : '' }}" data-controller="layout pwa-install">
+  <body class="{{ hideAppChrome ? 'app-chrome-hidden' : '' }} {{ hasUserNavigation ? 'has-mobile-bottom-nav' : '' }} {{ app.user and is_granted('ROLE_ADMIN') ? 'has-admin-navigation' : '' }}"
+        data-controller="layout pwa-install"
+        data-layout-user-id-value="{{ app.user ? app.user.id : 0 }}">
 
     {# ===== Layout wrapper ===== #}
     <div class="app-shell">
@@ -75,7 +78,9 @@
         {# Backdrop sidebar (uniquement si une sidebar est affichée) #}
         {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_USER') %}
           <div
+            id="app-sidebar-backdrop"
             class="sidebar-backdrop"
+            data-turbo-permanent
             data-layout-target="backdrop"
             data-action="click->layout#closeSidebar"
             aria-hidden="true"

@@ -164,6 +164,7 @@ export default class extends Controller {
 
   async logout(event) {
     event.preventDefault()
+    this.clearInterfaceCache()
 
     try {
       const response = await fetch('/api/logout', {
@@ -181,5 +182,13 @@ export default class extends Controller {
     } catch (err) {
       console.error('Erreur reseau :', err)
     }
+  }
+
+  clearInterfaceCache() {
+    try {
+      Object.keys(sessionStorage)
+        .filter((key) => key.startsWith('mykeynest:notifications:') || key.startsWith('mykeynest:credential-count:'))
+        .forEach((key) => sessionStorage.removeItem(key))
+    } catch {}
   }
 }

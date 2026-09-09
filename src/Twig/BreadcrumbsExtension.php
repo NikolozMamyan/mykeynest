@@ -93,6 +93,16 @@ class BreadcrumbsExtension extends AbstractExtension
                 ],
             ],
 
+            'app_notifications' => [
+                $dashboard,
+                [
+                    'label'  => 'breadcrumb.notifications',
+                    'icon'   => 'far fa-bell',
+                    'url'    => $this->urlGenerator->generate('app_notifications'),
+                    'active' => true,
+                ],
+            ],
+
             'app_extention' => [
                 $dashboard,
                 [
