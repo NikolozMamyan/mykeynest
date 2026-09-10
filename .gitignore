@@ -30,7 +30,10 @@
 /public/build/
 /public/uploads/avatars
 /public/uploads/chrome-extension-form-autofill-master.zip
-/public/uploads/blog
+/public/uploads/blog/*
+!/public/uploads/blog/partager-acces-sans-mot-de-passe.webp
+!/public/uploads/blog/gestion-acces-agence-web.webp
+!/public/uploads/blog/depart-collaborateur-acces.webp
 /public/uploads/steps
 npm-debug.log
 yarn-error.log

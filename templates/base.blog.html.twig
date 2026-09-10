@@ -33,7 +33,7 @@
 <body class="blog-layout">
   {% include 'components/nav.html.twig' %}
 
-  <main class="blog-main">
+  <main class="blog-main {% block main_class %}{% endblock %}">
     {% block body %}{% endblock %}
   </main>
 

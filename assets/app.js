@@ -17,6 +17,7 @@ import './styles/components/breadcrumb.css';
 import './styles/components/app-ui.css';
 import './styles/components/ui-system.css';
 import './styles/components/navigation-loading.css';
+import './styles/components/seo-links-band.css';
 import './styles/pages/blog-index.css';
 import './styles/pages/auth-forms.css';
 import './styles/pages/reset-password.css';

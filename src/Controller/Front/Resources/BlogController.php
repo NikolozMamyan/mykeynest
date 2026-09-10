@@ -21,6 +21,11 @@ public function index(
     $perPage = 10;
 
     $pagination = $repo->findPaginated($page, $perPage);
+    $readingMinutes = [];
+    foreach ($pagination['items'] as $article) {
+        $content = $locale === 'fr' ? $article->getContentFr() : $article->getContentEn();
+        $readingMinutes[$article->getId()] = $this->calculateReadingMinutes($content);
+    }
 
     // Canonical / alternates pour la page index blog
     $urlFr = $this->generateUrl('blog_index', ['_locale' => 'fr'], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -51,6 +56,7 @@ public function index(
             'pages' => $pagination['pages'],
             'total' => $pagination['total'],
             'perPage' => $pagination['perPage'],
+            'readingMinutes' => $readingMinutes,
         ],
         'articles' => $pagination['items'],
     ]);
@@ -80,6 +86,7 @@ public function index(
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $canonical = $locale === 'fr' ? $urlFr : $urlEn;
+        $content = $locale === 'fr' ? $article->getContentFr() : $article->getContentEn();
 
         $vm = [
             'url_fr' => $urlFr,
@@ -88,7 +95,10 @@ public function index(
             'seoTitle' => $locale === 'fr' ? $article->getSeoTitleFr() : $article->getSeoTitleEn(),
             'metaDesc' => $locale === 'fr' ? $article->getMetaDescFr() : $article->getMetaDescEn(),
             'h1' => $locale === 'fr' ? $article->getH1Fr() : $article->getH1En(),
-            'content' => $locale === 'fr' ? $article->getContentFr() : $article->getContentEn(),
+            'content' => $content,
+            'readingMinutes' => $this->calculateReadingMinutes($content),
+            'coverImage' => $article->getCoverImage(),
+            'coverAlt' => $article->getCoverAlt($locale),
             'publishedAt' => $article->getPublishedAt(),
             'updatedAt' => $article->getUpdatedAt(),
 
@@ -100,5 +110,13 @@ public function index(
             'article' => $article,
             'vm' => $vm,
         ]);
+    }
+
+    private function calculateReadingMinutes(string $html): int
+    {
+        $text = trim(strip_tags(html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        $words = preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        return max(1, (int) ceil(count($words ?: []) / 220));
     }
 }

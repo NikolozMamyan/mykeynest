@@ -21,12 +21,20 @@
     <meta property="og:locale" content="{{ vm.ogLocale }}">
     <meta property="og:locale:alternate" content="fr_FR">
     <meta property="og:locale:alternate" content="en_US">
+    {% if vm.coverImage %}
+        <meta property="og:image" content="{{ absolute_url(asset('uploads/blog/' ~ vm.coverImage)) }}">
+        <meta property="og:image:alt" content="{{ vm.coverAlt }}">
+    {% endif %}
 {% endblock %}
 
 {% block seo_twitter %}
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="{{ vm.coverImage ? 'summary_large_image' : 'summary' }}">
     <meta name="twitter:title" content="{{ vm.seoTitle }}">
     <meta name="twitter:description" content="{{ vm.metaDesc }}">
+    {% if vm.coverImage %}
+        <meta name="twitter:image" content="{{ absolute_url(asset('uploads/blog/' ~ vm.coverImage)) }}">
+        <meta name="twitter:image:alt" content="{{ vm.coverAlt }}">
+    {% endif %}
 {% endblock %}
 
 {% block seo_jsonld %}
@@ -40,31 +48,54 @@
   "datePublished": "{{ vm.publishedAt|date('c') }}",
   "dateModified": "{{ vm.updatedAt|date('c') }}",
   "inLanguage": "{{ app.request.locale|e('js') }}",
+{% if vm.coverImage %}
+  "image": "{{ absolute_url(asset('uploads/blog/' ~ vm.coverImage))|e('js') }}",
+{% endif %}
   "author": { "@type": "Organization", "name": "MyKeyNest" },
   "publisher": { "@type": "Organization", "name": "MyKeyNest" }
 }
 </script>
 {% endblock %}
 
+{% block main_class %}blog-main--article{% endblock %}
+
 {% block body %}
 {% set isEn = app.request.locale == 'en' %}
-<article itemscope itemtype="https://schema.org/Article">
-    <header>
+<div class="article-back-row">
+    <a class="article-back" href="{{ path('blog_index', {_locale: app.request.locale}) }}">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        {{ isEn ? 'All guides' : 'Tous les guides' }}
+    </a>
+</div>
+
+<article class="article-shell" itemscope itemtype="https://schema.org/Article">
+    <header class="article-header">
+        <span class="article-kicker"><i class="fa-regular fa-newspaper" aria-hidden="true"></i> {{ isEn ? 'Practical guide' : 'Guide pratique' }}</span>
         <h1 class="blog-page-title" itemprop="headline">{{ vm.h1 }}</h1>
 
         <div class="article-meta">
-            <time datetime="{{ vm.publishedAt|date('Y-m-d') }}">
+            <span class="article-meta__item">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                <time datetime="{{ vm.publishedAt|date('Y-m-d') }}">
                 {% if app.request.locale == 'fr' %}
                     {{ vm.publishedAt|date('d/m/Y') }}
                 {% else %}
                     {{ vm.publishedAt|date('M d, Y') }}
                 {% endif %}
-            </time>
-
-            <span class="meta-divider"></span>
-            <span>{{ app.request.locale == 'fr' ? 'Lecture 5 min' : '5 min read' }}</span>
+                </time>
+            </span>
+            <span class="article-meta__item"><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ app.request.locale == 'fr' ? 'Lecture ' ~ vm.readingMinutes ~ ' min' : vm.readingMinutes ~ ' min read' }}</span>
         </div>
     </header>
+
+    {% if vm.coverImage %}
+        <figure class="article-hero">
+            <img src="{{ asset('uploads/blog/' ~ vm.coverImage) }}"
+                 alt="{{ vm.coverAlt }}"
+                 decoding="async"
+                 fetchpriority="high">
+        </figure>
+    {% endif %}
 
     <section class="blog-content" itemprop="articleBody">
         {{ vm.content|raw }}
@@ -73,15 +104,15 @@
 
 {% include 'components/seo/_internal_links.html.twig' with {
   compact: true,
-  sectionTitle: isEn ? 'Related pages to continue after this article' : 'Pages utiles pour continuer apres cet article',
-  sectionSubtitle: isEn ? 'Move from reading to evaluation with four useful next pages.' : 'Passez de la lecture a l evaluation avec quatre pages vraiment utiles.',
+  sectionTitle: isEn ? 'Related pages to continue after this article' : 'Pour aller plus loin',
+  sectionSubtitle: isEn ? 'Move from reading to action with four useful next steps.' : 'Passez de la lecture à l’action avec quatre ressources vraiment utiles.',
   links: [
     {
       route: 'business_password_manager',
       params: app.request.locale == 'en' ? { lang: 'en' } : {},
       icon: 'fa-solid fa-key',
       label: isEn ? 'Product page' : 'Page produit',
-      kicker: isEn ? 'Secure access' : 'Acces securises',
+      kicker: isEn ? 'Secure access' : 'Accès sécurisés',
       title: isEn ? 'Enterprise password manager for SMBs' : 'Gestionnaire de mots de passe entreprise pour PME',
       text: isEn ? 'See the core product and key access-control features.' : 'Voir le produit central et ses fonctions clefs.',
       image: 'images/seo/gestoinnaire-mots-passes.png',
@@ -93,7 +124,7 @@
       icon: 'fa-solid fa-scale-balanced',
       label: isEn ? 'Comparison' : 'Comparatif',
       kicker: isEn ? 'Vendor choice' : 'Choix fournisseur',
-      title: isEn ? 'Compare MYKEYNEST with Dashlane and Bitwarden' : 'Comparer MYKEYNEST a Dashlane et Bitwarden',
+      title: isEn ? 'Compare MYKEYNEST with Dashlane and Bitwarden' : 'Comparer MYKEYNEST à Dashlane et Bitwarden',
       text: isEn ? 'Useful if the reader is already evaluating alternatives.' : 'Utile si le lecteur compare deja des alternatives.',
       image: 'images/seo/comparatif.png',
       imageAlt: isEn ? 'Software comparison illustration' : 'Illustration comparatif logiciel'
@@ -102,9 +133,9 @@
       route: 'app_help_center',
       params: app.request.locale == 'en' ? { lang: 'en' } : {},
       icon: 'fa-solid fa-circle-question',
-      label: isEn ? 'Help center' : 'Centre d aide',
+      label: isEn ? 'Help center' : 'Centre d’aide',
       kicker: isEn ? 'Implementation' : 'Mise en place',
-      title: isEn ? 'Setup guides and practical documentation' : 'Guides de mise en place et documentation pratique',
+      title: isEn ? 'Setup guides and practical documentation' : 'Guides de mise en place et documentation',
       text: isEn ? 'Answer product questions without leaving the site.' : 'Repondre aux questions produit sans quitter le site.',
       image: 'images/seo/help.png',
       imageAlt: isEn ? 'Documentation and onboarding illustration' : 'Illustration documentation et onboarding'
@@ -114,7 +145,7 @@
       params: app.request.locale == 'en' ? { lang: 'en' } : {},
       icon: 'fa-solid fa-shield-virus',
       label: isEn ? 'Cyber services' : 'Services cyber',
-      kicker: isEn ? 'Risk reduction' : 'Reduction du risque',
+      kicker: isEn ? 'Risk reduction' : 'Réduction du risque',
       title: isEn ? 'Cybersecurity audit and awareness services' : 'Audit cybersécurité et sensibilisation',
       text: isEn ? 'Explore phishing, awareness, and SMB security support.' : 'Explorer phishing, sensibilisation et accompagnement PME.',
       image: 'images/seo/audit.png',
@@ -125,11 +156,12 @@
 {% endblock %}
 
 {% block footer %}
-<footer class="page-footer">
+<section class="blog-cta-shell" aria-labelledby="blog-cta-title">
     <div class="cta-container">
         {% if app.request.locale == 'fr' %}
-            <h2 class="cta-title">Prêt à commencer ?</h2>
-            <p class="cta-description">Découvrez comment MyKeyNest peut simplifier votre gestion</p>
+            <span class="cta-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+            <h2 class="cta-title" id="blog-cta-title">Prêt à mieux contrôler vos accès ?</h2>
+            <p class="cta-description">Centralisez vos identifiants et partagez les accès utiles avec MYKEYNEST.</p>
             <a href="{{ path('show_register') }}" class="cta-button" aria-label="Créer un compte MyKeyNest">
                 Essayer gratuitement
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
@@ -137,8 +169,9 @@
                 </svg>
             </a>
         {% else %}
-            <h2 class="cta-title">Ready to get started?</h2>
-            <p class="cta-description">Discover how MyKeyNest can simplify your management</p>
+            <span class="cta-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+            <h2 class="cta-title" id="blog-cta-title">Ready to take control of your access?</h2>
+            <p class="cta-description">Centralize credentials and share useful access with MYKEYNEST.</p>
             <a href="{{ path('show_register') }}" class="cta-button" aria-label="Create a MyKeyNest account">
                 Try it free
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
@@ -147,5 +180,6 @@
             </a>
         {% endif %}
     </div>
-</footer>
+</section>
+{% include 'components/parts/_public_footer.html.twig' %}
 {% endblock %}

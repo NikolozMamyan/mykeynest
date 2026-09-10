@@ -14,6 +14,7 @@
 {% endblock %}
 
 {% block seo_open_graph %}
+    {% set featured = articles|first %}
     <meta property="og:title" content="{{ vm.seoTitle }}">
     <meta property="og:description" content="{{ vm.metaDesc }}">
     <meta property="og:type" content="website">
@@ -21,12 +22,21 @@
     <meta property="og:locale" content="{{ vm.ogLocale }}">
     <meta property="og:locale:alternate" content="fr_FR">
     <meta property="og:locale:alternate" content="en_US">
+    {% if featured and featured.coverImage %}
+        <meta property="og:image" content="{{ absolute_url(asset('uploads/blog/' ~ featured.coverImage)) }}">
+        <meta property="og:image:alt" content="{{ featured.getCoverAlt(app.request.locale) }}">
+    {% endif %}
 {% endblock %}
 
 {% block seo_twitter %}
-    <meta name="twitter:card" content="summary">
+    {% set featured = articles|first %}
+    <meta name="twitter:card" content="{{ featured and featured.coverImage ? 'summary_large_image' : 'summary' }}">
     <meta name="twitter:title" content="{{ vm.seoTitle }}">
     <meta name="twitter:description" content="{{ vm.metaDesc }}">
+    {% if featured and featured.coverImage %}
+        <meta name="twitter:image" content="{{ absolute_url(asset('uploads/blog/' ~ featured.coverImage)) }}">
+        <meta name="twitter:image:alt" content="{{ featured.getCoverAlt(app.request.locale) }}">
+    {% endif %}
 {% endblock %}
 
 {% block seo_jsonld %}
@@ -36,115 +46,142 @@
   "@type": "Blog",
   "name": "{{ vm.seoTitle|e('js') }}",
   "description": "{{ vm.metaDesc|e('js') }}",
+  "url": "{{ vm.canonical|e('js') }}",
   "inLanguage": "{{ app.request.locale|e('js') }}"
 }
 </script>
 {% endblock %}
 
+{% block main_class %}blog-main--index{% endblock %}
+
 {% block body %}
-<header class="blog-header">
-    <span class="blog-kicker">Blog</span>
-    <h1 class="blog-page-title">
-        {% if app.request.locale == 'fr' %}
-            Conseils cybersécurité & mots de passe
-        {% else %}
-            Password security & cybersecurity tips
-        {% endif %}
-    </h1>
+<div class="blog-home">
+    <header class="blog-header" style="display:none;">
+        <div class="blog-header__content">
+            <span class="blog-kicker"><i class="fa-regular fa-newspaper" aria-hidden="true"></i> Blog MYKEYNEST</span>
+            <h1 class="blog-page-title">
+                {% if app.request.locale == 'fr' %}
+                    Cybersécurité et mots de passe : des conseils concrets pour vos équipes
+                {% else %}
+                    Cybersecurity and passwords: practical guidance for your team
+                {% endif %}
+            </h1>
 
-    <p class="blog-subtitle">
-        {% if app.request.locale == 'fr' %}
-            Guides concrets pour protéger vos comptes : mots de passe forts, 2FA, phishing, bonnes pratiques et outils.
-        {% else %}
-            Practical guides to protect your accounts: strong passwords, 2FA, phishing defense, best practices and tools.
-        {% endif %}
-    </p>
-</header>
+            <p class="blog-subtitle">
+                {% if app.request.locale == 'fr' %}
+                    Mots de passe, partage d’accès et cybersécurité : des guides clairs, conçus pour les PME et leurs équipes.
+                {% else %}
+                    Passwords, access sharing and cybersecurity: clear guides designed for SMBs and their teams.
+                {% endif %}
+            </p>
 
-<section class="blog-grid" aria-label="Blog posts">
-    {% for a in articles %}
-        {% set url = path('blog_article_show', {
-            _locale: app.request.locale,
-            slug: (app.request.locale == 'fr' ? a.slugFr : a.slugEn)
-        }) %}
-
-        {% set title = (app.request.locale == 'fr' ? a.h1Fr : a.h1En) %}
-        {% set desc = (app.request.locale == 'fr' ? a.metaDescFr : a.metaDescEn) %}
-
-        <article class="post-card">
-            <div class="post-image">
-                <img
-                  src="{{ a.coverImage ? asset('uploads/blog/' ~ a.coverImage) : asset('images/blog/blog-default.webp') }}"
-                  alt="{{ a.getCoverAlt(app.request.locale) ?? 'Blog MyKeyNest' }}"
-                  loading="lazy"
-                  width="800"
-                  height="450"
-                >
+            <div class="blog-header__meta" aria-label="{{ app.request.locale == 'fr' ? 'Informations sur le blog' : 'Blog information' }}">
+                <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> {{ vm.total }} {{ app.request.locale == 'fr' ? 'guides pratiques' : 'practical guides' }}</span>
+                <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {{ app.request.locale == 'fr' ? 'Accès et sécurité' : 'Access and security' }}</span>
             </div>
-
-            <h2 class="post-title">
-                <a class="title-link" href="{{ url }}">{{ title }}</a>
-            </h2>
-
-            <p class="post-excerpt">{{ desc }}</p>
-
-            <div class="post-meta">
-                <time datetime="{{ a.publishedAt|date('Y-m-d') }}">
-                    {% if app.request.locale == 'fr' %}
-                        {{ a.publishedAt|date('d/m/Y') }}
-                    {% else %}
-                        {{ a.publishedAt|date('M d, Y') }}
-                    {% endif %}
-                </time>
-                <span class="dot"></span>
-                <span>{{ app.request.locale == 'fr' ? 'Lecture 5 min' : '5 min read' }}</span>
-            </div>
-        </article>
-    {% else %}
-        <p class="blog-content">
-            {% if app.request.locale == 'fr' %}
-                Aucun article pour le moment.
-            {% else %}
-                No posts yet.
-            {% endif %}
-        </p>
-    {% endfor %}
-</section>
-
-{% if vm.pages > 1 %}
-    <nav class="pagination" aria-label="Pagination">
-        {% set prevPage = vm.page - 1 %}
-        {% set nextPage = vm.page + 1 %}
-
-        <a class="pager {{ vm.page <= 1 ? 'disabled' : '' }}"
-           href="{{ path('blog_index', { _locale: app.request.locale }) }}{% if prevPage > 1 %}?page={{ prevPage }}{% endif %}">
-            {% if app.request.locale == 'fr' %}← Précédent{% else %}← Previous{% endif %}
-        </a>
-
-        <div class="page-indicator">
-            Page {{ vm.page }} / {{ vm.pages }}
         </div>
 
-        <a class="pager {{ vm.page >= vm.pages ? 'disabled' : '' }}"
-           href="{{ path('blog_index', { _locale: app.request.locale }) }}?page={{ nextPage }}">
-            {% if app.request.locale == 'fr' %}Suivant →{% else %}Next →{% endif %}
-        </a>
-    </nav>
-{% endif %}
+        <div class="blog-header__visual" aria-hidden="true">
+            <span class="blog-header__orbit blog-header__orbit--one"></span>
+            <span class="blog-header__orbit blog-header__orbit--two"></span>
+            <span class="blog-header__logo">
+                <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt="">
+            </span>
+        </div>
+    </header>
+
+    <section class="blog-grid" aria-label="{{ app.request.locale == 'fr' ? 'Articles du blog' : 'Blog posts' }}">
+        {% for a in articles %}
+            {% set url = path('blog_article_show', {
+                _locale: app.request.locale,
+                slug: (app.request.locale == 'fr' ? a.slugFr : a.slugEn)
+            }) %}
+            {% set title = app.request.locale == 'fr' ? a.h1Fr : a.h1En %}
+            {% set desc = app.request.locale == 'fr' ? a.metaDescFr : a.metaDescEn %}
+
+            <article class="post-card {{ loop.first ? 'post-card--featured' : '' }}">
+                <a class="post-card__link" href="{{ url }}" aria-label="{{ title }}">
+                    <div class="post-image">
+                        <img
+                          src="{{ a.coverImage ? asset('uploads/blog/' ~ a.coverImage) : asset('images/blog/blog-default.webp') }}"
+                          alt="{{ a.getCoverAlt(app.request.locale) ?? 'Blog MYKEYNEST' }}"
+                          {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                          decoding="async"
+                          width="800"
+                          height="450"
+                        >
+                        <span class="post-category">{{ app.request.locale == 'fr' ? 'Guide pratique' : 'Practical guide' }}</span>
+                    </div>
+
+                    <div class="post-card__body">
+                        <div class="post-meta">
+                            <time datetime="{{ a.publishedAt|date('Y-m-d') }}">
+                                {% if app.request.locale == 'fr' %}
+                                    {{ a.publishedAt|date('d/m/Y') }}
+                                {% else %}
+                                    {{ a.publishedAt|date('M d, Y') }}
+                                {% endif %}
+                            </time>
+                            <span class="dot"></span>
+                            <span>{{ app.request.locale == 'fr' ? 'Lecture ' ~ vm.readingMinutes[a.id] ~ ' min' : vm.readingMinutes[a.id] ~ ' min read' }}</span>
+                        </div>
+
+                        <h2 class="post-title">{{ title }}</h2>
+                        <p class="post-excerpt">{{ desc }}</p>
+
+                        <span class="post-action">
+                            {{ app.request.locale == 'fr' ? 'Lire l’article' : 'Read article' }}
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                </a>
+            </article>
+        {% else %}
+            <div class="blog-empty">
+                <i class="fa-regular fa-newspaper" aria-hidden="true"></i>
+                <p>{{ app.request.locale == 'fr' ? 'Aucun article pour le moment.' : 'No posts yet.' }}</p>
+            </div>
+        {% endfor %}
+    </section>
+
+    {% if vm.pages > 1 %}
+        <nav class="pagination" aria-label="Pagination">
+            {% set prevPage = vm.page - 1 %}
+            {% set nextPage = vm.page + 1 %}
+
+            <a class="pager {{ vm.page <= 1 ? 'disabled' : '' }}"
+               href="{{ path('blog_index', { _locale: app.request.locale }) }}{% if prevPage > 1 %}?page={{ prevPage }}{% endif %}">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                {{ app.request.locale == 'fr' ? 'Précédent' : 'Previous' }}
+            </a>
+
+            <div class="page-indicator">Page {{ vm.page }} / {{ vm.pages }}</div>
+
+            <a class="pager {{ vm.page >= vm.pages ? 'disabled' : '' }}"
+               href="{{ path('blog_index', { _locale: app.request.locale }) }}?page={{ nextPage }}">
+                {{ app.request.locale == 'fr' ? 'Suivant' : 'Next' }}
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </nav>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block footer %}
-<footer class="page-footer">
+<section class="blog-cta-shell" aria-labelledby="blog-cta-title">
     <div class="cta-container">
         {% if app.request.locale == 'fr' %}
-            <h2 class="cta-title">Prêt à sécuriser vos mots de passe ?</h2>
-            <p class="cta-description">Créez votre coffre MyKeyNest et passez à des mots de passe uniques et robustes.</p>
-            <a href="{{ path('show_register') }}" class="cta-button">Essayer gratuitement</a>
+            <span class="cta-icon"><i class="fa-solid fa-key" aria-hidden="true"></i></span>
+            <h2 class="cta-title" id="blog-cta-title">Prêt à sécuriser vos mots de passe ?</h2>
+            <p class="cta-description">Créez votre coffre MYKEYNEST et passez à des mots de passe uniques et robustes.</p>
+            <a href="{{ path('show_register') }}" class="cta-button">Essayer gratuitement <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         {% else %}
-            <h2 class="cta-title">Ready to secure your passwords?</h2>
-            <p class="cta-description">Create your MyKeyNest vault and start using strong, unique passwords.</p>
-            <a href="{{ path('show_register') }}" class="cta-button">Try it free</a>
+            <span class="cta-icon"><i class="fa-solid fa-key" aria-hidden="true"></i></span>
+            <h2 class="cta-title" id="blog-cta-title">Ready to secure your passwords?</h2>
+            <p class="cta-description">Create your MYKEYNEST vault and start using strong, unique passwords.</p>
+            <a href="{{ path('show_register') }}" class="cta-button">Try it free <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         {% endif %}
     </div>
-</footer>
+</section>
+{% include 'components/parts/_public_footer.html.twig' %}
 {% endblock %}
