@@ -59,6 +59,31 @@ final class CredentialLaunchControllerTest extends KernelTestCase
         self::assertSame('selected@example.test', $data['username']);
     }
 
+    public function testExplicitCrossDomainAutofillRequiresPasswordRevealPermission(): void
+    {
+        [$restrictedController, $restrictedRepository] = $this->controller(true, false);
+        $restricted = $restrictedController->autofill(
+            $this->request(['domain' => 'another-site.test', 'userId' => 1, 'allowCrossDomain' => true]),
+            10,
+            $restrictedRepository,
+        );
+        self::assertSame(403, $restricted->getStatusCode());
+
+        [$fullController, $fullRepository] = $this->controller(true, true);
+        self::assertSame(403, $fullController->autofill(
+            $this->request(['domain' => 'another-site.test', 'userId' => 1]),
+            10,
+            $fullRepository,
+        )->getStatusCode());
+        $full = $fullController->autofill(
+            $this->request(['domain' => 'another-site.test', 'userId' => 1, 'allowCrossDomain' => true]),
+            10,
+            $fullRepository,
+        );
+        self::assertSame(200, $full->getStatusCode(), (string) $full->getContent());
+        self::assertSame('test-password', json_decode((string) $full->getContent(), true)['password']);
+    }
+
     public function testOwnerCanAutomaticallyRememberASanitizedLoginPage(): void
     {
         [$controller, $repository, $credential] = $this->controller(false, true, true);

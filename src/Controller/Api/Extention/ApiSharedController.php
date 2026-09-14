@@ -516,7 +516,9 @@ final class ApiSharedController extends AbstractController
             return $this->badRequest('Domaine manquant ou invalide');
         }
 
-        return $this->credentialSecretResponse($id, $credentialRepository, $auth, false, $domain);
+        $allowCrossDomain = ($payload['allowCrossDomain'] ?? false) === true;
+
+        return $this->credentialSecretResponse($id, $credentialRepository, $auth, false, $domain, $allowCrossDomain);
     }
 
     #[Route('/extention/api/credentials/{id}/login-url', name: 'api_credential_login_url', methods: ['POST', 'OPTIONS'])]
@@ -794,6 +796,7 @@ final class ApiSharedController extends AbstractController
         array $auth,
         bool $requireRevealPermission,
         ?string $autofillDomain = null,
+        bool $allowCrossDomain = false,
     ): JsonResponse {
         $credential = $credentialRepository->find($id);
         if (!$credential instanceof Credential) {
@@ -805,7 +808,11 @@ final class ApiSharedController extends AbstractController
             return $this->withInstallationToken($this->json(['error' => 'Not found'], Response::HTTP_NOT_FOUND), $auth['issuedInstallationToken']);
         }
 
-        if ($autofillDomain !== null && !$this->credentialMatchesDomain($credential, $autofillDomain)) {
+        if (
+            $autofillDomain !== null
+            && !$this->credentialMatchesDomain($credential, $autofillDomain)
+            && (!$allowCrossDomain || !$this->credentialAccessPolicy->canRevealPassword($user, $credential))
+        ) {
             return $this->withInstallationToken($this->json([
                 'error' => 'Cet identifiant ne correspond pas au site actuellement ouvert.',
                 'code' => 'credential_domain_mismatch',
