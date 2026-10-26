@@ -1,0 +1,28 @@
+{% extends 'base_auth.html.twig' %}
+{% block title %}{{ app.request.locale == 'en' ? 'Publisher and legal notice | MYKEYNEST' : 'Mentions légales et éditeur | MYKEYNEST' }}{% endblock %}
+{% block description %}{{ app.request.locale == 'en' ? 'Publisher, publication director, business registration and hosting information for the MYKEYNEST password manager.' : 'Identité de l’éditeur, directeur de publication, immatriculation et hébergement du gestionnaire de mots de passe MYKEYNEST.' }}{% endblock %}
+{% block body %}
+{% set isEn = app.request.locale == 'en' %}
+<main class="legal-wrap">
+  <article class="legal-card legal">
+    <h1 class="legal-title">{{ isEn ? 'Legal notice' : 'Mentions légales' }}</h1>
+    <h2>{{ isEn ? 'Website publisher' : 'Éditeur du site' }}</h2>
+    <p>{{ isEn ? 'MYKEYNEST is a password management and digital access sharing service operated under the OptiWebSolutions brand.' : 'MYKEYNEST est un service de gestion des mots de passe et de partage des accès numériques, exploité sous la marque OptiWebSolutions.' }}</p>
+    <dl>
+      <dt>{{ isEn ? 'Business owner' : 'Entrepreneur' }}</dt><dd>Mamyan Nikoloz — {{ isEn ? 'Individual entrepreneur' : 'Entrepreneur individuel' }}</dd>
+      <dt>{{ isEn ? 'Trading name' : 'Nom commercial' }}</dt><dd>{{ publisher_name }}</dd>
+      <dt>SIREN</dt><dd>852 249 408</dd>
+      <dt>SIRET</dt><dd>85224940800026</dd>
+      <dt>{{ isEn ? 'Publication director' : 'Directeur de la publication' }}</dt><dd>{{ founder_name }}</dd>
+      <dt>Contact</dt><dd><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></dd>
+    </dl>
+    <h2>{{ isEn ? 'Hosting provider' : 'Hébergement' }}</h2>
+    <p>o2switch<br>Chemin des Pardiaux, 63000 Clermont-Ferrand, France<br><a href="tel:+33444446040">+33 4 44 44 60 40</a><br><a href="https://www.o2switch.fr/support-hebergeur/" rel="noopener">{{ isEn ? 'Hosting provider contact information' : 'Coordonnées de l’hébergeur' }}</a></p>
+    <h2>{{ isEn ? 'Purpose of the service' : 'Objet du service' }}</h2>
+    <p>{{ isEn ? 'MYKEYNEST on key-nest.com is software for managing online credentials. It is independent of the physical key storage and collection service operated on keynest.com.' : 'MYKEYNEST, accessible sur key-nest.com, est un logiciel de gestion d’identifiants en ligne. Il est indépendant du service de dépôt et de remise de clés physiques exploité sur keynest.com.' }}</p>
+    <h2>{{ isEn ? 'Terms and personal data' : 'Conditions et données personnelles' }}</h2>
+    <p><a href="{{ path('legal_cgu') }}">{{ isEn ? 'Terms of use (French)' : 'Conditions générales d’utilisation' }}</a> · <a href="{{ path('legal_cgv') }}">{{ isEn ? 'Terms of sale (French)' : 'Conditions générales de vente' }}</a> · <a href="{{ path('legal_privacy') }}">{{ isEn ? 'Privacy policy (French)' : 'Politique de confidentialité' }}</a></p>
+    <p><a href="{{ path('app_security', isEn ? {lang: 'en'} : {}) }}">{{ isEn ? 'Read about the security architecture and its limits' : 'Consulter l’architecture de sécurité et ses limites' }}</a></p>
+  </article>
+</main>
+{% endblock %}

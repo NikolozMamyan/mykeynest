@@ -1,0 +1,80 @@
+{
+  "solution": {
+    "title": "Build a cybersecurity process that fits your small business",
+    "intro": "Small business cybersecurity starts with clear responsibilities and actions your team can repeat every day. A password manager supports part of this process by organizing credentials and sharing. It belongs alongside device protection, backups, email security and an incident response plan. Start with a manageable scope and expand once the team understands how to maintain it.",
+    "sections": {
+      "1": {
+        "title": "Identify the accounts that can interrupt your business",
+        "first": "Start with your primary email, domain registrar, hosting, billing and the tools used to work with clients. For each service, record an owner, the authorized users and the recovery process. An overlooked account can become a serious obstacle when the only person who knows how to access it is absent or leaves the company.",
+        "second": "Rank accounts by the impact of losing access: interrupted operations, lost data or exposure of customer information. Prioritize the accounts used to recover other accounts, particularly business email. Use this inventory to decide what to address first. Keep passwords out of the inventory itself: store secrets in the vault and organizational information in your internal procedure, then assign someone to maintain both."
+      },
+      "2": {
+        "title": "Reduce the most common risks",
+        "first": "Use a different password for each service and enable two-factor authentication where available. Separate administrator accounts from accounts used for daily work. Prefer named accounts when the target service supports them: they make individual revocation easier and reduce the need to share one common login between several people. Check that account recovery is protected as carefully as sign-in.",
+        "second": "Support these practices with device updates, a tested backup and a simple process for reporting suspicious messages. Explain how to check a website domain before signing in and who to contact when something looks wrong. A vault reduces the spread of credentials, but it does not replace phishing awareness or the protection of a compromised computer. Include these limits in the training given to new users."
+      },
+      "3": {
+        "title": "Manage onboarding, assignments and departures",
+        "first": "Before someone joins, list the tools required for their role and grant only the permissions they need. For a contractor, agree on the scope, the owner of each account and the expected end of the assignment. Apply the available sharing permissions and test the recipient's workflow before introducing the process to the whole team or moving sensitive production accounts.",
+        "second": "During offboarding, revoke vault shares, disable named accounts and close sessions on the affected services. Rotate shared passwords when the person may have obtained them. Revoking a share in MYKEYNEST does not automatically sign a user out of a third-party tool. A common checklist makes these actions repeatable and helps the account owner confirm that the departure has actually been completed."
+      },
+      "4": {
+        "title": "Measure progress and prepare for an incident",
+        "first": "Each month, review concrete indicators: critical accounts with an identified owner, two-factor authentication enabled, shares that remain justified and departures that were fully processed. Start with a small group of accounts, then extend the process after it becomes routine. A procedure consistently applied to ten critical accounts is more useful than an exhaustive document that no one knows how to maintain.",
+        "second": "Plan the first steps after an incident as well: contact the responsible person, revoke suspicious sessions, rotate affected credentials and preserve information needed for analysis. If you want assistance, audit and awareness services have a separate scope to agree according to your needs. Using a password manager alone does not establish regulatory compliance or replace an assessment of the other systems involved in your business."
+      }
+    }
+  },
+  "password_manager": {
+    "title": "Roll out a password manager across your team",
+    "intro": "MYKEYNEST manages work credentials and their use by authorized people. A practical rollout verifies one complete workflow: create an access, share it, use it from the extension and revoke it. Start with a test account and a few colleagues before importing the sensitive accounts used across the business. Confirm ownership and recovery arrangements as part of that pilot.",
+    "sections": {
+      "1": {
+        "title": "Prepare the vault and the first credentials",
+        "first": "Create your account with a unique password and protect the email address used for recovery. Add a first credential and check the service name, its URL and the account involved. Use an explicit label, such as the client and tool name, so users can select the correct access when several accounts share the same website. Confirm that the account owner understands how to maintain it.",
+        "second": "For a CSV import, check the columns and begin with a small sample. Export files can contain plaintext secrets: control where they are stored and remove unnecessary copies after verification. A successful import does not validate sharing permissions. The owner still needs to decide which credentials should be shared, who needs them and what those people should be allowed to do with each access."
+      },
+      "2": {
+        "title": "Share with a colleague or contractor",
+        "first": "Choose a recipient and permissions that match the assignment. Permission to use an access, reveal its password and edit it serve different needs. For a short assignment, avoid granting editing when the person only needs to sign in. Check the target service's terms too: some services require a named account or restrict the sharing of a common account between multiple people.",
+        "second": "Test the share with the recipient: the access should appear in their space and work with the extension linked to their account. When password reveal is disabled, the interface does not offer a reveal action. The browser nevertheless receives the information required for autofill. This permission controls use within the product; it does not make the password technically impossible to extract from a browser controlled by the recipient."
+      },
+      "3": {
+        "title": "Verify sign-in and the end of access",
+        "first": "Install and link the extension, open the target website and check its domain before filling the form. If autofill does not work, use the troubleshooting guide instead of sending the password through a messaging service. Some websites use unusual forms or require an additional verification step. Test the actual tools used by the team during the pilot and document any steps users need to complete manually.",
+        "second": "At the end of the assignment, revoke the share and check that the recipient can no longer use it through MYKEYNEST. This does not close sessions already opened on the target website. That service's owner must also revoke its sessions and, when necessary, rotate the common password. Document both actions in the offboarding process so that the team does not confuse revoking a share with signing someone out everywhere."
+      },
+      "4": {
+        "title": "Choose a suitable plan and security architecture",
+        "first": "The free account lets you evaluate the workflow before selecting a paid plan. Review the current storage, sharing and team limits on the pricing page, then estimate your needs from the number of people and services involved. Verify the features during the trial: a feature list does not replace a demonstration with your working constraints, supported websites and account ownership requirements.",
+        "second": "MYKEYNEST encrypts passwords on the server using AES-256-GCM. The server can decrypt them in authorized operations; it is not a zero-knowledge vault. If your security policy requires end-to-end encryption where the provider does not hold the keys, use that requirement to guide your choice. Read the published architecture and confirm any specific requirements before rolling the product out across the team."
+      }
+    }
+  },
+  "comparatif": {
+    "title": "How should a business compare password managers?",
+    "intro": "A useful comparison connects features to a specific working situation. An agency sharing client access and a business requiring a zero-knowledge architecture will evaluate different criteria. The table is a starting point. Confirm features, limits and prices in each vendor's official offer when making your decision, then run a pilot with the people who will administer and use the product.",
+    "sections": {
+      "1": {
+        "title": "Define requirements before comparing prices",
+        "first": "List the people who need the vault, their browsers and devices, the services they use and the offboarding rules you must apply. Separate requirements from preferences: multifactor authentication, account recovery, encryption, export and support. If a security requirement is mandatory, verify it before comparing subscription prices. This avoids spending time on a plan that cannot meet the conditions under which your team works.",
+        "second": "MYKEYNEST stores passwords using server-side AES-256-GCM encryption and decrypts them during authorized operations. This model differs from a zero-knowledge vault. Ask each provider for the corresponding technical documentation and apply the same standard when comparing them. The name of an encryption algorithm alone does not explain how keys are managed or the limits of the provider's ability to access vault contents."
+      },
+      "2": {
+        "title": "Test sharing through a complete user workflow",
+        "first": "Create a demonstration credential, share it with a second person and open their session to see what they can access. Test credential use, password reveal and editing separately. For an agency, repeat the exercise with an external contractor. Check extension installation and sign-in on the actual tools used in your business, including any additional authentication steps requested by those services.",
+        "second": "Revoke the share and check the result. Revocation in the manager and session closure on the target service are separate operations, so confirm that your procedure covers both. Shared passwords may also have been copied or used previously. A mode without password reveal in the interface is not an absolute guarantee against recovery on a device controlled by the recipient. Include this limit in the evaluation."
+      },
+      "3": {
+        "title": "Compare total cost and plan limits",
+        "first": "Calculate the cost for the whole team, including minimum seats, billing period and features restricted to particular subscriptions. Check what happens to credentials and shares after changing plans. Review the export options too: your decision should remain compatible with a future migration or a change in team structure. Record which features are included in the plan you are actually considering.",
+        "second": "MYKEYNEST offers a free account for trying the product and paid plans with limits published on the website. For Bitwarden and 1Password, consult their official pricing pages before preparing a budget. Offers evolve and an isolated price can omit material conditions. Compare an equivalent scope and record the date and assumptions used in your internal evaluation so that the calculation can be checked again before purchase."
+      },
+      "4": {
+        "title": "Run a pilot before a wider rollout",
+        "first": "Choose representative users: someone who administers access, someone who uses it daily and, where relevant, a contractor. Define simple tasks to complete without assistance: find the right account, share an access, use the extension and report a difficulty. Collect feedback after a few days and measure the time spent on help and maintenance rather than considering the subscription fee alone.",
+        "second": "Base the decision on the pilot results, the architecture and the contractual commitments available. No password manager automatically makes an organization GDPR compliant, and a commercial comparison does not replace a risk assessment. A suitable product should meet your technical requirements while remaining understandable enough to be used correctly by the team, including during an absence, a role change or the departure of a colleague."
+      }
+    }
+  }
+}

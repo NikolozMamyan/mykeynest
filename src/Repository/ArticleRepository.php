@@ -23,6 +23,8 @@ class ArticleRepository extends ServiceEntityRepository
     return $this->createQueryBuilder('a')
         ->andWhere($field . ' = :slug')
         ->setParameter('slug', $slug)
+        ->andWhere('a.publishedAt <= :now')
+        ->setParameter('now', new \DateTimeImmutable())
         ->getQuery()
         ->getOneOrNullResult();
 }
@@ -31,6 +33,8 @@ class ArticleRepository extends ServiceEntityRepository
 public function findPaginated(int $page, int $perPage): array
 {
     $qb = $this->createQueryBuilder('a')
+        ->andWhere('a.publishedAt <= :now')
+        ->setParameter('now', new \DateTimeImmutable())
         ->orderBy('a.publishedAt', 'DESC');
 
     $total = (int) (clone $qb)
@@ -55,6 +59,8 @@ public function findPaginated(int $page, int $perPage): array
 public function findAllForSitemap(): array
 {
     return $this->createQueryBuilder('a')
+        ->andWhere('a.publishedAt <= :now')
+        ->setParameter('now', new \DateTimeImmutable())
         ->orderBy('a.updatedAt', 'DESC')
         ->getQuery()
         ->getResult();

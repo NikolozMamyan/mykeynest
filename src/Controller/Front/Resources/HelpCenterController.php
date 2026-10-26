@@ -442,7 +442,7 @@ final class HelpCenterController extends AbstractController
                         'en' => 'MYKEYNEST Team',
                     ],
                     'tags' => ['sécurité', 'architecture', 'chiffrement'],
-                    'updatedAt' => new \DateTime('2026-01-15'),
+                    'updatedAt' => new \DateTime('2026-10-26'),
                     'helpfulYes' => 312,
                     'helpfulNo' => 8,
                     'sections' => [
@@ -464,8 +464,8 @@ final class HelpCenterController extends AbstractController
                                 'en' => 'How does it work?',
                             ],
                             'content' => [
-                                'fr' => '<ol><li>Votre compte est authentifié et les autorisations sont vérifiées.</li><li>Une clé de chiffrement propre au compte est dérivée avec le secret applicatif.</li><li>Le serveur ne restitue le secret déchiffré qu’au parcours autorisé : affichage, partage permis ou remplissage par l’extension.</li></ol>',
-                                'en' => '<ol><li>Your account is authenticated and permissions are checked.</li><li>An account-specific encryption key is derived together with the application secret.</li><li>The server returns a decrypted secret only through an authorized flow: viewing, permitted sharing or extension autofill.</li></ol>',
+                                'fr' => '<ol><li>Votre compte est authentifié et les autorisations sont vérifiées.</li><li>Une clé de chiffrement propre au compte est dérivée avec le secret applicatif.</li><li>Le serveur ne restitue le secret déchiffré qu’au parcours autorisé : affichage, partage permis ou remplissage par l’extension.</li></ol><p><strong>Cette architecture chiffre les données côté serveur ; elle n’est pas un chiffrement de bout en bout à connaissance nulle (« zero-knowledge »).</strong> Le serveur peut déchiffrer les secrets lors des opérations autorisées. Consultez la <a href="/securite">page de sécurité et ses limites</a> pour évaluer ce modèle selon vos exigences.</p>',
+                                'en' => '<ol><li>Your account is authenticated and permissions are checked.</li><li>An account-specific encryption key is derived together with the application secret.</li><li>The server returns a decrypted secret only through an authorized flow: viewing, permitted sharing or extension autofill.</li></ol><p><strong>This architecture encrypts data on the server; it is not end-to-end, zero-knowledge encryption.</strong> The server can decrypt secrets during authorized operations. Read the <a href="/securite?lang=en">security architecture and limits</a> to assess whether this model meets your requirements.</p>',
                             ],
                         ],
                         [

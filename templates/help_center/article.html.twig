@@ -2,12 +2,10 @@
 
 {% block title %}{{ article.title }} | Centre d'aide | MYKEYNEST{% endblock %}
 
-{% block meta_description %}
-<meta name="description" content="{{ article.excerpt }}">
-<meta property="og:title" content="{{ article.title }} | MYKEYNEST">
-<meta property="og:description" content="{{ article.excerpt }}">
-<meta property="og:type" content="article">
-{% endblock %}
+{% block description %}{{ article.excerpt }}{% endblock %}
+{% block og_title %}{{ article.title }} | MYKEYNEST{% endblock %}
+{% block og_description %}{{ article.excerpt }}{% endblock %}
+{% block og_type %}article{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/help-article.css') }}">
@@ -25,44 +23,44 @@
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "{{ app.request.locale == 'en' ? 'Home' : 'Accueil' }}",
-          "item": "{{ absolute_url(path('app_landing', localeParams)) }}"
+          "name": {{ (app.request.locale == 'en' ? 'Home' : 'Accueil')|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_landing', localeParams))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "{{ 'help_article.breadcrumb.help_center'|trans|e('js') }}",
-          "item": "{{ absolute_url(path('app_help_center', localeParams)) }}"
+          "name": {{ 'help_article.breadcrumb.help_center'|trans|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_help_center', localeParams))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "{{ category.title|e('js') }}",
-          "item": "{{ absolute_url(path('app_help_category', localeParams|merge({ slug: category.slug }))) }}"
+          "name": {{ category.title|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_help_category', localeParams|merge({ slug: category.slug })))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 4,
-          "name": "{{ article.title|e('js') }}",
-          "item": "{{ absolute_url(path('app_help_article', localeParams|merge({ categorySlug: category.slug, articleSlug: article.slug }))) }}"
+          "name": {{ article.title|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_help_article', localeParams|merge({ categorySlug: category.slug, articleSlug: article.slug })))|json_encode(15)|raw }}
         }
       ]
     },
     {
       "@type": "TechArticle",
-      "headline": "{{ article.title|e('js') }}",
-      "description": "{{ article.excerpt|e('js') }}",
-      "mainEntityOfPage": "{{ absolute_url(path('app_help_article', localeParams|merge({ categorySlug: category.slug, articleSlug: article.slug }))) }}",
-      "dateModified": "{{ article.updatedAt|date('c') }}",
+      "headline": {{ article.title|json_encode(15)|raw }},
+      "description": {{ article.excerpt|json_encode(15)|raw }},
+      "mainEntityOfPage": {{ absolute_url(path('app_help_article', localeParams|merge({ categorySlug: category.slug, articleSlug: article.slug })))|json_encode(15)|raw }},
+      "dateModified": {{ article.updatedAt|date('c')|json_encode(15)|raw }},
       "author": {
-        "@type": "Person",
-        "name": "{{ article.author|e('js') }}"
+        "@type": "Organization",
+        "name": {{ article.author|json_encode(15)|raw }}
       },
       "publisher": {
         "@type": "Organization",
         "name": "MYKEYNEST"
       },
-      "inLanguage": "{{ app.request.locale|default('fr') }}"
+      "inLanguage": {{ app.request.locale|default('fr')|json_encode(15)|raw }}
     }
   ]
 }
@@ -80,7 +78,7 @@
     <nav class="art-breadcrumb" aria-label="{{ 'help_article.breadcrumb.aria'|trans }}">
         <div class="art-breadcrumb-inner">
             <div class="art-breadcrumb-nav">
-                <a href="{{ path('app_help_center') }}">
+                <a href="{{ path('app_help_center', app.request.locale == 'en' ? {lang: 'en'} : {}) }}">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -90,7 +88,7 @@
 
                 <span class="art-breadcrumb-sep">&rsaquo;</span>
 
-                <a href="{{ path('app_help_category', { slug: category.slug }) }}">
+                <a href="{{ path('app_help_category', ({ slug: category.slug })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}">
                     <i class="{{ category.iconClass }}" aria-hidden="true"></i> {{ category.title }}
                 </a>
 
@@ -128,7 +126,7 @@
         {# Main article #}
         <div>
             {# Back link #}
-            <a href="{{ path('app_help_category', { slug: category.slug }) }}" class="art-back-link">
+            <a href="{{ path('app_help_category', ({ slug: category.slug })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}" class="art-back-link">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -178,21 +176,25 @@
 
             {% set articleScreenshots = {
                 'creer-son-compte': {
+                    width: 1440, height: 900,
                     src: 'images/help/register-account.png',
                     alt: app.request.locale == 'en' ? 'MYKEYNEST account creation form' : 'Formulaire de création de compte MYKEYNEST',
                     caption: app.request.locale == 'en' ? 'The account form clearly separates company information, email and the master password.' : 'Le formulaire distingue clairement l’entreprise, l’adresse e-mail et le mot de passe principal.'
                 },
                 'application-mobile': {
+                    width: 390, height: 844,
                     src: 'images/help/install-mobile.png',
                     alt: app.request.locale == 'en' ? 'MYKEYNEST mobile installation page' : 'Page d’installation mobile MYKEYNEST',
                     caption: app.request.locale == 'en' ? 'The installation page adapts its instructions to the detected device.' : 'La page d’installation adapte les instructions à l’appareil détecté.'
                 },
                 'utiliser-le-generateur': {
+                    width: 1440, height: 900,
                     src: 'images/help/password-generator.png',
                     alt: app.request.locale == 'en' ? 'MYKEYNEST secure password generator' : 'Générateur de mots de passe sécurisé MYKEYNEST',
                     caption: app.request.locale == 'en' ? 'Choose the length and character families, then copy the generated password.' : 'Choisissez la longueur et les familles de caractères, puis copiez le mot de passe généré.'
                 },
                 'installer-extension-chrome': {
+                    width: 380, height: 650,
                     src: 'images/help/browser-extension.png',
                     alt: app.request.locale == 'en' ? 'MYKEYNEST browser extension sign-in screen' : 'Écran de connexion de l’extension navigateur MYKEYNEST',
                     caption: app.request.locale == 'en' ? 'Pair the extension with your web session before using autofill.' : 'Associez l’extension à votre session web avant d’utiliser le remplissage automatique.'
@@ -202,32 +204,32 @@
             {% if articleScreenshot %}
                 <figure class="art-product-shot">
                     <div class="art-product-shot__bar" aria-hidden="true"><span></span><span></span><span></span><strong>MYKEYNEST</strong></div>
-                    <img src="{{ asset(articleScreenshot.src) }}?v=20260821" alt="{{ articleScreenshot.alt }}" loading="lazy" decoding="async">
+                    <img src="{{ asset(articleScreenshot.src) }}?v=20260821" alt="{{ articleScreenshot.alt }}" width="{{ articleScreenshot.width }}" height="{{ articleScreenshot.height }}" loading="lazy" decoding="async">
                     <figcaption>{{ articleScreenshot.caption }}</figcaption>
                 </figure>
             {% endif %}
 
             {% set chromeStoreUrl = 'https://chromewebstore.google.com/detail/mykeynest/llckfoodkfccmibgmpfiodjkpincnfid' %}
             {% set articleActions = {
-                'creer-son-compte': { href: path('show_register'), label: 'help_article.actions.create_account', icon: 'fa-user-plus' },
+                'creer-son-compte': { href: path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}), label: 'help_article.actions.create_account', icon: 'fa-user-plus' },
                 'importer-identifiants': { href: path('credential_import'), label: 'help_article.actions.open_import', icon: 'fa-file-import' },
-                'synchronisation-appareils': { href: path('app_install_app'), label: 'help_article.actions.install_mobile', icon: 'fa-mobile-screen-button' },
-                'application-mobile': { href: path('app_install_app'), label: 'help_article.actions.install_mobile', icon: 'fa-mobile-screen-button' },
+                'synchronisation-appareils': { href: path('app_install_app', app.request.locale == 'en' ? {lang: 'en'} : {}), label: 'help_article.actions.install_mobile', icon: 'fa-mobile-screen-button' },
+                'application-mobile': { href: path('app_install_app', app.request.locale == 'en' ? {lang: 'en'} : {}), label: 'help_article.actions.install_mobile', icon: 'fa-mobile-screen-button' },
                 'zero-knowledge-explique': { href: path('legal_privacy'), label: 'help_article.actions.read_privacy', icon: 'fa-shield-halved' },
                 'aes-256-explique': { href: path('legal_privacy'), label: 'help_article.actions.read_privacy', icon: 'fa-shield-halved' },
                 'mot-de-passe-maitre': { href: path('app_forgot_password_request'), label: 'help_article.actions.reset_password', icon: 'fa-rotate-left' },
                 'activer-2fa': { href: path('app_user_preferences'), label: 'help_article.actions.open_preferences', icon: 'fa-shield-halved' },
                 'audit-securite': { href: path('app_security_checker'), label: 'help_article.actions.open_audit', icon: 'fa-shield' },
-                'utiliser-le-generateur': { href: path('app_public_generator'), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
-                'longueur-ideale': { href: path('app_public_generator'), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
-                'securite-generateur': { href: path('app_public_generator'), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
+                'utiliser-le-generateur': { href: path('app_public_generator', app.request.locale == 'en' ? {lang: 'en'} : {}), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
+                'longueur-ideale': { href: path('app_public_generator', app.request.locale == 'en' ? {lang: 'en'} : {}), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
+                'securite-generateur': { href: path('app_public_generator', app.request.locale == 'en' ? {lang: 'en'} : {}), label: 'help_article.actions.open_generator', icon: 'fa-wand-magic-sparkles' },
                 'partager-identifiant': { href: path('shared_access_new'), label: 'help_article.actions.open_sharing', icon: 'fa-share-nodes' },
                 'limite-partages-gratuits': { href: path('shared_access_index'), label: 'help_article.actions.manage_sharing', icon: 'fa-share-nodes' },
                 'revoquer-partage': { href: path('shared_access_index'), label: 'help_article.actions.manage_sharing', icon: 'fa-share-nodes' },
                 'installer-extension-chrome': { href: chromeStoreUrl, label: 'help_article.actions.install_extension', icon: 'fa-puzzle-piece', external: true },
                 'installer-extension-firefox': { href: chromeStoreUrl, label: 'help_article.actions.install_extension', icon: 'fa-puzzle-piece', external: true },
                 'autofill-ne-fonctionne-pas': { href: path('app_extention'), label: 'help_article.actions.open_extension', icon: 'fa-puzzle-piece' },
-                'difference-free-pro': { href: path('app_landing') ~ '#pricing', label: 'help_article.actions.compare_plans', icon: 'fa-table-columns' },
+                'difference-free-pro': { href: path('app_landing', app.request.locale == 'en' ? {lang: 'en'} : {}) ~ '#pricing', label: 'help_article.actions.compare_plans', icon: 'fa-table-columns' },
                 'passer-au-pro': { href: path('app_subscription'), label: 'help_article.actions.manage_subscription', icon: 'fa-credit-card' },
                 'annuler-abonnement': { href: path('app_subscription'), label: 'help_article.actions.manage_subscription', icon: 'fa-credit-card' }
             } %}
@@ -301,7 +303,7 @@
 
                     <div class="art-related-list">
                         {% for related in relatedArticles %}
-                            <a href="{{ path('app_help_article', { categorySlug: category.slug, articleSlug: related.slug }) }}"
+                            <a href="{{ path('app_help_article', ({ categorySlug: category.slug, articleSlug: related.slug })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}"
                                class="art-related-link">
                                 <div class="art-related-dot" aria-hidden="true"></div>
                                 <div class="art-related-info">

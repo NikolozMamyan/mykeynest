@@ -3,7 +3,7 @@
   {% for u in urls %}
     <url>
       <loc>{{ u.loc }}</loc>
-      <lastmod>{{ u.lastmod|date('Y-m-d') }}</lastmod>
+      {% if u.lastmod %}<lastmod>{{ u.lastmod|date('c') }}</lastmod>{% endif %}
       <changefreq>{{ u.changefreq }}</changefreq>
       <priority>{{ u.priority }}</priority>
     </url>

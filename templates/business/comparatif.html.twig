@@ -2,13 +2,14 @@
 
 {% block title %}{{ 'business.comparatif.meta.title'|trans }}{% endblock %}
 
-{% block meta_description %}
+{% block description %}{{ 'business.comparatif.meta.description'|trans }}{% endblock %}
+{% block keywords %}{{ 'business.comparatif.meta.keywords'|trans }}{% endblock %}
+{% block og_title %}{{ 'business.comparatif.meta.title'|trans }}{% endblock %}
+{% block og_description %}{{ 'business.comparatif.meta.description'|trans }}{% endblock %}
+{% block og_type %}website{% endblock %}
+
+{% block head_extras %}
 {% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
-<meta name="description" content="{{ 'business.comparatif.meta.description'|trans }}">
-<meta name="keywords" content="{{ 'business.comparatif.meta.keywords'|trans }}">
-<meta property="og:title" content="{{ 'business.comparatif.meta.title'|trans }}">
-<meta property="og:description" content="{{ 'business.comparatif.meta.description'|trans }}">
-<meta property="og:type" content="website">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -16,18 +17,17 @@
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "{{ 'business.comparatif.breadcrumb.home'|trans }}", "item": "{{ absolute_url(path('app_landing', localeParams)) }}" },
-        { "@type": "ListItem", "position": 2, "name": "{{ 'business.comparatif.breadcrumb.solution'|trans }}", "item": "{{ absolute_url(path('business_solution', localeParams)) }}" },
-        { "@type": "ListItem", "position": 3, "name": "{{ 'business.comparatif.breadcrumb.current'|trans }}", "item": "{{ absolute_url(path('business_comparatif', localeParams)) }}" }
+        { "@type": "ListItem", "position": 1, "name": {{ 'business.comparatif.breadcrumb.home'|trans|json_encode(15)|raw }}, "item": {{ absolute_url(path('app_landing', localeParams))|json_encode(15)|raw }} },
+        { "@type": "ListItem", "position": 2, "name": {{ 'business.comparatif.breadcrumb.solution'|trans|json_encode(15)|raw }}, "item": {{ absolute_url(path('business_solution', localeParams))|json_encode(15)|raw }} },
+        { "@type": "ListItem", "position": 3, "name": {{ 'business.comparatif.breadcrumb.current'|trans|json_encode(15)|raw }}, "item": {{ absolute_url(path('business_comparatif', localeParams))|json_encode(15)|raw }} }
       ]
     },
     {
       "@type": "Article",
-      "headline": "{{ 'business.comparatif.schema.headline'|trans }}",
-      "description": "{{ 'business.comparatif.schema.description'|trans }}",
-      "mainEntityOfPage": "{{ absolute_url(path('business_comparatif', localeParams)) }}",
-      "inLanguage": "{{ app.request.locale|default('fr') }}",
-      "dateModified": "{{ "now"|date("Y-m-d") }}"
+      "headline": {{ 'business.comparatif.schema.headline'|trans|json_encode(15)|raw }},
+      "description": {{ 'business.comparatif.schema.description'|trans|json_encode(15)|raw }},
+      "mainEntityOfPage": {{ absolute_url(path('business_comparatif', localeParams))|json_encode(15)|raw }},
+      "inLanguage": {{ app.request.locale|default('fr')|json_encode(15)|raw }}
     }
   ]
 }
@@ -45,9 +45,9 @@
     {# Breadcrumb #}
     <nav class="cmp-breadcrumb" aria-label="{{ 'business.comparatif.breadcrumb.aria'|trans }}">
         <div class="cmp-breadcrumb-inner">
-            <a href="{{ path('app_landing') }}">{{ 'business.comparatif.breadcrumb.home'|trans }}</a>
+            <a href="{{ path('app_landing', app.request.locale == 'en' ? {lang: 'en'} : {}) }}">{{ 'business.comparatif.breadcrumb.home'|trans }}</a>
             <span class="cmp-breadcrumb-sep">&rsaquo;</span>
-            <a href="{{ path('business_solution') }}">{{ 'business.comparatif.breadcrumb.solution'|trans }}</a>
+            <a href="{{ path('business_solution', app.request.locale == 'en' ? {lang: 'en'} : {}) }}">{{ 'business.comparatif.breadcrumb.solution'|trans }}</a>
             <span class="cmp-breadcrumb-sep">&rsaquo;</span>
             <span class="cmp-breadcrumb-current">{{ 'business.comparatif.breadcrumb.current'|trans }}</span>
         </div>
@@ -74,6 +74,8 @@
         </div>
     </section>
 
+    {% include 'components/seo/_product_definition.html.twig' %}
+
     <section class="cmp-layout" aria-labelledby="cmp-summary-title" style="padding-top: 2rem;">
         <div class="cmp-summary-card">
             <div class="cmp-section-eyebrow">{{ isEn ? 'Quick verdict' : 'Verdict rapide' }}</div>
@@ -85,9 +87,9 @@
                 <li>{{ 'business.comparatif.summary.point3'|trans }}</li>
             </ul>
             <div class="cmp-summary-actions">
-                <a href="{{ path('business_password_manager') }}" class="cmp-summary-link">{{ isEn ? 'Password manager page' : 'Page gestionnaire de mots de passe' }}</a>
-                <a href="{{ path('business_solution') }}" class="cmp-cta-btn">{{ isEn ? 'See the full solution' : 'Voir la solution complete' }}</a>
-                <a href="{{ path('business_audit') }}" class="cmp-summary-link">{{ isEn ? 'See audit services' : 'Voir les services audit' }}</a>
+                <a href="{{ path('business_password_manager', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="cmp-summary-link">{{ isEn ? 'Password manager page' : 'Page gestionnaire de mots de passe' }}</a>
+                <a href="{{ path('business_solution', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="cmp-cta-btn">{{ isEn ? 'See the full solution' : 'Voir la solution complete' }}</a>
+                <a href="{{ path('business_audit', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="cmp-summary-link">{{ isEn ? 'See audit services' : 'Voir les services audit' }}</a>
             </div>
         </div>
     </section>
@@ -106,7 +108,7 @@
                         <th class="cmp-th-empty" scope="col"></th>
                         <th class="cmp-th cmp-th-mykeynest" scope="col">
                             <div class="cmp-th-logo">
-                                <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" class="cmp-th-brand-mark" alt="" aria-hidden="true">
+                                <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" class="cmp-th-brand-mark" alt="" aria-hidden="true" width="201" height="267">
                                 MYKEYNEST
                                 <span class="cmp-th-price">5,49€</span>
                             </div>
@@ -149,19 +151,19 @@
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.aes256'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check" aria-hidden="true"></i><span class="sr-only">{{ isEn ? 'Included' : 'Inclus' }}</span></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check" aria-hidden="true"></i><span class="sr-only">{{ isEn ? 'Included' : 'Inclus' }}</span></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check" aria-hidden="true"></i><span class="sr-only">{{ isEn ? 'Included' : 'Inclus' }}</span></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.2fa'|trans }}</td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
-                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check" aria-hidden="true"></i><span class="sr-only">{{ isEn ? 'Included' : 'Inclus' }}</span></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check" aria-hidden="true"></i><span class="sr-only">{{ isEn ? 'Included' : 'Inclus' }}</span></span></td>
+                        <td class="cmp-td-val"><span class="cmp-yes"><i class="fa-solid fa-check" aria-hidden="true"></i><span class="sr-only">{{ isEn ? 'Included' : 'Inclus' }}</span></span></td>
                     </tr>
                     <tr>
                         <td class="cmp-td-feature">{{ 'business.comparatif.table.row.audit'|trans }}<small>{{ 'business.comparatif.table.row.audit_sub'|trans }}</small></td>
-                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check"></i></span></td>
+                        <td class="cmp-td-val cmp-td-mykeynest"><span class="cmp-yes"><i class="fa-solid fa-check" aria-hidden="true"></i><span class="sr-only">{{ isEn ? 'Included' : 'Inclus' }}</span></span></td>
                         <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'Depends on plan' : 'Selon l’offre' }}</span></td>
                         <td class="cmp-td-val"><span class="cmp-val-text">{{ isEn ? 'Depends on plan' : 'Selon l’offre' }}</span></td>
                     </tr>
@@ -215,7 +217,9 @@
             </div>
         </div>
 
-        {% include 'components/seo/_internal_links.html.twig' with {
+        {% include 'components/seo/_practical_guide.html.twig' with {guide: 'comparatif'} %}
+
+{% include 'components/seo/_internal_links.html.twig' with {
           sectionTitle: isEn ? 'Continue your evaluation' : 'Poursuivre votre évaluation',
           sectionSubtitle: isEn ? 'Review the product in detail, discover the separately scoped audit services, or read practical guidance.' : 'Consultez le produit en détail, découvrez les prestations d’audit proposées séparément ou lisez les guides pratiques.',
           links: [
@@ -258,7 +262,7 @@
         <div class="cmp-cta">
             <h2 class="cmp-cta-title">{{ 'business.comparatif.cta.title'|trans }}</h2>
             <p class="cmp-cta-sub">{{ 'business.comparatif.cta.subtitle'|trans }}</p>
-            <a href="{{ path('show_register') }}" class="cmp-cta-btn">
+            <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="cmp-cta-btn">
                 <i class="fa-solid fa-rocket" aria-hidden="true"></i>
                 {{ 'business.comparatif.cta.button'|trans }}
             </a>

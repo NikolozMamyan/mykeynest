@@ -1,0 +1,14 @@
+<script type="application/ld+json">
+{{ {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: 'MYKEYNEST – Gestionnaire de mots de passe sécurisé pour équipes',
+  description: app.request.locale == 'en' ? 'A demonstration of the MYKEYNEST password manager for teams.' : 'Une démonstration du gestionnaire de mots de passe MYKEYNEST pour les équipes.',
+  thumbnailUrl: ['https://i.ytimg.com/vi/IS4YgAdW-H8/maxresdefault.jpg'],
+  uploadDate: '2026-03-31T06:44:35-07:00',
+  duration: 'PT51S',
+  embedUrl: 'https://www.youtube-nocookie.com/embed/IS4YgAdW-H8',
+  inLanguage: 'fr',
+  publisher: {'@id': absolute_url(path('app_landing')) ~ '#organization'}
+}|json_encode(15)|raw }}
+</script>

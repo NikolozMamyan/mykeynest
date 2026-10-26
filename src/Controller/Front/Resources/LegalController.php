@@ -29,6 +29,18 @@ private function commonVars(): array
         ]);
     }
 
+    #[Route('/mentions-legales', name: 'legal_mentions', methods: ['GET'])]
+    public function mentions(): Response
+    {
+        return $this->render('legal/mentions.html.twig', $this->commonVars());
+    }
+
+    #[Route('/securite', name: 'app_security', methods: ['GET'])]
+    public function security(): Response
+    {
+        return $this->render('legal/security.html.twig');
+    }
+
     #[Route('/cgv', name: 'legal_cgv', methods: ['GET'])]
     public function cgv(): Response
     {

@@ -100,9 +100,9 @@
     {# ?? Breadcrumb ?? #}
     <nav class="aud-breadcrumb" aria-label="{{ 'business.audit.breadcrumb.aria'|trans }}">
         <div class="aud-breadcrumb-inner">
-            <a href="{{ path('app_landing') }}">{{ 'business.audit.breadcrumb.home'|trans }}</a>
+            <a href="{{ path('app_landing', app.request.locale == 'en' ? {lang: 'en'} : {}) }}">{{ 'business.audit.breadcrumb.home'|trans }}</a>
             <span class="aud-breadcrumb-sep">&rsaquo;</span>
-            <a href="{{ path('business_solution') }}">{{ 'business.audit.breadcrumb.solution'|trans }}</a>
+            <a href="{{ path('business_solution', app.request.locale == 'en' ? {lang: 'en'} : {}) }}">{{ 'business.audit.breadcrumb.solution'|trans }}</a>
             <span class="aud-breadcrumb-sep">&rsaquo;</span>
             <span class="aud-breadcrumb-current">{{ 'business.audit.breadcrumb.current'|trans }}</span>
         </div>
@@ -139,9 +139,9 @@
                 <li>{{ 'business.audit.summary.point3'|trans }}</li>
             </ul>
             <div class="aud-summary-actions">
-                <a href="{{ path('business_password_manager') }}" class="aud-summary-link">{{ isEn ? 'Password manager page' : 'Page gestionnaire de mots de passe' }}</a>
-                <a href="{{ path('business_solution') }}" class="aud-summary-link aud-summary-link--primary">{{ isEn ? 'View the full solution' : 'Voir la solution complete' }}</a>
-                <a href="{{ path('business_comparatif') }}" class="aud-summary-link">{{ isEn ? 'Open the comparison' : 'Ouvrir le comparatif' }}</a>
+                <a href="{{ path('business_password_manager', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="aud-summary-link">{{ isEn ? 'Password manager page' : 'Page gestionnaire de mots de passe' }}</a>
+                <a href="{{ path('business_solution', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="aud-summary-link aud-summary-link--primary">{{ isEn ? 'View the full solution' : 'Voir la solution complete' }}</a>
+                <a href="{{ path('business_comparatif', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="aud-summary-link">{{ isEn ? 'Open the comparison' : 'Ouvrir le comparatif' }}</a>
             </div>
         </div>
     </section>
@@ -266,7 +266,7 @@
             </div>
             <div class="aud-cta-actions">
                 <a href="mailto:contact@key-nest.com" class="aud-cta-btn-white">{{ 'business.audit.cta.primary'|trans }}</a>
-                <a href="{{ path('business_solution') }}" class="aud-cta-btn-ghost">{{ 'business.audit.cta.secondary'|trans }}</a>
+                <a href="{{ path('business_solution', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="aud-cta-btn-ghost">{{ 'business.audit.cta.secondary'|trans }}</a>
             </div>
         </div>
 

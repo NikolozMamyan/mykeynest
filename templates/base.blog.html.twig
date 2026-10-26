@@ -25,9 +25,12 @@
   {% block seo_open_graph %}{% endblock %}
   {% block seo_twitter %}{% endblock %}
   {% block seo_jsonld %}{% endblock %}
+  {% include 'components/seo/_organization.html.twig' %}
+  <link rel="stylesheet" href="{{ asset('styles/layouts/blog-layout.css') }}">
+  <link rel="stylesheet" href="{{ asset('styles/pages/blog-index.css') }}">
   {% block stylesheets %}{% endblock %}
   {% block javascripts %}
-    {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% block importmap %}{{ importmap('public') }}{% endblock %}
   {% endblock %}
   {% block extra_head %}{% endblock %}
   <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}">

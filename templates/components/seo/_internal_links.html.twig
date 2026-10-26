@@ -23,7 +23,7 @@
       <a href="{{ path(link.route, link.params|default({})) }}" class="seo-links-band__card" aria-label="{{ link.title }}">
         <div class="seo-links-band__visual">
           {% if link.image is defined and link.image is not empty %}
-            <img src="{{ asset(link.image) }}" alt="{{ link.imageAlt|default(link.title) }}" loading="lazy">
+            <img src="{{ asset(link.image) }}" alt="{{ link.imageAlt|default(link.title) }}" width="1376" height="768" loading="lazy" decoding="async">
           {% endif %}
           <div class="seo-links-band__visual-overlay">
             <span class="seo-links-band__visual-kicker">{{ link.kicker|default(link.label) }}</span>

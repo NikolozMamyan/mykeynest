@@ -1,3 +1,17 @@
+.public-guide { max-width: 1200px; margin: 64px auto; padding-inline: 24px; color: var(--color-text-dark); }
+.public-guide > h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -.035em; line-height: 1.2; }
+.public-guide p { color: var(--color-text-muted); line-height: 1.8; }
+.public-guide__intro, .public-guide--definition p { max-width: 85ch; }
+.public-guide__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-block: 28px; }
+.public-guide__section { padding: 28px; border: 1px solid var(--color-border); border-radius: 20px; background: var(--glass-card-bg); }
+.public-guide__section h3 { margin: 0 0 16px; font-size: 1.15rem; line-height: 1.4; }
+.public-guide__section p:last-child { margin-bottom: 0; }
+@media (max-width: 760px) {
+  .public-guide { margin-block: 40px; padding-inline: 20px; }
+  .public-guide__grid { grid-template-columns: 1fr; gap: 16px; }
+  .public-guide__section { padding: 22px; }
+}
+
 body.public-page :is(.hc-hero, .cat-hero, .cmp-hero, .aud-hero, .pmgr-hero, .install-hero, .blog-header) {
   background: radial-gradient(ellipse at 85% 10%, var(--public-accent-soft), transparent 65%), var(--glass-card-bg);
   border-color: var(--color-border);

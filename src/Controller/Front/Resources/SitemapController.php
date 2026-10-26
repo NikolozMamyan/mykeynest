@@ -10,6 +10,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class SitemapController extends AbstractController
 {
+    #[Route('/.well-known/{name}.txt', name: 'app_llms_alias', requirements: ['name' => 'llms|llms-full'], methods: ['GET'])]
+    public function llms(string $name): Response
+    {
+        $response = new Response(
+            file_get_contents($this->getParameter('kernel.project_dir').'/public/'.$name.'.txt'),
+            200,
+            ['Content-Type' => 'text/plain; charset=UTF-8'],
+        );
+        $response->setPublic()->setMaxAge(3600);
+
+        return $response;
+    }
+
     private function getHelpCenterData(): array
     {
         return [
@@ -71,11 +84,11 @@ final class SitemapController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         string $routeName,
         array $params,
-        \DateTimeInterface $lastmod,
+        ?\DateTimeInterface $lastmod,
         string $changefreq,
         string $priority
     ): array {
-        return [
+        $entries = [
             $this->entry(
                 $urlGenerator->generate($routeName, $params, UrlGeneratorInterface::ABSOLUTE_URL),
                 $lastmod,
@@ -89,6 +102,7 @@ final class SitemapController extends AbstractController
                 $priority
             ),
         ];
+        return in_array($routeName, ['legal_cgu', 'legal_cgv', 'legal_privacy'], true) ? [$entries[0]] : $entries;
     }
 
     #[Route('/sitemap.xml', name: 'sitemap', methods: ['GET'])]
@@ -97,13 +111,12 @@ final class SitemapController extends AbstractController
         ArticleRepository $articleRepository
     ): Response {
         $urls = [];
-        $now = new \DateTimeImmutable('now');
 
         $urls = array_merge($urls, $this->localizedPublicEntries(
             $urlGenerator,
             'app_landing',
             [],
-            $now,
+            null,
             'weekly',
             '1.0'
         ));
@@ -112,7 +125,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'app_public_generator',
             [],
-            $now,
+            null,
             'monthly',
             '1.0'
         ));
@@ -121,7 +134,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'app_help_center',
             [],
-            $now,
+            null,
             'weekly',
             '0.9'
         ));
@@ -131,7 +144,7 @@ final class SitemapController extends AbstractController
                 $urlGenerator,
                 'app_help_category',
                 ['slug' => $category['categorySlug']],
-                $now,
+                null,
                 'weekly',
                 '0.8'
             ));
@@ -144,7 +157,7 @@ final class SitemapController extends AbstractController
                         'categorySlug' => $category['categorySlug'],
                         'articleSlug' => $articleSlug,
                     ],
-                    $now,
+                    null,
                     'monthly',
                     '0.7'
                 ));
@@ -155,7 +168,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'business_solution',
             [],
-            $now,
+            null,
             'weekly',
             '0.9'
         ));
@@ -164,7 +177,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'business_comparatif',
             [],
-            $now,
+            null,
             'monthly',
             '0.8'
         ));
@@ -173,7 +186,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'business_audit',
             [],
-            $now,
+            null,
             'weekly',
             '0.8'
         ));
@@ -182,7 +195,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'business_password_manager',
             [],
-            $now,
+            null,
             'weekly',
             '0.9'
         ));
@@ -191,7 +204,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'legal_cgu',
             [],
-            $now,
+            null,
             'yearly',
             '0.3'
         ));
@@ -200,7 +213,7 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'legal_cgv',
             [],
-            $now,
+            null,
             'yearly',
             '0.3'
         ));
@@ -209,15 +222,21 @@ final class SitemapController extends AbstractController
             $urlGenerator,
             'legal_privacy',
             [],
-            $now,
+            null,
             'yearly',
             '0.3'
         ));
 
+        foreach (['legal_mentions', 'app_security'] as $route) {
+            $urls = array_merge($urls, $this->localizedPublicEntries(
+                $urlGenerator, $route, [], null, 'monthly', '0.6'
+            ));
+        }
+
         foreach (['fr', 'en'] as $locale) {
             $urls[] = $this->entry(
                 $urlGenerator->generate('blog_index', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),
-                $now,
+                null,
                 'weekly',
                 '0.9'
             );
@@ -254,7 +273,7 @@ final class SitemapController extends AbstractController
         );
     }
 
-    private function entry(string $loc, \DateTimeInterface $lastmod, string $changefreq, string $priority): array
+    private function entry(string $loc, ?\DateTimeInterface $lastmod, string $changefreq, string $priority): array
     {
         return [
             'loc' => $loc,

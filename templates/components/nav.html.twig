@@ -33,7 +33,7 @@
 
       <a href="/#features" class="nav-link" data-action="click->nav#smoothScroll">{{ 'landing.nav.features'|trans }}</a>
       <a href="/#pricing" class="nav-link" data-action="click->nav#smoothScroll">{{ 'landing.nav.pricing'|trans }}</a>
-      <a href="{{ path('app_help_center') }}" class="nav-link">{{ 'landing.footer.links.help_center'|trans }}</a>
+      <a href="{{ path('app_help_center', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="nav-link">{{ 'landing.footer.links.help_center'|trans }}</a>
 
       <a href="{{ path('blog_index', { _locale: app.request.locale }) }}"
          lang="{{ app.request.locale }}"
@@ -42,14 +42,14 @@
       </a>
 
       <div class="nav-cta nav-cta-mobile">
-        <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
-        <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
+        <a href="{{ path('show_login', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
+        <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
       </div>
     </div>
 
     <div class="nav-cta">
-      <a href="{{ path('show_login') }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
-      <a href="{{ path('show_register') }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
+      <a href="{{ path('show_login', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-outline">{{ 'landing.nav.login'|trans }}</a>
+      <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-primary">{{ 'landing.nav.free_trial'|trans }}</a>
 
       <div class="nav-lang" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
         {% set route = app.request.attributes.get('_route') %}

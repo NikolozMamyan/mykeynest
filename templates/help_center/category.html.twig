@@ -2,12 +2,10 @@
 
 {% block title %}{{ category.title }} | Centre d'aide | MYKEYNEST{% endblock %}
 
-{% block meta_description %}
-<meta name="description" content="{{ category.description }}">
-<meta property="og:title" content="{{ category.title }} | Centre d'aide MYKEYNEST">
-<meta property="og:description" content="{{ category.description }}">
-<meta property="og:type" content="website">
-{% endblock %}
+{% block description %}{{ category.description }}{% endblock %}
+{% block og_title %}{{ category.title }} | Centre d'aide MYKEYNEST{% endblock %}
+{% block og_description %}{{ category.description }}{% endblock %}
+{% block og_type %}website{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/help-category.css') }}">
@@ -25,29 +23,29 @@
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "{{ app.request.locale == 'en' ? 'Home' : 'Accueil' }}",
-          "item": "{{ absolute_url(path('app_landing', localeParams)) }}"
+          "name": {{ (app.request.locale == 'en' ? 'Home' : 'Accueil')|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_landing', localeParams))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "{{ 'help_category.breadcrumb.help_center'|trans|e('js') }}",
-          "item": "{{ absolute_url(path('app_help_center', localeParams)) }}"
+          "name": {{ 'help_category.breadcrumb.help_center'|trans|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_help_center', localeParams))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "{{ category.title|e('js') }}",
-          "item": "{{ absolute_url(path('app_help_category', localeParams|merge({ slug: category.slug }))) }}"
+          "name": {{ category.title|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_help_category', localeParams|merge({ slug: category.slug })))|json_encode(15)|raw }}
         }
       ]
     },
     {
       "@type": "CollectionPage",
-      "name": "{{ category.title|e('js') }}",
-      "url": "{{ absolute_url(path('app_help_category', localeParams|merge({ slug: category.slug }))) }}",
-      "inLanguage": "{{ app.request.locale|default('fr') }}",
-      "description": "{{ category.description|e('js') }}"
+      "name": {{ category.title|json_encode(15)|raw }},
+      "url": {{ absolute_url(path('app_help_category', localeParams|merge({ slug: category.slug })))|json_encode(15)|raw }},
+      "inLanguage": {{ app.request.locale|default('fr')|json_encode(15)|raw }},
+      "description": {{ category.description|json_encode(15)|raw }}
     }
   ]
 }
@@ -58,7 +56,7 @@
 <main>
     <nav class="cat-breadcrumb" aria-label="{{ 'help_category.breadcrumb.aria'|trans }}">
         <div class="cat-breadcrumb-inner">
-            <a href="{{ path('app_help_center') }}">
+            <a href="{{ path('app_help_center', app.request.locale == 'en' ? {lang: 'en'} : {}) }}">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -115,7 +113,7 @@
 
             <div class="cat-articles" id="catArticleList">
                 {% for article in articles %}
-                    <a href="{{ path('app_help_article', { categorySlug: category.slug, articleSlug: article.slug }) }}"
+                    <a href="{{ path('app_help_article', ({ categorySlug: category.slug, articleSlug: article.slug })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}"
                        class="cat-article-card"
                        data-popular="{{ article.popular ? 'true' : 'false' }}"
                        data-readtime="{{ article.readTime }}"
@@ -197,7 +195,7 @@
                 </div>
                 <div class="cat-other-grid">
                     {% for otherCat in otherCategories %}
-                        <a href="{{ path('app_help_category', { slug: otherCat.slug }) }}"
+                        <a href="{{ path('app_help_category', ({ slug: otherCat.slug })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}"
                            class="cat-sidebar-link"
                            {% if otherCat.slug == category.slug %}aria-current="page"{% endif %}>
                             <span class="cat-sidebar-link-icon" aria-hidden="true"><i class="{{ otherCat.iconClass }}"></i></span>

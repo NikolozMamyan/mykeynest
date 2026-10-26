@@ -3,6 +3,7 @@
 namespace App\Controller\Front\Resources;
 
 use App\Repository\ArticleRepository;
+use App\Service\BlogMedia;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,9 @@ public function index(
     $perPage = 10;
 
     $pagination = $repo->findPaginated($page, $perPage);
+    if ($page > $pagination['pages']) {
+        throw $this->createNotFoundException();
+    }
     $readingMinutes = [];
     foreach ($pagination['items'] as $article) {
         $content = $locale === 'fr' ? $article->getContentFr() : $article->getContentEn();
@@ -39,6 +43,9 @@ public function index(
     $seoTitle = $locale === 'fr'
         ? 'Blog cybersécurité & mots de passe | MyKeyNest'
         : 'Password security & cybersecurity blog | MyKeyNest';
+    if ($page > 1) {
+        $seoTitle .= ' — Page '.$page;
+    }
 
     $metaDesc = $locale === 'fr'
         ? 'Conseils pratiques pour sécuriser vos mots de passe : 2FA, gestionnaire de mots de passe, phishing, bonnes pratiques et guides.'
@@ -65,6 +72,7 @@ public function index(
     public function show(
         Request $request,
         ArticleRepository $repo,
+        BlogMedia $media,
         string $slug
     ): Response {
         $locale = $request->getLocale(); // fr|en
@@ -98,6 +106,7 @@ public function index(
             'content' => $content,
             'readingMinutes' => $this->calculateReadingMinutes($content),
             'coverImage' => $article->getCoverImage(),
+            'cover' => $article->getCoverImage() ? $media->image('/uploads/blog/'.$article->getCoverImage()) : null,
             'coverAlt' => $article->getCoverAlt($locale),
             'publishedAt' => $article->getPublishedAt(),
             'updatedAt' => $article->getUpdatedAt(),

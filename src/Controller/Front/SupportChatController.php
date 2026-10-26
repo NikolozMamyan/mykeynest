@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 final class SupportChatController extends AbstractController
 {
@@ -36,6 +37,15 @@ final class SupportChatController extends AbstractController
             'conversation' => $conversation,
             'conversationPayload' => $conversation ? $this->supportChatService->buildWidgetPayload($conversation) : null,
         ]);
+    }
+
+    #[Route('/support/chat/csrf-token', name: 'app_support_chat_csrf', methods: ['GET'])]
+    public function csrfToken(CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
+    {
+        $response = $this->json(['token' => $csrfTokenManager->getToken('support_chat_send')->getValue()]);
+        $response->headers->set('Cache-Control', 'private, no-store');
+
+        return $response;
     }
 
     #[Route('/support/chat/state', name: 'app_support_chat_state', methods: ['GET'])]

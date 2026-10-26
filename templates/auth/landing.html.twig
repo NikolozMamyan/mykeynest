@@ -1,14 +1,19 @@
 ﻿{% extends 'base_auth.html.twig' %}
 
-{% block title %}{{ app.request.locale == 'en' ? 'Share team access without revealing passwords | MYKEYNEST' : 'Partagez les accès sans révéler les mots de passe | MYKEYNEST' }}{% endblock %}
+{% block title %}{{ app.request.locale == 'en' ? 'MYKEYNEST — Password manager and team access sharing' : 'MYKEYNEST — Gestionnaire de mots de passe pour équipes' }}{% endblock %}
 {% block description %}{{ app.request.locale == 'en' ? 'MYKEYNEST helps SMBs and agencies centralize credentials, control sharing, and fill sign-in forms from the browser extension.' : 'MYKEYNEST aide les PME et agences à centraliser leurs identifiants, contrôler les partages et remplir les connexions depuis l’extension navigateur.' }}{% endblock %}
-{% block og_title %}{{ app.request.locale == 'en' ? 'Share team access without revealing passwords | MYKEYNEST' : 'Partagez les accès sans révéler les mots de passe | MYKEYNEST' }}{% endblock %}
+{% block og_title %}{{ app.request.locale == 'en' ? 'MYKEYNEST — Password manager and team access sharing' : 'MYKEYNEST — Gestionnaire de mots de passe pour équipes' }}{% endblock %}
 {% block og_description %}{{ app.request.locale == 'en' ? 'Centralize business credentials and decide how each teammate or external collaborator can use them.' : 'Centralisez les identifiants de l’entreprise et choisissez comment chaque collaborateur ou prestataire peut les utiliser.' }}{% endblock %}
 {% block twitter_title %}{{ app.request.locale == 'en' ? 'Controlled access sharing for SMBs | MYKEYNEST' : 'Partage d’accès contrôlé pour PME | MYKEYNEST' }}{% endblock %}
 {% block twitter_description %}{{ app.request.locale == 'en' ? 'Password management, controlled sharing, and browser autofill for teams.' : 'Gestion des mots de passe, partage contrôlé et auto-remplissage pour les équipes.' }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/landing.css') }}">
+{% endblock %}
+
+{% block seo_jsonld %}
+  {% include 'components/seo/_software.html.twig' %}
+  {% include 'components/seo/_demo_video.html.twig' %}
 {% endblock %}
 
 {% block body_class %}landing-page{% endblock %}
@@ -28,7 +33,7 @@
       </h1>
       <p class="hero-sub">{{ 'landing.hero.subtitle'|trans }}</p>
       <div class="hero-cta">
-        <a href="{{ path('show_register') }}" class="btn btn-primary btn-lg btn-w" aria-label="{{ 'landing.hero.cta_start_aria'|trans }}">
+        <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-primary btn-lg btn-w" aria-label="{{ 'landing.hero.cta_start_aria'|trans }}">
           {{ 'landing.hero.cta_start'|trans }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </a>
         <a href="#how-it-works" class="btn btn-outline btn-lg btn-w"><i class="fas fa-circle-play" aria-hidden="true"></i> {{ 'landing.hero.cta_discover'|trans }}</a>
@@ -105,6 +110,9 @@
     </div>
   </div>
 </section>
+
+{% include 'components/seo/_product_definition.html.twig' %}
+
 
 {# STRIP #}
 <div class="strip">
@@ -281,7 +289,7 @@
           <h3>{{ 'landing.pricing.showcase.starter.name'|trans }}</h3>
           <p class="p-tag">{{ 'landing.pricing.showcase.starter.target'|trans }}</p>
           <p class="p-price"><span>0€</span> <small>{{ 'landing.pricing.showcase.per_month'|trans }}</small></p>
-          <a href="{{ path('show_register') }}" class="btn p-cta" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">{{ 'landing.pricing.showcase.starter.cta'|trans }}</a>
+          <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn p-cta" aria-label="{{ 'landing.pricing.plan.basic_aria'|trans }}">{{ 'landing.pricing.showcase.starter.cta'|trans }}</a>
         </div>
         <p class="p-included"><i class="fas fa-user"></i> {{ 'landing.pricing.showcase.starter.included'|trans }}</p>
         <ul class="p-feats">
@@ -418,10 +426,10 @@
       <h2>{{ 'landing.cta.title'|trans }}</h2>
       <p>{{ 'landing.cta.subtitle'|trans }}</p>
       <div class="cta-btns">
-        <a href="{{ path('show_register') }}" class="btn btn-primary btn-lg btn-w">
+        <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-primary btn-lg btn-w">
           {{ 'landing.cta.start'|trans }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </a>
-        <a href="{{ path('show_login') }}" class="btn btn-outline btn-lg btn-w">{{ 'landing.cta.login'|trans }}</a>
+        <a href="{{ path('show_login', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-outline btn-lg btn-w">{{ 'landing.cta.login'|trans }}</a>
       </div>
       <p class="cta-note"><i class="fas fa-circle-check"></i> {{ 'landing.cta.note'|trans }}</p>
     </div>
@@ -430,17 +438,9 @@
 </main>
 
 {# JSON-LD FAQ #}
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-  {"@type":"Question","name":"{{ 'landing.faq.items.q1'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a1'|trans|e('js') }}"}},
-  {"@type":"Question","name":"{{ 'landing.faq.items.q2'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a2'|trans|e('js') }}"}},
-  {"@type":"Question","name":"{{ 'landing.faq.items.q3'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a3'|trans|e('js') }}"}},
-  {"@type":"Question","name":"{{ 'landing.faq.items.q4'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a4'|trans|e('js') }}"}},
-  {"@type":"Question","name":"{{ 'landing.faq.items.q5'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a5'|trans|e('js') }}"}},
-  {"@type":"Question","name":"{{ 'landing.faq.items.q6'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a6'|trans|e('js') }}"}},
-  {"@type":"Question","name":"{{ 'landing.faq.items.q7'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a7'|trans|e('js') }}"}},
-  {"@type":"Question","name":"{{ 'landing.faq.items.q8'|trans|e('js') }}","acceptedAnswer":{"@type":"Answer","text":"{{ 'landing.faq.items.a8'|trans|e('js') }}"}}
-]}
-</script>
+{% set questions = [] %}
+{% for number in 1..7 %}
+  {% set questions = questions|merge([{'@type': 'Question', name: ('landing.faq.items.q' ~ number)|trans, acceptedAnswer: {'@type': 'Answer', text: ('landing.faq.items.a' ~ number)|trans|striptags}}]) %}
+{% endfor %}
+<script type="application/ld+json">{{ {'@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: questions}|json_encode(15)|raw }}</script>
 {% endblock %}
-

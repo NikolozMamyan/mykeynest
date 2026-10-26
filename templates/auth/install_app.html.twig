@@ -306,7 +306,7 @@
 {% endblock %}
 
 {% block body %}
-  {% set nextRoute = app.user ? path('app_credential') : path('show_register') %}
+  {% set nextRoute = app.user ? path('app_credential') : path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) %}
   {% set nextLabel = app.user ? 'install_app.hero.secondary_cta_logged'|trans : 'install_app.hero.secondary_cta_guest'|trans %}
 
   <section class="install-app-page">

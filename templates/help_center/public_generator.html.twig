@@ -2,13 +2,14 @@
 
 {% block title %}{{ app.request.locale == 'en' ? 'Free Secure Password Generator | MYKEYNEST' : 'Generateur de mot de passe securise gratuit | MYKEYNEST' }}{% endblock %}
 
-{% block meta_description %}
+{% block description %}{{ 'public_generator.hero.subtitle'|trans }}{% endblock %}
+{% block og_title %}{{ app.request.locale == 'en' ? 'Free Secure Password Generator | MYKEYNEST' : 'Generateur de mot de passe securise gratuit | MYKEYNEST' }}{% endblock %}
+{% block og_description %}{{ 'public_generator.hero.subtitle'|trans }}{% endblock %}
+{% block og_type %}website{% endblock %}
+{% block twitter_card %}summary_large_image{% endblock %}
+
+{% block head_extras %}
 {% set localeParams = app.request.locale == 'en' ? { lang: 'en' } : {} %}
-<meta name="description" content="{{ 'public_generator.hero.subtitle'|trans }}">
-<meta property="og:title" content="{{ app.request.locale == 'en' ? 'Free Secure Password Generator | MYKEYNEST' : 'Generateur de mot de passe securise gratuit | MYKEYNEST' }}">
-<meta property="og:description" content="{{ 'public_generator.hero.subtitle'|trans }}">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -19,29 +20,29 @@
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "{{ app.request.locale == 'en' ? 'Home' : 'Accueil' }}",
-          "item": "{{ absolute_url(path('app_landing', localeParams)) }}"
+          "name": {{ (app.request.locale == 'en' ? 'Home' : 'Accueil')|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_landing', localeParams))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "{{ app.request.locale == 'en' ? 'Help center' : 'Centre d aide' }}",
-          "item": "{{ absolute_url(path('app_help_center', localeParams)) }}"
+          "name": {{ (app.request.locale == 'en' ? 'Help center' : 'Centre d aide')|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_help_center', localeParams))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 3,
-          "name": "{{ app.request.locale == 'en' ? 'Password generator' : 'Generateur de mot de passe' }}",
-          "item": "{{ absolute_url(path('app_public_generator', localeParams)) }}"
+          "name": {{ (app.request.locale == 'en' ? 'Password generator' : 'Generateur de mot de passe')|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_public_generator', localeParams))|json_encode(15)|raw }}
         }
       ]
     },
     {
       "@type": "WebPage",
-      "name": "{{ app.request.locale == 'en' ? 'MYKEYNEST Password Generator' : 'Generateur de mot de passe MYKEYNEST' }}",
-      "url": "{{ absolute_url(path('app_public_generator', localeParams)) }}",
-      "inLanguage": "{{ app.request.locale|default('fr') }}",
-      "description": "{{ 'public_generator.hero.subtitle'|trans|e('js') }}"
+      "name": {{ (app.request.locale == 'en' ? 'MYKEYNEST Password Generator' : 'Generateur de mot de passe MYKEYNEST')|json_encode(15)|raw }},
+      "url": {{ absolute_url(path('app_public_generator', localeParams))|json_encode(15)|raw }},
+      "inLanguage": {{ app.request.locale|default('fr')|json_encode(15)|raw }},
+      "description": {{ 'public_generator.hero.subtitle'|trans|json_encode(15)|raw }}
     }
   ]
 }
@@ -215,7 +216,7 @@
         <div class="cta-content">
             <h2 class="cta-title" style="color:white;">{{ 'public_generator.cta.title'|trans }}</h2>
             <p class="cta-description" style="color:white;">{{ 'public_generator.cta.description'|trans }}</p>
-            <a href="{{ path('show_register') }}" class="cta-btn">{{ 'public_generator.cta.button'|trans }}</a>
+            <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="cta-btn">{{ 'public_generator.cta.button'|trans }}</a>
         </div>
     </section>
 </main>

@@ -1,0 +1,80 @@
+{
+  "solution": {
+    "title": "Construire une démarche de cybersécurité adaptée à votre PME",
+    "intro": "La cybersécurité d’une PME commence par des responsabilités claires et des gestes que l’équipe peut appliquer chaque jour. Le gestionnaire de mots de passe prend en charge une partie de cette démarche : organiser les identifiants et les partages. Il s’inscrit dans un ensemble plus large qui comprend la protection des appareils, les sauvegardes, la messagerie et la capacité à réagir à un incident.",
+    "sections": {
+      "1": {
+        "title": "Identifier les comptes qui peuvent bloquer l’activité",
+        "first": "Commencez par votre messagerie principale, le nom de domaine, l’hébergement, la facturation et les outils utilisés pour travailler avec vos clients. Pour chaque service, notez un responsable, les personnes autorisées et la procédure de récupération. Un compte oublié peut devenir un point de blocage lorsque la seule personne qui le connaît est absente ou quitte l’entreprise.",
+        "second": "Classez ensuite les accès selon les conséquences d’une perte : arrêt de production, perte de données ou exposition d’informations clients. Traitez d’abord les comptes dont dépend la récupération des autres, notamment l’e-mail professionnel. Cet inventaire sert à décider des priorités. Évitez d’y inscrire les mots de passe en clair : conservez les secrets dans le coffre et les informations d’organisation dans votre procédure interne."
+      },
+      "2": {
+        "title": "Réduire les risques les plus fréquents",
+        "first": "Attribuez un mot de passe différent à chaque service et activez la double authentification lorsque celui-ci la propose. Séparez les comptes administrateurs des comptes utilisés au quotidien. Sur les services qui le permettent, privilégiez des comptes nominatifs : ils facilitent la révocation d’un accès individuel et réduisent le besoin de partager un compte commun entre plusieurs personnes.",
+        "second": "Complétez ce travail par la mise à jour des appareils, une sauvegarde testée et une procédure simple pour signaler un message suspect. Expliquez comment vérifier le domaine d’un site avant de se connecter et qui contacter en cas de doute. Le coffre limite la dispersion des identifiants ; il ne remplace ni la vigilance face au phishing ni la protection d’un ordinateur compromis."
+      },
+      "3": {
+        "title": "Encadrer les arrivées, les missions et les départs",
+        "first": "À l’arrivée d’un collaborateur, préparez une liste des outils nécessaires à sa mission et attribuez uniquement les droits utiles. Pour un prestataire, précisez dès le départ le périmètre, le propriétaire de chaque compte et la date prévue de fin de mission. Utilisez les permissions de partage disponibles et vérifiez le parcours du destinataire avant de généraliser la méthode à toute l’équipe.",
+        "second": "Au départ, retirez les partages du coffre, désactivez les comptes nominatifs et fermez les sessions sur les services concernés. Changez les mots de passe communs lorsque la personne a pu les connaître. Révoquer un partage dans MYKEYNEST ne déconnecte pas automatiquement un utilisateur déjà connecté à un outil tiers. Une checklist commune évite que ces opérations dépendent de la mémoire du responsable."
+      },
+      "4": {
+        "title": "Mesurer les progrès et préparer la réaction à un incident",
+        "first": "Chaque mois, vérifiez quelques indicateurs concrets : comptes critiques avec un responsable identifié, double authentification activée, partages encore justifiés et départs effectivement traités. Choisissez un périmètre réduit pour commencer, puis étendez-le une fois le processus compris. Une procédure utilisée sur dix comptes critiques apporte davantage qu’un document exhaustif que personne ne sait maintenir ou appliquer.",
+        "second": "Prévoyez aussi les premières actions en cas d’incident : contacter le responsable, révoquer les sessions suspectes, renouveler les identifiants concernés et conserver les éléments nécessaires à l’analyse. Si vous souhaitez un accompagnement, l’audit et la sensibilisation font l’objet d’un périmètre distinct, à définir selon vos besoins. L’usage d’un gestionnaire ne constitue, à lui seul, aucune preuve de conformité réglementaire."
+      }
+    }
+  },
+  "password_manager": {
+    "title": "Déployer un gestionnaire de mots de passe dans votre équipe",
+    "intro": "MYKEYNEST sert à gérer les identifiants de travail et à organiser leur utilisation par des personnes autorisées. Le bon déploiement se vérifie sur un parcours concret : créer un accès, le partager, l’utiliser depuis l’extension puis le révoquer. Commencez par un compte de test et quelques collaborateurs avant d’importer les accès sensibles de toute l’entreprise.",
+    "sections": {
+      "1": {
+        "title": "Préparer le coffre et les premiers identifiants",
+        "first": "Créez votre compte avec un mot de passe unique et protégez également l’adresse e-mail utilisée pour la récupération. Ajoutez ensuite un premier identifiant en vérifiant le nom du service, son URL et le compte concerné. Une désignation explicite, par exemple le nom du client et de l’outil, permet de choisir le bon accès lorsque plusieurs comptes utilisent le même site.",
+        "second": "Si vous importez un fichier CSV, vérifiez les colonnes et commencez par un petit échantillon. Les fichiers d’export peuvent contenir des secrets en clair : contrôlez où ils sont enregistrés et supprimez les copies devenues inutiles après vérification. Ne considérez pas une importation terminée comme une validation des droits : le propriétaire doit encore décider quels identifiants partager et avec quelles personnes."
+      },
+      "2": {
+        "title": "Partager avec un collaborateur ou un prestataire",
+        "first": "Choisissez le destinataire et les permissions correspondant à sa mission. L’autorisation d’utiliser un accès, celle d’afficher le mot de passe et celle de le modifier répondent à des besoins différents. Pour une mission courte, évitez d’accorder la modification si la personne doit seulement se connecter. Vérifiez aussi les conditions du service cible : certains services imposent un compte nominatif ou limitent le partage d’un compte.",
+        "second": "Testez le partage avec le destinataire : l’accès doit apparaître dans son espace et fonctionner avec l’extension associée à son compte. Lorsque l’affichage du mot de passe est désactivé, l’interface ne propose pas sa révélation. Le navigateur reçoit toutefois les données nécessaires au remplissage. Cette permission encadre l’usage dans le produit ; elle ne rend pas le mot de passe techniquement impossible à extraire du navigateur."
+      },
+      "3": {
+        "title": "Vérifier la connexion puis la fin d’accès",
+        "first": "Installez et associez l’extension, ouvrez le site cible et vérifiez son domaine avant de remplir le formulaire. Si le formulaire ne se remplit pas, consultez le guide de dépannage plutôt que de transmettre le mot de passe par messagerie. Certains sites utilisent des formulaires particuliers ou demandent une validation supplémentaire : testez les outils réellement utilisés par l’équipe pendant votre phase pilote.",
+        "second": "En fin de mission, révoquez le partage et vérifiez que le destinataire ne peut plus utiliser cet accès par MYKEYNEST. Cette action ne ferme pas les sessions déjà ouvertes sur le site cible. Le responsable de ce service doit donc également révoquer ses sessions et, si nécessaire, renouveler le mot de passe commun. Documentez ces deux opérations dans votre procédure de départ pour éviter de les confondre."
+      },
+      "4": {
+        "title": "Choisir une offre et une architecture adaptées",
+        "first": "Le compte gratuit permet d’évaluer le parcours avant de choisir une offre payante. Consultez les limites actuelles de stockage, de partage et d’équipe sur la page des tarifs, puis estimez votre besoin à partir du nombre de personnes et de services concernés. Vérifiez les fonctions pendant l’essai : une liste de fonctionnalités ne remplace pas une démonstration avec vos contraintes de travail.",
+        "second": "MYKEYNEST chiffre les mots de passe côté serveur avec AES-256-GCM. Le serveur peut les déchiffrer lors des opérations autorisées ; il ne s’agit pas d’un coffre à connaissance nulle. Si votre politique de sécurité exige un chiffrement de bout en bout dont le fournisseur ne détient pas les clés, ce critère doit guider votre choix. Consultez l’architecture publiée et validez les exigences particulières avant le déploiement."
+      }
+    }
+  },
+  "comparatif": {
+    "title": "Comment comparer les gestionnaires de mots de passe pour une entreprise ?",
+    "intro": "Un comparatif utile relie les fonctions à une situation de travail précise. Une agence qui partage des accès clients et une entreprise qui exige une architecture à connaissance nulle n’évaluent pas les mêmes critères. Le tableau fournit un premier repère ; confirmez ensuite les fonctions, les limites et les prix dans l’offre officielle de chaque éditeur au moment de votre décision.",
+    "sections": {
+      "1": {
+        "title": "Définir les exigences avant de regarder le tarif",
+        "first": "Listez les personnes qui doivent utiliser le coffre, les navigateurs et appareils concernés, les services à connecter et les règles de départ des collaborateurs. Distinguez les critères indispensables des préférences : authentification multifacteur, récupération du compte, chiffrement, export et support. Si une exigence de sécurité est bloquante, vérifiez-la avant de comparer les écarts de prix entre les abonnements disponibles.",
+        "second": "Pour MYKEYNEST, le stockage des mots de passe repose sur un chiffrement AES-256-GCM côté serveur, avec déchiffrement pendant les opérations autorisées. Ce modèle diffère d’un coffre à connaissance nulle. Demandez la documentation technique correspondante à chaque fournisseur et utilisez le même niveau d’exigence pour les comparer. Un nom d’algorithme, même reconnu, ne suffit pas à décrire la gestion des clés et les limites d’accès du fournisseur."
+      },
+      "2": {
+        "title": "Tester le partage dans un vrai parcours utilisateur",
+        "first": "Créez un accès de démonstration, partagez-le avec une seconde personne et ouvrez sa session pour vérifier ce qu’elle voit. Testez séparément l’usage de l’identifiant, l’affichage du mot de passe et la modification. Pour une agence, répétez l’exercice avec un prestataire externe. Vérifiez aussi la simplicité de l’installation de l’extension et la connexion aux formulaires des outils que vous utilisez réellement.",
+        "second": "Retirez ensuite le partage et contrôlez le résultat. Une révocation dans le gestionnaire et une fermeture de session sur le service cible sont deux opérations distinctes. Vérifiez que votre procédure traite les deux. Les mots de passe partagés peuvent également avoir été copiés ou utilisés auparavant : un mode sans affichage dans l’interface ne constitue pas une garantie absolue contre leur récupération sur un appareil contrôlé par le destinataire."
+      },
+      "3": {
+        "title": "Comparer le coût total et les limites de l’offre",
+        "first": "Calculez le coût pour l’ensemble de l’équipe en tenant compte du nombre minimal de sièges, de la période de facturation et des fonctions réservées à certains abonnements. Vérifiez ce qui arrive aux accès et aux partages en cas de changement d’offre. Consultez aussi les modalités d’export : une décision doit rester compatible avec une migration future ou un changement d’organisation.",
+        "second": "MYKEYNEST propose un compte gratuit pour essayer le produit ainsi que des offres payantes dont les limites sont présentées sur le site. Pour Bitwarden et 1Password, consultez leurs pages officielles avant d’établir votre budget. Les offres évoluent et un prix isolé peut omettre des conditions importantes. Comparez un périmètre identique et conservez la date et les hypothèses de votre évaluation interne."
+      },
+      "4": {
+        "title": "Organiser un pilote avant la généralisation",
+        "first": "Choisissez quelques utilisateurs représentatifs : une personne qui administre les accès, une personne qui les utilise au quotidien et, si nécessaire, un prestataire. Définissez des tâches simples à réussir sans assistance : retrouver le bon compte, partager un accès, utiliser l’extension et signaler une difficulté. Recueillez les retours après quelques jours et mesurez le temps consacré à l’aide et à la maintenance.",
+        "second": "Prenez votre décision à partir des résultats du pilote, de l’architecture et des engagements contractuels disponibles. Aucun gestionnaire ne rend automatiquement une organisation conforme au RGPD et aucun tableau commercial ne remplace une analyse de risque. Une solution adaptée doit répondre à vos exigences techniques tout en restant suffisamment compréhensible pour être utilisée correctement par l’équipe, y compris pendant une absence ou un départ."
+      }
+    }
+  }
+}

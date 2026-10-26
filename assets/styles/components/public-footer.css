@@ -45,7 +45,7 @@
 .public-footer__mobile > i { color: var(--color-text-light); font-size: .8rem; }
 
 .public-footer__column { display: flex; flex-direction: column; align-items: flex-start; gap: 11px; }
-.public-footer__column h2 { margin: 0 0 5px; color: var(--color-text-dark); font-size: .76rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.public-footer__title { margin: 0 0 5px; color: var(--color-text-dark); font-size: .76rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
 .public-footer__column a { color: var(--color-text-muted); font-size: .86rem; line-height: 1.45; text-decoration: none; }
 .public-footer__column a:hover { color: var(--color-primary); }
 

@@ -5,7 +5,7 @@
   data-controller="support-chat"
   data-support-chat-send-url-value="{{ path('app_support_chat_send') }}"
   data-support-chat-state-url-value="{{ path('app_support_chat_state') }}"
-  data-support-chat-csrf-token-value="{{ csrf_token('support_chat_send') }}"
+  data-support-chat-csrf-url-value="{{ path('app_support_chat_csrf') }}"
   data-support-chat-initial-conversation-value='{{ payloadJson|e('html_attr') }}'
   data-support-chat-visitor-label-value="{{ 'support_chat.visitor_label'|trans|e('html_attr') }}"
   data-support-chat-admin-label-value="{{ 'support_chat.admin_label'|trans|e('html_attr') }}"

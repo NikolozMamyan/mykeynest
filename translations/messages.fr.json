@@ -249,7 +249,7 @@
     },
     "hero": {
       "eyebrow": "Gestion des accès pour PME et agences",
-      "title_before": "Vos accès.",
+      "title_before": "Vos mots de passe.",
       "title_highlight": "Vos règles.",
       "subtitle": "Centralisez les identifiants de votre entreprise. Partagez les accès sans dévoiler les mots de passe. Gardez le contrôle, même en équipe.",
       "hint": "Compte gratuit · Sans carte bancaire",
@@ -2584,7 +2584,7 @@
   "business": {
     "solution": {
       "meta": {
-        "title": "Gestion des accès et mots de passe pour PME | MYKEYNEST",
+        "title": "Cybersécurité PME : organiser et protéger les accès | MYKEYNEST",
         "description": "MYKEYNEST aide les PME et agences à centraliser leurs identifiants, partager des accès contrôlés et gérer les membres depuis un espace commun.",
         "keywords": "cybersécurité PME, sécurité informatique PME, solution cybersécurité entreprise, gestionnaire de mot de passe entreprise, password manager entreprise, sécuriser mots de passe PME, audit cybersécurité PME, audit sécurité informatique PME, protection contre ransomware PME, conformité RGPD PME"
       },
@@ -2594,9 +2594,9 @@
       },
       "hero": {
         "eyebrow": "Solution entreprise",
-        "h1_before": "Centralisez les identifiants de votre PME et",
-        "h1_highlight": "contrôlez les accès",
-        "h1_after": "de chaque collaborateur",
+        "h1_before": "Cybersécurité PME :",
+        "h1_highlight": "organisez les accès",
+        "h1_after": "et réduisez les risques au quotidien",
         "subtitle": "Enregistrez les mots de passe professionnels, partagez-les selon le bon niveau d’autorisation et retirez les accès qui ne sont plus nécessaires.",
         "cta_primary": "Démarrer gratuitement",
         "cta_secondary": "Demander un audit",

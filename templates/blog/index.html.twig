@@ -23,7 +23,7 @@
     <meta property="og:locale:alternate" content="fr_FR">
     <meta property="og:locale:alternate" content="en_US">
     {% if featured and featured.coverImage %}
-        <meta property="og:image" content="{{ absolute_url(asset('uploads/blog/' ~ featured.coverImage)) }}">
+        <meta property="og:image" content="{{ absolute_url(blog_image('/uploads/blog/' ~ featured.coverImage).src) }}">
         <meta property="og:image:alt" content="{{ featured.getCoverAlt(app.request.locale) }}">
     {% endif %}
 {% endblock %}
@@ -34,7 +34,7 @@
     <meta name="twitter:title" content="{{ vm.seoTitle }}">
     <meta name="twitter:description" content="{{ vm.metaDesc }}">
     {% if featured and featured.coverImage %}
-        <meta name="twitter:image" content="{{ absolute_url(asset('uploads/blog/' ~ featured.coverImage)) }}">
+        <meta name="twitter:image" content="{{ absolute_url(blog_image('/uploads/blog/' ~ featured.coverImage).src) }}">
         <meta name="twitter:image:alt" content="{{ featured.getCoverAlt(app.request.locale) }}">
     {% endif %}
 {% endblock %}
@@ -44,10 +44,10 @@
 {
   "@context": "https://schema.org",
   "@type": "Blog",
-  "name": "{{ vm.seoTitle|e('js') }}",
-  "description": "{{ vm.metaDesc|e('js') }}",
-  "url": "{{ vm.canonical|e('js') }}",
-  "inLanguage": "{{ app.request.locale|e('js') }}"
+  "name": {{ vm.seoTitle|json_encode(15)|raw }},
+  "description": {{ vm.metaDesc|json_encode(15)|raw }},
+  "url": {{ vm.canonical|json_encode(15)|raw }},
+  "inLanguage": {{ app.request.locale|json_encode(15)|raw }}
 }
 </script>
 {% endblock %}
@@ -98,17 +98,17 @@
             }) %}
             {% set title = app.request.locale == 'fr' ? a.h1Fr : a.h1En %}
             {% set desc = app.request.locale == 'fr' ? a.metaDescFr : a.metaDescEn %}
+            {% set cover = a.coverImage ? blog_image('/uploads/blog/' ~ a.coverImage, 960) : null %}
 
             <article class="post-card {{ loop.first ? 'post-card--featured' : '' }}">
                 <a class="post-card__link" href="{{ url }}" aria-label="{{ title }}">
                     <div class="post-image">
                         <img
-                          src="{{ a.coverImage ? asset('uploads/blog/' ~ a.coverImage) : asset('images/blog/blog-default.webp') }}"
+                          src="{{ cover ? cover.src : asset('images/seo/gestoinnaire-mots-passes.webp') }}"
                           alt="{{ a.getCoverAlt(app.request.locale) ?? 'Blog MYKEYNEST' }}"
                           {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
                           decoding="async"
-                          width="800"
-                          height="450"
+                          {% if cover and cover.width %}width="{{ cover.width }}" height="{{ cover.height }}"{% else %}width="1376" height="768"{% endif %}
                         >
                         <span class="post-category">{{ app.request.locale == 'fr' ? 'Guide pratique' : 'Practical guide' }}</span>
                     </div>

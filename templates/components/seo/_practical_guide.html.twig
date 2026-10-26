@@ -1,0 +1,14 @@
+<section class="public-guide" aria-labelledby="{{ guide }}-guide-title">
+  <h2 id="{{ guide }}-guide-title">{{ (guide ~ '.title')|trans({}, 'seo') }}</h2>
+  <p class="public-guide__intro">{{ (guide ~ '.intro')|trans({}, 'seo') }}</p>
+  <div class="public-guide__grid">
+    {% for number in 1..4 %}
+      <section class="public-guide__section">
+        <h3>{{ (guide ~ '.sections.' ~ number ~ '.title')|trans({}, 'seo') }}</h3>
+        <p>{{ (guide ~ '.sections.' ~ number ~ '.first')|trans({}, 'seo') }}</p>
+        <p>{{ (guide ~ '.sections.' ~ number ~ '.second')|trans({}, 'seo') }}</p>
+      </section>
+    {% endfor %}
+  </div>
+  <p><a href="{{ path('app_security', app.request.locale == 'en' ? {lang: 'en'} : {}) }}">{{ app.request.locale == 'en' ? 'Read about the security architecture and sharing limits' : 'Consulter l’architecture de sécurité et les limites du partage' }}</a></p>
+</section>

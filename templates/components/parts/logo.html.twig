@@ -1,4 +1,4 @@
-<a href="{{ path('app_landing') }}" class="nav-logo">
+<a href="{{ path('app_landing', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="nav-logo">
   <div class="nav-logo-icon">
     {% include 'components/parts/_dot_mark.html.twig' with { extraClass: 'nav-logo-mark' } only %}
   </div>

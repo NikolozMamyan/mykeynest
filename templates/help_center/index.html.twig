@@ -2,13 +2,11 @@
 
 {% block title %}{{ app.request.locale == 'en' ? 'Cybersecurity Help Center for SMBs | MYKEYNEST' : 'Centre d aide cybersécurité PME | MYKEYNEST' }}{% endblock %}
 
-{% block meta_description %}
-<meta name="description" content="{{ app.request.locale == 'en' ? 'Help center for SMB cybersecurity, password manager setup, phishing awareness, browser extension support, and secure password best practices.' : 'Centre d aide sur la cybersécurité PME, le gestionnaire de mots de passe, le phishing, l extension navigateur et les bonnes pratiques pour sécuriser les mots de passe.' }}">
-<meta name="keywords" content="{{ app.request.locale == 'en' ? 'help center password manager, SMB cybersecurity help, phishing awareness, secure password guide, browser extension support' : 'centre aide cybersécurité PME, aide gestionnaire de mot de passe, sécuriser mots de passe PME, phishing entreprise, support extension navigateur' }}">
-<meta property="og:title" content="{{ app.request.locale == 'en' ? 'Cybersecurity Help Center for SMBs | MYKEYNEST' : 'Centre d aide cybersécurité PME | MYKEYNEST' }}">
-<meta property="og:description" content="{{ app.request.locale == 'en' ? 'Guides and answers about passwords, phishing, browser extension setup, and SMB cybersecurity.' : 'Guides et réponses sur les mots de passe, le phishing, l extension navigateur et la cybersécurité PME.' }}">
-<meta property="og:type" content="website">
-{% endblock %}
+{% block description %}{{ app.request.locale == 'en' ? 'Help center for SMB cybersecurity, password manager setup, phishing awareness, browser extension support, and secure password best practices.' : 'Centre d aide sur la cybersécurité PME, le gestionnaire de mots de passe, le phishing, l extension navigateur et les bonnes pratiques pour sécuriser les mots de passe.' }}{% endblock %}
+{% block keywords %}{{ app.request.locale == 'en' ? 'help center password manager, SMB cybersecurity help, phishing awareness, secure password guide, browser extension support' : 'centre aide cybersécurité PME, aide gestionnaire de mot de passe, sécuriser mots de passe PME, phishing entreprise, support extension navigateur' }}{% endblock %}
+{% block og_title %}{{ app.request.locale == 'en' ? 'Cybersecurity Help Center for SMBs | MYKEYNEST' : 'Centre d aide cybersécurité PME | MYKEYNEST' }}{% endblock %}
+{% block og_description %}{{ app.request.locale == 'en' ? 'Guides and answers about passwords, phishing, browser extension setup, and SMB cybersecurity.' : 'Guides et réponses sur les mots de passe, le phishing, l extension navigateur et la cybersécurité PME.' }}{% endblock %}
+{% block og_type %}website{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/help-center.css') }}">
@@ -26,23 +24,23 @@
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "{{ app.request.locale == 'en' ? 'Home' : 'Accueil' }}",
-          "item": "{{ absolute_url(path('app_landing', localeParams)) }}"
+          "name": {{ (app.request.locale == 'en' ? 'Home' : 'Accueil')|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_landing', localeParams))|json_encode(15)|raw }}
         },
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "{{ app.request.locale == 'en' ? 'Help center' : 'Centre d aide' }}",
-          "item": "{{ absolute_url(path('app_help_center', localeParams)) }}"
+          "name": {{ (app.request.locale == 'en' ? 'Help center' : 'Centre d aide')|json_encode(15)|raw }},
+          "item": {{ absolute_url(path('app_help_center', localeParams))|json_encode(15)|raw }}
         }
       ]
     },
     {
       "@type": "CollectionPage",
-      "name": "{{ app.request.locale == 'en' ? 'MYKEYNEST Help Center' : 'Centre d aide MYKEYNEST' }}",
-      "url": "{{ absolute_url(path('app_help_center', localeParams)) }}",
-      "inLanguage": "{{ app.request.locale|default('fr') }}",
-      "description": "{{ 'help_center.hero.subtitle'|trans|e('js') }}"
+      "name": {{ (app.request.locale == 'en' ? 'MYKEYNEST Help Center' : 'Centre d aide MYKEYNEST')|json_encode(15)|raw }},
+      "url": {{ absolute_url(path('app_help_center', localeParams))|json_encode(15)|raw }},
+      "inLanguage": {{ app.request.locale|default('fr')|json_encode(15)|raw }},
+      "description": {{ 'help_center.hero.subtitle'|trans|json_encode(15)|raw }}
     }
   ]
 }
@@ -89,19 +87,19 @@
 
             {% set isEn = app.request.locale == 'en' %}
             <div class="hc-quick-links" aria-label="{{ isEn ? 'Help center shortcuts' : 'Raccourcis centre d aide' }}">
-                <a href="{{ path('app_help_category', { slug: 'demarrer' }) }}" class="hc-quick-link">
+                <a href="{{ path('app_help_category', ({ slug: 'demarrer' })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}" class="hc-quick-link">
                     <i class="fa-solid fa-rocket" aria-hidden="true"></i>
                     <span>{{ isEn ? 'Getting started' : 'Demarrer' }}</span>
                 </a>
-                <a href="{{ path('app_help_category', { slug: 'securite' }) }}" class="hc-quick-link">
+                <a href="{{ path('app_help_category', ({ slug: 'securite' })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}" class="hc-quick-link">
                     <i class="fa-solid fa-lock" aria-hidden="true"></i>
                     <span>{{ isEn ? 'Security' : 'Securite' }}</span>
                 </a>
-                <a href="{{ path('app_help_category', { slug: 'extension' }) }}" class="hc-quick-link">
+                <a href="{{ path('app_help_category', ({ slug: 'extension' })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}" class="hc-quick-link">
                     <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
                     <span>{{ isEn ? 'Extension' : 'Extension' }}</span>
                 </a>
-                <a href="{{ path('app_public_generator') }}" class="hc-quick-link">
+                <a href="{{ path('app_public_generator', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="hc-quick-link">
                     <i class="fa-solid fa-key" aria-hidden="true"></i>
                     <span>{{ isEn ? 'Generator' : 'Generateur' }}</span>
                 </a>
@@ -168,7 +166,7 @@
 
         <div class="hc-categories" id="hcCategories">
             {% for cat in categories %}
-                <a href="{{ path('app_help_category', { slug: cat.slug }) }}"
+                <a href="{{ path('app_help_category', ({ slug: cat.slug })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}"
                    class="hc-cat-card"
                    data-tags="{{ cat.tags }}"
                    data-help-center-target="category">
@@ -212,7 +210,7 @@
 
                 <div class="hc-popular-list">
                     {% for article in popularArticles %}
-                        <a href="{{ path('app_help_article', { categorySlug: article.categorySlug, articleSlug: article.articleSlug }) }}"
+                        <a href="{{ path('app_help_article', ({ categorySlug: article.categorySlug, articleSlug: article.articleSlug })|merge(app.request.locale == 'en' ? {lang: 'en'} : {})) }}"
                            class="hc-article-row">
                             <div class="hc-article-num" aria-hidden="true">
                                 <i class="fa-solid fa-file-lines"></i>
@@ -291,7 +289,7 @@
             </div>
             <div class="hc-cta-actions">
                 <a href="mailto:contact@key-nest.com" class="hc-cta-btn-white">{{ 'help_center.cta.support'|trans }}</a>
-                <a href="{{ path('show_register') }}" class="hc-cta-btn-ghost">{{ 'help_center.cta.create_account'|trans }}</a>
+                <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="hc-cta-btn-ghost">{{ 'help_center.cta.create_account'|trans }}</a>
             </div>
         </div>
 

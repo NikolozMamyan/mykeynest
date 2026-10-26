@@ -15,7 +15,7 @@
     </div>
 
     <div class="public-footer__column">
-      <h2>{{ 'landing.footer.product'|trans }}</h2>
+      <p class="public-footer__title">{{ 'landing.footer.product'|trans }}</p>
       <a href="{{ path('app_landing', footerLocaleParams) }}#features">{{ 'landing.footer.links.features'|trans }}</a>
       <a href="{{ path('app_landing', footerLocaleParams) }}#pricing">{{ 'landing.footer.links.pricing'|trans }}</a>
       <a href="{{ path('app_help_category', footerLocaleParams|merge({slug: 'extension'})) }}">{{ 'landing.footer.links.extension'|trans }}</a>
@@ -23,7 +23,7 @@
     </div>
 
     <div class="public-footer__column">
-      <h2>{{ 'landing.footer.company'|trans }}</h2>
+      <p class="public-footer__title">{{ 'landing.footer.company'|trans }}</p>
       <a href="{{ path('business_solution', footerLocaleParams) }}">{{ 'landing.footer.links.cyber_pme_solution'|trans }}</a>
       <a href="{{ path('business_comparatif', footerLocaleParams) }}">{{ 'landing.footer.links.password_manager_entreprise_comparatif'|trans }}</a>
       <a href="{{ path('business_audit', footerLocaleParams) }}">{{ 'landing.footer.links.audit_cyber_pme'|trans }}</a>
@@ -31,7 +31,7 @@
     </div>
 
     <div class="public-footer__column">
-      <h2>{{ 'landing.footer.resources'|trans }}</h2>
+      <p class="public-footer__title">{{ 'landing.footer.resources'|trans }}</p>
       <a href="{{ path('app_help_center', footerLocaleParams) }}">{{ 'landing.footer.links.help_center'|trans }}</a>
       <a href="{{ path('app_help_category', footerLocaleParams|merge({slug: 'demarrer'})) }}">{{ 'landing.footer.links.documentation'|trans }}</a>
       <a href="{{ path('app_help_category', footerLocaleParams|merge({slug: 'partage'})) }}">{{ 'landing.footer.links.guides'|trans }}</a>
@@ -42,6 +42,8 @@
   <div class="public-footer__bottom">
     <span>&copy; {{ 'now'|date('Y') }} MYKEYNEST. {{ 'landing.footer.links.all_rights'|trans }}</span>
     <nav aria-label="{{ app.request.locale == 'en' ? 'Legal information' : 'Informations légales' }}">
+      <a href="{{ path('legal_mentions', footerLocaleParams) }}">{{ app.request.locale == 'en' ? 'Legal notice' : 'Mentions légales' }}</a>
+      <a href="{{ path('app_security', footerLocaleParams) }}">{{ app.request.locale == 'en' ? 'Security' : 'Sécurité' }}</a>
       <a href="{{ path('legal_privacy', footerLocaleParams) }}">{{ 'landing.footer.links.privacy'|trans }}</a>
       <a href="{{ path('legal_cgu', footerLocaleParams) }}">{{ app.request.locale == 'en' ? 'Terms of use' : 'CGU' }}</a>
       <a href="{{ path('legal_cgv', footerLocaleParams) }}">{{ app.request.locale == 'en' ? 'Terms of sale' : 'CGV' }}</a>

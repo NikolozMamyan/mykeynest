@@ -1,0 +1,25 @@
+{% set siteUrl = absolute_url(path('app_landing')) %}
+<script type="application/ld+json">
+{{ {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': siteUrl ~ '#organization',
+      name: 'MYKEYNEST',
+      url: siteUrl,
+      description: app.request.locale == 'en' ? 'Password management and digital access sharing software for individuals and teams.' : 'Logiciel de gestion des mots de passe et de partage des accès numériques pour particuliers et équipes.',
+      logo: absolute_url(asset('apple-touch-icon.png')),
+      email: 'contact@key-nest.com'
+    },
+    {
+      '@type': 'WebSite',
+      '@id': siteUrl ~ '#website',
+      name: 'MYKEYNEST',
+      url: siteUrl,
+      publisher: {'@id': siteUrl ~ '#organization'},
+      inLanguage: ['fr', 'en']
+    }
+  ]
+}|json_encode(15)|raw }}
+</script>

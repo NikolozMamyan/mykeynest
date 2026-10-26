@@ -5,7 +5,7 @@ export default class extends Controller {
     static values = {
         sendUrl: String,
         stateUrl: String,
-        csrfToken: String,
+        csrfUrl: String,
         initialConversation: String,
         visitorLabel: String,
         adminLabel: String,
@@ -75,11 +75,16 @@ export default class extends Controller {
         this.submitTarget.disabled = true;
 
         const formData = new FormData();
-        formData.set("_token", this.csrfTokenValue);
         formData.set("email", email);
         formData.set("message", message);
 
         try {
+            const tokenResponse = await fetch(this.csrfUrlValue, { cache: 'no-store' });
+            if (!tokenResponse.ok) {
+                throw new Error('Could not initialize support form');
+            }
+            const { token } = await tokenResponse.json();
+            formData.set('_token', token);
             const response = await fetch(this.sendUrlValue, {
                 method: "POST",
                 body: formData,

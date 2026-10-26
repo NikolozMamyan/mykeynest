@@ -28,13 +28,18 @@ final class LocaleSubscriber implements EventSubscriberInterface
     }
 
     $request = $event->getRequest();
+    $isPublicPage = in_array($request->attributes->get('_route'), PublicPageSubscriber::ROUTES, true);
+    if (in_array($request->attributes->get('_route'), ['legal_cgu', 'legal_cgv', 'legal_privacy'], true)) {
+        $request->setLocale('fr');
+        return;
+    }
 
     // 0) Si une route a déjà _locale, on respecte
     if ($request->attributes->has('_locale')) {
         $locale = $request->attributes->get('_locale');
         if (is_string($locale) && in_array($locale, $this->supportedLocales, true)) {
             $request->setLocale($locale);
-            if ($request->hasSession()) {
+            if (!$isPublicPage && $request->hasSession()) {
                 $request->getSession()->set('_locale', $locale);
             }
             return;
@@ -45,14 +50,14 @@ final class LocaleSubscriber implements EventSubscriberInterface
     $lang = $request->query->get('lang');
     if (is_string($lang) && in_array($lang, $this->supportedLocales, true)) {
         $request->setLocale($lang);
-        if ($request->hasSession()) {
+        if (!$isPublicPage && $request->hasSession()) {
             $request->getSession()->set('_locale', $lang);
         }
         return;
     }
 
     // 2) Session
-    if ($request->hasSession()) {
+    if (!$isPublicPage && $request->hasPreviousSession()) {
         $stored = $request->getSession()->get('_locale');
         if (is_string($stored) && in_array($stored, $this->supportedLocales, true)) {
             $request->setLocale($stored);

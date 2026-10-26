@@ -11,10 +11,14 @@
 - Password generator: https://key-nest.com/generator
 - Help center: https://key-nest.com/help/center
 - Blog: https://key-nest.com/fr/blog
+- Security architecture and limits: https://key-nest.com/securite
+- Publisher and legal notice: https://key-nest.com/mentions-legales
 
 ## Product summary
 
 MYKEYNEST helps users store, organize, generate, and share credentials securely.
+Stored passwords use server-side AES-256-GCM encryption. The service is not a zero-knowledge or end-to-end encrypted vault. See the security architecture page for sharing and autofill limitations.
+MYKEYNEST on key-nest.com is independent of the physical key storage service on keynest.com.
 Core topics covered on the public website:
 
 - Password management

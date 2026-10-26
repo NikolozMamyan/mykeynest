@@ -1,0 +1,15 @@
+<script type="application/ld+json">
+{{ {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  '@id': absolute_url(path('app_landing')) ~ '#software',
+  name: 'MYKEYNEST',
+  url: absolute_url(path('business_password_manager', app.request.locale == 'en' ? {lang: 'en'} : {})),
+  description: app.request.locale == 'en' ? 'A web password manager with encrypted credential storage, permission-based sharing and browser autofill.' : 'Un gestionnaire de mots de passe en ligne avec stockage chiffré des identifiants, partage avec permissions et remplissage par extension navigateur.',
+  applicationCategory: 'SecurityApplication',
+  operatingSystem: 'Web browser',
+  inLanguage: ['fr', 'en'],
+  publisher: {'@id': absolute_url(path('app_landing')) ~ '#organization'},
+  offers: {'@type': 'Offer', price: 0, priceCurrency: 'EUR', name: app.request.locale == 'en' ? 'Free account' : 'Compte gratuit', url: absolute_url(path('show_register'))}
+}|json_encode(15)|raw }}
+</script>

@@ -1,5 +1,12 @@
 # MYKEYNEST Full Summary
 
+MYKEYNEST is a web password manager and digital credential sharing application operated under the OptiWebSolutions brand. It is independent of the physical key storage service on keynest.com.
+
+Security architecture: https://key-nest.com/securite
+Publisher and legal notice: https://key-nest.com/mentions-legales
+
+Stored passwords use server-side AES-256-GCM encryption. The server can decrypt passwords in authorized operations. MYKEYNEST is not a zero-knowledge or end-to-end encrypted vault. Disabling password reveal controls the interface; it does not guarantee that a person controlling the browser cannot obtain a password used for autofill. Revoking a share does not close sessions already opened on third-party websites.
+
 ## What this site is
 
 MYKEYNEST is a web application focused on password management and access security.
