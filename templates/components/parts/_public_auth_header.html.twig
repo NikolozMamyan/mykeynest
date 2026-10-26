@@ -1,0 +1,7 @@
+<header class="public-auth-header">
+  {% include 'components/parts/logo.html.twig' %}
+  <div class="public-auth-header__actions">
+    <a class="public-auth-header__back" href="{{ path('app_landing', app.request.locale == 'en' ? { lang: 'en' } : {}) }}">{{ app.request.locale == 'en' ? 'Back to website' : 'Retour au site' }} <span aria-hidden="true">↗</span></a>
+    {% include 'components/parts/lang_switcher.html.twig' %}
+  </div>
+</header>

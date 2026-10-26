@@ -11,48 +11,63 @@
     <link rel="stylesheet" href="{{ asset('styles/pages/landing.css') }}">
 {% endblock %}
 
+{% block body_class %}landing-page{% endblock %}
+
 {% block body %}
+<main id="main-content">
 {# ======================== HERO ======================== #}
-<section class="hero" role="banner" id="main-content">
+<section class="hero" aria-labelledby="hero-title">
   <div class="hero-inner">
     <div class="hero-text">
-      <div class="hero-eyebrow" aria-hidden="true">
-        <i class="fas fa-shield-halved"></i> {{ 'landing.hero.eyebrow'|trans }}
+      <div class="hero-eyebrow">
+        <span class="status-dot" aria-hidden="true"></span> {{ 'landing.hero.eyebrow'|trans }}
       </div>
-      <h1 class="hero-h1">
+      <h1 class="hero-h1" id="hero-title">
         {{ 'landing.hero.title_before'|trans }}
         <span class="hl">{{ 'landing.hero.title_highlight'|trans }}</span>
       </h1>
       <p class="hero-sub">{{ 'landing.hero.subtitle'|trans }}</p>
       <div class="hero-cta">
         <a href="{{ path('show_register') }}" class="btn btn-primary btn-lg btn-w" aria-label="{{ 'landing.hero.cta_start_aria'|trans }}">
-          <i class="fas fa-rocket" aria-hidden="true"></i> {{ 'landing.hero.cta_start'|trans }}
+          {{ 'landing.hero.cta_start'|trans }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </a>
-        <a href="#how-it-works" class="btn btn-outline btn-lg btn-w">{{ 'landing.hero.cta_discover'|trans }}</a>
+        <a href="#how-it-works" class="btn btn-outline btn-lg btn-w"><i class="fas fa-circle-play" aria-hidden="true"></i> {{ 'landing.hero.cta_discover'|trans }}</a>
       </div>
       <p class="hero-hint"><i class="fas fa-circle-check"></i> {{ 'landing.hero.hint'|trans }}</p>
       <div class="trust" aria-label="{{ 'landing.hero.trust_aria'|trans }}">
-        <div class="trust-item"><i class="fas fa-shield-check"></i><span>{{ 'landing.hero.trust.aes'|trans }}</span></div>
+        <div class="trust-item"><i class="fas fa-shield-halved"></i><span>{{ 'landing.hero.trust.aes'|trans }}</span></div>
         <div class="trust-item"><i class="fas fa-lock"></i><span>{{ 'landing.hero.trust.zeroknowledge'|trans }}</span></div>
         <div class="trust-item"><i class="fas fa-fingerprint"></i><span>{{ 'landing.hero.trust.hashed'|trans }}</span></div>
       </div>
     </div>
 
     <div class="hero-vis" aria-hidden="true">
-      <div class="sec-pill"><i class="fas fa-shield-check"></i> {{ app.request.locale == 'en' ? 'Encrypted vault' : 'Coffre-fort chiffré' }}</div>
+      <div class="visual-orbit"></div>
+      <div class="sec-pill"><i class="fas fa-shield-halved"></i> {{ app.request.locale == 'en' ? 'Encrypted vault' : 'Coffre-fort chiffré' }} <span>AES-256</span></div>
       <div class="vault">
         <div class="vault-bar">
           <div class="vdots"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div>
-          <span class="vault-title">MyKeyNest - Vault</span>
+          <span class="vault-title"><i class="fas fa-lock"></i> mykeynest / {{ app.request.locale == 'en' ? 'workspace' : 'espace de travail' }}</span>
         </div>
+        <div class="vault-workspace">
+          <div class="vault-sidebar">
+            <div class="vault-brand"><i class="fas fa-layer-group"></i><span>MYKEYNEST<small>{{ app.request.locale == 'en' ? 'Team workspace' : 'Espace équipe' }}</small></span></div>
+            <div class="vault-nav-item is-current"><i class="fas fa-key"></i> {{ app.request.locale == 'en' ? 'My vault' : 'Mon coffre' }}</div>
+            <div class="vault-nav-item"><i class="fas fa-share-nodes"></i> {{ app.request.locale == 'en' ? 'Shared access' : 'Partages' }}</div>
+            <div class="vault-nav-item"><i class="fas fa-users"></i> {{ app.request.locale == 'en' ? 'My team' : 'Mon équipe' }}</div>
+            <div class="vault-sidebar-note"><i class="fas fa-shield-halved"></i><span>{{ app.request.locale == 'en' ? 'Your access. Your rules.' : 'Vos accès. Vos règles.' }}</span></div>
+          </div>
+          <div class="vault-content">
+            <div class="vault-heading"><div><span>{{ app.request.locale == 'en' ? 'YOUR WORKSPACE' : 'VOTRE ESPACE' }}</span><strong>{{ app.request.locale == 'en' ? 'Team vault' : 'Coffre d’équipe' }}</strong></div><div class="vault-avatar">MN</div></div>
         <div class="vault-search">
           <i class="fas fa-magnifying-glass"></i>
-          <input type="text" placeholder="{{ app.request.locale == 'en' ? 'Search an access' : 'Rechercher un accès' }}" tabindex="-1" readonly>
+          <span>{{ app.request.locale == 'en' ? 'Search an access…' : 'Rechercher un accès…' }}</span>
+          <span class="vault-shortcut">⌘ K</span>
         </div>
         <div class="cred-list">
           <div class="cred">
             <div class="cred-logo g"><i class="fab fa-google"></i></div>
-            <div class="cred-body"><b>{{ 'landing.hero.mock.gmail'|trans }}</b><span>email@example.com</span></div>
+            <div class="cred-body"><b>{{ 'landing.hero.mock.gmail'|trans }}</b><span>••••••••••••</span></div>
             <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
             <i class="fas fa-lock cred-lock"></i>
           </div>
@@ -64,35 +79,35 @@
           </div>
           <div class="cred">
             <div class="cred-logo gh"><i class="fab fa-github"></i></div>
-            <div class="cred-body"><b>{{ 'landing.hero.mock.github'|trans }}</b><span>developer@mail.com</span></div>
+            <div class="cred-body"><b>{{ 'landing.hero.mock.github'|trans }}</b><span>••••••••••••</span></div>
             <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
             <i class="fas fa-lock cred-lock"></i>
           </div>
           <div class="cred cred-extra">
             <div class="cred-logo s"><i class="fab fa-stripe-s"></i></div>
-            <div class="cred-body"><b>Stripe Dashboard</b><span>admin@company.com</span></div>
+            <div class="cred-body"><b>Stripe Dashboard</b><span>••••••••••••</span></div>
             <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
             <i class="fas fa-lock cred-lock"></i>
           </div>
           <div class="cred cred-extra">
             <div class="cred-logo a"><i class="fab fa-aws"></i></div>
-            <div class="cred-body"><b>AWS Console</b><span>ops@company.com</span></div>
+            <div class="cred-body"><b>AWS Console</b><span>••••••••••••</span></div>
             <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
             <i class="fas fa-lock cred-lock"></i>
           </div>
         </div>
-        <div class="hash-badge">
-          <span style="color:#64748b;">{{ app.request.locale == 'en' ? 'ACCESS' : 'ACCÈS' }}</span>
-          <span>{{ app.request.locale == 'en' ? 'Guest' : 'Invité' }}</span>
-          <span class="hash-ok"><i class="fas fa-circle-check"></i> {{ app.request.locale == 'en' ? 'AUTHORIZED' : 'AUTORISÉ' }}</span>
+            <div class="vault-footer"><i class="fas fa-lock"></i> {{ app.request.locale == 'en' ? 'Encrypted credentials · Controlled access' : 'Identifiants chiffrés · Accès contrôlés' }}</div>
+          </div>
         </div>
       </div>
+      <div class="share-notice"><span class="share-notice-icon"><i class="fas fa-user-check"></i></span><div><strong>{{ app.request.locale == 'en' ? 'Access shared. Secret protected.' : 'Accès partagé. Secret préservé.' }}</strong><span>{{ app.request.locale == 'en' ? 'Sign-in allowed · Password hidden' : 'Connexion autorisée · Mot de passe masqué' }}</span></div><i class="fas fa-circle-check"></i></div>
+      <span class="visual-caption">{{ app.request.locale == 'en' ? 'ILLUSTRATIVE VAULT PREVIEW' : 'APERÇU ILLUSTRATIF DU COFFRE' }}</span>
     </div>
   </div>
 </section>
 
 {# STRIP #}
-<div class="strip" aria-hidden="true">
+<div class="strip">
   <div class="strip-inner">
     <div class="s-item"><i class="fas fa-certificate"></i> {{ app.request.locale == 'en' ? 'Encrypted credentials' : 'Identifiants chiffrés' }}</div>
     <div class="s-div"></div>
@@ -108,6 +123,57 @@
 
 
 
+{# ======================== FEATURES ======================== #}
+<section class="feat-section" id="features">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-bolt"></i> {{ 'landing.features.label'|trans }}</span>
+      <h2>{{ 'landing.features.title'|trans }}</h2>
+      <p>{{ 'landing.features.subtitle'|trans }}</p>
+    </div>
+    <div class="feat-layout">
+      <div class="fhero">
+        <div class="fhero-icon"><i class="fas fa-fingerprint"></i></div>
+        <span class="fhero-tag"><i class="fas fa-star"></i> {{ 'landing.features.cards.hashed_tag'|trans }}</span>
+        <h3>{{ 'landing.features.cards.hashed_title'|trans }}</h3>
+        <p>{{ 'landing.features.cards.hashed_text'|trans }}</p>
+        <div class="fhero-term" aria-hidden="true">
+          <div class="ftl"><i class="fas fa-puzzle-piece"></i><span>MYKEYNEST / {{ app.request.locale == 'en' ? 'Browser extension' : 'Extension navigateur' }}</span></div>
+          <div class="ftl"><i class="fas fa-circle-check"></i><span>{{ app.request.locale == 'en' ? 'Associated with your account' : 'Associée à votre compte' }}</span></div>
+          <div class="ftl"><i class="fas fa-sliders"></i><span>{{ app.request.locale == 'en' ? 'Manage your installations' : 'Gérez vos installations' }}</span></div>
+        </div>
+      </div>
+      <div class="feat-grid">
+        <div class="fc accent">
+          <div class="fci"><i class="fas fa-shield-halved"></i></div>
+          <div><h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3><p>{{ 'landing.features.cards.e2e_text'|trans }}</p></div>
+        </div>
+        <div class="fc dark">
+          <div class="fci"><i class="fas fa-mobile-screen-button"></i></div>
+          <div><h3>{{ 'landing.features.cards.twofactor_title'|trans }}</h3><p>{{ 'landing.features.cards.twofactor_text'|trans }}</p></div>
+        </div>
+        <div class="fc">
+          <div class="fci"><i class="fas fa-wand-magic-sparkles"></i></div>
+          <div><h3>{{ 'landing.features.cards.generator_title'|trans }}</h3><p>{{ 'landing.features.cards.generator_text'|trans }}</p></div>
+        </div>
+        <div class="fc">
+          <div class="fci"><i class="fas fa-shield-heart"></i></div>
+          <div><h3>{{ 'landing.features.cards.audit_title'|trans }}</h3><p>{{ 'landing.features.cards.audit_text'|trans }}</p></div>
+        </div>
+        <div class="fc wide">
+          <div class="fci"><i class="fas fa-bolt"></i></div>
+          <div class="fc-bdy"><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
+          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-puzzle-piece"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'extension' : 'extension' }}</span></div>
+        </div>
+        <div class="fc wide accent">
+          <div class="fci"><i class="fas fa-share-nodes"></i></div>
+          <div class="fc-bdy"><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
+          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-user-shield"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'controlled' : 'contrôlé' }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {# ======================== SECURITY ======================== #}
 <section class="sec-section" id="security" aria-labelledby="sec-h2">
   <div class="wrap">
@@ -135,39 +201,66 @@
           </div>
         </div>
       </div>
-      <div class="terminal" aria-hidden="true">
-        <div class="t-bar">
-          <div class="t-dots"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>
-          <span class="t-title">{{ app.request.locale == 'en' ? 'mykeynest - access manager' : 'mykeynest - gestion des accès' }}</span>
-        </div>
-        <div class="t-body">
-          <div class="tl"><span class="tp">$</span><span class="tc">check_access --user collaborator</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">CREDENTIAL&nbsp; : ENCRYPTED</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">SHARE_MODE&nbsp; : SIGN-IN ONLY</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tv">EXTENSION&nbsp;&nbsp; : ASSOCIATED &#10003;</span></div>
-          <br>
-          <div class="tl"><span class="tp">$</span><span class="tc">revoke_access --user collaborator</span></div>
-          <div class="tl"><span class="tp"> </span><span class="te">ACCESS&nbsp;&nbsp; : REVOKED</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tw">SESSION : CLOSED</span></div>
-          <br>
-          <div class="tl"><span class="tp">$</span><span class="tc">status</span></div>
-          <div class="tl"><span class="tp"> </span><span class="tok">&#10003; OWNER CONTROL RETAINED</span></div>
-        </div>
-        <div class="t-chain">
-          <div class="tnode"><i class="fas fa-puzzle-piece"></i></div>
-          <div class="tarrow"></div>
-          <div class="tnode"><i class="fas fa-file-signature"></i></div>
-          <div class="tarrow"></div>
-          <div class="tnode"><i class="fas fa-lock"></i></div>
-          <div class="tarrow"></div>
-          <div class="tnode"><i class="fas fa-shield-check"></i></div>
-        </div>
-        <div class="t-scan"></div>
+      <div class="access-visual" aria-hidden="true">
+        <div class="access-visual-top"><span>MYKEYNEST / {{ app.request.locale == 'en' ? 'ACCESS CONTROL' : 'CONTRÔLE DES ACCÈS' }}</span><i class="fas fa-ellipsis"></i></div>
+        <div class="access-lock"><i class="fas fa-shield-halved"></i><span class="access-lock-check"><i class="fas fa-check"></i></span></div>
+        <h3>{{ app.request.locale == 'en' ? 'You hold the keys.' : 'Les clés restent entre vos mains.' }}</h3>
+        <p>{{ app.request.locale == 'en' ? 'One vault. The right permissions for everyone.' : 'Un coffre. Les bons droits pour chacun.' }}</p>
+        <div class="access-person"><span class="access-person-icon"><i class="fas fa-user-tie"></i></span><div><strong>{{ app.request.locale == 'en' ? 'Owner' : 'Propriétaire' }}</strong><span>{{ app.request.locale == 'en' ? 'Full control' : 'Contrôle complet' }}</span></div><span class="access-role">Admin</span></div>
+        <div class="access-person"><span class="access-person-icon"><i class="fas fa-user"></i></span><div><strong>{{ app.request.locale == 'en' ? 'Collaborator' : 'Collaborateur' }}</strong><span>{{ app.request.locale == 'en' ? 'Password hidden' : 'Mot de passe masqué' }}</span></div><span class="access-role">{{ app.request.locale == 'en' ? 'Sign-in only' : 'Connexion seule' }}</span></div>
+        <div class="access-control-note"><i class="fas fa-sliders"></i> {{ app.request.locale == 'en' ? 'Permissions managed by you, at any time.' : 'Des permissions que vous gérez à tout moment.' }}</div>
       </div>
     </div>
   </div>
 </section>
 
+{# ======================== HOW IT WORKS ======================== #}
+<section class="how" id="how-it-works">
+  <div class="wrap">
+    <div class="sh">
+      <span class="sh-label"><i class="fas fa-map"></i> {{ 'landing.how.label'|trans }}</span>
+      <h2>{{ 'landing.how.title'|trans }}</h2>
+      <p>{{ 'landing.how.subtitle'|trans }}</p>
+    </div>
+    <div class="how-demo">
+      <div class="how-demo-copy">
+        <span class="how-demo-eyebrow"><i class="fas fa-play-circle"></i> {{ 'landing.how.demo.eyebrow'|trans }}</span>
+        <h3>{{ 'landing.how.demo.title'|trans }}</h3>
+        <p>{{ 'landing.how.demo.text'|trans }}</p>
+      </div>
+      <div class="how-demo-shell">
+        <div class="how-demo-bar">
+          <div class="how-demo-dots"><span></span><span></span><span></span></div>
+          <span>mykeynest://demo/onboarding</span>
+        </div>
+        <div class="how-demo-screen">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/IS4YgAdW-H8?rel=0"
+            title="{{ 'landing.how.demo.iframe_title'|trans }}"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s1_title'|trans }}</h3><p>{{ 'landing.how.steps.s1_text'|trans }}</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s2_title'|trans }}</h3><p>{{ 'landing.how.steps.s2_text'|trans }}</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-body"><h3>{{ 'landing.how.steps.s3_title'|trans }}</h3><p>{{ 'landing.how.steps.s3_text'|trans }}</p></div>
+      </div>
+    </div>
+  </div>
+</section>
 {# ======================== PRICING ======================== #}
 <section class="pricing" id="pricing" aria-label="{{ 'landing.pricing.aria'|trans }}">
   <div class="wrap">
@@ -261,104 +354,6 @@
     </div>
   </div>
 </section>
-{# ======================== HOW IT WORKS ======================== #}
-<section class="how" id="how-it-works">
-  <div class="wrap">
-    <div class="sh">
-      <span class="sh-label"><i class="fas fa-map"></i> {{ 'landing.how.label'|trans }}</span>
-      <h2>{{ 'landing.how.title'|trans }}</h2>
-      <p>{{ 'landing.how.subtitle'|trans }}</p>
-    </div>
-    <div class="how-demo">
-      <div class="how-demo-copy">
-        <span class="how-demo-eyebrow"><i class="fas fa-play-circle"></i> {{ 'landing.how.demo.eyebrow'|trans }}</span>
-        <h3>{{ 'landing.how.demo.title'|trans }}</h3>
-        <p>{{ 'landing.how.demo.text'|trans }}</p>
-      </div>
-      <div class="how-demo-shell" aria-hidden="true">
-        <div class="how-demo-bar">
-          <div class="how-demo-dots"><span></span><span></span><span></span></div>
-          <span>mykeynest://demo/onboarding</span>
-        </div>
-        <div class="how-demo-screen">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/IS4YgAdW-H8?rel=0"
-            title="{{ 'landing.how.demo.iframe_title'|trans }}"
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
-        </div>
-      </div>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">1</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s1_title'|trans }}</h3><p>{{ 'landing.how.steps.s1_text'|trans }}</p></div>
-      </div>
-      <div class="step">
-        <div class="step-n">2</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s2_title'|trans }}</h3><p>{{ 'landing.how.steps.s2_text'|trans }}</p></div>
-      </div>
-      <div class="step">
-        <div class="step-n">3</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s3_title'|trans }}</h3><p>{{ 'landing.how.steps.s3_text'|trans }}</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-{# ======================== FEATURES ======================== #}
-<section class="feat-section" id="features">
-  <div class="wrap">
-    <div class="sh">
-      <span class="sh-label"><i class="fas fa-bolt"></i> {{ 'landing.features.label'|trans }}</span>
-      <h2>{{ 'landing.features.title'|trans }}</h2>
-      <p>{{ 'landing.features.subtitle'|trans }}</p>
-    </div>
-    <div class="feat-layout">
-      <div class="fhero">
-        <div class="fhero-icon"><i class="fas fa-fingerprint"></i></div>
-        <span class="fhero-tag"><i class="fas fa-star"></i> {{ 'landing.features.cards.hashed_tag'|trans }}</span>
-        <h3>{{ 'landing.features.cards.hashed_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.hashed_text'|trans }}</p>
-        <div class="fhero-term" aria-hidden="true">
-          <div class="ftl"><span class="ftp">$</span><span class="ftv">HASH_STATUS : SIGNED & VERIFIED &#10003;</span></div>
-          <div class="ftl"><span class="ftp">$</span><span class="fte">attack - HASH_MISMATCH - denied</span></div>
-          <div class="ftl"><span class="ftp"> </span><span class="ftw">VAULT : LOCKED</span></div>
-        </div>
-      </div>
-      <div class="feat-grid">
-        <div class="fc accent">
-          <div class="fci"><i class="fas fa-shield-halved"></i></div>
-          <div><h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3><p>{{ 'landing.features.cards.e2e_text'|trans }}</p></div>
-        </div>
-        <div class="fc dark">
-          <div class="fci"><i class="fas fa-mobile-screen-button"></i></div>
-          <div><h3>{{ 'landing.features.cards.twofactor_title'|trans }}</h3><p>{{ 'landing.features.cards.twofactor_text'|trans }}</p></div>
-        </div>
-        <div class="fc">
-          <div class="fci"><i class="fas fa-wand-magic-sparkles"></i></div>
-          <div><h3>{{ 'landing.features.cards.generator_title'|trans }}</h3><p>{{ 'landing.features.cards.generator_text'|trans }}</p></div>
-        </div>
-        <div class="fc">
-          <div class="fci"><i class="fas fa-shield-heart"></i></div>
-          <div><h3>{{ 'landing.features.cards.audit_title'|trans }}</h3><p>{{ 'landing.features.cards.audit_text'|trans }}</p></div>
-        </div>
-        <div class="fc wide">
-          <div class="fci"><i class="fas fa-bolt"></i></div>
-          <div class="fc-bdy"><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-puzzle-piece"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'extension' : 'extension' }}</span></div>
-        </div>
-        <div class="fc wide accent">
-          <div class="fci"><i class="fas fa-share-nodes"></i></div>
-          <div class="fc-bdy"><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-user-shield"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'controlled' : 'contrôlé' }}</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section> 
 {# ======================== FAQ ======================== #}
 <section class="faq">
   <div class="wrap">
@@ -384,7 +379,8 @@
 <div class="contact-page" id="contact">
   <div class="contact-container">
     <div class="contact-info">
-      <h1>{{ 'landing.contact.title'|trans }}</h1>
+      <span class="sh-label"><i class="fas fa-comments" aria-hidden="true"></i> {{ app.request.locale == 'en' ? 'Let’s talk' : 'Parlons de votre équipe' }}</span>
+      <h2>{{ 'landing.contact.title'|trans }}</h2>
       <p class="subtitle">{{ 'landing.contact.subtitle'|trans }}</p>
       <div class="contact-methods">
         <div class="contact-method">
@@ -418,11 +414,12 @@
 <section class="cta-sec">
   <div class="wrap">
     <div class="cta-box">
+      <div class="cta-icon" aria-hidden="true"><i class="fas fa-key"></i></div>
       <h2>{{ 'landing.cta.title'|trans }}</h2>
       <p>{{ 'landing.cta.subtitle'|trans }}</p>
       <div class="cta-btns">
         <a href="{{ path('show_register') }}" class="btn btn-primary btn-lg btn-w">
-          <i class="fas fa-rocket"></i> {{ 'landing.cta.start'|trans }}
+          {{ 'landing.cta.start'|trans }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </a>
         <a href="{{ path('show_login') }}" class="btn btn-outline btn-lg btn-w">{{ 'landing.cta.login'|trans }}</a>
       </div>
@@ -430,6 +427,7 @@
     </div>
   </div>
 </section>
+</main>
 
 {# JSON-LD FAQ #}
 <script type="application/ld+json">

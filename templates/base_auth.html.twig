@@ -137,11 +137,12 @@
 
     {% block head_extras %}{% endblock %}
     {% block stylesheets %}{% endblock %}
-    <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}" />
     {% block page_styles %}{% endblock %}
     {% block javascripts %}
       {% block importmap %}{{ importmap('app') }}{% endblock %}
     {% endblock %}
+
+    <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}" />
 
     {% block seo_jsonld %}
       <script type="application/ld+json">
@@ -166,10 +167,12 @@
     {% endblock %}
   </head>
 
-  <body class="auth-layout {% block body_class %}{% endblock %}" data-controller="pwa-install">
+  <body class="auth-layout public-page {% block body_class %}{% endblock %}" data-controller="pwa-install">
     {% set route = app.request.attributes.get('_route') %}
 
-    {% if route not in ['show_login', 'show_register', 'app_pending_login'] %}
+    {% if route in ['show_login', 'show_register', 'app_pending_login', 'app_guest_register'] %}
+      {% include 'components/parts/_public_auth_header.html.twig' %}
+    {% else %}
       {% include 'components/nav.html.twig' %}
     {% endif %}
 

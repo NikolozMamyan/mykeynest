@@ -249,9 +249,9 @@
     },
     "hero": {
       "eyebrow": "Gestion des accès pour PME et agences",
-      "title_before": "Partagez les accès de votre équipe,",
-      "title_highlight": "sans transmettre les mots de passe",
-      "subtitle": "Centralisez les identifiants de l’entreprise, choisissez qui peut les utiliser et connectez-vous plus simplement grâce à l’extension MYKEYNEST.",
+      "title_before": "Vos accès.",
+      "title_highlight": "Vos règles.",
+      "subtitle": "Centralisez les identifiants de votre entreprise. Partagez les accès sans dévoiler les mots de passe. Gardez le contrôle, même en équipe.",
       "hint": "Compte gratuit · Sans carte bancaire",
       "cta_start": "Commencer gratuitement",
       "cta_start_aria": "Créer un compte gratuit sur MYKEYNEST",

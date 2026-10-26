@@ -249,9 +249,9 @@
     },
     "hero": {
       "eyebrow": "Access management for SMBs and agencies",
-      "title_before": "Share access with your team,",
-      "title_highlight": "without handing over passwords",
-      "subtitle": "Centralize company credentials, decide who can use them, and simplify sign-in with the MYKEYNEST browser extension.",
+      "title_before": "Your access.",
+      "title_highlight": "Your rules.",
+      "subtitle": "Centralize your company credentials. Share access without revealing passwords. Stay in control, even as your team grows.",
       "hint": "Free account · No credit card",
       "cta_start": "Get started for free",
       "cta_start_aria": "Create a free account on MYKEYNEST",

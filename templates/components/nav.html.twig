@@ -7,6 +7,7 @@
 
     <button class="btn nav-toggle"
             type="button"
+            aria-label="{{ app.request.locale == 'en' ? 'Open navigation menu' : 'Ouvrir le menu de navigation' }}"
             aria-controls="primary-nav"
       aria-expanded="false"
       data-nav-target="toggle"
@@ -61,9 +62,8 @@
       </div>
     </div>
   </div>
+  <div class="nav-overlay"
+       aria-hidden="true"
+       data-nav-target="overlay"
+       data-action="click->nav#closeMenu"></div>
 </nav>
-
-<div class="nav-overlay"
-     aria-hidden="true"
-     data-nav-target="overlay"
-     data-action="click->nav#closeMenu"></div>

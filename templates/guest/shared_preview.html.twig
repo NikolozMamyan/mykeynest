@@ -754,8 +754,10 @@
       }
     }
   </style>
+  {% include 'components/parts/_theme_boot.html.twig' %}
+  <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}">
 </head>
-<body>
+<body class="public-page guest-preview-page">
   <div class="page-shell">
     <main class="page">
       <div class="topbar">

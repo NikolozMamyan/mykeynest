@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f3f7f5">
+  {% include 'components/parts/_theme_boot.html.twig' %}
 
   <title>{% block seo_title %}{% endblock %}</title>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RG9YT46TFS"></script>
@@ -28,9 +30,10 @@
     {% block importmap %}{{ importmap('app') }}{% endblock %}
   {% endblock %}
   {% block extra_head %}{% endblock %}
+  <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}">
 </head>
 
-<body class="blog-layout">
+<body class="blog-layout public-page">
   {% include 'components/nav.html.twig' %}
 
   <main class="blog-main {% block main_class %}{% endblock %}">
@@ -38,5 +41,6 @@
   </main>
 
   {% block footer %}{% endblock %}
+  {% include 'components/parts/_public_footer.html.twig' %}
 </body>
 </html>
