@@ -50,7 +50,7 @@ final class PublicPageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $response->setVary(['Cookie', 'Authorization'], false);
+        $response->setVary(['Cookie', 'Authorization', 'Accept-Language'], false);
         if (!$request->isMethodSafe() || !$response->isOk() || $request->cookies->count() > 0
             || $request->headers->has('Authorization') || $response->headers->getCookies()
             || ($request->hasSession() && $request->getSession()->isStarted())) {

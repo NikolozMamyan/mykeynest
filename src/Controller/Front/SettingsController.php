@@ -131,7 +131,7 @@ public function preferences(
         
         $this->addFlash('success', 'Préférences mises à jour avec succès');
 
-        return $this->redirectToRoute('app_user_preferences');
+        return $this->redirectToRoute('app_user_preferences', ['lang' => $user->getLocale()]);
     }
 
     return $this->render('settings/preferences.html.twig', [

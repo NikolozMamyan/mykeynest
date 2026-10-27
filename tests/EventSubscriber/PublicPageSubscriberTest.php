@@ -39,6 +39,7 @@ final class PublicPageSubscriberTest extends TestCase
         self::assertSame(300, $response->getMaxAge());
         self::assertContains('Cookie', $response->getVary());
         self::assertContains('Authorization', $response->getVary());
+        self::assertContains('Accept-Language', $response->getVary());
 
         $request->cookies->set('AUTH_TOKEN', 'test-token');
         self::assertTrue($this->respond($request)->headers->hasCacheControlDirective('private'));

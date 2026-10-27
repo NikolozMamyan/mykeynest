@@ -1,6 +1,6 @@
 <div class="lang-switch" role="group" aria-label="{{ 'landing.nav.language'|trans }}">
   {% if app.request.locale == 'fr' %}
-    <a href="{{ vm.url_fr }}"
+    <a href="{{ vm.url_fr ~ '?lang=fr' }}"
        class="lang-switch__btn is-active"
        lang="fr"
        aria-current="true"
@@ -14,7 +14,7 @@
         height="16"
       >
     </a>
-    <a href="{{ vm.url_en }}"
+    <a href="{{ vm.url_en ~ '?lang=en' }}"
        class="lang-switch__btn"
        lang="en"
        hreflang="en"
@@ -29,7 +29,7 @@
       >
     </a>
   {% else %}
-    <a href="{{ vm.url_en }}"
+    <a href="{{ vm.url_en ~ '?lang=en' }}"
        class="lang-switch__btn is-active"
        lang="en"
        aria-current="true"
@@ -43,7 +43,7 @@
         height="16"
       >
     </a>
-    <a href="{{ vm.url_fr }}"
+    <a href="{{ vm.url_fr ~ '?lang=fr' }}"
        class="lang-switch__btn"
        lang="fr"
        hreflang="fr"

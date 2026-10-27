@@ -9,7 +9,7 @@ final class PrivacyPageTest extends WebTestCase
     public function testPrivacyPolicyIsPublicAndDirectlyAccessible(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/privacy');
+        $crawler = $client->request('GET', '/privacy', server: ['HTTP_ACCEPT_LANGUAGE' => 'fr-FR']);
 
         self::assertResponseIsSuccessful();
         self::assertSame('/privacy', parse_url((string) $crawler->filter('link[rel="canonical"]')->attr('href'), PHP_URL_PATH));
