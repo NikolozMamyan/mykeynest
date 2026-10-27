@@ -1,0 +1,20 @@
+<div class="ds-stack-lg" data-admin-visitors-target="content">
+  <section class="ds-surface admin-panel">
+    <div class="ds-section-head"><div><span class="admin-eyebrow">Session #{{ session.id }}</span><h2 class="ds-section-title"><code>{{ session.ipAddress }}</code></h2><p class="ds-section-text">{{ countryName }} · {{ session.pageViewCount }} pages vues · Mis à jour à {{ updatedAt|date('H:i:s', 'Europe/Paris') }}</p></div></div>
+    <dl class="visitors-facts">
+      <div><dt>Début</dt><dd>{{ session.startedAt|date('d/m/Y H:i:s', 'Europe/Paris') }}</dd></div>
+      <div><dt>Dernière activité</dt><dd>{{ session.lastSeenAt|date('d/m/Y H:i:s', 'Europe/Paris') }}</dd></div>
+      <div><dt>Source / support</dt><dd>{{ session.source == 'direct' ? 'Accès direct' : session.source }}{% if session.medium %} / {{ session.medium }}{% endif %}</dd></div>
+      <div><dt>Campagne</dt><dd>{{ session.campaign ?: 'Sans campagne UTM' }}</dd></div>
+      <div><dt>Page d’entrée</dt><dd><code>{{ session.entryPath }}</code></dd></div>
+      <div><dt>Dernière page</dt><dd><code>{{ session.currentPath }}</code></dd></div>
+    </dl>
+    <details class="visitors-browser"><summary>Navigateur et appareil</summary><p>{{ session.userAgent ?: 'Non communiqué' }}</p></details>
+  </section>
+  <section class="ds-surface admin-panel">
+    <div class="ds-section-head"><div><span class="admin-eyebrow">Chronologie</span><h2 class="ds-section-title">Pages consultées</h2><p class="ds-section-text">Heure de Paris · Les paramètres d’URL ne sont pas enregistrés.</p></div></div>
+    <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th scope="col">Date et heure</th><th scope="col">Page</th></tr></thead><tbody>{% for visit in visits %}<tr><td>{{ visit.visitedAt|date('d/m/Y H:i:s', 'Europe/Paris') }}</td><td><code>{{ visit.path }}</code></td></tr>{% else %}<tr><td colspan="2" class="ds-empty">Aucune page enregistrée.</td></tr>{% endfor %}</tbody></table></div>
+    {% if pageCount > 1 %}<nav class="admin-pagination" aria-label="Pagination du parcours">{% if page > 1 %}<a class="admin-pagination__control" href="{{ path('admin_visitor_session', {id: session.id, page: page - 1}) }}">← Précédent</a>{% endif %}<span>Page {{ page }} / {{ pageCount }}</span>{% if page < pageCount %}<a class="admin-pagination__control" href="{{ path('admin_visitor_session', {id: session.id, page: page + 1}) }}">Suivant →</a>{% endif %}</nav>{% endif %}
+  </section>
+  {% if otherSessions %}<section class="ds-surface admin-panel"><h2 class="ds-section-title">Autres sessions avec la même IP et le même navigateur</h2><p class="ds-section-text">Ce rapprochement est une estimation, il ne permet pas d’identifier une personne.</p><div class="visitors-related">{% for other in otherSessions %}<a class="ds-btn ds-btn--ghost" href="{{ path('admin_visitor_session', {id: other.id}) }}">{{ other.startedAt|date('d/m/Y H:i', 'Europe/Paris') }} · {{ other.pageViewCount }} pages</a>{% endfor %}</div></section>{% endif %}
+</div>

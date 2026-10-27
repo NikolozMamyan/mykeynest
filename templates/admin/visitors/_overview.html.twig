@@ -1,0 +1,82 @@
+<div class="ds-stack-lg" data-admin-visitors-target="content">
+  {% if invalidIp %}<p class="visitors-notice" role="alert">L’adresse IP saisie n’est pas valide. Aucun résultat ne correspond à ce filtre.</p>{% endif %}
+  <div class="admin-kpi-grid">
+    <div class="admin-kpi"><span class="admin-kpi__icon"><i class="fas fa-users" aria-hidden="true"></i></span><span class="admin-kpi__meta">Visiteurs estimés</span><strong>{{ uniqueVisitors|number_format(0, ',', ' ') }}</strong><small>{{ periodSessions }} nouvelles sessions sur {{ chartDays }} jours</small></div>
+    <div class="admin-kpi"><span class="admin-kpi__icon admin-kpi__icon--blue"><i class="fas fa-file-lines" aria-hidden="true"></i></span><span class="admin-kpi__meta">Pages vues</span><strong>{{ periodViews|number_format(0, ',', ' ') }}</strong><small>{{ todayViews }} aujourd’hui · {{ averageDailyViews|number_format(1, ',', ' ') }} / jour</small></div>
+    <div class="admin-kpi"><span class="admin-kpi__icon admin-kpi__icon--violet"><i class="fas fa-signal" aria-hidden="true"></i></span><span class="admin-kpi__meta">Sessions récentes</span><strong>{{ activeCount }}</strong><small>Une page consultée dans les 5 dernières minutes</small></div>
+    <div class="admin-kpi"><span class="admin-kpi__icon admin-kpi__icon--amber"><i class="fas fa-bullhorn" aria-hidden="true"></i></span><span class="admin-kpi__meta">Trafic des campagnes</span><strong>{{ campaignShare|number_format(1, ',', ' ') }} %</strong><small>{{ campaignViews }} pages vues avec une campagne UTM</small></div>
+  </div>
+
+  <section class="ds-surface admin-panel">
+    <div class="ds-section-head"><div><span class="admin-eyebrow">Évolution du trafic</span><h2 class="ds-section-title">Les visites, jour après jour</h2><p class="ds-section-text">{{ chartDays }} jours · Heure de Paris · Mis à jour à {{ updatedAt|date('H:i:s', 'Europe/Paris') }}</p></div><div class="visitors-legend"><span><i class="visitors-dot visitors-dot--views"></i>Pages vues</span><span><i class="visitors-dot visitors-dot--sessions"></i>Sessions</span></div></div>
+    {% set chartWidth = max(770, chartDays * 28 + 56) %}
+    {% set step = (chartWidth - 56) / chartDays %}
+    {% set points = [] %}
+    <div class="visitors-chart-scroll">
+      <svg class="visitors-chart" viewBox="0 0 {{ chartWidth }} 248" style="min-width: {{ chartWidth }}px" role="group" aria-label="Pages vues et sessions par jour">
+        {% for tick in 0..4 %}
+          {% set y = 202 - tick * 45 %}
+          <line x1="38" y1="{{ y }}" x2="{{ chartWidth - 8 }}" y2="{{ y }}" class="visitors-chart-grid"/>
+          <text x="30" y="{{ y + 4 }}" text-anchor="end" class="visitors-chart-label">{{ (chartMax / 4 * tick)|number_format(0, ',', ' ') }}</text>
+        {% endfor %}
+        {% for day in chart %}
+          {% set x = 42 + loop.index0 * step + step / 2 %}
+          {% set viewsHeight = day.views / chartMax * 180 %}
+          {% set sessionY = 202 - day.sessions / chartMax * 180 %}
+          {% set points = points|merge([x ~ ',' ~ sessionY]) %}
+          {% set label = day.date|date('d/m/Y') ~ ' : ' ~ day.views ~ ' pages vues, ' ~ day.sessions ~ ' sessions, ' ~ day.campaignViews ~ ' pages issues de campagnes.' %}
+          <g class="visitors-chart-day" tabindex="0" role="img" aria-label="{{ label }}" data-label="{{ label }}" data-action="pointerenter->admin-visitors#showDay focusin->admin-visitors#showDay">
+            <title>{{ label }}</title>
+            <rect x="{{ x - step / 2 }}" y="16" width="{{ step }}" height="190" fill="transparent"/>
+            <rect class="visitors-chart-bar" x="{{ x - step * 0.29 }}" y="{{ 202 - viewsHeight }}" width="{{ step * 0.58 }}" height="{{ viewsHeight }}" rx="3"/>
+            <circle class="visitors-chart-point" cx="{{ x }}" cy="{{ sessionY }}" r="3"/>
+          </g>
+          {% if loop.first or loop.last or loop.index0 % (chartDays > 30 ? 7 : 3) == 0 %}<text x="{{ x }}" y="229" text-anchor="middle" class="visitors-chart-label">{{ day.date|date('d/m') }}</text>{% endif %}
+        {% endfor %}
+        <polyline points="{{ points|join(' ') }}" class="visitors-chart-line"/>
+      </svg>
+    </div>
+    <p class="visitors-chart-detail" data-admin-visitors-target="detail">Survolez un jour ou sélectionnez-le au clavier pour afficher le détail.</p>
+    {% if periodViews == 0 %}<p class="admin-empty-compact">Les premières visites apparaîtront ici après la mise en service du suivi.</p>{% endif %}
+  </section>
+
+  <div class="ds-grid-2">
+    <section class="ds-surface admin-panel"><div class="ds-section-head"><div><span class="admin-eyebrow">Acquisition</span><h2 class="ds-section-title">Sources du trafic</h2><p class="ds-section-text">Part des pages vues, selon la source d’entrée de la session.</p></div></div>
+      <div class="visitors-ranking">
+        {% for source in trafficSources %}<div><div class="visitors-ranking-label"><span>{{ source.source == 'direct' ? 'Accès direct' : source.source }}{% if source.medium %}<small>{{ source.medium }}</small>{% endif %}</span><strong>{{ source.views }} <small>· {{ source.share|number_format(1, ',', ' ') }} %</small></strong></div><div class="admin-progress"><span style="width: {{ source.share|number_format(2, '.', '') }}%"></span></div></div>{% else %}<p class="admin-empty-compact">Aucune source pour cette période.</p>{% endfor %}
+      </div>
+    </section>
+    <section class="ds-surface admin-panel"><div class="ds-section-head"><div><span class="admin-eyebrow">Géographie</span><h2 class="ds-section-title">Pays des visiteurs</h2><p class="ds-section-text">Localisation approximative de l’IP · Part des nouvelles sessions.</p></div></div>
+      <div class="visitors-ranking">
+        {% for country in countries %}<div><div class="visitors-ranking-label"><span>{{ country.name }}{% if country.code %}<small>{{ country.code }}</small>{% endif %}</span><strong>{{ country.sessions }} <small>· {{ country.share|number_format(1, ',', ' ') }} %</small></strong></div><div class="admin-progress"><span style="width: {{ country.share|number_format(2, '.', '') }}%"></span></div></div>{% else %}<p class="admin-empty-compact">Aucun pays pour cette période.</p>{% endfor %}
+      </div>
+    </section>
+    <section class="ds-surface admin-panel"><div class="ds-section-head"><div><span class="admin-eyebrow">Campagnes</span><h2 class="ds-section-title">Contribution des campagnes</h2><p class="ds-section-text">Les identifiants Google Ads sont reconnus comme source google / cpc.</p></div></div>
+      <div class="visitors-ranking">
+        {% for campaign in trafficCampaigns %}<div><div class="visitors-ranking-label"><span>{{ campaign.campaign ?: 'Sans campagne UTM' }}{% if campaign.source %}<small>{{ campaign.source }}{% if campaign.medium %} / {{ campaign.medium }}{% endif %}</small>{% endif %}</span><strong>{{ campaign.views }} <small>· {{ campaign.share|number_format(1, ',', ' ') }} %</small></strong></div><div class="admin-progress"><span style="width: {{ campaign.share|number_format(2, '.', '') }}%"></span></div></div>{% else %}<p class="admin-empty-compact">Aucune campagne pour cette période.</p>{% endfor %}
+      </div>
+    </section>
+    <section class="ds-surface admin-panel"><div class="ds-section-head"><div><span class="admin-eyebrow">Contenu</span><h2 class="ds-section-title">Pages les plus consultées</h2><p class="ds-section-text">Les 10 premières pages sur la période sélectionnée.</p></div></div>
+      <div class="visitors-ranking">
+        {% for item in topPages %}<div class="visitors-ranking-label"><code>{{ item.path }}</code><strong>{{ item.views }} <small>vues</small></strong></div>{% else %}<p class="admin-empty-compact">Aucune page consultée pour cette période.</p>{% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <section class="ds-surface admin-panel">
+    <div class="ds-section-head"><div><span class="admin-eyebrow">Journal des visites</span><h2 class="ds-section-title">Dernières sessions</h2><p class="ds-section-text">{{ sessionCount }} sessions avec une activité sur la période · Ouvrez une session pour voir son parcours.</p></div></div>
+    <div class="ds-table-wrap"><table class="ds-table visitors-table"><thead><tr><th scope="col">Dernière visite</th><th scope="col">Adresse IP / pays</th><th scope="col">Source / campagne</th><th scope="col">Parcours</th><th scope="col">Pages</th><th scope="col"><span class="visitors-sr-only">Détail</span></th></tr></thead><tbody>
+      {% for session in sessions %}<tr>
+        <td><div class="visitors-cell"><strong>{{ session.lastSeenAt|date('d/m/Y H:i:s', 'Europe/Paris') }}</strong><small>{% if session.lastSeenAt >= activeSince %}<span class="visitors-active-dot"></span>Activité récente{% else %}Début {{ session.startedAt|date('d/m H:i', 'Europe/Paris') }}{% endif %}</small></div></td>
+        <td><div class="visitors-cell"><a href="{{ path('admin_visitors', {days: days, ip: session.ipAddress}) }}"><code>{{ session.ipAddress }}</code></a><small>{{ countryNames[session.countryCode ?? ''] ?? 'Pays non déterminé' }}</small></div></td>
+        <td><div class="visitors-cell"><strong>{{ session.source == 'direct' ? 'Accès direct' : session.source }}{% if session.medium %} <small>/ {{ session.medium }}</small>{% endif %}</strong><small>{{ session.campaign ?: 'Sans campagne UTM' }}</small></div></td>
+        <td><div class="visitors-cell visitors-path"><code title="{{ session.entryPath }}">{{ session.entryPath }}</code><small title="{{ session.currentPath }}">→ {{ session.currentPath }}</small></div></td>
+        <td>{{ session.pageViewCount }}</td><td><a class="admin-row-action" href="{{ path('admin_visitor_session', {id: session.id}) }}" aria-label="Parcours de la session {{ session.id }}"><i class="fas fa-chevron-right" aria-hidden="true"></i></a></td>
+      </tr>{% else %}<tr><td colspan="6" class="ds-empty">Aucune visite pour cette période et ce filtre.</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% if pageCount > 1 %}<nav class="admin-pagination" aria-label="Pagination des sessions">
+      {% if page > 1 %}<a class="admin-pagination__control" href="{{ path('admin_visitors', {days: days, ip: ip, page: page - 1}) }}">← Précédent</a>{% endif %}<span>Page {{ page }} / {{ pageCount }}</span>{% if page < pageCount %}<a class="admin-pagination__control" href="{{ path('admin_visitors', {days: days, ip: ip, page: page + 1}) }}">Suivant →</a>{% endif %}
+    </nav>{% endif %}
+  </section>
+  <p class="visitors-footnote">Pages publiques uniquement. Robots connus et préchargements exclus. Une session se termine après 30 minutes sans nouvelle page. Les visiteurs sont estimés par IP et navigateur : un réseau partagé ou un VPN peut modifier le résultat. Aucun contenu du coffre ni paramètre d’URL sensible n’est conservé. Une visite servie uniquement depuis un cache externe peut ne pas être comptée.</p>
+</div>

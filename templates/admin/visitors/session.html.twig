@@ -1,0 +1,15 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Parcours visiteur · MYKEYNEST{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ asset('styles/pages/admin-visitors.css') }}">{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-visitors{% endblock %}
+{% block admin_page_title %}Parcours d’un visiteur{% endblock %}
+{% block admin_page_intro %}Les pages publiques consultées pendant cette session.{% endblock %}
+{% block admin_toolbar %}<a class="ds-btn ds-btn--ghost" href="{{ path('admin_visitors') }}">← Tous les visiteurs</a><a class="ds-btn ds-btn--primary" href="{{ path('admin_visitors', {ip: session.ipAddress}) }}">Filtrer cette IP</a>{% endblock %}
+
+{% block admin_content %}
+  <div class="ds-stack-lg" data-controller="admin-visitors" data-admin-visitors-url-value="{{ path('admin_visitor_session', {id: session.id, page: page}) }}">
+    <span class="admin-live-status" data-admin-visitors-target="status" role="status"><span></span>Actualisation · 15 s</span>
+    {% include 'admin/visitors/_history.html.twig' %}
+  </div>
+{% endblock %}

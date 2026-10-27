@@ -19,6 +19,7 @@ import SharedAccessIndexController from "./pages/shared_access_index_controller.
 import TeamShowController from "./pages/team_show_controller.js";
 import HelpArticleController from "./pages/help_article_controller.js";
 import AdminEmailPreviewController from "./admin_email_preview_controller.js";
+import AdminVisitorsController from "./admin_visitors_controller.js";
 import SupportChatController from "./support_chat_controller.js";
 import ExtensionSettingsController from "./pages/extension_settings_controller.js";
 import AdminManualSubscriptionController from "./admin_manual_subscription_controller.js";
@@ -49,6 +50,7 @@ application.register("shared-access-index", SharedAccessIndexController);
 application.register("team-show", TeamShowController);
 application.register("help-article", HelpArticleController);
 application.register("admin-email-preview", AdminEmailPreviewController);
+application.register("admin-visitors", AdminVisitorsController);
 application.register("support-chat", SupportChatController);
 application.register("extension-settings", ExtensionSettingsController);
 application.register("admin-manual-subscription", AdminManualSubscriptionController);

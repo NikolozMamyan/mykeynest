@@ -1,5 +1,9 @@
 framework:
   rate_limiter:
+    visitor_geolocation:
+      policy: fixed_window
+      limit: 8
+      interval: '1 second'
     extension_api:
       policy: fixed_window
       limit: 60

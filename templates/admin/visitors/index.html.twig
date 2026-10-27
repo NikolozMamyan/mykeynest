@@ -1,0 +1,29 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Visiteurs · Pilotage MYKEYNEST{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ asset('styles/pages/admin-visitors.css') }}">{% endblock %}
+{% block admin_page_class %}ds-page--wide admin-visitors{% endblock %}
+{% block admin_page_title %}Visiteurs{% endblock %}
+{% block admin_page_intro %}Comprendre d’où viennent les visiteurs et les pages qu’ils consultent.{% endblock %}
+
+{% block admin_content %}
+  <div class="ds-stack-lg" data-controller="admin-visitors" data-admin-visitors-url-value="{{ path('admin_visitors', {days: days, ip: ip, page: page}) }}">
+    <div class="ds-toolbar">
+      <form method="get" action="{{ path('admin_visitors') }}" class="admin-filter-bar visitors-filters">
+        <label for="visitor-days" class="visitors-sr-only">Période</label>
+        <select name="days" id="visitor-days" class="ds-select">
+          {% for period in [7, 30, 90] %}<option value="{{ period }}" {{ days == period ? 'selected' : '' }}>{{ period }} derniers jours</option>{% endfor %}
+        </select>
+        <label class="admin-search-field" for="visitor-ip">
+          <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+          <span class="visitors-sr-only">Filtrer par adresse IP</span>
+          <input id="visitor-ip" name="ip" value="{{ ip }}" placeholder="Rechercher une adresse IP" maxlength="45" aria-invalid="{{ invalidIp ? 'true' : 'false' }}">
+        </label>
+        <button class="ds-btn ds-btn--primary" type="submit">Filtrer</button>
+        {% if ip %}<a class="ds-btn ds-btn--ghost" href="{{ path('admin_visitors', {days: days}) }}">Effacer</a>{% endif %}
+      </form>
+      <span class="admin-live-status" data-admin-visitors-target="status" role="status"><span></span>Actualisation · 15 s</span>
+    </div>
+    {% include 'admin/visitors/_overview.html.twig' %}
+  </div>
+{% endblock %}
