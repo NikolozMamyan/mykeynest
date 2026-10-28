@@ -54,7 +54,7 @@ class TeamAddCredentialsType extends AbstractType
             'help' => 'credential_access.reveal_help',
             'mapped' => false,
             'required' => false,
-            'data' => true,
+            'data' => false,
         ]);
     }
 

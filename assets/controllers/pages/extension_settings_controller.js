@@ -25,7 +25,7 @@ export default class extends Controller {
 
   connect() {
     this.requests = new Map();
-    this.currentMode = 'default';
+    this.currentMode = 'inline';
     this.currentSortMode = 'recent';
     this.supportsDisplayModes = false;
     this.supportsSortModes = false;
@@ -211,7 +211,7 @@ export default class extends Controller {
         throw new Error(response?.error || 'Extension unavailable');
       }
 
-      const mode = DISPLAY_MODES.has(response.displayMode) ? response.displayMode : 'default';
+      const mode = DISPLAY_MODES.has(response.displayMode) ? response.displayMode : 'inline';
       const sortMode = SORT_MODES.has(response.sortMode) ? response.sortMode : 'recent';
       this.currentMode = mode;
       this.currentSortMode = sortMode;
