@@ -62,6 +62,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $extensionOnboardedAt = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $productGuideState = ['status' => 'pending', 'step' => 1];
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
@@ -291,6 +294,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getExtensionOnboardedAt(): ?\DateTimeImmutable
     {
         return $this->extensionOnboardedAt;
+    }
+
+    public function getProductGuideState(): ?array
+    {
+        return $this->productGuideState;
+    }
+
+    public function setProductGuideState(?array $state): static
+    {
+        $this->productGuideState = $state;
+
+        return $this;
     }
 
     public function hasActiveSubscription(): bool

@@ -12,6 +12,7 @@ use App\Service\CredentialManager;
 use App\Service\MailerService;
 use App\Service\SharedAccessNotifier;
 use App\Service\SubscriptionPlanService;
+use App\Service\ProductGuide;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,6 +30,7 @@ class SharedAccessController extends AbstractController
         private RateLimiterFactory $shareInvitationLimiter,
         private SubscriptionPlanService $subscriptionPlans,
         private TranslatorInterface $translator,
+        private ProductGuide $productGuide,
     ) {
     }
 
@@ -387,6 +389,7 @@ class SharedAccessController extends AbstractController
             return $this->redirectToRoute($redirectRoute);
         }
 
+        $this->productGuide->advanceAfter($owner, 3);
         $entityManager->flush();
         if ($createdCount > 0) {
             $notifier->notifyCredentialsShared($guest, $owner, $sharedCredentials);

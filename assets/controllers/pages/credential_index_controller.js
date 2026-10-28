@@ -221,6 +221,7 @@ export default class extends Controller {
         return;
       }
       this.launchFeedbackTarget.textContent = this.launchMessagesValue.opened;
+      window.dispatchEvent(new CustomEvent('mykeynest:credential-launched'));
     } catch {
       this.launchFeedbackTarget.textContent = this.launchMessagesValue.launch_error;
     } finally {

@@ -16,6 +16,9 @@ final class ExtensionOnboardingPolicy
 
     public function initializeNewRegistration(User $user): void
     {
+        if ($user->getProductGuideState() === null) {
+            $user->setProductGuideState(['status' => 'pending', 'step' => 1]);
+        }
         if ($this->enabled && $this->isExtensionAvailableFor($user)) {
             $user->requireExtensionOnboarding();
 

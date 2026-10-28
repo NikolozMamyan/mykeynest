@@ -209,6 +209,15 @@
           <div class="user-dropdown-divider"></div>
 
           <div class="user-dropdown-section user-dropdown-section--actions">
+            {% if not is_granted('ROLE_ADMIN') %}
+              <a href="{{ path('app_credential', {guide: 1}) }}" class="user-dropdown-item product-guide-replay" data-turbo="false">
+                <div class="user-dropdown-item-icon"><i class="fas fa-compass" aria-hidden="true"></i></div>
+                <div class="user-dropdown-item-text">
+                  <div class="user-dropdown-item-label">{{ 'replay'|trans({}, 'product_guide') }}</div>
+                  <div class="user-dropdown-item-desc">{{ 'replay_description'|trans({}, 'product_guide') }}</div>
+                </div>
+              </a>
+            {% endif %}
             <a href="{{ path('app_settings') }}" class="user-dropdown-item">
               <div class="user-dropdown-item-icon">
                 <i class="fas fa-cog"></i>

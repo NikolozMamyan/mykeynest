@@ -22,7 +22,7 @@
         <span>{{ 'sidebar.items.dashboard'|trans }}</span>
       </a>
 
-      <a href="{{ path('app_credential') }}"
+      <a href="{{ path('app_credential') }}" data-guide-nav="credentials"
          data-turbo="true" data-turbo-action="advance"
          data-navigation-paths="{{ path('app_credential') }},{{ path('credential_import') }}"
          class="nav-item {{ credentialsActive ? 'active' : '' }}">
@@ -31,7 +31,7 @@
         <span class="nav-item-badge" data-layout-target="passLength"></span>
       </a>
 
-      <a href="{{ path('shared_access_index') }}"
+      <a href="{{ path('shared_access_index') }}" data-guide-nav="shares"
          data-turbo="true" data-turbo-action="advance"
          class="nav-item {{ sharingActive ? 'active' : '' }}">
         <i class="fas fa-share-nodes"></i>
@@ -61,7 +61,7 @@
       </summary>
 
       <div class="sidebar-more__content">
-        <a href="{{ path('app_extention') }}"
+        <a href="{{ path('app_extention') }}" data-guide-nav="extension"
            data-turbo="true" data-turbo-action="advance"
            class="nav-item nav-item--nested {{ currentRoute == 'app_extention' ? 'active' : '' }}">
           <i class="fas fa-puzzle-piece"></i>
@@ -136,7 +136,7 @@
     <span>{{ 'sidebar.mobile.home'|trans }}</span>
   </a>
 
-  <a href="{{ path('app_credential') }}"
+  <a href="{{ path('app_credential') }}" data-guide-nav="credentials"
      data-turbo="true" data-turbo-action="advance"
      data-navigation-paths="{{ path('app_credential') }},{{ path('credential_import') }}"
      class="mobile-bottom-nav__item {{ credentialsActive ? 'active' : '' }}"
@@ -145,7 +145,7 @@
     <span>{{ 'sidebar.mobile.vault'|trans }}</span>
   </a>
 
-  <a href="{{ path('shared_access_index') }}"
+  <a href="{{ path('shared_access_index') }}" data-guide-nav="shares"
      data-turbo="true" data-turbo-action="advance"
      class="mobile-bottom-nav__item {{ sharingActive ? 'active' : '' }}"
      {% if sharingActive %}aria-current="page"{% endif %}>

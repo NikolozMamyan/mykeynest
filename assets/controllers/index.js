@@ -7,6 +7,7 @@ import GeneratorController from './generator/generator_controller.js';
 import SessionManagerController from "./session_manager_controller.js";
 import PendingLoginController from "./pending_login_controller.js";
 import NavController from "./components/nav_controller.js";
+import ProductGuideController from "./components/product_guide_controller.js";
 import ThemeController from "./components/theme_controller.js";
 import LocaleSwitcherController from "./components/locale_switcher_controller.js";
 import ToastsController from "./components/toasts_controller.js";
@@ -38,6 +39,7 @@ application.register('generator', GeneratorController)
 application.register('session-manager', SessionManagerController)
 application.register('pending-login', PendingLoginController)
 application.register("nav", NavController);
+application.register("product-guide", ProductGuideController);
 application.register("theme", ThemeController);
 application.register("locale-switcher", LocaleSwitcherController);
 application.register("toasts", ToastsController);

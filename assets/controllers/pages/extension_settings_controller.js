@@ -76,6 +76,7 @@ export default class extends Controller {
       this.renderMode(this.currentMode);
       this.feedbackTarget.textContent = this.savedValue;
       this.feedbackTarget.className = 'extension-save-status is-saved';
+      window.dispatchEvent(new CustomEvent('mykeynest:extension-mode-saved'));
     } catch (error) {
       this.renderMode(previousMode);
       this.feedbackTarget.textContent = this.saveErrorValue;

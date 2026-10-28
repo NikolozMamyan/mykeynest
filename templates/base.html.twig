@@ -120,6 +120,9 @@
     {# ===== Toasts / Alerts (fixed bottom-right) ===== #}
     {% include './components/parts/_toasts.html.twig' %}
     {% include './components/parts/_pwa_install_banner.html.twig' %}
+    {% if hasUserNavigation %}
+      {% include 'components/parts/_product_guide.html.twig' %}
+    {% endif %}
 
     {# JS page #}
     {% block page_scripts %}{% endblock %}

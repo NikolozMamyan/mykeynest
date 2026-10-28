@@ -34,6 +34,16 @@ final class ExtensionOnboardingPolicyTest extends TestCase
         self::assertSame(User::EXTENSION_ONBOARDING_PENDING, $user->getExtensionOnboardingStatus());
     }
 
+    public function testRegistrationActivatesGuideForAnExistingInvitedAccount(): void
+    {
+        $user = (new User())->setProductGuideState(null);
+        $policy = new ExtensionOnboardingPolicy(true, $this->createSubscriptionPlans());
+
+        $policy->initializeNewRegistration($user);
+
+        self::assertSame(['status' => 'pending', 'step' => 1], $user->getProductGuideState());
+    }
+
     private function createSubscriptionPlans(): SubscriptionPlanService
     {
         $repository = $this->createMock(SubscriptionPlanConfigurationRepository::class);

@@ -12,6 +12,7 @@ use App\Service\CredentialCsvImporter;
 use App\Service\CredentialManager;
 use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialUrlPolicy;
+use App\Service\ProductGuide;
 use App\Service\SecurityCheckerService;
 use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,6 +34,7 @@ final class CredentialPageController extends AbstractController
         private EntityManagerInterface $entityManager,
         private CredentialRepository $credentialRepository,
         private SubscriptionPlanService $subscriptionPlans,
+        private ProductGuide $productGuide,
     ) {}
 
     private function getAuthenticatedUser(): User
@@ -181,6 +183,9 @@ final class CredentialPageController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->credentialManager->create($credential, $user);
+            if ($this->productGuide->advanceAfter($user, 1)) {
+                $this->entityManager->flush();
+            }
             $this->addFlash('success', 'Nouvel identifiant ajoute avec succes.');
             $this->checker->buildReportAndNotify($user, SecurityCheckerService::ROTATION_DAYS_DEFAULT);
 

@@ -1,0 +1,69 @@
+{% set guideMessages = {} %}
+{% for key in ['label', 'progress', 'back', 'next', 'finish', 'skip', 'minimize', 'resume', 'close', 'error', 'hint', 'create_title', 'create_text', 'create_form', 'create_go', 'extension_title', 'extension_text', 'extension_dialog', 'share_title', 'share_text', 'share_form', 'share_quick', 'share_page', 'share_fast', 'settings_title', 'settings_text', 'settings_waiting', 'settings_navigation', 'settings_go', 'done_title', 'done_text'] %}
+  {% set guideMessages = guideMessages|merge({(key): key|trans({}, 'product_guide')}) %}
+{% endfor %}
+<div data-controller="product-guide"
+     data-product-guide-user-id-value="{{ app.user.id }}"
+     {% if app.user.productGuideState is not null %}
+     data-product-guide-state-value="{{ app.user.productGuideState|json_encode|e('html_attr') }}"
+     {% endif %}
+     data-product-guide-available-value="{{ app.user.extensionOnboardingStatus == 'completed' ? 'true' : 'false' }}"
+     data-product-guide-route-value="{{ currentRoute }}"
+     data-product-guide-endpoint-value="{{ path('api_product_guide_update') }}"
+     data-product-guide-csrf-value="{{ csrf_token('product_guide') }}"
+     data-product-guide-messages-value="{{ guideMessages|json_encode|e('html_attr') }}"
+     data-product-guide-urls-value="{{ {credentials: path('app_credential'), create: path('credential_new'), shares: path('shared_access_index'), share: path('shared_access_new'), extension: path('app_extention')}|json_encode|e('html_attr') }}">
+  <div class="product-guide-portal" data-guide-portal hidden>
+    {% for side in ['top', 'left', 'right', 'bottom'] %}<div class="product-guide-shade" data-guide-shade="{{ side }}" aria-hidden="true"></div>{% endfor %}
+    <div class="product-guide-spotlight" data-guide-spotlight aria-hidden="true"></div>
+    <div class="product-guide-browser-pointer" data-guide-browser-pointer hidden aria-hidden="true">
+      <span>{{ 'browser_toolbar'|trans({}, 'product_guide') }}</span>
+      <i class="fas fa-arrow-up"></i>
+    </div>
+    <section class="product-guide-card" data-guide-card role="dialog" aria-labelledby="product-guide-title" aria-describedby="product-guide-description">
+      <img class="product-guide-mascot" src="{{ asset('images/guide-guardian.webp') }}" width="80" height="96" alt="" aria-hidden="true">
+      <div class="product-guide-topline">
+        <span class="product-guide-counter" data-guide-counter aria-live="polite"></span>
+        <button class="product-guide-minimize" data-guide-action="minimize" type="button" aria-label="{{ 'minimize'|trans({}, 'product_guide') }}"><span aria-hidden="true">−</span></button>
+      </div>
+      <p class="product-guide-label">{{ 'label'|trans({}, 'product_guide') }}</p>
+      <h2 id="product-guide-title" data-guide-title tabindex="-1"></h2>
+      <p id="product-guide-description" class="product-guide-description" data-guide-description></p>
+      <figure class="product-guide-browser-preview" data-guide-browser-preview hidden>
+        <figcaption>{{ 'browser_preview'|trans({}, 'product_guide') }}</figcaption>
+        <div class="product-guide-browser-toolbar" aria-hidden="true">
+          <span class="product-guide-browser-address"></span>
+          <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" width="18" height="24" alt="">
+          <i class="fas fa-puzzle-piece"></i>
+          <i class="fas fa-ellipsis-vertical"></i>
+        </div>
+        <div class="product-guide-browser-pin">
+          <i class="fas fa-puzzle-piece" aria-hidden="true"></i>
+          <span>{{ 'browser_extensions'|trans({}, 'product_guide') }}</span>
+          <span aria-hidden="true">→</span>
+          <strong>MYKEYNEST</strong>
+          <i class="fas fa-thumbtack" aria-hidden="true"></i>
+          <span>{{ 'browser_pin'|trans({}, 'product_guide') }}</span>
+        </div>
+      </figure>
+      <div class="product-guide-share-methods" data-guide-methods hidden>
+        <button type="button" data-guide-action="share-page">{{ 'share_page'|trans({}, 'product_guide') }}</button>
+        <button type="button" data-guide-action="share-quick">{{ 'share_fast'|trans({}, 'product_guide') }}</button>
+      </div>
+      <a class="product-guide-destination" data-guide-destination hidden></a>
+      <p class="product-guide-hint" data-guide-hint>{{ 'hint'|trans({}, 'product_guide') }}</p>
+      <p class="product-guide-error" data-guide-error role="alert" hidden></p>
+      <div class="product-guide-progress" aria-hidden="true">{% for step in 1..4 %}<span data-guide-progress="{{ step }}"></span>{% endfor %}</div>
+      <div class="product-guide-controls">
+        <button type="button" class="product-guide-skip" data-guide-action="skip">{{ 'skip'|trans({}, 'product_guide') }}</button>
+        <div>
+          <button type="button" class="product-guide-back" data-guide-action="back">{{ 'back'|trans({}, 'product_guide') }}</button>
+          <button type="button" class="product-guide-next" data-guide-action="next">{{ 'next'|trans({}, 'product_guide') }}</button>
+        </div>
+      </div>
+    </section>
+    <button type="button" class="product-guide-dock" data-guide-action="resume" aria-label="{{ 'resume'|trans({}, 'product_guide') }}" hidden>
+      <img src="{{ asset('images/guide-guardian.webp') }}" width="50" height="60" alt="" aria-hidden="true"><span data-guide-dock-counter></span>
+    </button>
+  </div>
+</div>

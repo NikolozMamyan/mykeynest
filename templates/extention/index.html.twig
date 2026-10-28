@@ -16,7 +16,7 @@
      data-extension-settings-invalid-domain-value="{{ 'extension.page.configuration.exclusions.invalid'|trans|e('html_attr') }}"
      data-extension-settings-remove-label-value="{{ 'extension.page.configuration.exclusions.remove'|trans|e('html_attr') }}">
 
-  <section class="extension-download-card" aria-labelledby="extension-page-title">
+  <section class="extension-download-card" aria-labelledby="extension-page-title" data-guide="extension-overview">
     <div class="extension-download-card__content">
       <span class="extension-kicker">
         <span class="extension-kicker__dot"></span>
@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div class="extension-mode-grid" role="radiogroup" aria-label="{{ 'extension.page.configuration.aria'|trans }}">
+    <div class="extension-mode-grid" role="radiogroup" aria-label="{{ 'extension.page.configuration.aria'|trans }}" data-guide="extension-modes">
       <label class="extension-mode-card" data-extension-settings-target="card">
         <input type="radio" name="extension-display-mode" value="default"
                data-extension-settings-target="mode"
