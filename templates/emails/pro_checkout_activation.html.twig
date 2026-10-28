@@ -11,9 +11,7 @@
 {% endblock %}
 
 {% block action %}
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:26px;">
-    <tr><td style="background:#059669;border-radius:4px;"><a href="{{ setup_url }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">{{ 'email.subscription.create_account'|trans({}, null, locale|default('fr')) }}</a></td></tr>
-  </table>
+  {% include 'emails/_action.html.twig' with {actionUrl: setup_url, label: 'email.subscription.create_account'|trans({}, null, emailLocale)} %}
 {% endblock %}
 
 {% block after_action %}
@@ -22,5 +20,5 @@
 
 {% block footer %}
   <p style="margin:0;">{{ 'email.subscription.security_footer'|trans({}, null, locale|default('fr')) }}</p>
-  <p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>
+
 {% endblock %}

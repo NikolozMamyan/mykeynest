@@ -130,8 +130,8 @@
       "cta": "Compléter mon profil",
       "footer": "Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.",
       "benefits": {
-        "title": "✨ Ce que vous pouvez faire dès maintenant :",
-        "item1": "Gérer vos clés en toute sécurité",
+        "title": "Pour bien démarrer :",
+        "item1": "Organiser vos identifiants dans votre coffre",
         "item2": "Accéder à votre tableau de bord personnalisé",
         "item3": "Configurer vos préférences"
       },
@@ -140,7 +140,7 @@
         "link": "Contactez notre support"
       },
       "copyright": "KeyNest - Gestion sécurisée de clés",
-      "disclaimer": "Vous recevez cet email car vous vous êtes inscrit sur KeyNest."
+      "disclaimer": "Vous recevez cet e-mail à la suite de votre inscription sur MYKEYNEST."
     }
   },
   "common": {

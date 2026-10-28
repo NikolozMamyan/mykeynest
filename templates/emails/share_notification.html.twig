@@ -7,18 +7,18 @@
 
 {% block content %}
   <p style="margin:0 0 22px;">Les accès ci-dessous sont maintenant disponibles dans votre espace MYKEYNEST, selon les autorisations choisies par le propriétaire.</p>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f7faf9;border:1px solid #e1e9e7;border-radius:6px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;background:#f4f7f5;border:1px solid #e0e8e3;border-radius:12px;">
     {% for credential in credentials %}
       <tr>
-        <td style="width:38px;padding:13px 0 13px 15px;{{ loop.last ? '' : 'border-bottom:1px solid #e8eeec;' }}"><span style="display:inline-block;width:31px;height:31px;border-radius:4px;background:#059669;color:#fff;font-size:10px;font-weight:700;line-height:31px;text-align:center;">{{ credential.name|slice(0, 2)|upper }}</span></td>
-        <td style="padding:13px 15px 13px 10px;{{ loop.last ? '' : 'border-bottom:1px solid #e8eeec;' }}"><strong style="display:block;color:#172033;font-size:13px;">{{ credential.name }}</strong><span style="display:block;margin-top:2px;color:#88938f;font-size:11px;">{{ credential.domain }} · {{ credential.username }}</span></td>
+        <td style="word-wrap:break-word;width:38px;padding:13px 0 13px 15px;{{ loop.last ? '' : 'border-bottom:1px solid #e8eeec;' }}"><span style="display:inline-block;width:31px;height:31px;border-radius:4px;background:#087f5b;color:#fff;font-size:10px;font-weight:700;line-height:31px;text-align:center;">{{ credential.name|slice(0, 2)|upper }}</span></td>
+        <td style="word-wrap:break-word;padding:13px 15px 13px 10px;{{ loop.last ? '' : 'border-bottom:1px solid #e8eeec;' }}"><strong style="display:block;color:#132c25;font-size:13px;">{{ credential.name }}</strong><span style="display:block;margin-top:2px;color:#576d65;font-size:11px;">{{ credential.domain }} · {{ credential.username }}</span></td>
       </tr>
     {% endfor %}
   </table>
 {% endblock %}
 
 {% block action %}
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#059669;border-radius:4px;"><a href="{{ app_url }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">Ouvrir mes accès partagés</a></td></tr></table>
+  {% include 'emails/_action.html.twig' with {actionUrl: app_url, label: 'Ouvrir mes accès partagés'} %}
 {% endblock %}
 
-{% block footer %}<p style="margin:0;">Cet e-mail vous est envoyé parce qu’un utilisateur MYKEYNEST a partagé un accès avec vous.</p><p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>{% endblock %}
+{% block footer %}<p style="margin:0;">Cet e-mail vous est envoyé parce qu’un utilisateur MYKEYNEST a partagé un accès avec vous.</p>{% endblock %}

@@ -6,25 +6,23 @@
 {% block heading %}{{ 'email.welcome.title'|trans }}{% endblock %}
 
 {% block content %}
-  <p style="margin:0;">{{ 'email.welcome.message'|trans({'%email%': user.email})|raw }}</p>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:24px 0;background:#eefaf5;border:1px solid #d7eee5;border-radius:6px;">
-    <tr><td style="padding:17px 18px;color:#23473b;font-size:13px;line-height:1.75;">
+  <p style="margin:0;">{{ 'email.welcome.message'|trans({'%email%': user.email|e}, null, emailLocale)|raw }}</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;margin:24px 0;background:#eefaf5;border:1px solid #d7eee5;border-radius:12px;">
+    <tr><td style="word-wrap:break-word;padding:17px 18px;color:#23473b;font-size:13px;line-height:1.75;">
       <strong>{{ 'email.welcome.benefits.title'|trans }}</strong><br>
-      <span style="color:#059669;">✓</span> {{ 'email.welcome.benefits.item1'|trans }}<br>
-      <span style="color:#059669;">✓</span> {{ 'email.welcome.benefits.item2'|trans }}<br>
-      <span style="color:#059669;">✓</span> {{ 'email.welcome.benefits.item3'|trans }}
+      <span style="color:#087f5b;">✓</span> {{ 'email.welcome.benefits.item1'|trans }}<br>
+      <span style="color:#087f5b;">✓</span> {{ 'email.welcome.benefits.item2'|trans }}<br>
+      <span style="color:#087f5b;">✓</span> {{ 'email.welcome.benefits.item3'|trans }}
     </td></tr>
   </table>
 {% endblock %}
 
 {% block action %}
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-    <tr><td style="background:#059669;border-radius:4px;"><a href="{{ settingsUrl }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">{{ 'email.welcome.cta'|trans }}</a></td></tr>
-  </table>
+  {% include 'emails/_action.html.twig' with {actionUrl: settingsUrl, label: 'email.welcome.cta'|trans({}, null, emailLocale)} %}
 {% endblock %}
 
 {% block after_action %}
-  <p style="margin:22px 0 0;color:#88938f;font-size:12px;line-height:1.6;">{{ 'email.welcome.footer'|trans }}<br><a href="mailto:contact@key-nest.com" style="color:#059669;">{{ 'email.welcome.support.link'|trans }}</a></p>
+  <p style="margin:22px 0 0;color:#576d65;font-size:12px;line-height:1.6;">{{ 'email.welcome.footer'|trans }}<br><a href="mailto:contact@key-nest.com" style="color:#087f5b;">{{ 'email.welcome.support.link'|trans }}</a></p>
 {% endblock %}
 
-{% block footer %}<p style="margin:0;">{{ 'email.welcome.disclaimer'|trans }}</p><p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>{% endblock %}
+{% block footer %}<p style="margin:0;">{{ 'email.welcome.disclaimer'|trans }}</p>{% endblock %}

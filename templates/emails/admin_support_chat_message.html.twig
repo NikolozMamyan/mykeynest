@@ -5,8 +5,10 @@
 {% block eyebrow %}Support MYKEYNEST{% endblock %}
 {% block heading %}Nouveau message dans le chat{% endblock %}
 {% block content %}
-  <p style="margin:0 0 20px;"><strong style="color:#172033;">{{ conversation.email }}</strong> a envoyé un nouveau message le {{ receivedAt|date('d/m/Y à H:i') }}.</p>
-  <div style="padding:15px;background:#f7faf9;border-left:3px solid #059669;border-radius:4px;color:#334155;white-space:pre-line;">{{ message }}</div>
-  <p style="margin:12px 0 0;color:#88938f;font-size:11px;">Conversation #{{ conversation.id ?: '—' }}</p>
+  <p style="margin:0 0 20px;"><strong style="color:#132c25;">{{ conversation.email }}</strong> a envoyé un nouveau message le {{ receivedAt|date('d/m/Y à H:i') }}.</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;background:#f4f7f5;border:1px solid #e0e8e3;border-radius:12px;"><tr><td style="word-wrap:break-word;padding:18px;color:#435e53;font-size:14px;line-height:24px;word-wrap:break-word;">{{ message|nl2br }}</td></tr></table>
+  <p style="margin:12px 0 0;color:#576d65;font-size:11px;">Conversation #{{ conversation.id ?: '—' }}</p>
 {% endblock %}
-{% block action %}<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#172033;border-radius:4px;"><a href="{{ adminUrl }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">Répondre au message</a></td></tr></table>{% endblock %}
+{% block action %}
+  {% include 'emails/_action.html.twig' with {actionUrl: adminUrl, label: 'Répondre au message'} %}
+{% endblock %}

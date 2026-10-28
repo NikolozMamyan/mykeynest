@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block action %}
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#059669;border-radius:4px;"><a href="{{ action_url }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">{{ (requires_registration ? 'teams.organization.invite.email_action_pending' : 'teams.organization.invite.email_action_active')|trans({}, null, locale) }}</a></td></tr></table>
+  {% include 'emails/_action.html.twig' with {actionUrl: action_url, label: (requires_registration ? 'teams.organization.invite.email_action_pending' : 'teams.organization.invite.email_action_active')|trans({}, null, locale)} %}
 {% endblock %}
 
-{% block footer %}<p style="margin:0;">Invitation personnelle envoyée par MYKEYNEST.</p><p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>{% endblock %}
+{% block footer %}<p style="margin:0;">Invitation personnelle envoyée par MYKEYNEST.</p>{% endblock %}

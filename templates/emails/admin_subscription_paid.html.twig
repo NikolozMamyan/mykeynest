@@ -7,14 +7,16 @@
 
 {% block content %}
   <p style="margin:0 0 22px;">Le paiement Stripe a été synchronisé et les droits du compte ont été mis à jour.</p>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f7faf9;border:1px solid #e1e9e7;border-radius:6px;">
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Client</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;font-weight:700;">{{ user.email }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Entreprise</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;">{{ user.company ?: '—' }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Offre</td><td align="right" style="padding:9px 15px;color:#059669;font-size:13px;font-weight:800;">{{ subscription.planCode|default('pro')|upper }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Statut</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;">{{ subscription.status|default('active') }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Source</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;">{{ source }}</td></tr>
-    <tr><td style="padding:9px 15px 14px;color:#748079;font-size:12px;">Date</td><td align="right" style="padding:9px 15px 14px;color:#172033;font-size:13px;">{{ paidAt|date('d/m/Y H:i') }}</td></tr>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;background:#f4f7f5;border:1px solid #e0e8e3;border-radius:12px;">
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Client</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:13px;font-weight:700;">{{ user.email }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Entreprise</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:13px;">{{ user.company ?: '—' }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Offre</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#087f5b;font-size:13px;font-weight:800;">{{ subscription.planCode|default('pro')|upper }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Statut</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:13px;">{{ subscription.status|default('active') }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Source</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:13px;">{{ source }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px 14px;color:#576d65;font-size:12px;">Date</td><td align="right" style="word-wrap:break-word;padding:9px 15px 14px;color:#132c25;font-size:13px;">{{ paidAt|date('d/m/Y H:i') }}</td></tr>
   </table>
 {% endblock %}
 
-{% block action %}<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#172033;border-radius:4px;"><a href="{{ adminUrl }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">Ouvrir l’administration</a></td></tr></table>{% endblock %}
+{% block action %}
+  {% include 'emails/_action.html.twig' with {actionUrl: adminUrl, label: 'Ouvrir l’administration'} %}
+{% endblock %}

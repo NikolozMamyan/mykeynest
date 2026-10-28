@@ -1,0 +1,26 @@
+{% set actionColor = variant|default('primary') == 'secondary' ? '#ffffff' : '#087f5b' %}
+{% set actionText = variant|default('primary') == 'secondary' ? '#435e53' : '#ffffff' %}
+{% set actionBorder = variant|default('primary') == 'secondary' ? '#cddbd3' : '#087f5b' %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">
+  <tr><td align="left" style="padding:24px 0 0;">
+    <table role="presentation" {% if secondaryUrl is defined %}width="100%"{% endif %} cellpadding="0" cellspacing="0" border="0" style="{% if secondaryUrl is defined %}width:100%;table-layout:fixed;{% endif %}mso-table-lspace:0pt;mso-table-rspace:0pt;">
+      <tr><td align="center" bgcolor="{{ actionColor }}" style="background-color:{{ actionColor }};border:1px solid {{ actionBorder }};border-radius:9px;mso-padding-alt:13px 20px;">
+        <a href="{{ actionUrl }}" style="display:inline-block;padding:13px 20px;border-radius:9px;font-family:Arial,Helvetica,sans-serif;color:{{ actionText }};font-size:14px;font-weight:700;line-height:22px;text-align:center;text-decoration:none;mso-padding-alt:0;">{{ label }}</a>
+      </td>
+      {% if secondaryUrl is defined %}
+        <td width="10" style="width:10px;font-size:1px;">&nbsp;</td>
+        <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;border:1px solid #cddbd3;border-radius:9px;mso-padding-alt:13px 12px;">
+          <a href="{{ secondaryUrl }}" style="display:block;padding:13px 12px;border-radius:9px;font-family:Arial,Helvetica,sans-serif;color:#435e53;font-size:14px;font-weight:700;line-height:22px;text-align:center;text-decoration:none;mso-padding-alt:0;">{{ secondaryLabel }}</a>
+        </td>
+      {% endif %}
+      </tr>
+    </table>
+  </td></tr>
+  {% if showFallback|default(true) %}
+    <tr><td style="padding:15px 0 0;font-family:Arial,Helvetica,sans-serif;color:#576d65;font-size:12px;line-height:20px;word-wrap:break-word;">
+      {{ 'link_fallback'|trans({}, 'emails', emailLocale|default('locale'|trans({}, 'emails'))) }}<br>
+      <a href="{{ actionUrl }}" style="color:#435e53;text-decoration:underline;word-wrap:break-word;word-break:break-all;">{{ actionUrl }}</a>
+      {% if secondaryUrl is defined %}<br>{{ secondaryLabel }} : <a href="{{ secondaryUrl }}" style="color:#435e53;text-decoration:underline;word-wrap:break-word;word-break:break-all;">{{ secondaryUrl }}</a>{% endif %}
+    </td></tr>
+  {% endif %}
+</table>

@@ -6,19 +6,19 @@
 {% block heading %}Autorisez cette installation{% endblock %}
 
 {% block content %}
-  <p style="margin:0;">Bonjour <strong style="color:#172033;">{{ user.email }}</strong>, une nouvelle installation de l’extension MYKEYNEST a été détectée.</p>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:23px 0;background:#f7faf9;border:1px solid #e1e9e7;border-radius:6px;">
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Appareil</td><td align="right" style="padding:9px 15px;color:#172033;font-size:12px;">{{ deviceLabel ?: userAgent ?: 'Inconnu' }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Navigateur</td><td align="right" style="padding:9px 15px;color:#172033;font-size:12px;">{{ browserName ?: 'Inconnu' }} {{ browserVersion ?: '' }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Système</td><td align="right" style="padding:9px 15px;color:#172033;font-size:12px;">{{ osName ?: 'Inconnu' }} {{ osVersion ?: '' }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Adresse IP</td><td align="right" style="padding:9px 15px;color:#172033;font-size:12px;">{{ ip ?: 'Inconnue' }}</td></tr>
-    <tr><td style="padding:9px 15px 14px;color:#748079;font-size:12px;">Date</td><td align="right" style="padding:9px 15px 14px;color:#172033;font-size:12px;">{{ requestedAt|date('d/m/Y à H:i') }}</td></tr>
+  <p style="margin:0;">Bonjour <strong style="color:#132c25;">{{ user.email }}</strong>, une nouvelle installation de l’extension MYKEYNEST a été détectée.</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;margin:23px 0;background:#f4f7f5;border:1px solid #e0e8e3;border-radius:12px;">
+    <tr><td colspan="2" style="padding:9px 15px;color:#132c25;font-size:12px;line-height:21px;word-wrap:break-word;"><span style="display:block;color:#576d65;">Appareil</span>{{ deviceLabel ?: userAgent ?: 'Inconnu' }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Navigateur</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:12px;">{{ browserName ?: 'Inconnu' }} {{ browserVersion ?: '' }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Système</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:12px;">{{ osName ?: 'Inconnu' }} {{ osVersion ?: '' }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Adresse IP</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:12px;">{{ ip ?: 'Inconnue' }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px 14px;color:#576d65;font-size:12px;">Date</td><td align="right" style="word-wrap:break-word;padding:9px 15px 14px;color:#132c25;font-size:12px;">{{ requestedAt|date('d/m/Y à H:i') }}</td></tr>
   </table>
 {% endblock %}
 
 {% block action %}
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px;"><tr><td style="padding-right:9px;"><a href="{{ approveUrl }}" style="display:inline-block;padding:13px 21px;border-radius:4px;background:#059669;color:#fff;font-size:13px;font-weight:700;text-decoration:none;">Autoriser</a></td><td><a href="{{ rejectUrl }}" style="display:inline-block;padding:12px 20px;border:1px solid #ef4444;border-radius:4px;color:#dc2626;font-size:13px;font-weight:700;text-decoration:none;">Refuser</a></td></tr></table>
+  {% include 'emails/_action.html.twig' with {actionUrl: approveUrl, label: 'Autoriser', secondaryUrl: rejectUrl, secondaryLabel: 'Refuser'} %}
 {% endblock %}
 
-{% block after_action %}<p style="margin:21px 0 0;color:#88938f;font-size:12px;line-height:1.6;">Les liens expirent dans 15 minutes. L’extension restera inactive tant que vous ne l’avez pas autorisée.</p>{% endblock %}
-{% block footer %}<p style="margin:0;">Si cette demande ne vient pas de vous, refusez-la et vérifiez la sécurité de votre compte.</p><p style="margin:5px 0 0;">© {{ 'now'|date('Y') }} MYKEYNEST</p>{% endblock %}
+{% block after_action %}<p style="margin:21px 0 0;color:#576d65;font-size:12px;line-height:1.6;">Les liens expirent dans 15 minutes. L’extension restera inactive tant que vous ne l’avez pas autorisée.</p>{% endblock %}
+{% block footer %}<p style="margin:0;">Si cette demande ne vient pas de vous, refusez-la et vérifiez la sécurité de votre compte.</p>{% endblock %}

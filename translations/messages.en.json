@@ -130,8 +130,8 @@
       "cta": "Complete my profile",
       "footer": "If you did not sign up for this account, you can safely ignore this email.",
       "benefits": {
-        "title": "✨ What you can do right now:",
-        "item1": "Manage your keys securely",
+        "title": "Getting started:",
+        "item1": "Organize your credentials in your vault",
         "item2": "Access your personalized dashboard",
         "item3": "Configure your preferences"
       },
@@ -140,7 +140,7 @@
         "link": "Contact our support"
       },
       "copyright": "KeyNest - Secure key management",
-      "disclaimer": "You are receiving this email because you signed up for KeyNest."
+      "disclaimer": "You received this email after signing up for MYKEYNEST."
     }
   },
   "common": {

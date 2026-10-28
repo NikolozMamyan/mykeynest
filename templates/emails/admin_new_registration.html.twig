@@ -6,12 +6,14 @@
 {% block heading %}Nouvelle inscription{% endblock %}
 {% block content %}
   <p style="margin:0 0 20px;">Un nouvel utilisateur vient de créer son compte MYKEYNEST.</p>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f7faf9;border:1px solid #e1e9e7;border-radius:6px;">
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">E-mail</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;font-weight:700;">{{ user.email }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Entreprise</td><td align="right" style="padding:9px 15px;color:#172033;font-size:13px;">{{ user.company ?? '—' }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">Date</td><td align="right" style="padding:9px 15px;color:#172033;font-size:12px;">{{ registeredAt|date('d/m/Y H:i') }}</td></tr>
-    <tr><td style="padding:9px 15px;color:#748079;font-size:12px;">IP</td><td align="right" style="padding:9px 15px;color:#172033;font-size:12px;">{{ ip ?? '—' }}</td></tr>
-    <tr><td style="padding:9px 15px 14px;color:#748079;font-size:12px;">Appareil</td><td align="right" style="max-width:310px;padding:9px 15px 14px;color:#172033;font-size:11px;word-break:break-word;">{{ userAgent ?? '—' }}</td></tr>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;background:#f4f7f5;border:1px solid #e0e8e3;border-radius:12px;">
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">E-mail</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:13px;font-weight:700;">{{ user.email }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Entreprise</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:13px;">{{ user.company ?? '—' }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">Date</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:12px;">{{ registeredAt|date('d/m/Y H:i') }}</td></tr>
+    <tr><td style="word-wrap:break-word;padding:9px 15px;color:#576d65;font-size:12px;">IP</td><td align="right" style="word-wrap:break-word;padding:9px 15px;color:#132c25;font-size:12px;">{{ ip ?? '—' }}</td></tr>
+    <tr><td colspan="2" style="padding:9px 15px 14px;color:#132c25;font-size:12px;line-height:21px;word-wrap:break-word;"><span style="display:block;color:#576d65;">Appareil</span>{{ userAgent ?? '—' }}</td></tr>
   </table>
 {% endblock %}
-{% block action %}<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:25px;"><tr><td style="background:#172033;border-radius:4px;"><a href="{{ adminUrl }}" style="display:inline-block;padding:13px 23px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">Ouvrir l’administration</a></td></tr></table>{% endblock %}
+{% block action %}
+  {% include 'emails/_action.html.twig' with {actionUrl: adminUrl, label: 'Ouvrir l’administration'} %}
+{% endblock %}
