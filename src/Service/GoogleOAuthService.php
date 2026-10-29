@@ -15,6 +15,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final readonly class GoogleOAuthService
 {
     private const SESSION_KEY = '_google_oauth';
+    private const CLOCK_TOLERANCE = 60;
 
     public function __construct(
         private HttpClientInterface $httpClient,
@@ -89,11 +90,17 @@ final readonly class GoogleOAuthService
             $keys = $this->cache->get('google_oidc_signing_keys', $fetchKeys);
         }
         $keys['keys'] = array_values(array_filter($keys['keys'] ?? [], static fn (array $key): bool => ($key['alg'] ?? '') === 'RS256'));
-        $claims = (array) JWT::decode($tokens['id_token'], JWK::parseKeySet($keys, 'RS256'));
+        $previousLeeway = JWT::$leeway;
+        try {
+            JWT::$leeway = self::CLOCK_TOLERANCE;
+            $claims = (array) JWT::decode($tokens['id_token'], JWK::parseKeySet($keys, 'RS256'));
+        } finally {
+            JWT::$leeway = $previousLeeway;
+        }
         if (!in_array($claims['iss'] ?? null, ['accounts.google.com', 'https://accounts.google.com'], true)
             || ($claims['aud'] ?? null) !== $this->clientId || (isset($claims['azp']) && $claims['azp'] !== $this->clientId)
             || !is_numeric($claims['exp'] ?? null) || $claims['exp'] <= time()
-            || !is_numeric($claims['iat'] ?? null) || $claims['iat'] > time()
+            || !is_numeric($claims['iat'] ?? null) || $claims['iat'] > time() + self::CLOCK_TOLERANCE
             || !is_string($claims['nonce'] ?? null) || !hash_equals($transaction['nonce'], $claims['nonce'])
             || !is_string($claims['sub'] ?? null) || '' === $claims['sub'] || strlen($claims['sub']) > 255
             || !in_array($claims['email_verified'] ?? false, [true, 'true'], true)

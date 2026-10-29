@@ -59,12 +59,13 @@ final class GoogleOAuthServiceTest extends TestCase
             [['aud' => 'another-client']], [['iss' => 'https://attacker.example']],
             [['nonce' => 'wrong-nonce']], [['email_verified' => false]], [['email' => 'invalid']],
             [['sub' => '']], [['azp' => 'another-client']],
+            [['exp' => time() - 30]],
         ];
     }
 
     public function testRejectsExpiredSignedToken(): void
     {
-        [$service, $request, $query] = $this->flow(['exp' => time() - 30]);
+        [$service, $request, $query] = $this->flow(['exp' => time() - 120]);
         $request->query->add(['code' => 'code', 'state' => $query['state']]);
         self::expectException(\UnexpectedValueException::class);
         $service->finish($request);
@@ -76,6 +77,33 @@ final class GoogleOAuthServiceTest extends TestCase
         $request->query->add(['code' => 'code', 'state' => $query['state']]);
         self::expectException(\UnexpectedValueException::class);
         $service->finish($request);
+    }
+
+    public function testAcceptsSmallClockSkewAndRestoresTheGlobalJwtSetting(): void
+    {
+        $previousLeeway = JWT::$leeway;
+        JWT::$leeway = 7;
+        try {
+            [$service, $request, $query] = $this->flow(['iat' => time() + 10]);
+            $request->query->add(['code' => 'code', 'state' => $query['state']]);
+            self::assertSame('google-subject', $service->finish($request)['identity']['sub']);
+            self::assertSame(7, JWT::$leeway);
+        } finally {
+            JWT::$leeway = $previousLeeway;
+        }
+    }
+
+    public function testRejectsTokensIssuedTooFarInTheFuture(): void
+    {
+        $previousLeeway = JWT::$leeway;
+        [$service, $request, $query] = $this->flow(['iat' => time() + 120]);
+        $request->query->add(['code' => 'code', 'state' => $query['state']]);
+        self::expectException(\UnexpectedValueException::class);
+        try {
+            $service->finish($request);
+        } finally {
+            self::assertSame($previousLeeway, JWT::$leeway);
+        }
     }
 
     public function testRejectsInvalidStateBeforeContactingGoogle(): void
