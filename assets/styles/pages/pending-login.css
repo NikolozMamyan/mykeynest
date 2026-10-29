@@ -1,0 +1,22 @@
+.login-verification .verification-wrapper { min-height: calc(100svh - 112px); display: grid; place-items: center; padding: 32px 24px 56px; }
+.login-verification .verification-card { width: min(500px, 100%); padding: 38px; border: 1px solid var(--color-border); border-radius: 24px; background: var(--glass-card-bg); box-shadow: var(--glass-card-shadow); text-align: center; }
+.verification-icon { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 24px; border: 1px solid var(--color-border); border-radius: 18px; color: var(--color-primary); background: var(--public-accent-soft); }
+.verification-icon svg { width: 32px; height: 32px; }
+.verification-card h1 { margin: 0 0 16px; color: var(--color-text-dark); font-size: clamp(1.5rem, 4vw, 1.9rem); line-height: 1.25; letter-spacing: -.045em; }
+.verification-email { margin: 0 0 18px; color: var(--color-primary); font-size: .85rem; font-weight: 600; overflow-wrap: anywhere; }
+.verification-status { display: inline-block; padding: 6px 12px; border-radius: 20px; color: var(--color-primary); background: var(--public-accent-soft); font-size: .72rem; font-weight: 600; }
+.verification-feedback p { margin: 15px 0 0; color: var(--color-text-muted); font-size: .85rem; line-height: 1.8; }
+.verification-steps { display: grid; gap: 14px; margin: 24px 0 0; padding: 20px 20px 20px 40px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--app-surface); text-align: left; color: var(--color-text-medium); font-size: .8rem; line-height: 1.7; }
+.verification-steps li { padding-left: 4px; }
+.verification-steps li::marker { color: var(--color-primary); font-weight: 700; }
+.verification-hint { margin: 20px 0 0; color: var(--color-text-muted); font-size: .75rem; line-height: 1.7; }
+.verification-actions { display: grid; gap: 10px; margin-top: 26px; }
+.verification-button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 11px; background: var(--app-surface); color: var(--color-text-medium); font: inherit; font-size: .8rem; font-weight: 600; text-decoration: none; cursor: pointer; }
+.verification-button--primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
+.verification-button:hover { filter: brightness(.96); }
+.verification-button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.verification-button:disabled { cursor: wait; opacity: .65; }
+.verification-card [hidden] { display: none; }
+.verification-card:is([data-state="rejected"], [data-state="expired"], [data-state="missing"]) .verification-status { color: #9a3412; background: #fff7ed; }
+.verification-card[data-state="unavailable"] .verification-status { color: #92400e; background: #fef3c7; }
+@media (max-width: 540px) { .login-verification .verification-wrapper { min-height: calc(100svh - 96px); padding: 24px 16px 40px; } .login-verification .verification-card { padding: 28px 22px; } }

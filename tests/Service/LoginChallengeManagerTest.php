@@ -105,6 +105,25 @@ final class LoginChallengeManagerTest extends TestCase
         self::assertFalse($manager->claimForCompletion(new LoginChallenge()));
     }
 
+    public function testExpiredApprovalIsMarkedExpiredInsteadOfRemainingApproved(): void
+    {
+        $challenge = (new LoginChallenge())->setStatus(LoginChallenge::STATUS_APPROVED)->setExpiresAt(new \DateTimeImmutable('-1 minute'));
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('flush');
+        $manager = new LoginChallengeManager($em, $this->createMock(LoginChallengeRepository::class), new RequestStack(), $this->createMock(UserDeviceManager::class));
+        $manager->markExpiredIfNeeded($challenge);
+        self::assertSame(LoginChallenge::STATUS_EXPIRED, $challenge->getStatus());
+    }
+
+    public function testReplacedChallengeIsInvalidEvenBeforeItsOriginalExpiry(): void
+    {
+        $challenge = (new LoginChallenge())->setStatus(LoginChallenge::STATUS_EXPIRED);
+        $repository = $this->createMock(LoginChallengeRepository::class);
+        $repository->method('findOneBy')->willReturn($challenge);
+        $manager = new LoginChallengeManager($this->createMock(EntityManagerInterface::class), $repository, new RequestStack(), $this->createMock(UserDeviceManager::class));
+        self::assertNull($manager->findValidByPlainToken('replaced-token'));
+    }
+
     public function testApprovedChallengeIsClaimedOnlyThroughAtomicRepositoryUpdate(): void
     {
         $challenge = (new LoginChallenge())

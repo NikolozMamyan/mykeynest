@@ -11,11 +11,9 @@ use App\Service\UserLoginService;
 use App\Service\UserRegistrationService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\SessionManager;
-use App\Service\UserDeviceManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -120,12 +118,13 @@ final class AuthController extends AbstractController
     #[Route('/api/login-challenge/status', name: 'api_login_challenge_status', methods: ['GET'])]
     public function loginChallengeStatus(
         Request $request,
-        LoginChallengeManager $loginChallengeManager
+        LoginChallengeManager $loginChallengeManager,
+        SessionManager $sessionManager,
     ): JsonResponse {
         $plainToken = $request->cookies->get(LoginChallengeManager::COOKIE_NAME);
 
         if (!$plainToken) {
-            return new JsonResponse([
+            return $this->activeLoginResponse($request, $sessionManager) ?? $this->challengeResponse([
                 'error' => 'Aucune tentative de connexion en attente.',
             ], 404);
         }
@@ -133,14 +132,20 @@ final class AuthController extends AbstractController
         $challenge = $loginChallengeManager->findByPlainToken($plainToken);
 
         if (!$challenge) {
-            return new JsonResponse([
+            return $this->challengeResponse([
                 'error' => 'Tentative introuvable.',
             ], 404);
         }
 
         $loginChallengeManager->markExpiredIfNeeded($challenge);
 
-        return new JsonResponse([
+        if ($challenge->isCompleted() && null !== ($response = $this->activeLoginResponse($request, $sessionManager, $challenge->getUser()))) {
+            $response->headers->clearCookie(LoginChallengeManager::COOKIE_NAME, '/');
+
+            return $response;
+        }
+
+        return $this->challengeResponse([
             'status' => $challenge->getStatus(),
             'expiresAt' => $challenge->getExpiresAt()?->format(DATE_ATOM),
             'email' => $challenge->getUser()?->getEmail(),
@@ -152,31 +157,31 @@ final class AuthController extends AbstractController
         Request $request,
         LoginChallengeManager $loginChallengeManager,
         SessionManager $sessionManager,
-        UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
         $plainToken = $request->cookies->get(LoginChallengeManager::COOKIE_NAME);
 
         if (!$plainToken) {
-            return new JsonResponse(['error' => 'Aucune validation en attente.'], 404);
+            return $this->activeLoginResponse($request, $sessionManager) ?? $this->challengeResponse(['error' => 'Aucune validation en attente.'], 404);
         }
 
         $challenge = $loginChallengeManager->findValidByPlainToken($plainToken);
 
         if (!$challenge) {
-            $response = new JsonResponse(['error' => 'Tentative invalide ou expirée.'], 400);
+            $response = $this->challengeResponse(['error' => 'Tentative invalide ou expirée.', 'status' => 'expired'], 400);
             $response->headers->clearCookie(LoginChallengeManager::COOKIE_NAME, '/');
 
             return $response;
         }
 
         if ($challenge->isCompleted()) {
-            return new JsonResponse([
+            return $this->activeLoginResponse($request, $sessionManager, $challenge->getUser()) ?? $this->challengeResponse([
                 'error' => 'Cette tentative a déjà été finalisée.',
+                'status' => 'completed',
             ], 409);
         }
 
         if (!$challenge->isApproved()) {
-            return new JsonResponse([
+            return $this->challengeResponse([
                 'error' => 'Cette tentative n’a pas encore été approuvée.',
                 'status' => $challenge->getStatus(),
             ], 409);
@@ -190,9 +195,10 @@ final class AuthController extends AbstractController
             || $challengeDeviceId === null
             || !hash_equals($challengeDeviceId, $currentDeviceId)
         ) {
-            $response = new JsonResponse([
+            $response = $this->challengeResponse([
                 'error' => 'Appareil de validation différent',
                 'message' => 'Finalisez la connexion depuis le navigateur qui a demandé le challenge.',
+                'status' => 'different_device',
             ], 409);
             $response->headers->clearCookie(LoginChallengeManager::COOKIE_NAME, '/');
 
@@ -200,8 +206,9 @@ final class AuthController extends AbstractController
         }
 
         if (!$loginChallengeManager->claimForCompletion($challenge)) {
-            return new JsonResponse([
+            return $this->challengeResponse([
                 'error' => 'Cette tentative a déjà été utilisée ou a expiré.',
+                'status' => $challenge->isExpired() ? 'expired' : 'completed',
             ], 409);
         }
 
@@ -217,13 +224,14 @@ final class AuthController extends AbstractController
                 $challengeDeviceId
             );
         } catch (\RuntimeException $e) {
-            return new JsonResponse([
+            return $this->challengeResponse([
                 'error' => 'Connexion bloquée',
                 'message' => $e->getMessage(),
+                'status' => 'rejected',
             ], 403);
         }
 
-        $response = new JsonResponse([
+        $response = $this->challengeResponse([
             'message' => 'Connexion validée et finalisée.',
             'user' => [
                 'id' => $challenge->getUser()?->getId(),
@@ -244,19 +252,33 @@ final class AuthController extends AbstractController
         return $response;
     }
 
+    private function challengeResponse(array $data, int $status = 200): JsonResponse
+    {
+        return new JsonResponse($data, $status, ['Cache-Control' => 'private, no-store']);
+    }
+
+    private function activeLoginResponse(Request $request, SessionManager $sessions, ?User $expectedUser = null): ?JsonResponse
+    {
+        $token = $request->cookies->get('AUTH_TOKEN');
+        $user = is_string($token) ? $sessions->findActiveSessionByPlainToken($token)?->getUser() : null;
+        if (null === $user || (null !== $expectedUser && $expectedUser->getId() !== $user->getId())) {
+            return null;
+        }
+
+        return $this->challengeResponse(['status' => 'completed', 'redirectUrl' => $this->userLogin->redirectUrl($user, $request)]);
+    }
+
     #[Route('/api/login-challenge/{token}/approve', name: 'api_login_challenge_approve', methods: ['GET', 'POST'])]
     public function approveLoginChallenge(
         Request $request,
         string $token,
-        LoginChallengeManager $loginChallengeManager
+        LoginChallengeManager $loginChallengeManager,
+        SessionManager $sessionManager,
     ): Response {
         $challenge = $loginChallengeManager->findValidByPlainToken($token);
 
         if (!$challenge) {
-            return new Response(
-                '<h1>Lien invalide ou expiré</h1><p>Cette demande de connexion n’est plus valide.</p>',
-                400
-            );
+            return $this->render('security/pending_login.html.twig', ['state' => 'expired', 'poll' => false], new Response(status: 400));
         }
 
         if ($request->isMethod(Request::METHOD_GET)) {
@@ -276,8 +298,13 @@ final class AuthController extends AbstractController
 
         $loginChallengeManager->approve($challenge);
 
-        return $this->redirectToRoute('app_pending_login', [
-            'approved' => 1,
+        $pendingToken = $request->cookies->get(LoginChallengeManager::COOKIE_NAME);
+        $sameBrowser = is_string($pendingToken) && hash_equals($token, $pendingToken)
+            && $sessionManager->getCurrentDeviceId() === $challenge->getDeviceId();
+
+        return $this->render('security/pending_login.html.twig', [
+            'state' => $challenge->isRejected() ? 'rejected' : ($challenge->isExpired() ? 'expired' : 'approved'),
+            'poll' => $sameBrowser && ($challenge->isApproved() || $challenge->isCompleted()),
         ]);
     }
 
@@ -291,10 +318,7 @@ final class AuthController extends AbstractController
         $challenge = $loginChallengeManager->findValidByPlainToken($token);
 
         if (!$challenge) {
-            return new Response(
-                '<h1>Lien invalide ou expiré</h1><p>Cette demande de connexion n’est plus valide.</p>',
-                400
-            );
+            return $this->render('security/pending_login.html.twig', ['state' => 'expired', 'poll' => false], new Response(status: 400));
         }
 
         if ($request->isMethod(Request::METHOD_GET)) {
@@ -304,7 +328,7 @@ final class AuthController extends AbstractController
                 'confirmLabel' => 'Oui, refuser et bloquer',
                 'cancelLabel' => 'Annuler',
                 'csrfTokenId' => 'login_challenge_reject_' . $token,
-                'autoSubmit' => true,
+                'autoSubmit' => false,
             ]);
         }
 
@@ -312,17 +336,14 @@ final class AuthController extends AbstractController
             throw $this->createAccessDeniedException('CSRF token invalide.');
         }
 
-        $loginChallengeManager->reject($challenge);
+        if ($challenge->isPending()) {
+            $loginChallengeManager->reject($challenge);
+            $sessionManager->blockDevice($challenge->getUser(), $challenge->getDeviceId(), 'Connexion refusée par e-mail');
+        }
 
-        $sessionManager->blockDevice(
-            $challenge->getUser(),
-            $challenge->getDeviceId(),
-            'Connexion refusée par e-mail'
-        );
-
-        return new Response(
-            '<h1>Connexion refusée</h1><p>L’appareil a été bloqué. Si ce n’était pas vous, votre compte est protégé.</p>'
-        );
+        return $this->render('security/pending_login.html.twig', [
+            'state' => $challenge->isRejected() ? 'rejected' : ($challenge->isExpired() ? 'expired' : 'approved'), 'poll' => false,
+        ]);
     }
 
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]

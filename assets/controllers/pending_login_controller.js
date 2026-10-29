@@ -1,93 +1,97 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['status', 'message']
+  static targets = ['status', 'message', 'title', 'email', 'steps', 'hint', 'retry']
+  static values = { poll: { type: Boolean, default: true }, messages: Object }
 
   connect() {
-    this.completing = false
-    this.interval = setInterval(() => this.checkStatus(), 3000)
-    this.checkStatus()
+    this.active = true
+    this.checking = false
+    this.polling = this.pollValue
+    if (this.polling) this.checkStatus()
   }
 
   disconnect() {
-    if (this.interval) {
-      clearInterval(this.interval)
+    this.active = false
+    clearTimeout(this.timeout)
+  }
+
+  showState(state, message = null) {
+    const labels = this.messagesValue[state]
+    this.element.dataset.state = state
+    this.titleTarget.textContent = labels.title
+    this.statusTarget.textContent = labels.status
+    this.messageTarget.textContent = message || labels.message
+    this.stepsTarget.hidden = state !== 'pending'
+    this.hintTarget.hidden = state !== 'pending'
+    this.retryTarget.textContent = state === 'unavailable' ? this.messagesValue.retry : this.messagesValue.check
+    if (['rejected', 'expired', 'missing', 'completed', 'different_device'].includes(state)) {
+      this.polling = false
+      this.retryTarget.hidden = true
     }
   }
 
   async checkStatus() {
+    if (!this.active || this.checking || !this.polling) return
+    clearTimeout(this.timeout)
+    this.checking = true
+    this.retryTarget.disabled = true
     try {
       const response = await fetch('/api/login-challenge/status', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json'
-        }
+        credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' }
       })
-
-      const data = await response.json().catch(() => ({}))
-
+      const data = await response.json()
+      if (!this.active) return
       if (!response.ok) {
-        this.statusTarget.textContent = 'error'
-        this.messageTarget.textContent = data.error || 'Tentative introuvable'
+        this.showState(response.status === 404 ? 'missing' : 'unavailable')
         return
       }
-
-      this.statusTarget.textContent = data.status
-
-      if (data.status === 'pending') {
-        this.messageTarget.textContent = 'Validation en attente. Vérifiez votre e-mail.'
+      if (data.email) {
+        this.emailTarget.textContent = data.email
+        this.emailTarget.hidden = false
+      }
+      if (data.status === 'completed' && data.redirectUrl) {
+        this.polling = false
+        window.location.assign(data.redirectUrl)
         return
       }
-
+      if (!['pending', 'approved', 'rejected', 'expired', 'completed'].includes(data.status)) {
+        this.showState('unavailable')
+        return
+      }
+      this.showState(data.status)
       if (data.status === 'approved') {
-        this.messageTarget.textContent = 'Connexion approuvée. Finalisation en cours...'
-        if (!this.completing) {
-          await this.completeLogin()
-        }
-        return
+        this.messageTarget.textContent = this.messagesValue.finishing
+        await this.completeLogin()
       }
-
-      if (data.status === 'rejected') {
-        this.messageTarget.textContent = 'Connexion refusée. Cet appareil a été bloqué.'
-        clearInterval(this.interval)
-        return
+    } catch {
+      if (this.active) this.showState('unavailable')
+    } finally {
+      this.checking = false
+      this.retryTarget.disabled = false
+      if (this.active && this.polling) {
+        this.timeout = setTimeout(() => this.checkStatus(), 3000)
       }
-
-      if (data.status === 'expired') {
-        this.messageTarget.textContent = 'La demande a expiré. Veuillez recommencer.'
-        clearInterval(this.interval)
-        return
-      }
-
-      if (data.status === 'completed') {
-        window.location.href = '/app/credential'
-      }
-    } catch (error) {
-      this.messageTarget.textContent = 'Erreur réseau.'
     }
   }
 
   async completeLogin() {
-    this.completing = true
-    clearInterval(this.interval)
-
     const response = await fetch('/api/login-challenge/complete', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json'
-      }
+      method: 'POST', credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' }
     })
-
-    const data = await response.json().catch(() => ({}))
-
-    if (!response.ok) {
-      this.messageTarget.textContent = data.error || 'Impossible de finaliser la connexion.'
+    const data = await response.json()
+    if (!this.active) return
+    if (response.ok && data.redirectUrl) {
+      this.polling = false
+      window.location.assign(data.redirectUrl)
       return
     }
-
-    clearInterval(this.interval)
-    window.location.href = data.redirectUrl || '/app/credential'
+    if (response.status === 409 && data.status === 'completed') {
+      // Another tab may have just received the session cookie; check it on the next poll.
+      this.messageTarget.textContent = this.messagesValue.finishing
+      return
+    }
+    const state = ['expired', 'rejected', 'different_device'].includes(data.status) ? data.status : 'unavailable'
+    this.showState(state)
   }
 }

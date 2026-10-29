@@ -72,7 +72,7 @@ class LoginChallengeManager
 
         $this->markExpiredIfNeeded($challenge);
 
-        if ($challenge->isExpired()) {
+        if ($challenge->isExpired() || LoginChallenge::STATUS_EXPIRED === $challenge->getStatus()) {
             return null;
         }
 
@@ -133,7 +133,7 @@ class LoginChallengeManager
 
     public function markExpiredIfNeeded(LoginChallenge $challenge): void
     {
-        if (!$challenge->isExpired() || !$challenge->isPending()) {
+        if (!$challenge->isExpired() || (!$challenge->isPending() && !$challenge->isApproved())) {
             return;
         }
 

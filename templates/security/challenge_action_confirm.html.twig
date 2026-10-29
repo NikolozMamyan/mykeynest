@@ -85,8 +85,18 @@
     </form>
     {% if autoSubmit|default(false) %}
       <script>
+        const challengeForm = document.getElementById('challenge-action-form');
+        let submitting = false;
+        challengeForm.addEventListener('submit', event => {
+          if (submitting) {
+            event.preventDefault();
+            return;
+          }
+          submitting = true;
+          challengeForm.querySelector('button[type="submit"]').disabled = true;
+        });
         window.setTimeout(() => {
-          document.getElementById('challenge-action-form')?.submit();
+          if (!submitting) challengeForm.requestSubmit();
         }, 60);
       </script>
     {% endif %}

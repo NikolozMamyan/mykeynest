@@ -1,4 +1,23 @@
 {
+  "login_verification": {
+    "pending": {"title": "Check your email", "status": "Waiting for your confirmation", "message": "Use the MYKEYNEST email to approve this sign-in. Keep this page open."},
+    "approved": {"title": "Sign-in approved", "status": "Confirmation received", "message": "You can close this page. Return to the browser where you started signing in: it will sign you in automatically."},
+    "rejected": {"title": "Sign-in denied", "status": "Device blocked", "message": "This request was denied. The device cannot sign in. You can close this page."},
+    "expired": {"title": "This request has expired", "status": "Link expired or replaced", "message": "For your security, approval links are valid for 15 minutes. Start signing in again to receive a new link."},
+    "missing": {"title": "No pending sign-in", "status": "Request not found", "message": "Return to the browser where you started signing in, or start again to receive a new link."},
+    "unavailable": {"title": "Checking your sign-in", "status": "Checking again in a few seconds", "message": "The connection to the server was interrupted. Your approval has not been cancelled: we will retry automatically."},
+    "completed": {"title": "This request has already been used", "status": "Sign-in already completed", "message": "Return to your account in the original browser. If you no longer have access to it, start signing in again."},
+    "different_device": {"title": "Return to your original browser", "status": "Sign-in approved on another device", "message": "Your approval was received. To finish signing in, use the browser where you started."},
+    "finishing": "Your sign-in is approved. Opening your account…",
+    "check": "I’ve approved the email",
+    "retry": "Check again",
+    "restart": "Start signing in again",
+    "step_email": "Open the MYKEYNEST sign-in email.",
+    "step_confirm": "Click “Yes, it’s me”.",
+    "step_return": "Return here: your account will open automatically.",
+    "spam": "Can’t find the email? Check your spam folder too. The link is valid for 15 minutes.",
+    "javascript": "Enable JavaScript to finish signing in automatically, then refresh this page."
+  },
   "error_pages": {
     "not_found": {
       "title": "Page not found",

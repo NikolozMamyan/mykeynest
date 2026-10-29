@@ -1,4 +1,23 @@
 {
+  "login_verification": {
+    "pending": {"title": "Vérifiez votre boîte mail", "status": "En attente de votre confirmation", "message": "Un e-mail MYKEYNEST vous permet d’autoriser cette connexion. Gardez cette page ouverte."},
+    "approved": {"title": "Connexion approuvée", "status": "Confirmation reçue", "message": "Vous pouvez fermer cette page. Retournez dans le navigateur où vous avez commencé la connexion : il vous connectera automatiquement."},
+    "rejected": {"title": "Connexion refusée", "status": "Appareil bloqué", "message": "Cette demande a été refusée. L’appareil concerné ne peut pas se connecter. Vous pouvez fermer cette page."},
+    "expired": {"title": "Cette demande a expiré", "status": "Lien expiré ou remplacé", "message": "Pour votre sécurité, une validation reste valable 15 minutes. Recommencez la connexion pour recevoir un nouveau lien."},
+    "missing": {"title": "Aucune connexion en attente", "status": "Demande introuvable", "message": "Revenez dans le navigateur où vous avez commencé la connexion, ou recommencez pour recevoir un nouveau lien."},
+    "unavailable": {"title": "Nous vérifions votre connexion", "status": "Nouvelle vérification dans quelques secondes", "message": "La connexion au serveur a été interrompue. Votre validation n’est pas annulée : nous réessayons automatiquement."},
+    "completed": {"title": "Cette demande a déjà été utilisée", "status": "Connexion déjà finalisée", "message": "Retrouvez votre espace dans le navigateur d’origine. Si vous n’y avez plus accès, recommencez la connexion."},
+    "different_device": {"title": "Revenez au navigateur d’origine", "status": "Connexion approuvée sur un autre appareil", "message": "La validation a bien été reçue. Pour terminer, utilisez le navigateur dans lequel vous avez commencé la connexion."},
+    "finishing": "Votre connexion est approuvée. Ouverture de votre espace…",
+    "check": "J’ai validé l’e-mail",
+    "retry": "Vérifier à nouveau",
+    "restart": "Recommencer la connexion",
+    "step_email": "Ouvrez l’e-mail de connexion MYKEYNEST.",
+    "step_confirm": "Cliquez sur « Oui, c’est moi ».",
+    "step_return": "Revenez ici : votre espace s’ouvrira automatiquement.",
+    "spam": "E-mail introuvable ? Vérifiez aussi les spams. Le lien est valable 15 minutes.",
+    "javascript": "Activez JavaScript pour terminer la connexion automatiquement, puis actualisez cette page."
+  },
   "error_pages": {
     "not_found": {
       "title": "Page introuvable",
