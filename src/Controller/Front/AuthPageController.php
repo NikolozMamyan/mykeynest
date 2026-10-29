@@ -11,6 +11,7 @@ use App\Service\ExtensionOnboardingPolicy;
 use App\Service\SessionManager;
 use App\Service\OrganizationSeatManager;
 use App\Service\TokenCleaner;
+use App\Service\GoogleOAuthService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -88,7 +89,7 @@ class AuthPageController extends AbstractController
     }
 
     #[Route('/login', name: 'show_login', methods: ['GET'])]
-    public function login(Request $request, TokenCleaner $cleaner, SessionManager $sessionManager): Response
+    public function login(Request $request, TokenCleaner $cleaner, SessionManager $sessionManager, GoogleOAuthService $google): Response
     {
         $redirect = $this->redirectIfAuthenticatedBySessionCookie($request, $sessionManager);
         if ($redirect !== null) {
@@ -99,14 +100,14 @@ class AuthPageController extends AbstractController
         $cleaner->clearTokenFromRequest($request, $response);
 
         $response->setContent(
-            $this->renderView('auth/login.html.twig')
+            $this->renderView('auth/login.html.twig', ['googleAuthEnabled' => $google->isConfigured()])
         );
 
         return $response;
     }
 
     #[Route('/register', name: 'show_register', methods: ['GET'])]
-    public function showRegister(Request $request, TokenCleaner $cleaner, SessionManager $sessionManager): Response
+    public function showRegister(Request $request, TokenCleaner $cleaner, SessionManager $sessionManager, GoogleOAuthService $google): Response
     {
         $redirect = $this->redirectIfAuthenticatedBySessionCookie($request, $sessionManager);
         if ($redirect !== null) {
@@ -117,7 +118,7 @@ class AuthPageController extends AbstractController
         $cleaner->clearTokenFromRequest($request, $response);
 
         $response->setContent(
-            $this->renderView('auth/register.html.twig')
+            $this->renderView('auth/register.html.twig', ['googleAuthEnabled' => $google->isConfigured()])
         );
 
         return $response;

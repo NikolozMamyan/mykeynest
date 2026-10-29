@@ -1,0 +1,68 @@
+{% set locale = app.request.getPreferredLanguage(['en', 'fr']) %}
+{% set savedLocale = app.request.cookies.get('MYKEYNEST_LOCALE') %}
+{% set requestedLocale = app.request.query.all.lang|default(null) %}
+{% if savedLocale in ['fr', 'en'] %}{% set locale = savedLocale %}{% endif %}
+{% if requestedLocale in ['fr', 'en'] %}{% set locale = requestedLocale %}{% endif %}
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <meta name="theme-color" content="#f3f7f5">
+    <title>{{ 'error_pages.not_found.title'|trans({}, 'messages', locale) }} · MYKEYNEST</title>
+    {% include 'components/parts/_theme_boot.html.twig' %}
+    <link rel="icon" href="{{ asset('icon-192.png') }}">
+    <link rel="stylesheet" href="{{ asset('styles/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/components/logo.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/components/lang-switcher.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/pages/error-page.css') }}">
+  </head>
+  <body class="public-page error-page">
+    {% set localeParams = { lang: locale } %}
+    <header class="public-auth-header">
+      <a href="{{ path('app_landing', localeParams) }}" class="nav-logo">
+        <div class="nav-logo-icon">{% include 'components/parts/_dot_mark.html.twig' with { extraClass: 'nav-logo-mark' } only %}</div>
+        <span class="nav-logo-text"><span class="logo-my">MY</span><span class="logo-key">KEY</span><span class="logo-nest">NEST</span></span>
+      </a>
+      <nav class="lang-switch" aria-label="{{ 'landing.nav.language'|trans({}, 'messages', locale) }}">
+        <a href="?lang=fr" class="lang-switch__btn {{ locale == 'fr' ? 'is-active' : '' }}" title="Français" {{ locale == 'fr' ? 'aria-current="true"' : '' }}><img src="{{ asset('images/flags/fr.svg') }}" alt="Français" class="lang-switch__flag" width="22" height="16"></a>
+        <a href="?lang=en" class="lang-switch__btn {{ locale == 'en' ? 'is-active' : '' }}" title="English" {{ locale == 'en' ? 'aria-current="true"' : '' }}><img src="{{ asset('images/flags/gb.svg') }}" alt="English" class="lang-switch__flag" width="22" height="16"></a>
+      </nav>
+    </header>
+
+    <main class="not-found" aria-labelledby="not-found-title">
+      <div class="not-found__art" aria-hidden="true">
+        <span class="not-found__orbit"></span>
+        <span class="not-found__digit">4</span>
+        <div class="not-found__lock">
+          <svg viewBox="0 0 80 100" fill="none">
+            <path d="M40 5 71 18v29c0 23-18 39-31 48C27 86 9 70 9 47V18L40 5Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M40 13 64 23v24c0 18-13 32-24 40C29 79 16 65 16 47V23l24-10Z" stroke="currentColor" stroke-opacity=".25"/>
+            <rect x="27" y="42" width="26" height="23" rx="6" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="2"/>
+            <path d="M32 42v-8a8 8 0 0 1 16 0v8M40 52v5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <span class="not-found__spark">✦</span>
+        </div>
+        <span class="not-found__digit">4</span>
+      </div>
+
+      <span class="not-found__eyebrow">{{ 'error_pages.not_found.label'|trans({}, 'messages', locale) }}</span>
+      <h1 id="not-found-title">{{ 'error_pages.not_found.heading'|trans({}, 'messages', locale) }}</h1>
+      <p class="not-found__description">{{ 'error_pages.not_found.description'|trans({}, 'messages', locale) }}</p>
+
+      <nav class="not-found__actions" aria-label="{{ 'error_pages.not_found.navigation'|trans({}, 'messages', locale) }}">
+        <a class="not-found__button not-found__button--primary" href="{{ path('app_landing', localeParams) }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8"/></svg>
+          {{ 'error_pages.not_found.home'|trans({}, 'messages', locale) }}
+        </a>
+        <a class="not-found__button" href="{{ path('show_login', localeParams) }}">
+          {{ 'error_pages.not_found.login'|trans({}, 'messages', locale) }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </a>
+      </nav>
+      <p class="not-found__footnote">MYKEYNEST <span aria-hidden="true">·</span> {{ 'error_pages.not_found.footnote'|trans({}, 'messages', locale) }}</p>
+    </main>
+  </body>
+</html>

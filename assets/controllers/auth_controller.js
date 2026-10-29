@@ -1,10 +1,48 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['email', 'company', 'password', 'result']
+  static targets = ['email', 'company', 'password', 'result', 'accountType', 'companyField']
+  static values = { locale: String }
+
+  get messages() {
+    return this.localeValue === 'en'
+      ? { login: 'Signing in…', verify: 'Check your email to approve this sign-in.', loggedIn: 'Signed in. Redirecting…', loginError: 'Unable to sign in.', network: 'Network error. Please try again.', register: 'Creating your account…', registered: 'Account created. Redirecting…', registerError: 'Unable to create your account.' }
+      : { login: 'Connexion en cours…', verify: 'Vérifiez votre e-mail pour valider cette connexion.', loggedIn: 'Connexion réussie. Redirection…', loginError: 'Connexion impossible.', network: 'Erreur réseau. Veuillez réessayer.', register: 'Création du compte en cours…', registered: 'Compte créé. Redirection…', registerError: 'Création du compte impossible.' }
+  }
+
+  showFeedback(message, error = false) {
+    const notice = document.createElement('div')
+    notice.className = error ? 'flash-error' : 'auth-feedback'
+    notice.textContent = message
+    this.resultTarget.replaceChildren(notice)
+  }
 
   connect() {
-    console.log('Stimulus auth controller is active ✅')
+    this.changeAccountType()
+  }
+
+  changeAccountType() {
+    if (!this.hasCompanyFieldTarget) return
+    const professional = this.accountTypeTargets.some(input => input.checked && input.value === 'professional')
+    this.companyFieldTarget.hidden = !professional
+    this.companyTarget.disabled = !professional
+    this.companyTarget.required = professional
+  }
+
+  google(event) {
+    if (!this.validateCompany()) {
+      event.preventDefault()
+      return
+    }
+    const form = event.currentTarget
+    form.elements.accountType.value = this.accountTypeTargets.find(input => input.checked)?.value || 'personal'
+    form.elements.company.value = this.hasCompanyTarget && !this.companyTarget.disabled ? this.companyTarget.value.trim() : ''
+  }
+
+  validateCompany() {
+    if (!this.hasCompanyTarget || this.companyTarget.disabled) return true
+    this.companyTarget.value = this.companyTarget.value.trim()
+    return this.companyTarget.reportValidity()
   }
 
   getNextUrl() {
@@ -14,6 +52,7 @@ export default class extends Controller {
     if (!next) return null
     if (!next.startsWith('/')) return null
     if (next.startsWith('//')) return null
+    if (/[\\\x00-\x20]/.test(next)) return null
 
     return next
   }
@@ -21,18 +60,13 @@ export default class extends Controller {
   async login(event) {
     event.preventDefault()
 
-    const submitButton = event.currentTarget
+    const submitButton = event.currentTarget.querySelector('button[type="submit"]')
     submitButton.disabled = true
 
     const email = this.emailTarget.value.trim()
     const password = this.passwordTarget.value
 
-    this.resultTarget.innerHTML = `
-      <div style="color: var(--color-text-muted); font-weight: 500;">
-        Connexion en cours...
-        <span class="spinner"></span>
-      </div>
-    `
+    this.showFeedback(this.messages.login)
 
     try {
       const response = await fetch('/api/login', {
@@ -48,12 +82,7 @@ export default class extends Controller {
       const data = await response.json().catch(() => ({}))
 
       if (response.status === 202 && data.status === 'email_verification_required') {
-        this.resultTarget.innerHTML = `
-          <div style="color: var(--color-primary); font-weight: 500;">
-            Validation requise. Verifiez votre e-mail puis confirmez la connexion.
-            <span class="spinner"></span>
-          </div>
-        `
+        this.showFeedback(this.messages.verify)
 
         setTimeout(() => {
           window.location.href = '/app/security/pending-login'
@@ -63,12 +92,7 @@ export default class extends Controller {
       }
 
       if (response.ok) {
-        this.resultTarget.innerHTML = `
-          <div style="color: var(--color-primary); font-weight: 500;">
-            Connexion reussie... redirection...
-            <span class="spinner"></span>
-          </div>
-        `
+        this.showFeedback(this.messages.loggedIn)
 
         const nextUrl = this.getNextUrl() || data.redirectUrl || '/app/credential'
 
@@ -79,19 +103,11 @@ export default class extends Controller {
         return
       }
 
-      this.resultTarget.innerHTML = `
-        <div style="color: var(--damage-color);">
-          ⚠ ${data.message || data.error || 'Connexion impossible'}
-        </div>
-      `
+      this.showFeedback(data.message || data.error || this.messages.loginError, true)
     } catch (error) {
       console.error('Erreur login:', error)
 
-      this.resultTarget.innerHTML = `
-        <div style="color: var(--damage-color);">
-          ⚠ Erreur reseau. Veuillez reessayer.
-        </div>
-      `
+      this.showFeedback(this.messages.network, true)
     } finally {
       submitButton.disabled = false
     }
@@ -99,20 +115,17 @@ export default class extends Controller {
 
   async register(event) {
     event.preventDefault()
+    if (!this.validateCompany()) return
 
-    const submitButton = event.currentTarget
+    const submitButton = event.currentTarget.querySelector('button[type="submit"]')
     submitButton.disabled = true
 
-    const company = this.companyTarget.value.trim()
+    const company = this.companyTarget.disabled ? '' : this.companyTarget.value.trim()
+    const accountType = this.accountTypeTargets.find(input => input.checked)?.value || 'personal'
     const email = this.emailTarget.value.trim()
     const password = this.passwordTarget.value
 
-    this.resultTarget.innerHTML = `
-      <div style="color: var(--color-text-muted); font-weight: 500;">
-        Creation du compte en cours...
-        <span class="spinner"></span>
-      </div>
-    `
+    this.showFeedback(this.messages.register)
 
     try {
       const response = await fetch('/api/register', {
@@ -121,19 +134,14 @@ export default class extends Controller {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ company, email, password }),
+        body: JSON.stringify({ company, accountType, email, password }),
         credentials: 'include'
       })
 
       const data = await response.json().catch(() => ({}))
 
       if (response.ok) {
-        this.resultTarget.innerHTML = `
-          <div style="color: var(--color-primary); font-weight: 500;">
-            Compte cree... redirection...
-            <span class="spinner"></span>
-          </div>
-        `
+        this.showFeedback(this.messages.registered)
 
         const nextUrl = this.getNextUrl() || data.redirectUrl || '/app/credential'
 
@@ -144,19 +152,11 @@ export default class extends Controller {
         return
       }
 
-      this.resultTarget.innerHTML = `
-        <div style="color: var(--damage-color);">
-          ⚠ ${data.error || 'Creation du compte impossible.'}
-        </div>
-      `
+      this.showFeedback(data.error || this.messages.registerError, true)
     } catch (error) {
       console.error('Erreur register:', error)
 
-      this.resultTarget.innerHTML = `
-        <div style="color: var(--damage-color);">
-          ⚠ Erreur reseau. Veuillez reessayer.
-        </div>
-      `
+      this.showFeedback(this.messages.network, true)
     } finally {
       submitButton.disabled = false
     }

@@ -777,6 +777,23 @@
     </div>
 
     {{ form_end(form) }}
+
+    <section class="pref-section" style="margin-top: 20px;">
+      <div class="pref-section-header">
+        <div>
+          <h2 class="pref-section-title">{{ 'auth.google.settings_title'|trans }}</h2>
+          <p class="pref-section-desc">{{ 'auth.google.settings_hint'|trans }}</p>
+        </div>
+      </div>
+      {% if app.user.googleSubject %}
+        <p>{{ 'auth.google.linked'|trans }}</p>
+      {% elseif googleAuthEnabled|default(false) %}
+        <form action="{{ path('auth_google_link') }}" method="post">
+          <input type="hidden" name="_token" value="{{ csrf_token('google_oauth_start') }}">
+          <button class="btn btn-primary" type="submit">{{ 'auth.google.link'|trans }}</button>
+        </form>
+      {% endif %}
+    </section>
   </div>
 
 

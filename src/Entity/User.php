@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_USER_GOOGLE_SUBJECT', fields: ['googleSubject'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const EXTENSION_ONBOARDING_PENDING = 'pending';
@@ -32,8 +33,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?string $password = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleSubject = null;
 
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $apiToken = null;
@@ -41,7 +45,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $tokenExpiresAt = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $company = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -193,9 +197,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->company;
     }
 
-    public function setCompany(string $company): static
+    public function setCompany(?string $company): static
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getGoogleSubject(): ?string
+    {
+        return $this->googleSubject;
+    }
+
+    public function setGoogleSubject(?string $googleSubject): static
+    {
+        $this->googleSubject = $googleSubject;
 
         return $this;
     }

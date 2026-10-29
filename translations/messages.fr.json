@@ -1,4 +1,16 @@
 {
+  "error_pages": {
+    "not_found": {
+      "title": "Page introuvable",
+      "label": "Erreur 404 · Page introuvable",
+      "heading": "Cette page a perdu sa clé.",
+      "description": "Le lien a peut-être changé, ou la page n’existe plus. Retrouvez votre chemin vers MYKEYNEST.",
+      "navigation": "Continuer la navigation",
+      "home": "Retour à l’accueil",
+      "login": "Se connecter",
+      "footnote": "Vos accès, au bon endroit."
+    }
+  },
   "breadcrumb": {
     "dashboard": "Tableau de bord",
     "teams": "Entreprise",
@@ -651,6 +663,23 @@
     }
   },
   "auth": {
+    "google": {
+      "continue": "Continuer avec Google",
+      "or_email": "ou avec votre adresse e-mail",
+      "unavailable": "La connexion Google est temporairement indisponible. Utilisez votre adresse e-mail.",
+      "too_many": "Trop de tentatives de connexion Google. Veuillez réessayer dans quelques minutes.",
+      "invalid_state": "Cette demande a expiré. Relancez la connexion Google.",
+      "cancelled": "La connexion Google a été annulée. Vous pouvez réessayer.",
+      "failed": "La connexion Google n’a pas abouti. Réessayez ou utilisez votre adresse e-mail.",
+      "link_required": "Ce compte existe déjà. Connectez-vous avec votre mot de passe, puis associez Google dans Préférences > Connexion Google.",
+      "email_mismatch": "Choisissez le compte Google qui utilise la même adresse e-mail que votre compte MYKEYNEST.",
+      "link_conflict": "Ce compte Google est déjà associé à un autre compte.",
+      "login_blocked": "La connexion ne peut pas être finalisée. Vérifiez les autorisations de votre appareil ou utilisez la connexion par e-mail.",
+      "settings_title": "Connexion Google",
+      "settings_hint": "Associez votre compte Google pour vous connecter avec la même adresse e-mail.",
+      "link": "Associer mon compte Google",
+      "linked": "Votre compte Google est associé. Vous pouvez l’utiliser pour vous connecter."
+    },
     "login": {
       "hero": {
         "title": "Vos accès dans un seul espace",
@@ -687,13 +716,26 @@
         "title": "Créer un compte",
         "subtitle": "Remplissez les informations ci-dessous pour commencer",
         "company_label": "Nom de la société",
-        "company_placeholder": "Acme Corporation",
+        "company_placeholder": "Nom de votre entreprise",
+        "account_type": "Vous utilisez MYKEYNEST en tant que…",
+        "personal": "Particulier",
+        "personal_hint": "Pour vos accès personnels",
+        "professional": "Professionnel",
+        "professional_hint": "Pour votre activité ou équipe",
+        "free_note": "Compte gratuit · Sans carte bancaire",
         "email_label": "Adresse email",
         "email_placeholder": "vous@exemple.com",
         "password_label": "Mot de passe",
-        "submit": "Créer mon compte",
+        "submit": "Créer mon compte gratuit",
         "hint": "Déjà un compte ?",
         "hint_link": "Se connecter"
+      },
+      "errors": {
+        "invalid_input": "Renseignez une adresse e-mail valide et un mot de passe.",
+        "invalid_company": "Le nom de société n’est pas valide.",
+        "invalid_type": "Choisissez Particulier ou Professionnel.",
+        "company_required": "Renseignez le nom de votre société (255 caractères maximum).",
+        "email_used": "Cette adresse e-mail est déjà utilisée. Connectez-vous à votre compte."
       }
     }
   },

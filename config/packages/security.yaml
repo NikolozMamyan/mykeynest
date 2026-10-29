@@ -39,6 +39,7 @@ security:
         - { path: ^/api/extension-pairing/exchange$, roles: PUBLIC_ACCESS }
 
         # Pages publiques web
+        - { path: ^/auth/google(?:/callback)?$, roles: PUBLIC_ACCESS }
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/register$, roles: PUBLIC_ACCESS }

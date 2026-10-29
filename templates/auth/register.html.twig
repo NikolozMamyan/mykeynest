@@ -7,7 +7,7 @@
 
 
 <div class="auth-container">
-  <div class="register-wrapper" data-controller="auth">
+  <div class="register-wrapper" data-controller="auth" data-auth-locale-value="{{ app.request.locale }}">
 
     <!-- Colonne gauche - Hero -->
     <div class="register-hero">
@@ -51,19 +51,37 @@
         <p>{{ 'auth.register.form.subtitle'|trans }}</p>
       </div>
 
-      <form class="register-form" data-action="submit->auth#register">
-        <div class="form-group">
+      {% include 'components/auth/feedback.html.twig' %}
+      <fieldset class="auth-account-types">
+        <legend>{{ 'auth.register.form.account_type'|trans }}</legend>
+        <label class="auth-account-type">
+          <input type="radio" name="accountType" value="personal" checked form="register-form" data-auth-target="accountType" data-action="change->auth#changeAccountType" aria-controls="company-field">
+          <span class="auth-account-type__mark" aria-hidden="true"></span>
+          <span><strong>{{ 'auth.register.form.personal'|trans }}</strong><small>{{ 'auth.register.form.personal_hint'|trans }}</small></span>
+        </label>
+        <label class="auth-account-type">
+          <input type="radio" name="accountType" value="professional" form="register-form" data-auth-target="accountType" data-action="change->auth#changeAccountType" aria-controls="company-field">
+          <span class="auth-account-type__mark" aria-hidden="true"></span>
+          <span><strong>{{ 'auth.register.form.professional'|trans }}</strong><small>{{ 'auth.register.form.professional_hint'|trans }}</small></span>
+        </label>
+      </fieldset>
+        <div class="form-group auth-company-field" id="company-field" data-auth-target="companyField" hidden>
           <label for="company">{{ 'auth.register.form.company_label'|trans }}</label>
           <input
             type="text"
             id="company"
             data-auth-target="company"
             placeholder="{{ 'auth.register.form.company_placeholder'|trans }}"
-            required
+            form="register-form"
+            disabled
+            maxlength="255"
             autocomplete="organization"
           >
         </div>
 
+      {% include 'components/auth/google_button.html.twig' %}
+
+      <form id="register-form" class="register-form" data-action="submit->auth#register">
         <div class="form-group">
           <label for="email">{{ 'auth.register.form.email_label'|trans }}</label>
           <input
@@ -98,7 +116,8 @@
         </p>
       </form>
 
-      <div data-auth-target="result"></div>
+      <p class="auth-free-note">{{ 'auth.register.form.free_note'|trans }}</p>
+      <div data-auth-target="result" role="status" aria-live="polite"></div>
     </div>
 
   </div>

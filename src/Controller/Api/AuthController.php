@@ -3,20 +3,15 @@
 namespace App\Controller\Api;
 
 use App\Entity\LoginChallenge;
-use App\Entity\Notification;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\DeviceIdentifier;
-use App\Service\AdminNotificationService;
 use App\Service\LoginChallengeManager;
-use App\Service\MailerService;
-use App\Service\NotificationService;
-use App\Service\ExtensionOnboardingPolicy;
-use App\Service\EmailTwoFactorPolicy;
+use App\Service\UserLoginService;
+use App\Service\UserRegistrationService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Service\SessionManager;
 use App\Service\UserDeviceManager;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,31 +21,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class AuthController extends AbstractController
 {
     public function __construct(
         private RateLimiterFactory $authLoginLimiter,
         private RateLimiterFactory $authRegisterLimiter,
-        private ExtensionOnboardingPolicy $extensionOnboardingPolicy,
-        private EmailTwoFactorPolicy $emailTwoFactorPolicy,
+        private UserLoginService $userLogin,
+        private UserRegistrationService $registrations,
+        private TranslatorInterface $translator,
     ) {
-    }
-
-    private function getPostAuthRedirectUrl(UrlGeneratorInterface $urlGenerator, User $user): string
-    {
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            return $urlGenerator->generate('app_admin');
-        }
-
-        if ($this->extensionOnboardingPolicy->isRequiredFor($user)) {
-            return $urlGenerator->generate('app_extention', [
-                'onboarding' => 1,
-            ]);
-        }
-
-        return '/app/credential';
     }
 
     private function buildAuthCookie(Request $request, string $plainToken, \DateTimeInterface $expiresAt): Cookie
@@ -75,17 +55,6 @@ final class AuthController extends AbstractController
             ->withExpires(new \DateTimeImmutable('+5 years'));
     }
 
-    private function buildPendingLoginCookie(Request $request, string $plainToken): Cookie
-    {
-        return Cookie::create(LoginChallengeManager::COOKIE_NAME)
-            ->withValue($plainToken)
-            ->withHttpOnly(true)
-            ->withSecure($request->isSecure())
-            ->withSameSite('lax')
-            ->withPath('/')
-            ->withExpires(new \DateTimeImmutable('+15 minutes'));
-    }
-
     private function buildLimiterKey(Request $request, ?string $identifier = null): string
     {
         $ip = (string) ($request->getClientIp() ?? 'unknown');
@@ -95,139 +64,34 @@ final class AuthController extends AbstractController
     }
 
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
-    public function register(
-        Request $request,
-        UserRepository $userRepository,
-        UserPasswordHasherInterface $passwordHasher,
-        NotificationService $notificationService,
-        LoggerInterface $logger,
-        EntityManagerInterface $em,
-        UrlGeneratorInterface $urlGenerator,
-        MailerService $mailerService,
-        SessionManager $sessionManager,
-        AdminNotificationService $adminNotificationService
-    ): JsonResponse {
+    public function register(Request $request, UserRepository $userRepository): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
-        $email = is_array($data) && isset($data['email']) && is_string($data['email']) ? $data['email'] : null;
+        $email = is_array($data) && is_string($data['email'] ?? null) ? mb_strtolower(trim($data['email'])) : '';
         $limit = $this->authRegisterLimiter->create($this->buildLimiterKey($request, $email))->consume(1);
-
         if (!$limit->isAccepted()) {
-            $retryAfter = $limit->getRetryAfter();
-
-            return new JsonResponse([
-                'error' => 'Too many registration attempts. Please try again later.',
-                'retryAfter' => $retryAfter?->format(DATE_ATOM),
-            ], 429);
+            return new JsonResponse(['error' => 'Too many registration attempts. Please try again later.', 'retryAfter' => $limit->getRetryAfter()?->format(DATE_ATOM)], 429);
         }
-
-        if (!is_array($data) || !isset($data['email'], $data['password'])) {
-            return new JsonResponse(['error' => 'Email and password are required'], 400);
+        if (!is_array($data) || !is_string($data['password'] ?? null) || '' === $data['password'] || strlen($data['password']) > 4096
+            || mb_strlen($email) > 180 || false === filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return new JsonResponse(['error' => $this->translator->trans('auth.register.errors.invalid_input')], 400);
         }
-
-        if ($userRepository->findOneBy(['email' => $data['email']])) {
-            return new JsonResponse(['error' => 'Email already in use'], 409);
-        }
-
-        $user = new User();
-        $user->setCompany($data['company'] ?? null);
-        $user->setEmail($data['email']);
-        $user->setRoles(['ROLE_USER']);
-        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
-        $this->extensionOnboardingPolicy->initializeNewRegistration($user);
-        // $token = bin2hex(random_bytes(32));
-        // $expiresAt = (new \DateTime())->modify('+1 hour');
-        // $user->setApiToken($token);
-        // $user->setTokenExpiresAt($expiresAt);
-        $user->regenerateApiExtensionToken();
-
-        $em->persist($user);
-        $em->flush();
-
-        $deviceId = $sessionManager->getOrCreateCurrentDeviceId();
-        $sessionManager->trustDevice($user, $deviceId);
-        [$session, $plainToken] = $sessionManager->createSession($user, deviceId: $deviceId);
-
         try {
-            $notificationService->createEntityNotification(
-                $user,
-                'Welcome',
-                $user,
-                'Complete your profile to fully enjoy the application.',
-                Notification::TYPE_SUCCESS,
-                '/app/settings/profile',
-                'fa-hands-clapping',
-                Notification::PRIORITY_LOW
-            );
-        } catch (\Exception $e) {
-            $logger->error('Failed to create registration notification', [
-                'userId' => $user->getId(),
-                'error' => $e->getMessage(),
-            ]);
+            $company = $this->registrations->companyFor($data);
+        } catch (\InvalidArgumentException $exception) {
+            return new JsonResponse(['error' => $this->translator->trans($exception->getMessage())], 400);
         }
-
-        try {
-            $settingsUrl = $urlGenerator->generate('app_user_profile', [], UrlGeneratorInterface::ABSOLUTE_URL);
-
-            $mailerService->send(
-                $user->getEmail(),
-                'Bienvenue sur MYKEYNEST',
-                'emails/welcome.html.twig',
-                [
-                    'user' => $user,
-                    'settingsUrl' => $settingsUrl,
-                ]
-            );
-        } catch (\Exception $e) {
-            $logger->error('Failed to send registration emails', [
-                'userId' => $user->getId(),
-                'error' => $e->getMessage(),
-            ]);
+        if ($userRepository->findOneBy(['email' => $email])) {
+            return new JsonResponse(['error' => $this->translator->trans('auth.register.errors.email_used')], 409);
         }
+        $user = $this->registrations->register($request, $email, $data['password'], $company);
 
-        try {
-            $adminNotificationService->notifyNewRegistration(
-                $user,
-                $request->getClientIp(),
-                $request->headers->get('User-Agent')
-            );
-        } catch (\Exception $e) {
-            $logger->error('Failed to send admin registration notification', [
-                'userId' => $user->getId(),
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        $response = new JsonResponse([
-            'message' => 'Inscription réussie',
-            'user' => [
-                'id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'roles' => $user->getRoles(),
-            ],
-            'session' => [
-                'id' => $session->getId(),
-                'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
-            ],
-            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user),
-        ], 201);
-
-        $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
-        $response->headers->setCookie($this->buildDeviceCookie($request, $deviceId));
-
-        return $response;
+        return $this->userLogin->complete($user, $request, true);
     }
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
-    public function login(
-        Request $request,
-        UserRepository $userRepository,
-        UserPasswordHasherInterface $passwordHasher,
-        SessionManager $sessionManager,
-        LoginChallengeManager $loginChallengeManager,
-        MailerService $mailerService,
-        UrlGeneratorInterface $urlGenerator,
-        LoggerInterface $logger
-    ): JsonResponse {
+    public function login(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
         $email = is_array($data) && isset($data['email']) && is_string($data['email']) ? $data['email'] : null;
         $limit = $this->authLoginLimiter->create($this->buildLimiterKey($request, $email))->consume(1);
@@ -241,7 +105,7 @@ final class AuthController extends AbstractController
             ], 429);
         }
 
-        if (!is_array($data) || !isset($data['email'], $data['password'])) {
+        if (!is_array($data) || !is_string($data['email'] ?? null) || !is_string($data['password'] ?? null)) {
             return new JsonResponse(['error' => 'Email and password are required'], 400);
         }
 
@@ -250,109 +114,7 @@ final class AuthController extends AbstractController
         if (!$user || !$passwordHasher->isPasswordValid($user, $data['password'])) {
             return new JsonResponse(['error' => 'Invalid credentials'], 401);
         }
-        $deviceId = $sessionManager->getOrCreateCurrentDeviceId();
-        $deviceAccessState = $sessionManager->getDeviceAccessState($user, $deviceId);
-
-        if ($deviceAccessState === UserDeviceManager::STATE_BLOCKED) {
-            return new JsonResponse([
-                'error' => 'Connexion bloquée',
-                'message' => 'Cet appareil a été bloqué. Utilisez un autre appareil ou débloquez-le depuis vos paramètres de sécurité.',
-            ], 403);
-        }
-
-        $emailTwoFactorEnabled = $this->emailTwoFactorPolicy->isEnabledFor($user);
-
-        // Appareil connu, ou 2FA email desactivee/non incluse => login direct.
-        if ($deviceAccessState === UserDeviceManager::STATE_TRUSTED
-            || !$emailTwoFactorEnabled) {
-            try {
-                [$session, $plainToken, $finalDeviceId] = $sessionManager->createSession(
-                    $user,
-                    deviceId: $deviceId,
-                    trustUnknownDevice: !$emailTwoFactorEnabled,
-                );
-            } catch (\RuntimeException $e) {
-                return new JsonResponse([
-                    'error' => 'Connexion bloquée',
-                    'message' => $e->getMessage(),
-                ], 403);
-            }
-
-            $response = new JsonResponse([
-                'message' => 'Connexion réussie',
-                'user' => [
-                    'id' => $user->getId(),
-                    'email' => $user->getEmail(),
-                    'roles' => $user->getRoles(),
-                ],
-                'session' => [
-                    'id' => $session->getId(),
-                    'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
-                ],
-                'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $user),
-            ]);
-
-            $response->headers->setCookie($this->buildAuthCookie($request, $plainToken, $session->getExpiresAt()));
-            $response->headers->setCookie($this->buildDeviceCookie($request, $finalDeviceId));
-
-            return $response;
-        }
-
-        // Appareil inconnu => challenge email
-        [$challenge, $plainChallengeToken] = $loginChallengeManager->createChallenge($user, $deviceId);
-
-        $approveUrl = $urlGenerator->generate('api_login_challenge_approve', [
-            'token' => $plainChallengeToken,
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $rejectUrl = $urlGenerator->generate('api_login_challenge_reject', [
-            'token' => $plainChallengeToken,
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        try {
-            $mailerService->send(
-                $user->getEmail(),
-                'Validez cette connexion',
-                'emails/security/login_challenge.html.twig',
-                [
-                    'user' => $user,
-                    'approveUrl' => $approveUrl,
-                    'rejectUrl' => $rejectUrl,
-                    'ip' => $request->getClientIp(),
-                    'userAgent' => $request->headers->get('User-Agent'),
-                    'requestedAt' => new \DateTimeImmutable(),
-                ]
-            );
-        } catch (\Throwable $e) {
-            $loginChallengeManager->expire($challenge);
-            $logger->error('Failed to send login challenge email', [
-                'userId' => $user->getId(),
-                'challengeId' => $challenge->getPublicId(),
-                'error' => $e->getMessage(),
-            ]);
-
-            $response = new JsonResponse([
-                'error' => 'Validation temporairement indisponible',
-                'message' => 'L’e-mail de validation n’a pas pu être envoyé. Veuillez réessayer dans quelques minutes.',
-            ], 503);
-            $response->headers->setCookie($this->buildDeviceCookie($request, $deviceId));
-
-            return $response;
-        }
-
-        $response = new JsonResponse([
-            'status' => 'email_verification_required',
-            'message' => 'Nous avons envoyé un e-mail pour valider cette connexion.',
-            'challenge' => [
-                'publicId' => $challenge->getPublicId(),
-                'expiresAt' => $challenge->getExpiresAt()?->format(DATE_ATOM),
-            ],
-        ], 202);
-
-        $response->headers->setCookie($this->buildPendingLoginCookie($request, $plainChallengeToken));
-        $response->headers->setCookie($this->buildDeviceCookie($request, $deviceId));
-
-        return $response;
+        return $this->userLogin->complete($user, $request);
     }
 
     #[Route('/api/login-challenge/status', name: 'api_login_challenge_status', methods: ['GET'])]
@@ -472,7 +234,7 @@ final class AuthController extends AbstractController
                 'id' => $session->getId(),
                 'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
             ],
-            'redirectUrl' => $this->getPostAuthRedirectUrl($urlGenerator, $challenge->getUser()),
+            'redirectUrl' => $this->userLogin->redirectUrl($challenge->getUser(), $request),
         ]);
 
         $response->headers->setCookie($this->buildAuthCookie($request, $plainAuthToken, $session->getExpiresAt()));

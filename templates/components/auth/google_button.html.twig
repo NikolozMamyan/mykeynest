@@ -1,0 +1,11 @@
+<form method="post" action="{{ path('auth_google_start') }}" class="auth-google-form" data-action="submit->auth#google">
+  <input type="hidden" name="_token" value="{{ csrf_token('google_oauth_start') }}">
+  <input type="hidden" name="accountType" value="personal">
+  <input type="hidden" name="company" value="">
+  <input type="hidden" name="next" value="{{ app.request.query.get('next', '') }}">
+  <button class="auth-google-button" type="submit" {{ not googleAuthEnabled|default(false) ? 'disabled' : '' }}>
+    <img src="{{ asset('images/google-g.png') }}" alt="" width="20" height="20" aria-hidden="true">
+    {{ 'auth.google.continue'|trans }}
+  </button>
+</form>
+<div class="auth-divider"><span>{{ 'auth.google.or_email'|trans }}</span></div>

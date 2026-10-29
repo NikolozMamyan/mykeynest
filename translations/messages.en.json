@@ -1,4 +1,16 @@
 {
+  "error_pages": {
+    "not_found": {
+      "title": "Page not found",
+      "label": "Error 404 · Page not found",
+      "heading": "This page lost its key.",
+      "description": "The link may have changed, or the page no longer exists. Let’s get you back to MYKEYNEST.",
+      "navigation": "Continue browsing",
+      "home": "Back to home",
+      "login": "Sign in",
+      "footnote": "Your logins, in the right place."
+    }
+  },
   "breadcrumb": {
     "dashboard": "Dashboard",
     "teams": "Company",
@@ -510,6 +522,23 @@
     }
   },
   "auth": {
+    "google": {
+      "continue": "Continue with Google",
+      "or_email": "or with your email address",
+      "unavailable": "Google sign-in is temporarily unavailable. Please use your email address.",
+      "too_many": "Too many Google sign-in attempts. Please try again in a few minutes.",
+      "invalid_state": "This request has expired. Please restart Google sign-in.",
+      "cancelled": "Google sign-in was cancelled. You can try again.",
+      "failed": "Google sign-in could not be completed. Try again or use your email address.",
+      "link_required": "This account already exists. Sign in with your password, then link Google under Preferences > Google sign-in.",
+      "email_mismatch": "Choose the Google account with the same email address as your MYKEYNEST account.",
+      "link_conflict": "This Google account is already linked to another account.",
+      "login_blocked": "Sign-in could not be completed. Check your device permissions or use email sign-in.",
+      "settings_title": "Google sign-in",
+      "settings_hint": "Link your Google account to sign in with the same email address.",
+      "link": "Link my Google account",
+      "linked": "Your Google account is linked. You can use it to sign in."
+    },
     "login": {
       "hero": {
         "title": "Your access in one workspace",
@@ -547,12 +576,25 @@
         "subtitle": "Fill in the details below to get started",
         "company_label": "Company name",
         "company_placeholder": "Acme Corporation",
+        "account_type": "You are using MYKEYNEST as…",
+        "personal": "Individual",
+        "personal_hint": "For your personal logins",
+        "professional": "Professional",
+        "professional_hint": "For your work or team",
+        "free_note": "Free account · No credit card required",
         "email_label": "Email address",
         "email_placeholder": "you@example.com",
         "password_label": "Password",
-        "submit": "Create my account",
+        "submit": "Create my free account",
         "hint": "Already have an account?",
         "hint_link": "Log in"
+      },
+      "errors": {
+        "invalid_input": "Enter a valid email address and a password.",
+        "invalid_company": "The company name is invalid.",
+        "invalid_type": "Choose Individual or Professional.",
+        "company_required": "Enter your company name (255 characters maximum).",
+        "email_used": "This email address is already in use. Please sign in to your account."
       }
     }
   },

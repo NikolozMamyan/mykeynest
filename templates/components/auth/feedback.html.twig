@@ -1,0 +1,3 @@
+{% for kind in ['error', 'success'] %}
+  {% for message in app.flashes(kind) %}<div class="flash-{{ kind }}" role="{{ kind == 'error' ? 'alert' : 'status' }}">{{ message }}</div>{% endfor %}
+{% endfor %}

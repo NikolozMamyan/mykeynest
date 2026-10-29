@@ -6,6 +6,7 @@ use App\Form\UserType;
 use App\Form\AvatarType;
 use App\Form\PreferencesType;
 use App\Service\EmailTwoFactorPolicy;
+use App\Service\GoogleOAuthService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -109,6 +110,7 @@ public function preferences(
     Request $request,
     EntityManagerInterface $em,
     EmailTwoFactorPolicy $emailTwoFactorPolicy,
+    GoogleOAuthService $google,
 ): Response
 {
     $user = $this->getUser();
@@ -137,6 +139,7 @@ public function preferences(
     return $this->render('settings/preferences.html.twig', [
         'form' => $form->createView(),
         'emailTwoFactorAvailable' => $emailTwoFactorAvailable,
+        'googleAuthEnabled' => $google->isConfigured(),
     ]);
 }
 

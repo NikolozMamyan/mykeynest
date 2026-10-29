@@ -7,7 +7,7 @@
 
 
 <div class="auth-container">
-  <div class="login-wrapper" data-controller="auth">
+  <div class="login-wrapper" data-controller="auth" data-auth-locale-value="{{ app.request.locale }}">
 
     <!-- Colonne gauche - Hero -->
     <div class="login-hero">
@@ -51,6 +51,9 @@
         <p>{{ 'auth.login.form.subtitle'|trans }}</p>
       </div>
 
+      {% include 'components/auth/feedback.html.twig' %}
+      {% include 'components/auth/google_button.html.twig' %}
+
       <form class="login-form" data-action="submit->auth#login">
         <div class="form-group">
           <label for="email">{{ 'auth.login.form.email_label'|trans }}</label>
@@ -89,7 +92,7 @@
         </p>
       </form>
 
-      <div data-auth-target="result"></div>
+      <div data-auth-target="result" role="status" aria-live="polite"></div>
     </div>
 
   </div>
