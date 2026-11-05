@@ -746,7 +746,8 @@ final class AdminController extends AbstractController
         TeamMemberAssignmentManager $memberAssignments,
         TeamNotifier $teamNotifier,
         MailerService $mailerService,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        TranslatorInterface $translator,
     ): Response {
         if (!$this->isCsrfTokenValid('admin_team_add_member_' . $team->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'Token CSRF invalide.');
@@ -779,10 +780,9 @@ final class AdminController extends AbstractController
                 $email,
                 $role,
                 $actor,
-                $team->getOrganization() !== null && $request->request->getString('membership_type') === 'guest',
             );
         } catch (\DomainException|\InvalidArgumentException|\LogicException $exception) {
-            $this->addFlash('warning', $exception->getMessage());
+            $this->addFlash('warning', $translator->trans($exception->getMessage()));
 
             return $this->redirectToRoute('admin_team_show', ['id' => $team->getId()]);
         }

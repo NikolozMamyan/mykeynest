@@ -1,18 +1,16 @@
-{% extends 'emails/layout.html.twig' %}
-
-{% block title %}{{ 'teams.organization.invite.email_subject'|trans({'%company%': organization.name}, null, locale) }}{% endblock %}
-{% block preheader %}{{ (requires_registration ? 'teams.organization.invite.email_body_pending' : 'teams.organization.invite.email_body_active')|trans({}, null, locale) }}{% endblock %}
-{% block eyebrow %}{{ 'teams.organization.invite.email_eyebrow'|trans({}, null, locale) }}{% endblock %}
-{% block heading %}{{ 'teams.organization.invite.email_title'|trans({'%company%': organization.name}, null, locale) }}{% endblock %}
-
+{% extends 'emails/sharing_layout.html.twig' %}
+{% set actionUrl = action_url %}
+{% block action_label %}{{ (requires_registration ? 'teams.organization.invite.email_action_pending' : 'teams.organization.invite.email_action_active')|trans({}, null, emailLocale) }}{% endblock %}
+{% block title %}{{ 'teams.organization.invite.email_subject'|trans({'%company%': organization.name}, null, emailLocale) }}{% endblock %}
+{% block preheader %}{{ (requires_registration ? 'teams.organization.invite.email_body_pending' : 'teams.organization.invite.email_body_active')|trans({}, null, emailLocale) }}{% endblock %}
+{% block eyebrow %}{{ 'teams.organization.invite.email_eyebrow'|trans({}, null, emailLocale) }}{% endblock %}
+{% block heading %}{{ 'sharing.organization_heading'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block introduction %}{{ 'teams.organization.invite.email_title'|trans({'%company%': organization.name}, null, emailLocale) }}{% endblock %}
 {% block content %}
-  <p style="margin:0;">{{ (requires_registration ? 'teams.organization.invite.email_body_pending' : 'teams.organization.invite.email_body_active')|trans({}, null, locale) }}</p>
-  <p style="margin:20px 0 0;padding:13px 15px;background:#eefaf5;border-left:3px solid #10b981;border-radius:4px;color:#436058;font-size:13px;"><strong>{{ 'teams.organization.invite.email_role'|trans({'%role%': ('teams.organization.role_' ~ membership.role.value|lower)|trans({}, null, locale)}, null, locale) }}</strong></p>
-  {% if requires_registration and expiresAt %}<p style="margin:14px 0 0;color:#80601f;font-size:12px;">{{ 'teams.organization.invite.email_expiry'|trans({'%date%': expiresAt|date('d/m/Y H:i')}, null, locale) }}</p>{% endif %}
+  <p style="margin:0 0 14px;">{{ (requires_registration ? 'teams.organization.invite.email_body_pending' : 'teams.organization.invite.email_body_active')|trans({}, null, emailLocale) }}</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f0fdf4" style="width:100%;table-layout:fixed;background-color:#f0fdf4;border-left:3px solid #059669;"><tr><td style="padding:13px 16px;word-wrap:break-word;">
+    <p style="margin:0;color:#1e293b;font-size:20px;line-height:27px;font-weight:700;">{{ organization.name }}</p>
+    <p style="margin:5px 0 0;color:#334155;font-size:15px;line-height:23px;">{{ 'teams.organization.invite.email_role'|trans({'%role%': ('teams.organization.role_' ~ membership.role.value|lower)|trans({}, null, emailLocale)}, null, emailLocale) }}</p>
+  </td></tr></table>
+  {% if requires_registration and expiresAt %}<p style="margin:14px 0 0;color:#475569;font-size:14px;line-height:21px;">{{ 'sharing.expiry'|trans({'%date%': expiresAt|date('d/m/Y H:i')}, 'emails', emailLocale) }}</p>{% endif %}
 {% endblock %}
-
-{% block action %}
-  {% include 'emails/_action.html.twig' with {actionUrl: action_url, label: (requires_registration ? 'teams.organization.invite.email_action_pending' : 'teams.organization.invite.email_action_active')|trans({}, null, locale)} %}
-{% endblock %}
-
-{% block footer %}<p style="margin:0;">Invitation personnelle envoyée par MYKEYNEST.</p>{% endblock %}

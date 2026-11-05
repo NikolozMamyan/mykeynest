@@ -1,23 +1,22 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
+  static values = { deleteConfirm: String };
+
   connect() {
     this.modal = this.element.querySelector("#credentialsModal");
     this.searchInput = this.element.querySelector("#credentialsSearch");
     this.clearButton = this.element.querySelector("#clearCredentialsSearch");
     this.counter = this.element.querySelector("#credentialsCounter");
     this.emptyState = this.element.querySelector("#credentialsEmpty");
-    this.memberAccessType = this.element.querySelector('[name$="[membershipType]"]');
-    this.memberRole = this.element.querySelector('[name$="[role]"]');
-    this.memberRoleGroup = this.element.querySelector("[data-member-role-group]");
     this.handleKeydown = this.handleKeydown.bind(this);
     document.addEventListener("keydown", this.handleKeydown);
     this.syncCredentialsUI();
-    this.syncMemberAccessType();
   }
 
   disconnect() {
     document.removeEventListener("keydown", this.handleKeydown);
+    if (this.modal?.classList.contains("active")) document.body.style.overflow = "";
   }
 
   openCredentialsModal() {
@@ -76,23 +75,13 @@ export default class extends Controller {
     this.syncCredentialsUI();
   }
 
-  syncMemberAccessType() {
-    if (!this.memberAccessType || !this.memberRole || !this.memberRoleGroup) return;
-
-    const isExternalGuest = this.memberAccessType.value === "guest";
-    if (isExternalGuest) {
-      this.memberRole.value = "MEMBER";
-    }
-    this.memberRoleGroup.hidden = isExternalGuest;
-  }
-
   confirmDeleteTeam() {
     const form = this.element.querySelector("#deleteTeamForm");
     if (!form) {
       window.alert("Erreur: formulaire de suppression introuvable.");
       return;
     }
-    if (window.confirm("Are you sure you want to delete this team? This action is irreversible and will also remove all members.")) {
+    if (window.confirm(this.deleteConfirmValue)) {
       form.submit();
     }
   }

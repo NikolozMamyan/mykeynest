@@ -1,24 +1,21 @@
-{% extends 'emails/layout.html.twig' %}
-
-{% block title %}De nouveaux accès ont été partagés avec vous{% endblock %}
-{% block preheader %}{{ owner.email }} a partagé {{ credentials|length }} accès avec vous.{% endblock %}
-{% block eyebrow %}Nouveau partage sécurisé{% endblock %}
-{% block heading %}{{ owner.email }} a partagé {{ credentials|length }} accès avec vous{% endblock %}
-
+{% extends 'emails/sharing_layout.html.twig' %}
+{% set actionUrl = app_url %}
+{% block action_label %}{{ 'sharing.open_access'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block title %}{{ 'sharing.received_heading'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block preheader %}{{ 'sharing.received_intro'|trans({'%owner%': owner.email, '%count%': credentials|length}, 'emails', emailLocale) }}{% endblock %}
+{% block eyebrow %}{{ 'sharing.share_eyebrow'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block heading %}{{ 'sharing.received_heading'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block introduction %}{{ 'sharing.received_intro'|trans({'%owner%': owner.email, '%count%': credentials|length}, 'emails', emailLocale) }}{% endblock %}
 {% block content %}
-  <p style="margin:0 0 22px;">Les accès ci-dessous sont maintenant disponibles dans votre espace MYKEYNEST, selon les autorisations choisies par le propriétaire.</p>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;background:#f4f7f5;border:1px solid #e0e8e3;border-radius:12px;">
-    {% for credential in credentials %}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;border-collapse:collapse;">
+    {% for credential in credentials|slice(0, 3) %}
       <tr>
-        <td style="word-wrap:break-word;width:38px;padding:13px 0 13px 15px;{{ loop.last ? '' : 'border-bottom:1px solid #e8eeec;' }}"><span style="display:inline-block;width:31px;height:31px;border-radius:4px;background:#087f5b;color:#fff;font-size:10px;font-weight:700;line-height:31px;text-align:center;">{{ credential.name|slice(0, 2)|upper }}</span></td>
-        <td style="word-wrap:break-word;padding:13px 15px 13px 10px;{{ loop.last ? '' : 'border-bottom:1px solid #e8eeec;' }}"><strong style="display:block;color:#132c25;font-size:13px;">{{ credential.name }}</strong><span style="display:block;margin-top:2px;color:#576d65;font-size:11px;">{{ credential.domain }} · {{ credential.username }}</span></td>
+        <td width="46" valign="middle" style="width:46px;padding:10px 0;{{ loop.last ? '' : 'border-bottom:1px solid #e2e8f0;' }}"><span style="display:block;width:36px;height:36px;border:1px solid #d1e6da;border-radius:9px;background-color:#f0fdf4;color:#047857;font-size:16px;font-weight:700;line-height:36px;text-align:center;">{{ credential.name|slice(0, 1)|upper }}</span></td>
+        <td style="padding:10px 0;word-wrap:break-word;{{ loop.last ? '' : 'border-bottom:1px solid #e2e8f0;' }}"><strong style="display:block;color:#1e293b;font-size:16px;line-height:23px;">{{ credential.name }}</strong><span style="display:block;color:#475569;font-size:14px;line-height:21px;">{{ credential.domain }}</span></td>
       </tr>
     {% endfor %}
   </table>
+  {% if credentials|length > 3 %}<p style="margin:10px 0 0;color:#047857;font-size:15px;font-weight:700;">{{ 'sharing.more_access'|trans({'%count%': credentials|length - 3}, 'emails', emailLocale) }}</p>{% endif %}
+  <p style="margin:12px 0 0;color:#475569;font-size:14px;line-height:21px;">{{ 'sharing.permissions'|trans({}, 'emails', emailLocale) }}</p>
 {% endblock %}
-
-{% block action %}
-  {% include 'emails/_action.html.twig' with {actionUrl: app_url, label: 'Ouvrir mes accès partagés'} %}
-{% endblock %}
-
-{% block footer %}<p style="margin:0;">Cet e-mail vous est envoyé parce qu’un utilisateur MYKEYNEST a partagé un accès avec vous.</p>{% endblock %}
+{% block footer %}{{ 'sharing.share_footer'|trans({}, 'emails', emailLocale) }}{% endblock %}

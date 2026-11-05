@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class TeamAddMemberType extends AbstractType
 {
@@ -15,20 +16,8 @@ class TeamAddMemberType extends AbstractType
     {
         $builder->add('email', EmailType::class, [
             'label' => 'teams.show.members.add.email_label',
+            'constraints' => [new Assert\NotBlank(), new Assert\Email()],
         ]);
-
-        if ($options['company_team']) {
-            $builder->add('membershipType', ChoiceType::class, [
-                'label' => 'teams.show.members.add.type_label',
-                'choices' => [
-                    'teams.show.members.add.type_employee' => 'employee',
-                    'teams.show.members.add.type_guest' => 'guest',
-                ],
-                'expanded' => false,
-                'multiple' => false,
-                'mapped' => false,
-            ]);
-        }
 
         $builder->add('role', ChoiceType::class, [
             'label' => 'teams.show.members.add.role_label',
@@ -36,6 +25,7 @@ class TeamAddMemberType extends AbstractType
                 'teams.show.members.add.role_member' => TeamRole::MEMBER,
                 'teams.show.members.add.role_admin' => TeamRole::ADMIN,
             ],
+            'choice_value' => static fn (?TeamRole $role): ?string => $role?->value,
             'expanded' => false,
             'multiple' => false,
         ]);
@@ -46,8 +36,6 @@ class TeamAddMemberType extends AbstractType
         // on utilise un simple array (pas d’entity liée directement)
         $resolver->setDefaults([
             'csrf_protection' => true,
-            'company_team' => false,
         ]);
-        $resolver->setAllowedTypes('company_team', 'bool');
     }
 }

@@ -35,7 +35,7 @@ final class SubscriptionPlanService
             'limits' => [
                 self::LIMIT_CREDENTIALS => 15,
                 self::LIMIT_SHARES => 5,
-                self::LIMIT_TEAMS => 1,
+                self::LIMIT_TEAMS => 0,
                 self::LIMIT_EXTENSION_INSTALLATIONS => 1,
             ],
             'features' => [

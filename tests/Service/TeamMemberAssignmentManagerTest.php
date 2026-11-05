@@ -15,8 +15,10 @@ use App\Repository\OrganizationMemberRepository;
 use App\Repository\OrganizationRepository;
 use App\Repository\TeamMemberRepository;
 use App\Repository\UserRepository;
+use App\Repository\SubscriptionPlanConfigurationRepository;
 use App\Service\OrganizationSeatManager;
 use App\Service\TeamMemberAssignmentManager;
+use App\Service\SubscriptionPlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -50,15 +52,15 @@ final class TeamMemberAssignmentManagerTest extends TestCase
         self::assertCount($memberCountBefore, $organization->getMembers());
     }
 
-    public function testUnknownEmployeeMustFirstBeInvitedFromCompanyWorkspace(): void
+    public function testUnknownUserReceivesAnInvitationAndAReservedLicenseAutomatically(): void
     {
         [$organization, $owner] = $this->createActiveOrganization();
         $team = (new Team())->setName('Marketing')->setOwner($owner)->setOrganization($organization);
         $users = $this->createMock(UserRepository::class);
         $users->method('findOneBy')->willReturn(null);
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects(self::never())->method('persist');
-        $entityManager->expects(self::never())->method('flush');
+        $entityManager->expects(self::exactly(3))->method('persist');
+        $entityManager->expects(self::once())->method('flush');
 
         [$manager] = $this->createAssignmentManager(
             $users,
@@ -67,11 +69,19 @@ final class TeamMemberAssignmentManagerTest extends TestCase
             $entityManager,
         );
 
-        $this->expectException(\DomainException::class);
-        $manager->assign($team, 'unknown@example.test', TeamRole::MEMBER, $owner);
+        $result = $manager->assign($team, 'unknown@example.test', TeamRole::MEMBER, $owner);
+
+        self::assertSame('unknown@example.test', $result['user']->getEmail());
+        self::assertContains('ROLE_GUEST', $result['user']->getRoles());
+        self::assertInstanceOf(\DateTimeImmutable::class, $result['invitationExpiresAt']);
+        $membership = $organization->getMembers()->last();
+        self::assertSame($result['user'], $membership->getUser());
+        self::assertSame(OrganizationRole::MEMBER, $membership->getRole());
+        self::assertSame(OrganizationMemberStatus::PENDING, $membership->getStatus());
+        self::assertTrue($membership->consumesSeat());
     }
 
-    public function testExternalGuestJoinsOneGroupWithoutConsumingASeat(): void
+    public function testExistingFreeUserReceivesALicenseAndTheRequestedGroupRole(): void
     {
         [$organization, $owner] = $this->createActiveOrganization();
         $guest = (new User())->setEmail('external@example.test')->setPassword('hashed');
@@ -94,12 +104,89 @@ final class TeamMemberAssignmentManagerTest extends TestCase
         $entityManager->expects(self::once())->method('flush');
 
         [$manager, $organizationSeats] = $this->createAssignmentManager($users, $organizationMembers, $teamMembers, $entityManager);
-        $result = $manager->assign($team, 'external@example.test', TeamRole::ADMIN, $owner, true);
+        $result = $manager->assign($team, 'external@example.test', TeamRole::ADMIN, $owner);
 
-        self::assertSame(TeamRole::MEMBER, $result['member']->getRole());
-        self::assertSame(1, $organizationSeats->getSeatSummary($organization)['used']);
-        self::assertSame(OrganizationRole::GUEST, $organization->getMembers()->last()->getRole());
+        self::assertSame(TeamRole::ADMIN, $result['member']->getRole());
+        self::assertNull($result['invitationExpiresAt']);
+        self::assertSame(2, $organizationSeats->getSeatSummary($organization)['used']);
+        self::assertSame(OrganizationRole::MEMBER, $organization->getMembers()->last()->getRole());
         self::assertCount(2, $persisted);
+    }
+
+    public function testAlreadyLicensedUserDoesNotConsumeAnotherLicenseWhenTheCompanyIsFull(): void
+    {
+        [$organization, $owner] = $this->createActiveOrganization();
+        $organization->getSubscription()->setQuantity(1);
+        $member = (new User())->setEmail('licensed@example.test')->setUserSubscription(
+            (new UserSubscription())->setPlanCode('pro')->setIsActive(true),
+        );
+        $users = $this->createMock(UserRepository::class);
+        $users->method('findOneBy')->willReturn($member);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist')->with(self::isInstanceOf(TeamMember::class));
+        $entityManager->expects(self::once())->method('flush');
+        [$manager, $seats] = $this->createAssignmentManager($users, $this->createMock(OrganizationMemberRepository::class), $this->createMock(TeamMemberRepository::class), $entityManager);
+
+        $result = $manager->assign((new Team())->setOwner($owner)->setOrganization($organization), 'licensed@example.test', TeamRole::MEMBER, $owner);
+
+        self::assertSame($member, $result['user']);
+        self::assertNull($result['invitationExpiresAt']);
+        self::assertCount(1, $organization->getMembers());
+        self::assertSame(1, $seats->getSeatSummary($organization)['used']);
+    }
+
+    public function testFreeUserCannotReceiveAnUnpurchasedCompanyLicense(): void
+    {
+        [$organization, $owner] = $this->createActiveOrganization();
+        $organization->getSubscription()->setQuantity(1);
+        $users = $this->createMock(UserRepository::class);
+        $users->method('findOneBy')->willReturn((new User())->setEmail('free@example.test'));
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('persist');
+        $entityManager->expects(self::never())->method('flush');
+        [$manager] = $this->createAssignmentManager($users, $this->createMock(OrganizationMemberRepository::class), $this->createMock(TeamMemberRepository::class), $entityManager);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Toutes les licences sont attribuées.');
+        $manager->assign((new Team())->setOwner($owner)->setOrganization($organization), 'free@example.test', TeamRole::MEMBER, $owner);
+    }
+
+    public function testProGroupCanAddAnAlreadyLicensedAccount(): void
+    {
+        $owner = (new User())->setEmail('owner@example.test')->setUserSubscription(
+            (new UserSubscription())->setPlanCode('pro')->setIsActive(true),
+        );
+        $member = (new User())->setEmail('licensed@example.test')->setUserSubscription(
+            (new UserSubscription())->setPlanCode('pro')->setIsActive(true),
+        );
+        $users = $this->createMock(UserRepository::class);
+        $users->method('findOneBy')->willReturn($member);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('persist')->with(self::isInstanceOf(TeamMember::class));
+        $entityManager->expects(self::once())->method('flush');
+        [$manager] = $this->createAssignmentManager($users, $this->createMock(OrganizationMemberRepository::class), $this->createMock(TeamMemberRepository::class), $entityManager);
+
+        $result = $manager->assign((new Team())->setOwner($owner), 'licensed@example.test', TeamRole::MEMBER, $owner);
+
+        self::assertSame($member, $result['user']);
+        self::assertNull($result['invitationExpiresAt']);
+    }
+
+    public function testProGroupCannotGrantALicenseWithoutCompanyCapacity(): void
+    {
+        $owner = (new User())->setEmail('owner@example.test')->setUserSubscription(
+            (new UserSubscription())->setPlanCode('pro')->setIsActive(true),
+        );
+        $users = $this->createMock(UserRepository::class);
+        $users->method('findOneBy')->willReturn(null);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('persist');
+        $entityManager->expects(self::never())->method('flush');
+        [$manager] = $this->createAssignmentManager($users, $this->createMock(OrganizationMemberRepository::class), $this->createMock(TeamMemberRepository::class), $entityManager);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('teams.wizard.license_required');
+        $manager->assign((new Team())->setOwner($owner), 'unknown@example.test', TeamRole::MEMBER, $owner);
     }
 
     public function testRemovingEmployeeFromGroupKeepsCompanySeat(): void
@@ -170,7 +257,9 @@ final class TeamMemberAssignmentManagerTest extends TestCase
         );
 
         return [
-            new TeamMemberAssignmentManager($users, $teamMembers, $organizationSeats, $entityManager),
+            new TeamMemberAssignmentManager($users, $teamMembers, $organizationSeats, $entityManager, new SubscriptionPlanService(
+                $this->createMock(SubscriptionPlanConfigurationRepository::class), $entityManager, $organizationMembers,
+            )),
             $organizationSeats,
         ];
     }

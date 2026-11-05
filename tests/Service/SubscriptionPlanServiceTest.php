@@ -23,7 +23,7 @@ final class SubscriptionPlanServiceTest extends TestCase
 
         self::assertSame(15, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_CREDENTIALS));
         self::assertSame(5, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_SHARES));
-        self::assertSame(1, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_TEAMS));
+        self::assertSame(0, $service->getLimit($freeUser, SubscriptionPlanService::LIMIT_TEAMS));
         self::assertFalse($service->hasFeature($freeUser, SubscriptionPlanService::FEATURE_SECURE_NOTES));
         self::assertNull($service->getLimit($proUser, SubscriptionPlanService::LIMIT_CREDENTIALS));
         self::assertSame(1, $service->getLimit($proUser, SubscriptionPlanService::LIMIT_EXTENSION_INSTALLATIONS));
@@ -80,7 +80,7 @@ final class SubscriptionPlanServiceTest extends TestCase
         self::assertNull($service->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS));
         self::assertNull($service->getLimit($user, SubscriptionPlanService::LIMIT_SHARES));
         self::assertNull($service->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
-        self::assertSame(1, $service->getPersonalLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
+        self::assertSame(0, $service->getPersonalLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
         self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_SECURE_NOTES));
         self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_SECURITY_CHECKER));
         self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_CREDENTIAL_IMPORT));
@@ -103,7 +103,7 @@ final class SubscriptionPlanServiceTest extends TestCase
 
         self::assertNull($service->getLimit($user, SubscriptionPlanService::LIMIT_CREDENTIALS));
         self::assertSame(8, $service->getLimit($user, SubscriptionPlanService::LIMIT_SHARES));
-        self::assertSame(1, $service->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
+        self::assertSame(0, $service->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
         self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_SECURE_NOTES));
         self::assertTrue($service->hasFeature($user, SubscriptionPlanService::FEATURE_PASSWORD_GENERATOR));
     }

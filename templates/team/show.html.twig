@@ -1,275 +1,80 @@
-﻿{% extends 'base.html.twig' %}
-
+{% extends 'base.html.twig' %}
 {% block title %}{{ 'teams.show.title'|trans({'%name%': team.name}) }}{% endblock %}
-
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('styles/pages/team-show.css') }}">
+{% block body_class %}team-workspace-page{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block page_styles %}
+<link rel="stylesheet" href="{{ asset('styles/pages/team-show.css') }}">
+<link rel="stylesheet" href="{{ asset('styles/pages/team-workspace.css') }}">
 {% endblock %}
-
 {% block body %}
-<div data-controller="team-show">
-<div class="team-show-container">
-    {# Header #}
-    <div class="team-show-header">
-        <a href="{{ path('app_team_index') }}" class="btn-back">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-            {{ 'teams.show.back'|trans }}
-        </a>
-
-        <div class="team-show-header-actions">
-            {% set currentMember = null %}
-            {% for member in team.members %}
-                {% if member.user and app.user and member.user.id == app.user.id %}
-                    {% set currentMember = member %}
-                {% endif %}
-            {% endfor %}
-
-            {% if currentMember and currentMember.role != constant('App\\Enum\\TeamRole::OWNER') %}
-                <form method="post"
-                      action="{{ path('app_team_leave', {id: team.id}) }}"
-                      data-action="submit->team-show#confirmForm"
-                      data-confirm-message="Voulez-vous vraiment quitter cette equipe ?">
-                    <input type="hidden" name="_token" value="{{ csrf_token('leave_team_' ~ team.id) }}">
-                    <button type="submit" class="btn-secondary-outline">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"/>
-                        </svg>
-                        Quitter l equipe
-                    </button>
-                </form>
+{% set canManage = is_granted('TEAM_MANAGE', team) %}
+{% set currentMember = null %}
+{% for member in team.members %}{% if member.user and app.user and member.user.id == app.user.id %}{% set currentMember = member %}{% endif %}{% endfor %}
+<div class="tw-workspace" data-controller="team-show team-workspace" data-team-show-delete-confirm-value="{{ 'teams.workspace.delete_confirm'|trans }}">
+    <header class="tw-heading tw-group-heading">
+        <div><a href="{{ path('app_team_index') }}" class="tw-back"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {{ 'teams.show.back'|trans }}</a><h1>{{ team.name }}</h1><p>{{ 'teams.show.created_at'|trans({'%date%': team.createdAt|date('d/m/Y')}) }}</p></div>
+        <div class="tw-actions">
+            {% if currentMember and currentMember.role.value != 'OWNER' %}
+            <form method="post" action="{{ path('app_team_leave', {id: team.id}) }}" data-action="submit->team-show#confirmForm" data-confirm-message="{{ 'teams.card.leave_confirm'|trans }}"><input type="hidden" name="_token" value="{{ csrf_token('leave_team_' ~ team.id) }}"><button type="submit" class="tw-button tw-button-secondary" aria-label="{{ 'teams.card.leave'|trans }}"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i><span>{{ 'teams.card.leave'|trans }}</span></button></form>
             {% endif %}
-
-            {% if is_granted('TEAM_DELETE', team) %}
-                <button type="button" class="btn-danger-outline" data-action="click->team-show#confirmDeleteTeam">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                    {{ 'teams.show.delete_team'|trans }}
-                </button>
-            {% endif %}
+            {% if is_granted('TEAM_DELETE', team) %}<button type="button" class="tw-button tw-button-secondary tw-danger-text" aria-label="{{ 'teams.show.delete_team'|trans }}" data-action="team-show#confirmDeleteTeam"><i class="fa-regular fa-trash-can" aria-hidden="true"></i><span>{{ 'teams.show.delete_team'|trans }}</span></button>{% endif %}
         </div>
+    </header>
+    <div class="tw-feedback">{% include 'components/ui/flash_messages.html.twig' %}</div>
+    <section class="tw-overview tw-team-overview" aria-label="{{ 'teams.show.title'|trans({'%name%': team.name}) }}">
+        <div class="tw-company-identity"><span class="tw-group-avatar">{{ team.name|slice(0, 2)|upper }}</span><div><strong>{{ 'teams.wizard.owner'|trans }}{% if app.user and team.owner.id == app.user.id %}<span class="tw-you">{{ 'teams.wizard.you'|trans }}</span>{% endif %}</strong><p>{{ team.owner.email }}</p></div></div>
+        <div class="tw-metric"><strong>{{ team.members|length }}</strong><span>{{ 'teams.workspace.members'|trans }}</span></div>
+        <div class="tw-metric"><strong>{{ team.credentials|length }}</strong><span>{{ 'teams.wizard.accesses'|trans }}</span></div>
+        {% if seatSummary %}<div class="tw-metric"><strong>{{ seatSummary.available }}</strong><span>{{ 'teams.workspace.available_licenses'|trans }}</span></div>{% endif %}
+    </section>
+    <div class="tw-tabs" role="tablist" aria-label="{{ 'teams.show.title'|trans({'%name%': team.name}) }}">
+        <button id="tw-credentials-tab" type="button" role="tab" aria-controls="tw-credentials-panel" data-panel="credentials" data-team-workspace-target="tab" data-action="team-workspace#switchPanel keydown->team-workspace#tabKeydown">{{ 'teams.wizard.accesses'|trans }} <span>{{ team.credentials|length }}</span></button>
+        <button id="tw-members-tab" type="button" role="tab" aria-controls="tw-members-panel" data-panel="members" data-team-workspace-target="tab" data-action="team-workspace#switchPanel keydown->team-workspace#tabKeydown">{{ 'teams.workspace.members'|trans }} <span>{{ team.members|length }}</span></button>
     </div>
-
-    {# Team Info Card #}
-    <div class="team-info-card">
-        <div class="team-info-header">
-            <div class="team-avatar-large">
-                {{ team.name|slice(0, 2)|upper }}
-            </div>
-            <div class="team-details">
-                <h1 class="team-title">{{ team.name }}</h1>
-                <div class="team-metadata">
-                    <span class="metadata-item">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        {{ 'teams.show.created_at'|trans({'%date%': team.createdAt|date('d/m/Y')}) }}
-                    </span>
-                    <span class="metadata-item">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        {{ 'teams.show.owner'|trans({'%email%': team.owner.email ?? ('teams.show.na'|trans) }) }}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {# Credentials Section #}
-    <div class="section-card">
-        <div class="section-header">
-            <div class="section-title">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                </svg>
-                <h2>{{ 'teams.show.credentials.title'|trans }}</h2>
-                <span class="member-count">{{ team.credentials|length }}</span>
-            </div>
-            {% if is_granted('TEAM_MANAGE', team) %}
-                <button type="button" class="btn-add-small" data-action="click->team-show#openCredentialsModal">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    {{ 'teams.show.credentials.add'|trans }}
-                </button>
-            {% endif %}
-        </div>
-
-        {% if team.credentials is empty %}
-            <div class="empty-members">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                </svg>
-                <p>{{ 'teams.show.credentials.empty'|trans }}</p>
-            </div>
-        {% else %}
-            <div class="credentials-list">
+    <div class="tw-columns">
+        <section class="tw-panel" id="tw-credentials-panel" aria-labelledby="tw-credentials-title" data-panel="credentials" data-team-workspace-target="panel">
+            <header class="tw-panel-heading"><div><span class="tw-panel-icon"><i class="fa-solid fa-key" aria-hidden="true"></i></span><h2 id="tw-credentials-title">{{ 'teams.show.credentials.title'|trans }}</h2><span class="tw-count">{{ team.credentials|length }}</span></div>{% if canManage %}<button type="button" class="tw-button tw-button-small tw-button-secondary" data-action="team-show#openCredentialsModal"><i class="fa-solid fa-plus" aria-hidden="true"></i> {{ 'teams.show.credentials.add'|trans }}</button>{% endif %}</header>
+            {% if team.credentials is not empty %}<div class="tw-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" placeholder="{{ 'teams.workspace.search_credentials'|trans }}" aria-label="{{ 'teams.workspace.search_credentials'|trans }}" data-panel="credentials" data-team-workspace-target="search" data-action="input->team-workspace#filter"></div>{% endif %}
+            <div class="tw-list tw-access-list">
                 {% for credential in team.credentials %}
-                    <div class="credential-item">
-                        <div class="credential-icon">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                            </svg>
-                        </div>
-                        <div class="credential-info">
-                            <div class="credential-name">
-                                <a href="{{ path('credential_show', {'id': credential.id}) }}">{{ credential.name }}</a>
-                            </div>
-                            {% if credential.domain %}
-                                <div class="credential-url">{{ credential.domain }}</div>
-                            {% endif %}
-                        </div>
-
-                        {% if is_granted('TEAM_MANAGE', team) %}
-                            <form method="post"
-                                  action="{{ path('app_team_remove_credential', {id: team.id, credentialId: credential.id}) }}"
-                                  class="remove-credential-form"
-                                  data-action="submit->team-show#confirmForm"
-                                  data-confirm-message="{{ 'teams.show.credentials.remove_confirm'|trans|e('html_attr') }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('remove_credential_' ~ credential.id) }}">
-                                <button type="submit" class="btn-remove-member" title="{{ 'teams.show.credentials.remove_title'|trans }}">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                <div class="tw-access-item" data-panel="credentials" data-search="{{ (credential.name ~ ' ' ~ credential.domain ~ ' ' ~ credential.username)|lower }}" data-team-workspace-target="row">
+                    <span class="tw-site-logo" aria-hidden="true"><span>{{ credential.name|first|upper }}</span>{% if credential.domain is not empty and '.' in credential.domain and ' ' not in credential.domain %}<img src="https://www.google.com/s2/favicons?domain={{ credential.domain|url_encode }}&amp;sz=64" alt="" width="26" height="26" loading="lazy" referrerpolicy="no-referrer" data-team-workspace-target="favicon" data-action="load->team-workspace#faviconLoaded error->team-workspace#faviconError">{% endif %}</span>
+                    <div class="tw-access-identity"><a href="{{ path('credential_show', {id: credential.id}) }}">{{ credential.name }}</a><small>{{ credential.domain }}</small><span>{{ credential.username }}</span></div>
+                    {% if canManage %}<form method="post" action="{{ path('app_team_remove_credential', {id: team.id, credentialId: credential.id}) }}" data-action="submit->team-show#confirmForm" data-confirm-message="{{ 'teams.show.credentials.remove_confirm'|trans }}"><input type="hidden" name="_token" value="{{ csrf_token('remove_credential_' ~ credential.id) }}"><button type="submit" class="tw-icon-button tw-danger-text" title="{{ 'teams.show.credentials.remove_title'|trans }}" aria-label="{{ 'teams.show.credentials.remove_title'|trans }}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>{% endif %}
+                </div>
+                {% else %}<div class="tw-empty"><span class="tw-empty-icon"><i class="fa-solid fa-key" aria-hidden="true"></i></span><p>{{ 'teams.show.credentials.empty'|trans }}</p></div>{% endfor %}
+                <p class="tw-no-results" data-panel="credentials" data-team-workspace-target="empty" hidden>{{ 'teams.workspace.no_results'|trans }}</p>
             </div>
-        {% endif %}
-    </div>
-
-    {# Members Section #}
-    <div class="section-card">
-        <div class="section-header">
-            <div class="section-title">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                </svg>
-                <h2>{{ 'teams.show.members.title'|trans }}</h2>
-                <span class="member-count">{{ team.members|length }}</span>
-            </div>
-        </div>
-
-        {% if team.members is empty %}
-            <div class="empty-members">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-                <p>{{ 'teams.show.members.empty'|trans }}</p>
-            </div>
-        {% else %}
-            <div class="members-list">
+        </section>
+        <section class="tw-panel" id="tw-members-panel" aria-labelledby="tw-members-title" data-panel="members" data-team-workspace-target="panel">
+            <header class="tw-panel-heading"><div><span class="tw-panel-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></span><h2 id="tw-members-title">{{ 'teams.show.members.title'|trans }}</h2><span class="tw-count">{{ team.members|length }}</span></div>{% if add_member_form %}<button class="tw-button tw-button-small tw-button-secondary" type="button" data-dialog="tw-add-member" data-action="team-workspace#openDialog"><i class="fa-solid fa-plus" aria-hidden="true"></i> {{ 'teams.show.members.add.submit'|trans }}</button>{% endif %}</header>
+            {% if team.members is not empty %}<div class="tw-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" placeholder="{{ 'teams.workspace.search_members'|trans }}" aria-label="{{ 'teams.workspace.search_members'|trans }}" data-panel="members" data-team-workspace-target="search" data-action="input->team-workspace#filter"></div>{% endif %}
+            <div class="tw-list tw-member-list">
                 {% for member in team.members %}
-                    <div class="member-item">
-<img class="avatar-img"
-               src="{{ member.user.avatar ? asset('uploads/avatars/' ~ member.user.avatar) : asset('images/avatar-default.png') }}"
-               alt="{{ 'header.profile.avatar_alt'|trans }}">
-                        <div class="member-info">
-                            <div class="member-email">{{ member.user.email }}</div>
-                            <div class="member-meta">
-                                <span class="role-badge role-{{ member.role.value|lower }}">
-                                    {% if member.role == constant('App\\Enum\\TeamRole::OWNER') %}
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                                        </svg>
-                                    {% elseif member.role == constant('App\\Enum\\TeamRole::ADMIN') %}
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                        </svg>
-                                    {% else %}
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                        </svg>
-                                    {% endif %}
-                                    {{ member.role.value }}
-                                </span>
-
-                                <span class="joined-date">
-                                    {{ 'teams.show.members.joined_at'|trans({'%date%': member.joinedAt|date('d/m/Y')}) }}
-                                </span>
-                            </div>
-                        </div>
-
-                        {% if is_granted('TEAM_MANAGE', team) and member.role != constant('App\\Enum\\TeamRole::OWNER') %}
-                            <form method="post"
-                                  action="{{ path('app_team_remove_member', {id: team.id, memberId: member.id}) }}"
-                                  class="remove-member-form"
-                                  data-action="submit->team-show#confirmForm"
-                                  data-confirm-message="{{ 'teams.show.members.remove_confirm'|trans|e('html_attr') }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('remove_member_' ~ member.id) }}">
-                                <button type="submit" class="btn-remove-member" title="{{ 'teams.show.members.remove_title'|trans }}">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                <div class="tw-person" data-panel="members" data-search="{{ (member.user.email ~ ' ' ~ ('teams.organization.role_' ~ member.role.value|lower)|trans)|lower }}" data-team-workspace-target="row">
+                    {% if member.user.avatar %}<img class="tw-person-avatar" src="{{ asset('uploads/avatars/' ~ member.user.avatar) }}" alt="">{% else %}<span class="tw-person-avatar">{{ member.user.email|first|upper }}</span>{% endif %}
+                    <div class="tw-person-identity"><strong>{{ member.user.email }}{% if app.user and member.user.id == app.user.id %}<span class="tw-you">{{ 'teams.wizard.you'|trans }}</span>{% endif %}</strong><small>{{ 'teams.show.members.joined_at'|trans({'%date%': member.joinedAt|date('d/m/Y')}) }}</small></div>
+                    <span class="tw-role {{ member.role.value == 'OWNER' ? 'is-owner' : '' }}">{{ ('teams.organization.role_' ~ member.role.value|lower)|trans }}</span>
+                    {% if canManage and member.role.value != 'OWNER' %}<form method="post" action="{{ path('app_team_remove_member', {id: team.id, memberId: member.id}) }}" data-action="submit->team-show#confirmForm" data-confirm-message="{{ 'teams.show.members.remove_confirm'|trans }}"><input type="hidden" name="_token" value="{{ csrf_token('remove_member_' ~ member.id) }}"><button class="tw-icon-button tw-danger-text" type="submit" title="{{ 'teams.show.members.remove_title'|trans }}" aria-label="{{ 'teams.show.members.remove_title'|trans }}"><i class="fa-solid fa-user-minus" aria-hidden="true"></i></button></form>{% endif %}
+                </div>
+                {% else %}<div class="tw-empty"><p>{{ 'teams.show.members.empty'|trans }}</p></div>{% endfor %}
+                <p class="tw-no-results" data-panel="members" data-team-workspace-target="empty" hidden>{{ 'teams.workspace.no_results'|trans }}</p>
             </div>
-        {% endif %}
+        </section>
     </div>
-
-    {# Add Member Section #}
-    {% if add_member_form is defined and add_member_form %}
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-title">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                    </svg>
-                    <h2>{{ 'teams.show.members.add.title'|trans }}</h2>
-                </div>
-            </div>
-
-            {{ form_start(add_member_form, {'attr': {'class': 'add-member-form'}}) }}
-                {% if seatSummary %}
-                    <div class="team-seat-inline">
-                        <i class="fa-solid fa-building-shield"></i>
-                        <span>{{ 'teams.show.members.add.company_help'|trans }}</span>
-                        <span>·</span>
-                        <span>{{ 'teams.organization.guests'|trans({'%used%': seatSummary.guests, '%limit%': seatSummary.guestLimit}) }}</span>
-                    </div>
-                {% endif %}
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        {{ form_label(add_member_form.email, null, {'label_attr': {'class': 'form-label-inline'}}) }}
-                        {{ form_widget(add_member_form.email, {'attr': {'class': 'form-input-inline', 'placeholder': 'teams.show.members.add.email_placeholder'|trans }}) }}
-                        {{ form_errors(add_member_form.email) }}
-                    </div>
-
-                    {% if add_member_form.membershipType is defined %}
-                        <div class="form-group-inline">
-                            {{ form_label(add_member_form.membershipType, null, {'label_attr': {'class': 'form-label-inline'}}) }}
-                            {{ form_widget(add_member_form.membershipType, {'attr': {'class': 'form-select-inline', 'data-action': 'change->team-show#syncMemberAccessType'}}) }}
-                            {{ form_errors(add_member_form.membershipType) }}
-                        </div>
-                    {% endif %}
-
-                    <div class="form-group-inline" data-member-role-group>
-                        {{ form_label(add_member_form.role, null, {'label_attr': {'class': 'form-label-inline'}}) }}
-                        {{ form_widget(add_member_form.role, {'attr': {'class': 'form-select-inline'}}) }}
-                        {{ form_errors(add_member_form.role) }}
-                    </div>
-
-                    <button type="submit" class="btn-add-member">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        {{ 'teams.show.members.add.submit'|trans }}
-                    </button>
-                </div>
+    {% if add_member_form %}
+    <dialog id="tw-add-member" class="tw-dialog" aria-labelledby="tw-add-member-title" data-team-workspace-target="dialog" data-auto-open="{{ add_member_form.vars.submitted and not add_member_form.vars.valid ? 'true' : 'false' }}" data-action="click->team-workspace#dismissDialog">
+        <header class="tw-dialog-header"><div><span class="tw-eyebrow">{{ team.name }}</span><h2 id="tw-add-member-title">{{ 'teams.show.members.add.title'|trans }}</h2></div><button class="tw-icon-button" type="button" aria-label="{{ 'teams.workspace.close'|trans }}" data-action="team-workspace#closeDialog"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>
+        <div class="tw-dialog-body"><p>{{ 'teams.show.members.add.company_help'|trans }}</p>
+            {{ form_start(add_member_form, {attr: {class: 'tw-form', 'data-turbo': 'false'}}) }}
+            {{ form_errors(add_member_form) }}
+            {{ form_label(add_member_form.email) }}{{ form_widget(add_member_form.email, {attr: {placeholder: 'teams.show.members.add.email_placeholder'|trans, autocomplete: 'email'}}) }}{{ form_errors(add_member_form.email) }}
+            {{ form_label(add_member_form.role) }}{{ form_widget(add_member_form.role) }}{{ form_errors(add_member_form.role) }}
+            <button class="tw-button tw-button-primary" type="submit"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> {{ 'teams.show.members.add.submit'|trans }}</button>
             {{ form_end(add_member_form) }}
         </div>
+    </dialog>
     {% endif %}
-</div>
-
 {# Modal pour ajouter des credentials #}
 {% if add_credentials_form is defined and add_credentials_form %}
 <div id="credentialsModal" class="modal" aria-hidden="true">
@@ -278,7 +83,7 @@
     <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="credentialsModalTitle">
         <div class="modal-header">
             <h2 id="credentialsModalTitle">{{ 'teams.show.credentials.modal.title'|trans }}</h2>
-            <button type="button" class="btn-close-modal" data-action="click->team-show#closeCredentialsModal" aria-label="Close">
+            <button type="button" class="btn-close-modal" data-action="click->team-show#closeCredentialsModal" aria-label="{{ 'teams.workspace.close'|trans }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
@@ -307,21 +112,21 @@
                         id="credentialsSearch"
                         type="text"
                         class="credentials-search-input"
-                        placeholder="{{ 'Rechercher un credential'|trans }}"
+                        placeholder="{{ 'teams.workspace.search_credentials'|trans }}"
                         autocomplete="off"
                         data-action="input->team-show#searchCredentials"
                     />
-                    <button type="button" class="btn-clear-search" id="clearCredentialsSearch" aria-label="Clear" hidden data-action="click->team-show#clearSearch">
+                    <button type="button" class="btn-clear-search" id="clearCredentialsSearch" aria-label="{{ 'teams.workspace.clear_search'|trans }}" hidden data-action="click->team-show#clearSearch">
                         &times;
                     </button>
                 </div>
 
                 <div class="credentials-actions">
                     <button type="button" class="btn-chip" id="selectAllCredentials" data-action="click->team-show#selectAll">
-                        {{ 'Tout selectionner'|trans }}
+                        {{ 'teams.wizard.select_all'|trans }}
                     </button>
                     <button type="button" class="btn-chip" id="unselectAllCredentials" data-action="click->team-show#unselectAll">
-                        {{ 'Tout decocher'|trans }}
+                        {{ 'teams.wizard.clear_selection'|trans }}
                     </button>
                     <span class="credentials-counter" id="credentialsCounter">
                         0 / 0
@@ -357,7 +162,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M20 20l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    <p>{{ 'Aucun resultat.'|trans }}</p>
+                    <p>{{ 'teams.workspace.no_results'|trans }}</p>
                 </div>
             </div>
 
@@ -366,9 +171,9 @@
             <label class="credential-option" style="margin-top: 1rem; align-items: flex-start;">
                 {{ form_widget(add_credentials_form.canRevealPassword, {'attr': {'class': 'share-permission-checkbox'}}) }}
                 <span class="credential-text">
-                    <span class="credential-title">{{ add_credentials_form.canRevealPassword.vars.label }}</span>
+                    <span class="credential-title">{{ add_credentials_form.canRevealPassword.vars.label|trans }}</span>
                     <small style="display:block; margin-top:.3rem; color:var(--color-text-medium); line-height:1.4;">
-                        {{ add_credentials_form.canRevealPassword.vars.help }}
+                        {{ add_credentials_form.canRevealPassword.vars.help|trans }}
                     </small>
                 </span>
             </label>
@@ -392,11 +197,7 @@
 </div>
 {% endif %}
 
-{# Formulaire cach? pour la suppression de l'?quipe #}
-{% if is_granted('TEAM_DELETE', team) %}
-<form id="deleteTeamForm" method="post" action="{{ path('app_team_delete', {id: team.id}) }}" hidden>
-    <input type="hidden" name="_token" value="{{ csrf_token('delete_team_' ~ team.id) }}">
-</form>
-{% endif %}
+
+{% if is_granted('TEAM_DELETE', team) %}<form id="deleteTeamForm" method="post" action="{{ path('app_team_delete', {id: team.id}) }}" hidden><input type="hidden" name="_token" value="{{ csrf_token('delete_team_' ~ team.id) }}"></form>{% endif %}
 </div>
 {% endblock %}

@@ -9,8 +9,10 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class TeamType extends AbstractType
 {
@@ -22,6 +24,16 @@ class TeamType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'teams.form.name_label',
+                'constraints' => [new Assert\NotBlank(), new Assert\Length(max: 180)],
+                'attr' => ['maxlength' => 180],
+            ])
+            ->add('members', CollectionType::class, [
+                'entry_type' => TeamAddMemberType::class,
+                'entry_options' => ['csrf_protection' => false],
+                'mapped' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'required' => false,
             ]);
 
         if ($user) {

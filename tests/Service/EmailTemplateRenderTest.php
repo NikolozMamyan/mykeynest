@@ -83,6 +83,16 @@ final class EmailTemplateRenderTest extends KernelTestCase
                 ['name' => 'Espace projet', 'domain' => 'project.example.invalid', 'username' => 'team@example.invalid'],
             ],
         ]];
+        yield 'guest registration EN' => ['emails/register_guest.html.twig', array_replace($base + $urls, ['locale' => 'en'])];
+        yield 'team invitation EN' => ['emails/team_invitation.html.twig', array_replace($base + $urls, ['locale' => 'en', 'team' => ['name' => 'Product']])];
+        foreach ([true, false] as $registration) {
+            yield 'organization EN '.($registration ? 'guest' : 'member') => ['emails/organization_invitation.html.twig', array_replace($base + $urls, [
+                'locale' => 'en', 'organization' => ['name' => 'Atelier Nova'], 'membership' => ['role' => ['value' => 'ADMIN']], 'requires_registration' => $registration,
+            ])];
+        }
+        yield 'shared access EN' => ['emails/share_notification.html.twig', array_replace($base + $urls, [
+            'locale' => 'en', 'owner' => ['email' => 'alex@example.invalid'], 'credentials' => [],
+        ])];
         yield 'subscription activation' => ['emails/pro_checkout_activation.html.twig', $base + $urls + ['planName' => 'TEAM', 'quantity' => 8, 'monthlyAmount' => '43,92 €']];
         yield 'subscription existing account' => ['emails/pro_checkout_existing_user.html.twig', $base + $urls + ['planName' => 'TEAM', 'quantity' => 8, 'monthlyAmount' => '43,92 €']];
         foreach ([true, false] as $cancelled) {
@@ -131,6 +141,23 @@ final class EmailTemplateRenderTest extends KernelTestCase
         self::assertStringNotContainsString('<style', $captured->getTextBody());
     }
 
+    public function testInvitationLinkIsPreservedInTheTextAlternative(): void
+    {
+        self::bootKernel();
+        $cases = iterator_to_array(self::emailTemplates());
+        [$template, $context] = $cases['guest registration'];
+        $captured = null;
+        $transport = $this->createMock(MailerInterface::class);
+        $transport->expects(self::once())->method('send')->willReturnCallback(static function ($email) use (&$captured): void {
+            $captured = $email;
+        });
+        (new MailerService($transport, self::getContainer()->get(Environment::class)))
+            ->send('preview@example.invalid', 'Invitation', $template, $context);
+
+        self::assertInstanceOf(Email::class, $captured);
+        self::assertStringContainsString($context['guest_register'], $captured->getTextBody());
+    }
+
     public function testWelcomeEscapesRecipientDataInsideFormattedTranslations(): void
     {
         self::bootKernel();
@@ -141,6 +168,23 @@ final class EmailTemplateRenderTest extends KernelTestCase
 
         self::assertStringNotContainsString('<img src=x', $html);
         self::assertStringContainsString('&lt;img src=x', $html);
+    }
+
+    public function testSharingEmailKeepsLongListsCompactAndEscapesNames(): void
+    {
+        self::bootKernel();
+        $credential = ['name' => '<script>alert(1)</script>', 'domain' => 'example.invalid', 'password' => 'secret-must-not-render'];
+        $html = self::getContainer()->get(Environment::class)->render('emails/share_notification.html.twig', [
+            'owner' => ['email' => 'alex@example.invalid'], 'locale' => 'en',
+            'credentials' => array_fill(0, 25, $credential), 'app_url' => 'https://key-nest.com/app/shared-access',
+        ]);
+
+        self::assertSame(3, substr_count($html, '&lt;script&gt;'));
+        self::assertStringNotContainsString('secret-must-not-render', $html);
+        self::assertStringNotContainsString('<script>', $html);
+        self::assertStringContainsString('22 more', $html);
+        self::assertStringContainsString('Open my shared credentials', $html);
+        self::assertStringNotContainsString('sharing.', strip_tags($html));
     }
 
     public function testSubscriptionEmailsRenderWithBillingSummary(): void

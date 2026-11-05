@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="{{ app.request.locale|default('fr') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <meta name="referrer" content="no-referrer">
+    <meta name="theme-color" content="#f8fafc">
+    <title>{% block title %}MYKEYNEST{% endblock %}</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}?v=4" sizes="any">
+    {% include 'components/parts/_theme_boot.html.twig' %}
+    {{ importmap('public') }}
+    <link rel="stylesheet" href="{{ asset('styles/pages/public-shell.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/pages/guest-access.css') }}">
+</head>
+<body class="public-page guest-access-page {% block body_class %}{% endblock %}">
+    <div class="ga-shell">
+        <header class="ga-header">
+            {% include 'components/parts/logo.html.twig' %}
+            <div class="ga-header-actions"><span class="ga-secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></svg>{{ 'guest_access.secure'|trans }}</span>{% include 'components/parts/lang_switcher.html.twig' %}</div>
+        </header>
+        {% block content %}{% endblock %}
+        <footer class="ga-footer"><span>MYKEYNEST · OptiWebSolutions</span><a href="mailto:contact@key-nest.com">{{ 'guest_access.need_help'|trans }}</a></footer>
+    </div>
+</body>
+</html>

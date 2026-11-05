@@ -1,18 +1,16 @@
-{% extends 'emails/layout.html.twig' %}
-
-{% block title %}Finalisez votre accès MYKEYNEST{% endblock %}
-{% block preheader %}Un accès sécurisé vous attend sur MYKEYNEST.{% endblock %}
-{% block eyebrow %}Invitation sécurisée{% endblock %}
-{% block heading %}Finalisez votre accès à MYKEYNEST{% endblock %}
-
+{% extends 'emails/sharing_layout.html.twig' %}
+{% set actionUrl = guest_register %}
+{% block action_label %}{{ 'sharing.activate'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block title %}{{ 'sharing.guest_title'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block preheader %}{{ 'sharing.guest_intro'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block eyebrow %}{{ 'sharing.share_eyebrow'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block heading %}{{ 'sharing.guest_title'|trans({}, 'emails', emailLocale) }}{% endblock %}
+{% block introduction %}{{ 'sharing.guest_intro'|trans({}, 'emails', emailLocale) }}{% endblock %}
 {% block content %}
-  <p style="margin:0;">Vous avez été invité à consulter un accès partagé en toute sécurité. Créez votre mot de passe pour activer votre espace personnel.</p>
-  <p style="margin:22px 0 0;padding:12px 14px;background:#fff8e7;border-left:3px solid #f59e0b;border-radius:4px;color:#80601f;font-size:12px;">Ce lien personnel expire le <strong>{{ expiresAt|date('d/m/Y à H:i') }}</strong>.</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f0fdf4" style="width:100%;table-layout:fixed;background-color:#f0fdf4;border-left:3px solid #059669;"><tr><td style="padding:13px 16px;word-wrap:break-word;">
+    <p style="margin:0;color:#334155;font-size:14px;line-height:21px;">{{ 'sharing.invited_email'|trans({}, 'emails', emailLocale) }}</p>
+    <p style="margin:4px 0 0;color:#1e293b;font-size:16px;line-height:24px;font-weight:700;">{{ user.email }}</p>
+  </td></tr></table>
+  <p style="margin:14px 0 0;color:#475569;font-size:14px;line-height:21px;">{{ 'sharing.expiry'|trans({'%date%': expiresAt|date('d/m/Y H:i')}, 'emails', emailLocale) }}</p>
 {% endblock %}
-
-{% block action %}
-  {% include 'emails/_action.html.twig' with {actionUrl: guest_register, label: 'Créer mon compte'} %}
-{% endblock %}
-
-{% block after_action %}<p style="margin:16px 0 0;font-size:12px;"><a href="{{ guest_preview }}" style="color:#435e53;text-decoration:underline;">Consulter l’invitation avant de créer mon compte</a></p>{% endblock %}
-{% block footer %}<p style="margin:0;">Si vous n’êtes pas concerné, ignorez simplement ce message.</p>{% endblock %}
+{% block after_action %}<p style="margin:15px 0 0;text-align:center;font-size:15px;line-height:23px;"><a href="{{ guest_preview }}" style="color:#047857;font-weight:700;text-decoration:underline;">{{ 'sharing.preview'|trans({}, 'emails', emailLocale) }}</a></p>{% endblock %}

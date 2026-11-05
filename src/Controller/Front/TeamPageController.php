@@ -21,6 +21,7 @@ use App\Service\OrganizationInvitationManager;
 use App\Service\TeamNotifier;
 use App\Service\TeamMemberAssignmentManager;
 use App\Service\TeamCredentialPermissionManager;
+use App\Service\TeamCreationManager;
 use App\Service\SubscriptionPlanService;
 use App\Service\OrganizationSeatManager;
 use App\Service\StripeBillingService;
@@ -31,6 +32,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -88,9 +90,11 @@ class TeamPageController extends AbstractController
         $currentPlan = $this->subscriptionPlans->getPlanForUser($user);
         $organization = $this->organizationSeats->getOrganizationForUser($user);
         $canManageOrganization = $organization ? $this->organizationSeats->canManage($organization, $user) : false;
-        $teamLimit = $canManageOrganization && $organization?->isActive()
-            ? null
-            : $this->subscriptionPlans->getPersonalLimit($user, SubscriptionPlanService::LIMIT_TEAMS);
+        $teamLimit = $currentPlan['code'] === SubscriptionPlanService::PLAN_FREE
+            ? 0
+            : ($canManageOrganization && $organization?->isActive()
+                ? null
+                : $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS));
         $organizationInviteForm = null;
         if ($organization?->isActive() && $canManageOrganization) {
             $organizationInviteForm = $this->createForm(OrganizationInviteMemberType::class, null, [
@@ -120,7 +124,12 @@ class TeamPageController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         Security $security,
-        TeamCredentialPermissionManager $permissionManager,
+        TeamCreationManager $teamCreation,
+        TeamNotifier $teamNotifier,
+        MailerService $mailer,
+        UrlGeneratorInterface $urlGenerator,
+        LoggerInterface $logger,
+        TranslatorInterface $translator,
     ): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -131,10 +140,16 @@ class TeamPageController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        if ($this->subscriptionPlans->getPlanForUser($user)['code'] === SubscriptionPlanService::PLAN_FREE) {
+            $this->addFlash('warning', $translator->trans('teams.wizard.paid_required'));
+
+            return $this->redirectToRoute('app_subscription');
+        }
+
         $organization = $this->organizationSeats->getOrganizationForUser($user);
         $teamLimit = $organization && $organization->isActive() && $this->organizationSeats->canManage($organization, $user)
             ? null
-            : $this->subscriptionPlans->getPersonalLimit($user, SubscriptionPlanService::LIMIT_TEAMS);
+            : $this->subscriptionPlans->getLimit($user, SubscriptionPlanService::LIMIT_TEAMS);
         $countTeams = $em->getRepository(Team::class)->count(['owner' => $user]);
 
         if ($teamLimit !== null && $countTeams >= $teamLimit) {
@@ -143,6 +158,9 @@ class TeamPageController extends AbstractController
             return $this->redirectToRoute('app_team_index');
         }
 
+        $isCompanyTeam = $organization
+            && $organization->isActive()
+            && $this->organizationSeats->canManage($organization, $user);
         $team = new Team();
 
         $form = $this->createForm(TeamType::class, $team, [
@@ -152,49 +170,45 @@ class TeamPageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $isCompanyTeam = $organization
-                && $organization->isActive()
-                && $this->organizationSeats->canManage($organization, $user);
-            $teamOwner = $isCompanyTeam ? $organization->getOwner() : $user;
-            if (!$teamOwner instanceof User) {
-                throw new \LogicException('Le propriétaire du groupe est introuvable.');
+            try {
+                $assignments = $teamCreation->create(
+                    $team,
+                    $user,
+                    $isCompanyTeam ? $organization : null,
+                    $form->get('members')->getData(),
+                    (bool) $form->get('canRevealPassword')->getData(),
+                );
+            } catch (\DomainException|\InvalidArgumentException|\LogicException $exception) {
+                $form->addError(new FormError($translator->trans($exception->getMessage())));
             }
 
-            $team->setOwner($teamOwner);
-            if ($isCompanyTeam) {
-                $team->setOrganization($organization);
+            if (isset($assignments)) {
+                foreach ($assignments as $assignment) {
+                    $teamNotifier->notifyMemberAdded($team, $assignment['user'], $user, $assignment['member']->getRole());
+                    if ($assignment['invitationExpiresAt'] instanceof \DateTimeImmutable) {
+                        try {
+                            $this->sendTeamGuestInvitationEmail($mailer, $urlGenerator, $assignment['user'], $team, $assignment['invitationExpiresAt']);
+                        } catch (\Throwable $exception) {
+                            $logger->warning('Unable to send team invitation email.', ['team_id' => $team->getId(), 'exception' => $exception->getMessage()]);
+                            $this->addFlash('warning', $translator->trans('teams.wizard.invitation_warning'));
+                        }
+                    }
+                }
+                $this->addFlash('success', $translator->trans('teams.wizard.success'));
+
+                return $this->redirectToRoute('app_team_index');
             }
-            $canRevealPassword = (bool) $form->get('canRevealPassword')->getData();
-
-            $ownerMember = (new TeamMember())
-                ->setTeam($team)
-                ->setUser($teamOwner)
-                ->setRole(TeamRole::OWNER);
-
-            $em->persist($team);
-            $em->persist($ownerMember);
-
-            if ($teamOwner !== $user) {
-                $creatorMember = (new TeamMember())
-                    ->setTeam($team)
-                    ->setUser($user)
-                    ->setRole(TeamRole::ADMIN);
-                $em->persist($creatorMember);
-            }
-
-            foreach ($team->getCredentials() as $credential) {
-                $permissionManager->setPasswordReveal($team, $credential, $canRevealPassword);
-            }
-
-            $em->flush();
-
-            $this->addFlash('success', 'Groupe créé avec succès.');
-
-            return $this->redirectToRoute('app_team_index');
         }
 
         return $this->render('team/new.html.twig', [
             'form' => $form->createView(),
+            'companyTeam' => $isCompanyTeam,
+            'teamOwnerEmail' => $isCompanyTeam ? $organization->getOwner()?->getEmail() : $user->getEmail(),
+            'currentUserEmail' => $user->getEmail(),
+            'automaticMembers' => array_values(array_unique(array_filter([
+                $isCompanyTeam ? $organization->getOwner()?->getEmail() : null,
+                $user->getEmail(),
+            ]))),
         ]);
     }
 
@@ -210,6 +224,7 @@ class TeamPageController extends AbstractController
         TeamNotifier $teamNotifier,
         TeamMemberAssignmentManager $memberAssignments,
         TeamCredentialPermissionManager $permissionManager,
+        TranslatorInterface $translator,
     ): Response {
         $this->denyAccessUnlessGranted('TEAM_VIEW', $team);
 
@@ -222,9 +237,7 @@ class TeamPageController extends AbstractController
         $addCredentialsFormView = null;
 
         if ($this->isGranted('TEAM_MANAGE', $team)) {
-            $memberForm = $this->createForm(TeamAddMemberType::class, null, [
-                'company_team' => $team->getOrganization() !== null,
-            ]);
+            $memberForm = $this->createForm(TeamAddMemberType::class);
             $memberForm->handleRequest($request);
 
             if ($memberForm->isSubmitted() && $memberForm->isValid()) {
@@ -232,19 +245,15 @@ class TeamPageController extends AbstractController
                 $email = (string) $data['email'];
                 /** @var TeamRole $role */
                 $role = $data['role'];
-                $membershipType = $memberForm->has('membershipType')
-                    ? (string) $memberForm->get('membershipType')->getData()
-                    : 'employee';
                 try {
                     $assignment = $memberAssignments->assign(
                         $team,
                         $email,
                         $role,
                         $user,
-                        $membershipType === 'guest',
                     );
                 } catch (\DomainException|\InvalidArgumentException|\LogicException $exception) {
-                    $this->addFlash('warning', $exception->getMessage());
+                    $this->addFlash('warning', $translator->trans($exception->getMessage()));
 
                     return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
                 }

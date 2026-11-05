@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\OrganizationMember;
 use App\Entity\Team;
 use App\Entity\TeamMember;
 use App\Entity\User;
@@ -20,6 +19,7 @@ final class TeamMemberAssignmentManager
         private readonly TeamMemberRepository $teamMembers,
         private readonly OrganizationSeatManager $organizationSeats,
         private readonly EntityManagerInterface $entityManager,
+        private readonly SubscriptionPlanService $subscriptionPlans,
     ) {
     }
 
@@ -31,7 +31,6 @@ final class TeamMemberAssignmentManager
         string $email,
         TeamRole $role,
         User $actor,
-        bool $externalGuest = false,
     ): array {
         $email = mb_strtolower(trim($email));
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -48,55 +47,60 @@ final class TeamMemberAssignmentManager
         $memberUser = $this->users->findOneBy(['email' => $email]);
         $invitationExpiresAt = null;
 
-        if ($organization !== null && !$externalGuest) {
-            if (!$memberUser instanceof User) {
-                throw new \DomainException('Invitez d’abord ce collaborateur depuis l’espace entreprise.');
+        if ($memberUser instanceof User) {
+            if ($team->getOwner() === $memberUser || (
+                $team->getOwner()?->getId() !== null
+                && $team->getOwner()?->getId() === $memberUser->getId()
+            )) {
+                throw new \DomainException('Le propriétaire est déjà membre de cette équipe.');
             }
 
-            $membership = $this->organizationSeats->getMembership($organization, $memberUser);
-            if (
-                !$membership instanceof OrganizationMember
-                || $membership->getStatus() !== OrganizationMemberStatus::ACTIVE
-                || $membership->getRole() === OrganizationRole::GUEST
-            ) {
-                throw new \DomainException('Ce collaborateur doit être actif dans l’entreprise avant de rejoindre un groupe.');
-            }
-        } else {
-            if (!$memberUser instanceof User) {
-                $invitationExpiresAt = new \DateTimeImmutable('+24 hours');
-                $memberUser = $this->createGuestUser($email, $invitationExpiresAt);
-            } elseif (in_array('ROLE_GUEST', $memberUser->getRoles(), true)) {
-                $invitationExpiresAt = new \DateTimeImmutable('+24 hours');
-                $memberUser
-                    ->setApiToken(bin2hex(random_bytes(32)))
-                    ->setTokenExpiresAt($invitationExpiresAt);
-            }
-
-            if ($organization !== null) {
-                $membership = $this->organizationSeats->inviteExternalGuest(
-                    $organization,
-                    $memberUser,
-                    $actor,
-                    $invitationExpiresAt !== null,
-                    $invitationExpiresAt,
-                );
-                $this->organizationSeats->assertMembershipMayJoinTeam($membership, $team);
-                $role = TeamRole::MEMBER;
+            if ($memberUser->getId() !== null && $this->teamMembers->findOneBy([
+                'team' => $team,
+                'user' => $memberUser,
+            ]) instanceof TeamMember) {
+                throw new \DomainException('Cet utilisateur est déjà membre de cette équipe.');
             }
         }
 
-        if ($team->getOwner() === $memberUser || (
-            $team->getOwner()?->getId() !== null
-            && $team->getOwner()?->getId() === $memberUser->getId()
-        )) {
-            throw new \DomainException('Le propriétaire est déjà membre de cette équipe.');
+        $membership = $organization !== null && $memberUser instanceof User
+            ? $this->organizationSeats->getMembership($organization, $memberUser)
+            : null;
+        if ($membership?->getStatus() === OrganizationMemberStatus::SUSPENDED) {
+            throw new \DomainException('teams.wizard.member_suspended');
+        }
+        $hasCompanyLicense = $membership?->getStatus() === OrganizationMemberStatus::ACTIVE
+            && $membership->getRole() !== OrganizationRole::GUEST;
+        $needsLicense = !$hasCompanyLicense && (
+            !$memberUser instanceof User
+            || $this->subscriptionPlans->getPlanForUser($memberUser)['code'] === SubscriptionPlanService::PLAN_FREE
+        );
+        if ($needsLicense && $organization === null) {
+            throw new \DomainException('teams.wizard.license_required');
         }
 
-        if ($memberUser->getId() !== null && $this->teamMembers->findOneBy([
-            'team' => $team,
-            'user' => $memberUser,
-        ]) instanceof TeamMember) {
-            throw new \DomainException('Cet utilisateur est déjà membre de cette équipe.');
+        if (!$memberUser instanceof User) {
+            $invitationExpiresAt = new \DateTimeImmutable('+24 hours');
+            $memberUser = $this->createGuestUser($email, $invitationExpiresAt);
+        } elseif (in_array('ROLE_GUEST', $memberUser->getRoles(), true)) {
+            $invitationExpiresAt = new \DateTimeImmutable('+24 hours');
+            $memberUser
+                ->setApiToken(bin2hex(random_bytes(32)))
+                ->setTokenExpiresAt($invitationExpiresAt);
+        }
+
+        if ($needsLicense) {
+            $membership = $this->organizationSeats->inviteCompanyMember(
+                $organization,
+                $memberUser,
+                $actor,
+                OrganizationRole::MEMBER,
+                $invitationExpiresAt !== null,
+                $invitationExpiresAt,
+            );
+            if ($invitationExpiresAt !== null) {
+                $membership->setInvitationExpiresAt($invitationExpiresAt);
+            }
         }
 
         $member = (new TeamMember())
