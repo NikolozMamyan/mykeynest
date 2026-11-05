@@ -140,7 +140,7 @@
                 {% endif %}
                 {% do form.credentials.setRendered %}
                 {{ form_errors(form.credentials) }}
-                <p class="tc-footnote"><i class="fa-solid fa-sliders" aria-hidden="true"></i> {{ 'teams.wizard.access_later'|trans }}</p>
+                {# <p class="tc-footnote"><i class="fa-solid fa-sliders" aria-hidden="true"></i> {{ 'teams.wizard.access_later'|trans }}</p> #}
             </section>
 
             <section class="tc-panel" id="tc-step-2" data-team-create-target="panel" aria-labelledby="tc-title-2">
@@ -161,14 +161,5 @@
             </footer>
         </div>
 
-        <aside class="tc-preview" aria-label="{{ 'teams.wizard.preview'|trans }}">
-            <div class="tc-preview-top"><span class="tc-eyebrow">{{ 'teams.wizard.preview'|trans }}</span><span class="tc-badge">{{ 'teams.wizard.draft'|trans }}</span></div>
-            <span class="tc-preview-avatar" data-team-create-target="initials" aria-hidden="true">G</span>
-            <h2 data-team-create-target="previewName">{{ 'teams.wizard.empty_name'|trans }}</h2>
-            <p>{{ (companyTeam ? 'teams.wizard.company_group' : 'teams.wizard.shared_group')|trans }}</p>
-            <div class="tc-preview-stats"><div><strong data-team-create-target="totalMembers">{{ automaticMembers|length }}</strong><span>{{ 'teams.wizard.people'|trans }}</span></div><div><strong data-team-create-target="credentialCount">0</strong><span>{{ 'teams.wizard.accesses'|trans }}</span></div></div>
-            <div class="tc-preview-permission"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span data-team-create-target="permissionText">{{ 'teams.wizard.restricted_title'|trans }}</span></div>
-            <div class="tc-preview-tip"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i><p>{{ 'teams.wizard.tip'|trans }}</p></div>
-        </aside>
     </div>
 {{ form_end(form) }}

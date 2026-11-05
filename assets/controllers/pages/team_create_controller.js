@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["panel", "stepItem", "name", "emailInput", "bulkInput", "bulkPanel", "members", "memberRow", "memberFeedback", "emptyMembers", "memberCount", "totalMembers", "credential", "credentialCount", "selectionCount", "search", "noResults", "reveal", "previewName", "initials", "permissionText", "reviewMembers", "reviewCredentials", "previous", "next", "submit", "favicon"];
+  static targets = ["panel", "stepItem", "name", "emailInput", "bulkInput", "bulkPanel", "members", "memberRow", "memberFeedback", "emptyMembers", "memberCount", "credential", "selectionCount", "search", "noResults", "reveal", "previewName", "initials", "permissionText", "reviewMembers", "reviewCredentials", "previous", "next", "submit", "favicon"];
   static values = { messages: Object, automaticMembers: Array, step: Number };
 
   connect() {
@@ -201,7 +201,6 @@ export default class extends Controller {
     const initials = name.split(/\s+/).slice(0, 2).map(word => Array.from(word)[0]).join("").toUpperCase();
     this.initialsTargets.forEach(target => { target.textContent = initials; });
     this.memberCountTargets.forEach(target => { target.textContent = this.memberRowTargets.length; });
-    this.totalMembersTarget.textContent = this.memberRowTargets.length + this.automaticMembersValue.length;
     this.emptyMembersTarget.hidden = this.memberRowTargets.length > 0;
     this.reviewMembersTarget.replaceChildren();
     this.memberRowTargets.forEach(row => {
@@ -220,7 +219,6 @@ export default class extends Controller {
 
     const selected = this.credentialTargets.filter(card => card.querySelector("input").checked);
     this.credentialTargets.forEach(card => { card.classList.toggle("is-selected", card.querySelector("input").checked); });
-    this.credentialCountTargets.forEach(target => { target.textContent = selected.length; });
     if (this.hasSelectionCountTarget) {
       this.selectionCountTarget.textContent = `${selected.length} / ${this.credentialTargets.length}`;
       this.selectionCountTarget.setAttribute("aria-label", this.messagesValue.selected_count.replace("%count%", selected.length).replace("%total%", this.credentialTargets.length));
