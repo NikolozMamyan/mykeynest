@@ -1,0 +1,4 @@
+# Set APP_DIR to the deployed application directory and install in its user's crontab.
+# Run the database migration before enabling this job. APP_URL must be the public HTTPS URL.
+APP_DIR=/path/to/MYKEYNEST
+*/5 * * * * cd "$APP_DIR" && php bin/console app:shared-access:expiry-reminders --env=prod --no-debug >> var/log/shared-access-reminders.log 2>&1

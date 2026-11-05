@@ -84,6 +84,15 @@ final class EmailTemplateRenderTest extends KernelTestCase
             ],
         ]];
         yield 'guest registration EN' => ['emails/register_guest.html.twig', array_replace($base + $urls, ['locale' => 'en'])];
+        foreach (['fr', 'en'] as $locale) {
+            foreach (['owner', 'guest', 'active'] as $recipient) {
+                yield 'expiry '.$locale.' '.$recipient => ['emails/share_expiry.html.twig', [
+                    'locale' => $locale, 'isOwner' => $recipient === 'owner', 'isGuest' => $recipient !== 'active',
+                    'share' => ['credential' => ['name' => 'Figma'], 'expiresAt' => $date, 'unlimitedOnActivation' => true, 'owner' => ['email' => 'owner@example.invalid'], 'guest' => ['email' => 'guest@example.invalid']],
+                    'manageUrl' => 'https://key-nest.com/app/shared-access/1/validity', 'registrationUrl' => $urls['guest_register'], 'requestUrl' => 'https://key-nest.com/guest/shared-access/1/extension?signature=preview',
+                ]];
+            }
+        }
         yield 'team invitation EN' => ['emails/team_invitation.html.twig', array_replace($base + $urls, ['locale' => 'en', 'team' => ['name' => 'Product']])];
         foreach ([true, false] as $registration) {
             yield 'organization EN '.($registration ? 'guest' : 'member') => ['emails/organization_invitation.html.twig', array_replace($base + $urls, [
@@ -156,6 +165,18 @@ final class EmailTemplateRenderTest extends KernelTestCase
 
         self::assertInstanceOf(Email::class, $captured);
         self::assertStringContainsString($context['guest_register'], $captured->getTextBody());
+    }
+
+    public function testExpiryTextEmailKeepsBothActivationAndExtensionRequestLinks(): void
+    {
+        self::bootKernel();
+        [$template, $context] = iterator_to_array(self::emailTemplates())['expiry fr guest'];
+        $captured = null;
+        $transport = $this->createMock(MailerInterface::class);
+        $transport->method('send')->willReturnCallback(static function ($email) use (&$captured): void { $captured = $email; });
+        (new MailerService($transport, self::getContainer()->get(Environment::class)))->send('preview@example.invalid', 'Expiry', $template, $context);
+        self::assertStringContainsString($context['registrationUrl'], $captured->getTextBody());
+        self::assertStringContainsString($context['requestUrl'], $captured->getTextBody());
     }
 
     public function testWelcomeEscapesRecipientDataInsideFormattedTranslations(): void

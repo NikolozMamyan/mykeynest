@@ -11,6 +11,6 @@
     <p style="margin:0;color:#334155;font-size:14px;line-height:21px;">{{ 'sharing.invited_email'|trans({}, 'emails', emailLocale) }}</p>
     <p style="margin:4px 0 0;color:#1e293b;font-size:16px;line-height:24px;font-weight:700;">{{ user.email }}</p>
   </td></tr></table>
-  <p style="margin:14px 0 0;color:#475569;font-size:14px;line-height:21px;">{{ 'sharing.expiry'|trans({'%date%': expiresAt|date('d/m/Y H:i')}, 'emails', emailLocale) }}</p>
+  <p style="margin:14px 0 0;color:#475569;font-size:14px;line-height:21px;">{{ 'sharing.expiry'|trans({'%date%': expiresAt|date('d/m/Y H:i', 'Europe/Paris')}, 'emails', emailLocale) }}</p>
 {% endblock %}
 {% block after_action %}<p style="margin:15px 0 0;text-align:center;font-size:15px;line-height:23px;"><a href="{{ guest_preview }}" style="color:#047857;font-weight:700;text-decoration:underline;">{{ 'sharing.preview'|trans({}, 'emails', emailLocale) }}</a></p>{% endblock %}

@@ -11,6 +11,7 @@ use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialManager;
 use App\Service\MailerService;
 use App\Service\SharedAccessNotifier;
+use App\Service\SharedAccessValidityManager;
 use App\Service\SubscriptionPlanService;
 use App\Service\ProductGuide;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,6 +32,7 @@ class SharedAccessController extends AbstractController
         private SubscriptionPlanService $subscriptionPlans,
         private TranslatorInterface $translator,
         private ProductGuide $productGuide,
+        private SharedAccessValidityManager $validity,
     ) {
     }
 
@@ -108,6 +110,9 @@ class SharedAccessController extends AbstractController
         $planLimit = $this->subscriptionPlans->getLimit($owner, SubscriptionPlanService::LIMIT_SHARES);
 
         if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('share_access', (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException();
+            }
             return $this->handleShareSubmission(
                 $request,
                 $owner,
@@ -211,7 +216,7 @@ class SharedAccessController extends AbstractController
     ): Response {
         $user = $this->getUser();
 
-        if ($sharedAccess->getGuest() !== $user) {
+        if ($sharedAccess->getGuest() !== $user || $sharedAccess->isExpired()) {
             throw $this->createAccessDeniedException('Vous n\'etes pas autorise a voir cet identifiant.');
         }
 
@@ -248,7 +253,7 @@ class SharedAccessController extends AbstractController
         string $redirectRoute
     ): RedirectResponse {
         $email = strtolower(trim((string) $request->request->get('email')));
-        $credentialIds = $request->request->all('credentials') ?? [];
+        $credentialIds = array_unique(array_map('intval', $request->request->all('credentials')));
         $canRevealPassword = $request->request->getBoolean('can_reveal_password');
         $limitKey = sprintf('%s|%s', $owner->getId() ?? 0, $email);
         $rateLimit = $this->shareInvitationLimiter->create($limitKey)->consume(1);
@@ -259,7 +264,7 @@ class SharedAccessController extends AbstractController
             return $this->redirectToRoute($redirectRoute);
         }
 
-        if ($email === '') {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('error', 'Veuillez renseigner une adresse email valide.');
 
             return $this->redirectToRoute($redirectRoute);
@@ -273,34 +278,23 @@ class SharedAccessController extends AbstractController
 
         $guest = $userRepository->findOneBy(['email' => $email]);
 
-        if (!$guest) {
-            $token = bin2hex(random_bytes(32));
-            $expiresAt = new \DateTimeImmutable('+6 hours');
+        try {
+            $expiresAt = $this->validity->parseExpiry((string) $request->request->get('expires_at', ''));
+        } catch (\DomainException $exception) {
+            $this->addFlash('error', $this->translator->trans($exception->getMessage()));
 
+            return $this->redirectToRoute($redirectRoute);
+        }
+        $invitationNeeded = !$guest || in_array('ROLE_GUEST', $guest->getRoles(), true);
+
+        if (!$guest) {
             $guest = new User();
             $guest->setEmail($email);
             $guest->setCompany('');
             $guest->setPassword('');
             $guest->setRoles(['ROLE_GUEST']);
-            $guest->setApiToken($token);
-            $guest->setTokenExpiresAt($expiresAt);
             $guest->regenerateApiExtensionToken();
 
-            $entityManager->persist($guest);
-            $entityManager->flush();
-
-            $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
-            $this->addFlash('success', 'Une invitation a ete envoyee a ' . $email . '.');
-        } elseif (in_array('ROLE_GUEST', $guest->getRoles(), true) && $guest->getApiToken() !== null) {
-            $token = bin2hex(random_bytes(32));
-            $expiresAt = new \DateTimeImmutable('+24 hours');
-
-            $guest->setApiToken($token);
-            $guest->setTokenExpiresAt($expiresAt);
-            $entityManager->flush();
-
-            $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt);
-            $this->addFlash('success', 'Une nouvelle invitation a ete envoyee a ' . $email . '.');
         }
 
         if ($guest === $owner) {
@@ -320,7 +314,7 @@ class SharedAccessController extends AbstractController
                     continue;
                 }
 
-                $exists = $entityManager->getRepository(SharedAccess::class)->findOneBy([
+                $exists = $guest->getId() === null ? null : $entityManager->getRepository(SharedAccess::class)->findOneBy([
                     'owner' => $owner,
                     'guest' => $guest,
                     'credential' => $credential,
@@ -346,6 +340,7 @@ class SharedAccessController extends AbstractController
             }
         }
 
+        $entityManager->persist($guest);
         $createdCount = 0;
         $updatedCount = 0;
         $sharedCredentials = [];
@@ -357,16 +352,17 @@ class SharedAccessController extends AbstractController
                 continue;
             }
 
-            $existingAccess = $entityManager->getRepository(SharedAccess::class)->findOneBy([
+            $existingAccess = $guest->getId() === null ? null : $entityManager->getRepository(SharedAccess::class)->findOneBy([
                 'owner' => $owner,
                 'guest' => $guest,
                 'credential' => $credential,
             ]);
 
             if ($existingAccess) {
+                $this->validity->apply($existingAccess, $expiresAt);
+                $updatedCount++;
                 if ($existingAccess->canRevealPassword() !== $canRevealPassword) {
                     $existingAccess->setCanRevealPassword($canRevealPassword);
-                    $updatedCount++;
                 }
                 continue;
             }
@@ -377,6 +373,7 @@ class SharedAccessController extends AbstractController
             $sharedAccess->setCredential($credential);
             $sharedAccess->setCreatedAt(new \DateTimeImmutable());
             $sharedAccess->setCanRevealPassword($canRevealPassword);
+            $this->validity->apply($sharedAccess, $expiresAt);
 
             $entityManager->persist($sharedAccess);
             $sharedCredentials[] = $credential;
@@ -391,6 +388,14 @@ class SharedAccessController extends AbstractController
 
         $this->productGuide->advanceAfter($owner, 3);
         $entityManager->flush();
+        if ($invitationNeeded) {
+            try {
+                $this->sendGuestInvitationEmail($mailer, $urlGenerator, $guest, $expiresAt ?? new \DateTimeImmutable('+7 days'));
+            } catch (\Throwable $exception) {
+                $logger->warning('Unable to send guest sharing invitation.', ['guest_id' => $guest->getId(), 'exception' => $exception]);
+                $this->addFlash('warning', $this->translator->trans('teams.wizard.invitation_warning'));
+            }
+        }
         if ($createdCount > 0) {
             $notifier->notifyCredentialsShared($guest, $owner, $sharedCredentials);
         }
@@ -417,6 +422,7 @@ class SharedAccessController extends AbstractController
                         'owner' => $owner,
                         'guest' => $guest,
                         'credentials' => $sharedCredentials,
+                        'expiresAt' => $expiresAt,
                         'app_url' => $urlGenerator->generate(
                             'shared_access_index',
                             [],

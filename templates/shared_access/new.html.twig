@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ 'shared_access.new.title'|trans }}{% endblock %}
+{% block body_class %}share-validity-new-page{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ asset('styles/pages/share-validity.css') }}">{% endblock %}
 
 {% block body %}
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -47,6 +50,7 @@
 
   {% else %}
     <form method="post" action="{{ path('shared_access_new') }}" class="share-form" id="shareForm" data-guide="share-form">
+      <input type="hidden" name="_token" value="{{ csrf_token('share_access') }}">
 
       {# ─── Page title ─── #}
       <div class="page-title">
@@ -86,6 +90,7 @@
             </span>
           </label>
 
+          {% include 'shared_access/_validity_field.html.twig' %}
           {# Summary card #}
           <div class="summary-card" id="summaryCard">
             <div class="summary-row">

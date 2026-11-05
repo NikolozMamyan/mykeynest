@@ -4,6 +4,7 @@ namespace App\Controller\Front;
 
 use App\Repository\UserRepository;
 use App\Repository\SharedAccessRepository;
+use App\Service\SharedAccessValidityManager;
 use App\Service\DeviceIdentifier;
 use App\Service\CredentialAccessPolicy;
 use App\Service\CredentialManager;
@@ -171,6 +172,7 @@ class AuthPageController extends AbstractController
         UserPasswordHasherInterface $hasher,
         SessionManager $sessionManager,
         OrganizationSeatManager $organizationSeats,
+        SharedAccessValidityManager $shareValidity,
     ): Response {
         $token = $request->query->get('token');
         $email = $request->query->get('email');
@@ -212,6 +214,7 @@ class AuthPageController extends AbstractController
             $user->setRoles(['ROLE_USER']);
             $this->extensionOnboardingPolicy->initializeNewRegistration($user);
             $organizationSeats->activatePendingMemberships($user);
+            $shareValidity->activate($user);
 
             $em->flush();
 
@@ -253,6 +256,7 @@ class AuthPageController extends AbstractController
         SharedAccessRepository $sharedAccessRepository,
         CredentialAccessPolicy $accessPolicy,
         CredentialManager $credentialManager,
+        SharedAccessValidityManager $shareValidity,
     ): Response {
         $token = $request->query->get('token');
         $email = $request->query->get('email');
@@ -273,12 +277,6 @@ class AuthPageController extends AbstractController
             return $this->redirectToRoute('show_login');
         }
 
-        if ($user->getTokenExpiresAt() && $user->getTokenExpiresAt() < new \DateTimeImmutable()) {
-            $this->addFlash('error', 'Lien expire. Demandez une nouvelle invitation.');
-
-            return $this->redirectToRoute('show_login');
-        }
-
         if ($email && strtolower($user->getEmail()) !== strtolower($email)) {
             throw $this->createAccessDeniedException('Email mismatch');
         }
@@ -294,7 +292,8 @@ class AuthPageController extends AbstractController
                 continue;
             }
 
-            $canRevealPassword = $accessPolicy->canRevealPassword($user, $credential);
+            $expired = $sharedAccess->isExpired() || ($sharedAccess->getExpiresAt() === null && $user->getTokenExpiresAt() && $user->getTokenExpiresAt() <= new \DateTimeImmutable());
+            $canRevealPassword = !$expired && $sharedAccess->canRevealPassword() && $accessPolicy->canRevealPassword($user, $credential);
             $decryptedPassword = $canRevealPassword
                 ? $credentialManager->decryptPassword($credential)
                 : '';
@@ -305,6 +304,8 @@ class AuthPageController extends AbstractController
                 'owner' => $owner,
                 'decryptedPassword' => $decryptedPassword,
                 'canRevealPassword' => $canRevealPassword,
+                'expired' => $expired,
+                'extensionUrl' => $sharedAccess->getExpiresAt() !== null ? $shareValidity->extensionRequestUrl($sharedAccess) : null,
             ];
         }
 

@@ -79,6 +79,18 @@ body.guest-preview-page .ga-shell { height: 100dvh; min-height: 0; }
 .ga-preview-hero > a { flex-shrink: 0; }
 .ga-preview-account { flex-shrink: 0; background: var(--app-surface); padding-block: 10px; }
 .ga-preview-expiry { max-width: 45%; color: var(--color-text-medium); font-size: 14px; line-height: 1.6; text-align: right; }
+.ga-invitation-actions { display: flex; flex-direction: column; align-items: flex-end; flex: 0 1 48% !important; gap: 7px; }
+.ga-invitation-actions .ga-preview-expiry { display: block; max-width: none; margin: 0; }
+.ga-request-extension { display: inline-flex; justify-content: center; padding: 8px 11px; border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-primary); background: var(--app-surface); font-size: 14px; line-height: 1.4; font-weight: 650; text-decoration: none; text-align: center; }
+.ga-request-extension:hover { background: var(--public-accent-soft); }
+.ga-extension-cta { display: inline-flex; justify-content: center; align-items: center; gap: 10px; width: 100%; margin-top: 4px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 9px; color: var(--color-primary); background: var(--public-accent-soft); font-size: 15px; font-weight: 650; text-decoration: none; }
+.ga-expired-access { padding: 18px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--app-surface-muted); color: var(--color-text-dark); }
+.ga-expired-access strong { font-size: 18px; }
+.ga-expired-access p { margin-top: 10px; color: var(--color-text-medium); font-size: 16px; line-height: 1.6; }
+.ga-extension-page { width: min(520px, 100%); margin: auto; padding: 28px; border: 1px solid var(--color-border); border-radius: 20px; background: var(--app-surface); }
+.ga-extension-page h1 { margin: 10px 0; font-size: 30px; line-height: 1.25; color: var(--color-text-dark); }
+.ga-extension-page > p { margin: 14px 0; color: var(--color-text-medium); font-size: 16px; line-height: 1.7; overflow-wrap: anywhere; }
+.ga-extension-page .ga-button { width: 100%; margin-top: 10px; }
 .ga-preview-workspace { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); flex: 1; min-height: 0; border: 1px solid var(--color-border); border-radius: 18px; overflow: hidden; background: var(--app-surface); }
 .ga-vault-list { display: flex; flex-direction: column; min-height: 0; min-width: 0; border-right: 1px solid var(--color-border); }
 .ga-vault-list header { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 14px; }
@@ -171,6 +183,12 @@ dd > .ga-copy-button { margin-left: auto; }
   .ga-preview:not(.is-enhanced) .ga-vault-list { max-height: 200px; }
 }
 @media (max-width: 560px) {
+  .ga-preview-account { flex-wrap: wrap; }
+  .ga-invitation-actions { flex: 1 0 100% !important; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
+  .ga-invitation-actions .ga-preview-expiry { flex: 1; font-size: 14px; text-align: left; }
+  .ga-request-extension { flex: 0 1 160px; }
+  .ga-extension-page { padding: 20px; }
+  .ga-extension-page h1 { font-size: 26px; }
   .ga-shell { padding-inline: 14px; }
   .ga-header { min-height: 64px; }
   .ga-secure { display: none; }

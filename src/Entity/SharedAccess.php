@@ -6,6 +6,7 @@ use App\Repository\SharedAccessRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SharedAccessRepository::class)]
+#[ORM\Index(name: 'IDX_SHARED_ACCESS_EXPIRY', columns: ['expires_at'])]
 class SharedAccess
 {
     #[ORM\Id]
@@ -30,6 +31,46 @@ class SharedAccess
 
     #[ORM\Column(options: ['default' => true])]
     private bool $canRevealPassword = true;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $expiresAt = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $unlimitedOnActivation = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $ownerReminderSentAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $guestReminderSentAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $extensionRequestedAt = null;
+
+    public function getExpiresAt(): ?\DateTimeImmutable { return $this->expiresAt; }
+    public function isUnlimitedOnActivation(): bool { return $this->unlimitedOnActivation; }
+    public function getOwnerReminderSentAt(): ?\DateTimeImmutable { return $this->ownerReminderSentAt; }
+    public function getGuestReminderSentAt(): ?\DateTimeImmutable { return $this->guestReminderSentAt; }
+    public function getExtensionRequestedAt(): ?\DateTimeImmutable { return $this->extensionRequestedAt; }
+    public function setOwnerReminderSentAt(?\DateTimeImmutable $date): self { $this->ownerReminderSentAt = $date; return $this; }
+    public function setGuestReminderSentAt(?\DateTimeImmutable $date): self { $this->guestReminderSentAt = $date; return $this; }
+    public function setExtensionRequestedAt(?\DateTimeImmutable $date): self { $this->extensionRequestedAt = $date; return $this; }
+
+    public function setValidity(?\DateTimeImmutable $expiresAt, bool $unlimitedOnActivation = false): self
+    {
+        if ($this->expiresAt != $expiresAt) {
+            $this->ownerReminderSentAt = $this->guestReminderSentAt = $this->extensionRequestedAt = null;
+        }
+        $this->expiresAt = $expiresAt;
+        $this->unlimitedOnActivation = $expiresAt !== null && $unlimitedOnActivation;
+
+        return $this;
+    }
+
+    public function isExpired(?\DateTimeImmutable $now = null): bool
+    {
+        return $this->expiresAt !== null && $this->expiresAt <= ($now ?? new \DateTimeImmutable());
+    }
 
     public function getId(): ?int
     {

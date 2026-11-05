@@ -1,0 +1,17 @@
+{% extends 'emails/sharing_layout.html.twig' %}
+{% set actionUrl = isOwner ? manageUrl : registrationUrl %}
+{% block title %}{{ 'share_validity.reminder_title'|trans({}, null, emailLocale) }}{% endblock %}
+{% block preheader %}{{ 'share_validity.email_intro'|trans({}, null, emailLocale) }}{% endblock %}
+{% block eyebrow %}{{ 'share_validity.eyebrow'|trans({}, null, emailLocale) }}{% endblock %}
+{% block heading %}{{ 'share_validity.email_heading'|trans({}, null, emailLocale) }}{% endblock %}
+{% block introduction %}{{ 'share_validity.email_intro'|trans({}, null, emailLocale) }}{% endblock %}
+{% block content %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f0fdf4" style="width:100%;table-layout:fixed;background:#f0fdf4;border-left:3px solid #059669;"><tr><td style="padding:14px 16px;word-wrap:break-word;"><strong style="display:block;color:#1e293b;font-size:20px;line-height:28px;">{{ share.credential.name }}</strong><p style="margin:7px 0 0;color:#334155;font-size:16px;line-height:25px;">{{ 'share_validity.until'|trans({}, null, emailLocale) }} {{ share.expiresAt|date('d/m/Y H:i', 'Europe/Paris') }}</p><p style="margin:6px 0 0;font-size:15px;line-height:23px;">{{ (isOwner ? share.guest.email : share.owner.email) }}</p></td></tr></table>
+<p style="margin:14px 0 0;">{{ (isOwner ? 'share_validity.owner_email_help' : isGuest and share.unlimitedOnActivation ? 'share_validity.guest_default_email_help' : 'share_validity.recipient_email_help')|trans({}, null, emailLocale) }}</p>
+{% endblock %}
+{% block action_label %}{{ (isOwner ? 'share_validity.extend' : isGuest ? 'guest_access.activate' : 'sharing.open_access')|trans({}, isOwner or isGuest ? 'messages' : 'emails', emailLocale) }}{% endblock %}
+{% block after_action %}
+<p style="margin:17px 0 0;text-align:center;font-size:15px;line-height:24px;"><a href="{{ isOwner ? manageUrl ~ '#revoke-share' : requestUrl }}" style="color:#047857;font-weight:700;text-decoration:underline;">{{ (isOwner ? 'share_validity.revoke' : 'share_validity.request_owner')|trans(isOwner ? {} : {'%email%': share.owner.email}, null, emailLocale) }}</a></p>
+<div aria-hidden="true" style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;mso-hide:all;">{{ isOwner ? manageUrl ~ '#revoke-share' : requestUrl }}</div>
+{% if isOwner %}<p style="margin:12px 0 0;font-size:14px;color:#475569;line-height:22px;">{{ 'share_validity.no_action'|trans({}, null, emailLocale) }}</p>{% endif %}
+{% endblock %}

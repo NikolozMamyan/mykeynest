@@ -103,7 +103,7 @@ class SecurityCheckerService
 
         // 2) Credentials partagés vers l'utilisateur (guest)
         /** @var SharedAccess[] $shared */
-        $shared = $this->sharedAccessRepository->findBy(['guest' => $viewer]);
+        $shared = $this->sharedAccessRepository->findSharedWith($viewer);
 
         /** @var Credential[] $allCreds */
         $allCreds = $owned;

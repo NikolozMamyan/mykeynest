@@ -4,6 +4,7 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/pages/shared-access-index.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/pages/share-validity.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -131,12 +132,14 @@
                     <div class="date-badge">
                       <i class="far fa-calendar-alt"></i>
                       <span>{{ access.createdAt|date('d/m/Y') }}</span>
+                      <span class="sv-card-validity {{ access.expired ? 'is-expired' : '' }}">{{ (access.expired ? 'share_validity.expired' : access.expiresAt ? 'share_validity.until' : 'share_validity.unlimited')|trans }}{% if access.expiresAt %} {{ access.expiresAt|date('d/m/Y H:i', 'Europe/Paris') }}{% endif %}</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Footer -->
                 <div class="card-footer">
+                  <a href="{{ path('shared_access_validity', {id: access.id}) }}" class="sv-manage-link">{{ 'share_validity.manage'|trans }}</a>
                   <form method="post"
                         action="{{ path('shared_access_revoke', {'id': access.id}) }}"
                         class="revoke-form"
@@ -213,10 +216,13 @@
 
                 <!-- Footer -->
                 <div class="card-footer">
+                  {% if access.expired %}<span class="sv-card-validity is-expired">{{ 'share_validity.expired'|trans }}</span>{% else %}
+                  <span class="sv-card-validity">{{ (access.expiresAt ? 'share_validity.until' : 'share_validity.unlimited')|trans }}{% if access.expiresAt %} {{ access.expiresAt|date('d/m/Y H:i', 'Europe/Paris') }}{% endif %}</span>
                   <a href="{{ path('shared_access_view_credential', {'id': access.id}) }}" class="btn-view">
                     <i class="fas fa-key"></i>
                     <span>{{ 'shared_access.index.actions.view_credentials'|trans }}</span>
                   </a>
+                  {% endif %}
                 </div>
               </div>
             </div>

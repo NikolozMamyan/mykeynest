@@ -38,6 +38,8 @@ final class GuestInvitationPageTest extends KernelTestCase
         self::assertStringNotContainsString('restricted-secret-must-not-render', $html);
         self::assertCount(1, $crawler->filter('#guest-credential-1 [data-password-visible]'));
         self::assertCount(0, $crawler->filter('#guest-credential-2 [data-password-visible], #guest-credential-2 [data-action="guest-access#toggleSecret"]'));
+        self::assertCount(1, $crawler->filter('#guest-credential-2 .ga-extension-cta'));
+        self::assertCount(1, $crawler->filter('.ga-request-extension'));
         self::assertCount(2, $crawler->filter('[data-guest-access-target="choice"]'));
         self::assertStringContainsString('token=preview-token', $crawler->filter('.ga-preview-hero a')->attr('href'));
         parse_str(parse_url($crawler->filter('.ga-preview-hero a')->attr('href'), PHP_URL_QUERY), $query);
@@ -57,6 +59,18 @@ final class GuestInvitationPageTest extends KernelTestCase
         self::assertStringContainsString('Activate my account', $html);
         self::assertStringNotContainsString('guest_access.', $crawler->text());
         self::assertSame('en', $crawler->filter('html')->attr('lang'));
+    }
+
+    public function testExpiredShareDoesNotRenderUsernameOrSecret(): void
+    {
+        $data = $this->pageData();
+        $data['sharedCredentials'][0]['sharedAccess']->setValidity(new \DateTimeImmutable('-1 minute'));
+        $data['sharedCredentials'][0]['credential']->setUsername('expired-username-must-not-render');
+        $html = self::getContainer()->get('twig')->render('guest/shared_preview.html.twig', $data);
+
+        self::assertStringNotContainsString('visible-secret-for-preview', $html);
+        self::assertStringNotContainsString('expired-username-must-not-render', $html);
+        self::assertCount(1, (new Crawler($html))->filter('#guest-credential-1 .ga-expired-access'));
     }
 
     private static function assertSensitivePage(Crawler $crawler, string $html): void
@@ -81,10 +95,13 @@ final class GuestInvitationPageTest extends KernelTestCase
         $items = [];
         foreach (['Figma', 'Notion'] as $index => $name) {
             $credential = (new Credential())->setName($name)->setDomain(strtolower($name).'.com')->setUsername('studio@example.invalid')->setUser($owner);
+            $share = (new SharedAccess())->setOwner($owner)->setGuest($guest)->setCredential($credential)->setCreatedAt(new \DateTimeImmutable('2026-11-05 10:30:00'))->setValidity(new \DateTimeImmutable('+3 days'));
+            (new \ReflectionProperty(SharedAccess::class, 'id'))->setValue($share, $index + 1);
             $items[] = [
                 'credential' => $credential,
                 'owner' => $owner,
-                'sharedAccess' => (new SharedAccess())->setOwner($owner)->setGuest($guest)->setCredential($credential)->setCreatedAt(new \DateTimeImmutable('2026-11-05 10:30:00')),
+                'sharedAccess' => $share,
+                'extensionUrl' => 'https://key-nest.com/guest/shared-access/'.($index + 1).'/extension?signature=preview',
                 'canRevealPassword' => $index === 0,
                 'decryptedPassword' => $index === 0 ? 'visible-secret-for-preview' : 'restricted-secret-must-not-render',
             ];

@@ -1,0 +1,5 @@
+<div class="share-validity-field">
+    <label for="{{ validityId|default('share-expires-at') }}">{{ 'share_validity.end_label'|trans }}</label>
+    <input type="datetime-local" id="{{ validityId|default('share-expires-at') }}" name="expires_at" value="{{ validityValue|default('') }}" aria-describedby="{{ validityId|default('share-expires-at') }}-help">
+    <p id="{{ validityId|default('share-expires-at') }}-help">{{ 'share_validity.default_help'|trans }}</p>
+</div>

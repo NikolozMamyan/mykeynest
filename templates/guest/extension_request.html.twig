@@ -1,0 +1,7 @@
+{% extends 'guest/layout.html.twig' %}
+{% block title %}{{ 'share_validity.request_button'|trans }} · MYKEYNEST{% endblock %}
+{% block content %}
+<main class="ga-extension-page"><span class="ga-eyebrow">{{ 'share_validity.eyebrow'|trans }}</span><h1>{{ (share.extensionRequestedAt ? 'share_validity.request_sent' : 'share_validity.request_button')|trans }}</h1><p>{{ share.credential.name }}</p><div class="ga-recipient"><span class="ga-avatar">{{ share.owner.email|slice(0, 1)|upper }}</span><div><span>{{ 'guest_access.shared_by'|trans }}</span><strong>{{ share.owner.email }}</strong></div></div><p>{{ (share.extensionRequestedAt ? 'share_validity.request_sent_help' : 'share_validity.request_help')|trans }}</p>
+{% if not share.extensionRequestedAt %}<form method="post"><input type="hidden" name="_token" value="{{ csrf_token('share_extension_' ~ share.id) }}"><button class="ga-button ga-button-primary" type="submit">{{ 'share_validity.confirm_request'|trans }}</button></form>{% endif %}
+<p class="ga-login">{{ 'share_validity.no_automatic_extension'|trans }}</p></main>
+{% endblock %}

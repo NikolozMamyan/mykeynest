@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['password', 'confirmation', 'strength', 'strengthLabel', 'match', 'choice', 'credential', 'select', 'empty', 'toast'];
+    static targets = ['password', 'confirmation', 'strength', 'strengthLabel', 'match', 'choice', 'credential', 'select', 'empty', 'toast', 'expiry', 'extension'];
     static values = { translations: Object };
 
     connect() {
@@ -60,6 +60,11 @@ export default class extends Controller {
         });
         this.credentialTargets.forEach(credential => {
             credential.hidden = credential.dataset.index !== index;
+            if (!credential.hidden && this.hasExpiryTarget) this.expiryTarget.textContent = credential.dataset.validityLabel;
+            if (!credential.hidden && this.hasExtensionTarget) {
+                this.extensionTarget.hidden = !credential.dataset.extensionUrl;
+                this.extensionTarget.href = credential.dataset.extensionUrl || '#';
+            }
             credential.querySelectorAll('[data-password-visible]').forEach(secret => { secret.hidden = true; });
             credential.querySelectorAll('[data-password-hidden]').forEach(secret => { secret.hidden = false; });
             const toggle = credential.querySelector('[data-action="guest-access#toggleSecret"]');

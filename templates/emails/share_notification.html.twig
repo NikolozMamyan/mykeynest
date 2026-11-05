@@ -17,5 +17,6 @@
   </table>
   {% if credentials|length > 3 %}<p style="margin:10px 0 0;color:#047857;font-size:15px;font-weight:700;">{{ 'sharing.more_access'|trans({'%count%': credentials|length - 3}, 'emails', emailLocale) }}</p>{% endif %}
   <p style="margin:12px 0 0;color:#475569;font-size:14px;line-height:21px;">{{ 'sharing.permissions'|trans({}, 'emails', emailLocale) }}</p>
+  {% if expiresAt|default(null) %}<p style="margin:12px 0 0;color:#047857;font-size:15px;line-height:23px;font-weight:700;">{{ 'share_validity.until'|trans({}, null, emailLocale) }} {{ expiresAt|date('d/m/Y H:i', 'Europe/Paris') }}</p>{% endif %}
 {% endblock %}
 {% block footer %}{{ 'sharing.share_footer'|trans({}, 'emails', emailLocale) }}{% endblock %}

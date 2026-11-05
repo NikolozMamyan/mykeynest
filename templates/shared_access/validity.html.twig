@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'share_validity.manage'|trans }} · MYKEYNEST{% endblock %}
+{% block body_class %}share-validity-manage-page{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ asset('styles/pages/share-validity.css') }}">{% endblock %}
+{% block body %}
+<section class="share-validity-page">
+    <a class="sv-back" href="{{ path('shared_access_index') }}">← {{ 'share_validity.back'|trans }}</a>
+    <header><span class="sv-eyebrow">{{ 'share_validity.eyebrow'|trans }}</span><h1>{{ 'share_validity.manage'|trans }}</h1><p>{{ share.credential.name }} · {{ share.guest.email }}</p></header>
+    <div class="sv-state {{ share.expired ? 'is-expired' : '' }}"><strong>{{ (share.expired ? 'share_validity.expired' : share.expiresAt ? 'share_validity.until' : 'share_validity.unlimited')|trans }}{% if share.expiresAt %} {{ share.expiresAt|date('d/m/Y H:i', 'Europe/Paris') }}{% endif %}</strong>{% if share.extensionRequestedAt %}<p>{{ 'share_validity.request_received'|trans }}</p>{% endif %}</div>
+    {% for message in app.flashes('success') %}<p class="sv-success" role="status">{{ message|trans }}</p>{% endfor %}
+    {% if error %}<p class="sv-error" role="alert">{{ error|trans }}</p>{% endif %}
+    {% set currentEnd = share.expiresAt ? share.expiresAt|date('Y-m-d', 'Europe/Paris') ~ 'T' ~ share.expiresAt|date('H:i', 'Europe/Paris') : '' %}
+    <form method="post"><input type="hidden" name="_token" value="{{ csrf_token('share_validity_' ~ share.id) }}">{% include 'shared_access/_validity_field.html.twig' with {validityValue: currentEnd} %}<button class="sv-button sv-primary" type="submit">{{ 'share_validity.save'|trans }}</button></form>
+    <div class="sv-secondary-actions"><a href="{{ path('shared_access_index') }}" class="sv-button">{{ 'share_validity.leave_expiring'|trans }}</a><form id="revoke-share" method="post" action="{{ path('shared_access_revoke', {id: share.id}) }}" onsubmit="return confirm('{{ 'share_validity.revoke_confirm'|trans|e('js') }}');"><input type="hidden" name="_token" value="{{ csrf_token('revoke' ~ share.id) }}"><button type="submit" class="sv-button sv-danger">{{ 'share_validity.revoke'|trans }}</button></form></div>
+</section>
+{% endblock %}
