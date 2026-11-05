@@ -179,7 +179,8 @@ class TeamPageController extends AbstractController
                     (bool) $form->get('canRevealPassword')->getData(),
                 );
             } catch (\DomainException|\InvalidArgumentException|\LogicException $exception) {
-                $form->addError(new FormError($translator->trans($exception->getMessage())));
+                ($exception->getMessage() === 'teams.wizard.duplicate_name' ? $form->get('name') : $form)
+                    ->addError(new FormError($translator->trans($exception->getMessage())));
             }
 
             if (isset($assignments)) {

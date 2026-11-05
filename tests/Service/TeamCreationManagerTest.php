@@ -15,6 +15,7 @@ use App\Repository\OrganizationMemberRepository;
 use App\Repository\OrganizationRepository;
 use App\Repository\TeamCredentialPermissionRepository;
 use App\Repository\TeamMemberRepository;
+use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Repository\SubscriptionPlanConfigurationRepository;
 use App\Service\OrganizationSeatManager;
@@ -23,6 +24,7 @@ use App\Service\TeamCredentialPermissionManager;
 use App\Service\TeamMemberAssignmentManager;
 use App\Service\SubscriptionPlanService;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -140,6 +142,50 @@ final class TeamCreationManagerTest extends TestCase
         ];
     }
 
+    /** @dataProvider duplicateGroupNames */
+    public function testDuplicateNameIsRejectedBeforePersistingOrAssigningLicenses(string $name, bool $company): void
+    {
+        $owner = (new User())->setEmail('owner@example.com');
+        $actor = $company ? (new User())->setEmail('admin@example.com') : $owner;
+        $organization = $company ? (new Organization())->setOwner($owner)->setSubscription(
+            (new UserSubscription())->setPlanCode('team')->setStatus('active')->setIsActive(true),
+        ) : null;
+        if ($organization) {
+            $organization->addMember((new OrganizationMember())->setUser($actor)->setRole(OrganizationRole::ADMIN)->activate());
+        }
+        $connection = $this->connection();
+        $connection->expects(self::once())->method('rollBack');
+        $connection->expects(self::never())->method('commit');
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('getConnection')->willReturn($connection);
+        $locked = false;
+        $em->expects(self::once())->method('lock')->with($organization ?? $owner, LockMode::PESSIMISTIC_WRITE)
+            ->willReturnCallback(static function () use (&$locked): void { $locked = true; });
+        $em->expects(self::never())->method('persist');
+        $em->expects(self::never())->method('flush');
+        $teams = $this->createMock(TeamRepository::class);
+        $teams->expects(self::once())->method('nameExistsInWorkspace')->with(trim($name), $owner, $organization)
+            ->willReturnCallback(static function () use (&$locked): bool { self::assertTrue($locked); return true; });
+        $users = $this->createMock(UserRepository::class);
+        $users->expects(self::never())->method('findOneBy');
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('teams.wizard.duplicate_name');
+        $this->manager($em, $users, $teams)->create((new Team())->setName($name), $actor, $organization, [
+            ['email' => 'new@example.com', 'role' => TeamRole::MEMBER],
+        ], false);
+    }
+
+    public static function duplicateGroupNames(): array
+    {
+        return [
+            'personal name' => ['Marketing', false],
+            'personal uppercase' => ['MARKETING', false],
+            'personal surrounding spaces' => [' marketing ', false],
+            'company administrator' => ['mArKeTiNg', true],
+        ];
+    }
+
     private function connection(): Connection
     {
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->onlyMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
@@ -148,7 +194,7 @@ final class TeamCreationManagerTest extends TestCase
         return $connection;
     }
 
-    private function manager(EntityManagerInterface $em, UserRepository $users): TeamCreationManager
+    private function manager(EntityManagerInterface $em, UserRepository $users, ?TeamRepository $teams = null): TeamCreationManager
     {
         $teamMembers = $this->createMock(TeamMemberRepository::class);
         $seats = new OrganizationSeatManager($this->createMock(OrganizationRepository::class), $this->createMock(OrganizationMemberRepository::class), $teamMembers, $em);
@@ -160,6 +206,7 @@ final class TeamCreationManagerTest extends TestCase
             )),
             new TeamCredentialPermissionManager($this->createMock(TeamCredentialPermissionRepository::class), $em),
             $seats,
+            $teams ?? $this->createMock(TeamRepository::class),
         );
     }
 }

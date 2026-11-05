@@ -2291,6 +2291,7 @@
       "tip": "Commencez simplement. Votre groupe pourra évoluer avec votre équipe, à tout moment.",
       "invalid_email": "L’adresse « %email% » n’est pas valide. Corrigez-la avant de continuer.",
       "duplicate_email": "Certaines adresses sont déjà dans le groupe. Chaque personne ne peut être ajoutée qu’une fois.",
+      "duplicate_name": "Un groupe portant ce nom existe déjà dans cet espace. Choisissez un autre nom.",
       "creating": "Création en cours…",
       "success": "Groupe créé avec succès.",
       "invitation_warning": "Le groupe est créé, mais un e-mail d’invitation n’a pas pu être envoyé.",

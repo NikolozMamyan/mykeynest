@@ -7,6 +7,8 @@ use App\Entity\Team;
 use App\Entity\TeamMember;
 use App\Entity\User;
 use App\Enum\TeamRole;
+use App\Repository\TeamRepository;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class TeamCreationManager
@@ -16,6 +18,7 @@ final class TeamCreationManager
         private readonly TeamMemberAssignmentManager $memberAssignments,
         private readonly TeamCredentialPermissionManager $permissions,
         private readonly OrganizationSeatManager $organizationSeats,
+        private readonly TeamRepository $teams,
     ) {
     }
 
@@ -40,7 +43,13 @@ final class TeamCreationManager
         }
 
         return $this->entityManager->getConnection()->transactional(function () use ($team, $actor, $owner, $organization, $members, $canRevealPassword): array {
-            $team->setOwner($owner)->setOrganization($organization);
+            $this->entityManager->lock($organization ?? $owner, LockMode::PESSIMISTIC_WRITE);
+            $name = trim((string) $team->getName());
+            if ($this->teams->nameExistsInWorkspace($name, $owner, $organization)) {
+                throw new \DomainException('teams.wizard.duplicate_name');
+            }
+
+            $team->setName($name)->setOwner($owner)->setOrganization($organization);
             $this->entityManager->persist($team);
             $ownerMember = (new TeamMember())->setUser($owner)->setRole(TeamRole::OWNER);
             $team->addMember($ownerMember);

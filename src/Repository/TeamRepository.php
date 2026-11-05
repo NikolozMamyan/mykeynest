@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\Credential;
+use App\Entity\Organization;
 use App\Enum\OrganizationStatus;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -17,6 +18,23 @@ class TeamRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Team::class);
+    }
+
+    public function nameExistsInWorkspace(string $name, User $owner, ?Organization $organization): bool
+    {
+        $query = $this->createQueryBuilder('t')
+            ->select('1')
+            ->andWhere('LOWER(TRIM(t.name)) = LOWER(:name)')
+            ->setParameter('name', trim($name))
+            ->setMaxResults(1);
+
+        if ($organization !== null) {
+            $query->andWhere('t.organization = :organization')->setParameter('organization', $organization);
+        } else {
+            $query->andWhere('t.organization IS NULL')->andWhere('t.owner = :owner')->setParameter('owner', $owner);
+        }
+
+        return $query->getQuery()->getOneOrNullResult() !== null;
     }
 
     /**

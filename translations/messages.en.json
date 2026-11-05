@@ -2282,6 +2282,7 @@
       "tip": "Start simple. Your group can grow and change with your team at any time.",
       "invalid_email": "“%email%” is not a valid email address. Correct it before continuing.",
       "duplicate_email": "Some addresses are already in the group. Each person can only be added once.",
+      "duplicate_name": "A group with this name already exists in this workspace. Choose another name.",
       "creating": "Creating your group…",
       "success": "Group created successfully.",
       "invitation_warning": "The group was created, but an invitation email could not be sent.",
