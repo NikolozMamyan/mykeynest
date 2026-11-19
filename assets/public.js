@@ -14,6 +14,7 @@ import PasswordToggleController from './controllers/credention/password-toggle_c
 import PasswordStrengthController from './controllers/credention/password-strength_controller.js';
 import PendingLoginController from './controllers/pending_login_controller.js';
 import GuestAccessController from './controllers/pages/guest_access_controller.js';
+import LandingController from './controllers/pages/landing_controller.js';
 import './styles/global.css';
 import './styles/auth.css';
 import './styles/layouts/auth-layout.css';
@@ -41,3 +42,4 @@ application.register('password-toggle', PasswordToggleController);
 application.register('password-strength', PasswordStrengthController);
 application.register('pending-login', PendingLoginController);
 application.register('guest-access', GuestAccessController);
+application.register('landing', LandingController);

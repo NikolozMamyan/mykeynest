@@ -4,49 +4,50 @@
 {% block body_class %}auth-form-page{% endblock %}
 
 {% block body %}
-
+{% set en = app.request.locale == 'en' %}
 
 <div class="auth-container">
+  <div class="auth-bg" aria-hidden="true"><span class="ab ab1"></span><span class="ab ab2"></span></div>
   <div class="register-wrapper" data-controller="auth" data-auth-locale-value="{{ app.request.locale }}">
 
     <!-- Colonne gauche - Hero -->
     <div class="register-hero">
       <div class="hero-content">
-        <div class="hero-icon">
-          <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt="" aria-hidden="true">
+        <div class="hero-brand">
+          <span class="hero-icon"><img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt="" aria-hidden="true"></span>
+          <span class="hero-status"><i class="fas fa-circle" aria-hidden="true"></i> {{ en ? 'Free · No credit card' : 'Gratuit · Sans carte bancaire' }}</span>
         </div>
 
-        <h1>{{ 'auth.register.hero.title'|trans }}</h1>
+        <h1>{{ en ? 'Ready in 3 minutes.' : 'Prêt en 3 minutes.' }}</h1>
         <p>{{ 'auth.register.hero.subtitle'|trans }}</p>
 
-        <div class="hero-features">
-          <div class="feature-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {{ 'auth.register.hero.features.f1'|trans }}
+        <div class="ah-scene" aria-hidden="true">
+          <div class="ah-vault">
+            <div class="ah-vault-head">
+              <span class="ah-lock is-rocket"><i class="fas fa-rocket"></i></span>
+              <div><small>{{ en ? 'Getting started' : 'Premiers pas' }}</small><b>{{ en ? 'Your setup' : 'Votre mise en route' }}</b></div>
+              <span class="ah-tag">1/4</span>
+            </div>
+            <div class="ah-step is-now" style="--i:0"><span class="ah-check"><i class="fas fa-check"></i></span><div><b>{{ en ? 'Create your account' : 'Créez votre compte' }}</b><small>{{ en ? 'You are here' : 'Vous êtes ici' }}</small></div></div>
+            <div class="ah-step" style="--i:1"><span class="ah-check"><i class="fas fa-check"></i></span><div><b>{{ en ? 'Install the extension' : 'Installez l’extension' }}</b><small>{{ en ? 'Fill sign-in forms in one click' : 'Remplissez vos connexions en un clic' }}</small></div></div>
+            <div class="ah-step" style="--i:2"><span class="ah-check"><i class="fas fa-check"></i></span><div><b>{{ en ? 'Add or import your logins' : 'Ajoutez ou importez vos accès' }}</b><small>{{ en ? 'Encrypted with AES-256' : 'Chiffrés en AES-256' }}</small></div></div>
+            <div class="ah-step" style="--i:3"><span class="ah-check"><i class="fas fa-check"></i></span><div><b>{{ en ? 'Share with your team' : 'Partagez avec votre équipe' }}</b><small>{{ en ? 'Sign-in only, password hidden' : 'Connexion seule, mot de passe masqué' }}</small></div></div>
           </div>
-
-          <div class="feature-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {{ 'auth.register.hero.features.f2'|trans }}
-          </div>
-
-          <div class="feature-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 0 002.25 2.25z" />
-            </svg>
-            {{ 'auth.register.hero.features.f3'|trans }}
-          </div>
+          <div class="ah-toast"><span><i class="fas fa-gift"></i></span><div><b>{{ en ? 'Starter plan included' : 'Offre Starter incluse' }}</b><small>{{ en ? 'Upgrade only if you need to' : 'Passez à Pro seulement si besoin' }}</small></div></div>
         </div>
+
+        <ul class="hero-features">
+          <li><i class="fas fa-circle-check" aria-hidden="true"></i> {{ 'auth.register.hero.features.f1'|trans }}</li>
+          <li><i class="fas fa-route" aria-hidden="true"></i> {{ 'auth.register.hero.features.f2'|trans }}</li>
+          <li><i class="fas fa-user-lock" aria-hidden="true"></i> {{ 'auth.register.hero.features.f3'|trans }}</li>
+        </ul>
       </div>
     </div>
 
     <!-- Colonne droite - Formulaire -->
     <div class="register-form-section">
       <div class="form-header">
+        <span class="form-kicker"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> {{ en ? 'Start for free' : 'Commencez gratuitement' }}</span>
         <h2>{{ 'auth.register.form.title'|trans }}</h2>
         <p>{{ 'auth.register.form.subtitle'|trans }}</p>
       </div>
@@ -56,27 +57,32 @@
         <legend>{{ 'auth.register.form.account_type'|trans }}</legend>
         <label class="auth-account-type">
           <input type="radio" name="accountType" value="personal" checked form="register-form" data-auth-target="accountType" data-action="change->auth#changeAccountType" aria-controls="company-field">
-          <span class="auth-account-type__mark" aria-hidden="true"></span>
+          <span class="auth-account-type__ico" aria-hidden="true"><i class="fas fa-user"></i></span>
           <span><strong>{{ 'auth.register.form.personal'|trans }}</strong><small>{{ 'auth.register.form.personal_hint'|trans }}</small></span>
+          <span class="auth-account-type__mark" aria-hidden="true"></span>
         </label>
         <label class="auth-account-type">
           <input type="radio" name="accountType" value="professional" form="register-form" data-auth-target="accountType" data-action="change->auth#changeAccountType" aria-controls="company-field">
-          <span class="auth-account-type__mark" aria-hidden="true"></span>
+          <span class="auth-account-type__ico" aria-hidden="true"><i class="fas fa-building"></i></span>
           <span><strong>{{ 'auth.register.form.professional'|trans }}</strong><small>{{ 'auth.register.form.professional_hint'|trans }}</small></span>
+          <span class="auth-account-type__mark" aria-hidden="true"></span>
         </label>
       </fieldset>
         <div class="form-group auth-company-field" id="company-field" data-auth-target="companyField" hidden>
           <label for="company">{{ 'auth.register.form.company_label'|trans }}</label>
-          <input
-            type="text"
-            id="company"
-            data-auth-target="company"
-            placeholder="{{ 'auth.register.form.company_placeholder'|trans }}"
-            form="register-form"
-            disabled
-            maxlength="255"
-            autocomplete="organization"
-          >
+          <div class="input-wrap">
+            <i class="fas fa-building input-ico" aria-hidden="true"></i>
+            <input
+              type="text"
+              id="company"
+              data-auth-target="company"
+              placeholder="{{ 'auth.register.form.company_placeholder'|trans }}"
+              form="register-form"
+              disabled
+              maxlength="255"
+              autocomplete="organization"
+            >
+          </div>
         </div>
 
       {% include 'components/auth/google_button.html.twig' %}
@@ -84,44 +90,53 @@
       <form id="register-form" class="register-form" data-action="submit->auth#register">
         <div class="form-group">
           <label for="email">{{ 'auth.register.form.email_label'|trans }}</label>
-          <input
-            type="email"
-            id="email"
-            data-auth-target="email"
-            placeholder="{{ 'auth.register.form.email_placeholder'|trans }}"
-            required
-            autocomplete="email"
-          >
+          <div class="input-wrap">
+            <i class="fas fa-envelope input-ico" aria-hidden="true"></i>
+            <input
+              type="email"
+              id="email"
+              data-auth-target="email"
+              placeholder="{{ 'auth.register.form.email_placeholder'|trans }}"
+              required
+              autocomplete="email"
+            >
+          </div>
         </div>
 
         <div class="form-group">
           <label for="password">{{ 'auth.register.form.password_label'|trans }}</label>
-          <input
-            type="password"
-            id="password"
-            data-auth-target="password"
-            placeholder="••••••••"
-            required
-            autocomplete="new-password"
-          >
+          <div class="input-wrap" data-controller="password-toggle">
+            <i class="fas fa-lock input-ico" aria-hidden="true"></i>
+            <input
+              type="password"
+              id="password"
+              data-auth-target="password"
+              data-password-toggle-target="input"
+              placeholder="••••••••"
+              required
+              autocomplete="new-password"
+            >
+            <button type="button" class="input-toggle" data-action="password-toggle#toggle" aria-label="{{ en ? 'Show or hide the password' : 'Afficher ou masquer le mot de passe' }}">
+              <i class="fas fa-eye" data-password-toggle-target="icon" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="btn-submit">
-          {{ 'auth.register.form.submit'|trans }}
+          {{ 'auth.register.form.submit'|trans }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </button>
 
         <p class="auth-hint">
           {{ 'auth.register.form.hint'|trans }}
-          <a href="/login">{{ 'auth.register.form.hint_link'|trans }}</a>
+          <a href="{{ path('show_login', en ? {lang: 'en'} : {}) }}">{{ 'auth.register.form.hint_link'|trans }}</a>
         </p>
       </form>
 
-      <p class="auth-free-note">{{ 'auth.register.form.free_note'|trans }}</p>
+      <p class="auth-free-note"><i class="fas fa-circle-check" aria-hidden="true"></i> {{ 'auth.register.form.free_note'|trans }}</p>
       <div data-auth-target="result" role="status" aria-live="polite"></div>
     </div>
 
   </div>
 </div>
-
 
 {% endblock %}

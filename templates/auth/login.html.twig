@@ -4,49 +4,49 @@
 {% block body_class %}auth-form-page{% endblock %}
 
 {% block body %}
-
+{% set en = app.request.locale == 'en' %}
 
 <div class="auth-container">
+  <div class="auth-bg" aria-hidden="true"><span class="ab ab1"></span><span class="ab ab2"></span></div>
   <div class="login-wrapper" data-controller="auth" data-auth-locale-value="{{ app.request.locale }}">
 
     <!-- Colonne gauche - Hero -->
     <div class="login-hero">
       <div class="hero-content">
-        <div class="hero-icon">
-          <img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt="" aria-hidden="true">
+        <div class="hero-brand">
+          <span class="hero-icon"><img src="{{ asset('images/mykeynest-dot-mark.svg') }}" alt="" aria-hidden="true"></span>
+          <span class="hero-status"><i class="fas fa-circle" aria-hidden="true"></i> {{ en ? 'Secure connection' : 'Connexion sécurisée' }}</span>
         </div>
 
         <h1>{{ 'auth.login.hero.title'|trans }}</h1>
         <p>{{ 'auth.login.hero.subtitle'|trans }}</p>
 
-        <div class="hero-features">
-          <div class="feature-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-            </svg>
-            {{ 'auth.login.hero.features.f1'|trans }}
+        <div class="ah-scene" aria-hidden="true">
+          <div class="ah-vault">
+            <div class="ah-vault-head">
+              <span class="ah-lock"><i class="fas fa-lock ah-lock-c"></i><i class="fas fa-lock-open ah-lock-o"></i></span>
+              <div><small>{{ en ? 'Your vault' : 'Votre coffre' }}</small><b>{{ en ? 'Unlocked' : 'Déverrouillé' }}</b></div>
+              <span class="ah-tag">AES-256</span>
+            </div>
+            <div class="ah-row" style="--i:0"><span class="ah-ico"><i class="fab fa-google"></i></span><div><b>Google Workspace</b><small>{{ en ? 'Owner' : 'Propriétaire' }}</small></div><em>••••••</em></div>
+            <div class="ah-row" style="--i:1"><span class="ah-ico"><i class="fab fa-shopify"></i></span><div><b>{{ en ? 'Client store' : 'Boutique client' }}</b><small>{{ en ? 'Shared with Léa · sign-in only' : 'Partagé avec Léa · connexion seule' }}</small></div><em>••••••</em></div>
+            <div class="ah-row" style="--i:2"><span class="ah-ico"><i class="fab fa-wordpress"></i></span><div><b>{{ en ? 'Agency website' : 'Site de l’agence' }}</b><small>{{ en ? 'Shared with the team' : 'Partagé avec l’équipe' }}</small></div><em>••••••</em></div>
           </div>
-
-          <div class="feature-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-            </svg>
-            {{ 'auth.login.hero.features.f2'|trans }}
-          </div>
-
-          <div class="feature-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-            </svg>
-            {{ 'auth.login.hero.features.f3'|trans }}
-          </div>
+          <div class="ah-toast"><span><i class="fas fa-user-check"></i></span><div><b>{{ en ? 'Léa signed in to the store' : 'Léa s’est connectée à la boutique' }}</b><small>{{ en ? 'Password stayed hidden' : 'Le mot de passe est resté masqué' }}</small></div></div>
         </div>
+
+        <ul class="hero-features">
+          <li><i class="fas fa-shield-halved" aria-hidden="true"></i> {{ 'auth.login.hero.features.f1'|trans }}</li>
+          <li><i class="fas fa-user-lock" aria-hidden="true"></i> {{ 'auth.login.hero.features.f2'|trans }}</li>
+          <li><i class="fas fa-puzzle-piece" aria-hidden="true"></i> {{ 'auth.login.hero.features.f3'|trans }}</li>
+        </ul>
       </div>
     </div>
 
     <!-- Colonne droite - Formulaire -->
     <div class="login-form-section">
       <div class="form-header">
+        <span class="form-kicker"><i class="fas fa-right-to-bracket" aria-hidden="true"></i> {{ en ? 'Sign in' : 'Connexion' }}</span>
         <h2>{{ 'auth.login.form.title'|trans }}</h2>
         <p>{{ 'auth.login.form.subtitle'|trans }}</p>
       </div>
@@ -57,42 +57,54 @@
       <form class="login-form" data-action="submit->auth#login">
         <div class="form-group">
           <label for="email">{{ 'auth.login.form.email_label'|trans }}</label>
-          <input
-            type="email"
-            id="email"
-            data-auth-target="email"
-            placeholder="{{ 'auth.login.form.email_placeholder'|trans }}"
-            required
-            autocomplete="email"
-          >
+          <div class="input-wrap">
+            <i class="fas fa-envelope input-ico" aria-hidden="true"></i>
+            <input
+              type="email"
+              id="email"
+              data-auth-target="email"
+              placeholder="{{ 'auth.login.form.email_placeholder'|trans }}"
+              required
+              autocomplete="email"
+            >
+          </div>
         </div>
 
         <div class="form-group">
-          <label for="password">{{ 'auth.login.form.password_label'|trans }}</label>
-          <input
-            type="password"
-            id="password"
-            data-auth-target="password"
-            placeholder="••••••••"
-            required
-            autocomplete="current-password"
-          >
+          <div class="label-row">
+            <label for="password">{{ 'auth.login.form.password_label'|trans }}</label>
+            <a href="{{ path('app_forgot_password_request') }}" class="label-link">{{ 'auth.login.form.hint_link1'|trans }}</a>
+          </div>
+          <div class="input-wrap" data-controller="password-toggle">
+            <i class="fas fa-lock input-ico" aria-hidden="true"></i>
+            <input
+              type="password"
+              id="password"
+              data-auth-target="password"
+              data-password-toggle-target="input"
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+            >
+            <button type="button" class="input-toggle" data-action="password-toggle#toggle" aria-label="{{ en ? 'Show or hide the password' : 'Afficher ou masquer le mot de passe' }}">
+              <i class="fas fa-eye" data-password-toggle-target="icon" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="btn-submit">
-          {{ 'auth.login.form.submit'|trans }}
+          {{ 'auth.login.form.submit'|trans }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </button>
 
         <p class="auth-hint">
           {{ 'auth.login.form.hint'|trans }}
-          <a href="{{ path('show_register') }}">{{ 'auth.login.form.hint_link'|trans }}</a>
-          <br>
-          <br>
-          <a href="{{ path('app_forgot_password_request') }}">{{ 'auth.login.form.hint_link1'|trans }}</a>
+          <a href="{{ path('show_register', en ? {lang: 'en'} : {}) }}">{{ 'auth.login.form.hint_link'|trans }}</a>
         </p>
       </form>
 
       <div data-auth-target="result" role="status" aria-live="polite"></div>
+
+      <p class="auth-trust"><i class="fas fa-lock" aria-hidden="true"></i> {{ en ? 'Encrypted credentials · Manageable sessions' : 'Identifiants chiffrés · Sessions gérables' }}</p>
     </div>
 
   </div>

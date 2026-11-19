@@ -19,228 +19,244 @@
 {% block body_class %}landing-page{% endblock %}
 
 {% block body %}
-<main id="main-content">
+<main id="main-content" data-controller="landing">
+{% set en = app.request.locale == 'en' %}
+{% set registerUrl = path('show_register', en ? {lang: 'en'} : {}) %}
+
 {# ======================== HERO ======================== #}
 <section class="hero" aria-labelledby="hero-title">
+  <div class="hero-bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="hero-grid"></span></div>
   <div class="hero-inner">
     <div class="hero-text">
-      <div class="hero-eyebrow">
-        <span class="status-dot" aria-hidden="true"></span> {{ 'landing.hero.eyebrow'|trans }}
+      <div class="hero-eyebrow" data-reveal>
+        <span class="status-dot" aria-hidden="true"></span> {{ en ? 'Password manager for SMBs, agencies & freelancers' : 'Gestionnaire d’accès pour PME, agences & freelances' }}
       </div>
-      <h1 class="hero-h1" id="hero-title">
-        {{ 'landing.hero.title_before'|trans }}
-        <span class="hl">{{ 'landing.hero.title_highlight'|trans }}</span>
+      <h1 class="hero-h1" id="hero-title" data-reveal style="--d:1">
+        {{ en ? 'Share the access.' : 'Partagez l’accès.' }}
+        <span class="hl">{{ en ? 'Keep the password.' : 'Gardez le mot de passe.' }}</span>
       </h1>
-      <p class="hero-sub">{{ 'landing.hero.subtitle'|trans }}</p>
-      <div class="hero-cta">
-        <a href="{{ path('show_register', app.request.locale == 'en' ? {lang: 'en'} : {}) }}" class="btn btn-primary btn-lg btn-w" aria-label="{{ 'landing.hero.cta_start_aria'|trans }}">
+      <p class="hero-sub" data-reveal style="--d:2">
+        {{ en
+          ? 'MYKEYNEST stores your company’s credentials in an encrypted vault. Let a teammate or a contractor sign in from the browser extension — without ever seeing the password — and take that access back in one click.'
+          : 'MYKEYNEST range les identifiants de votre entreprise dans un coffre chiffré. Un collègue ou un prestataire se connecte depuis l’extension navigateur — sans jamais voir le mot de passe — et vous reprenez l’accès en un clic.' }}
+      </p>
+      <ol class="hero-flow" data-reveal style="--d:3" aria-label="{{ en ? 'How it works in three steps' : 'Le principe en trois étapes' }}">
+        <li><i class="fas fa-lock" aria-hidden="true"></i> {{ en ? 'Store' : 'Stockez' }}</li>
+        <li><i class="fas fa-share-nodes" aria-hidden="true"></i> {{ en ? 'Share' : 'Partagez' }}</li>
+        <li><i class="fas fa-user-xmark" aria-hidden="true"></i> {{ en ? 'Revoke' : 'Révoquez' }}</li>
+      </ol>
+      <div class="hero-cta" data-reveal style="--d:4">
+        <a href="{{ registerUrl }}" class="btn btn-primary btn-lg btn-w lp-btn-main" aria-label="{{ 'landing.hero.cta_start_aria'|trans }}">
           {{ 'landing.hero.cta_start'|trans }} <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </a>
         <a href="#how-it-works" class="btn btn-outline btn-lg btn-w"><i class="fas fa-circle-play" aria-hidden="true"></i> {{ 'landing.hero.cta_discover'|trans }}</a>
       </div>
-      <p class="hero-hint"><i class="fas fa-circle-check"></i> {{ 'landing.hero.hint'|trans }}</p>
-      <div class="trust" aria-label="{{ 'landing.hero.trust_aria'|trans }}">
-        <div class="trust-item"><i class="fas fa-shield-halved"></i><span>{{ 'landing.hero.trust.aes'|trans }}</span></div>
-        <div class="trust-item"><i class="fas fa-lock"></i><span>{{ 'landing.hero.trust.zeroknowledge'|trans }}</span></div>
-        <div class="trust-item"><i class="fas fa-fingerprint"></i><span>{{ 'landing.hero.trust.hashed'|trans }}</span></div>
+      <p class="hero-hint" data-reveal style="--d:5"><i class="fas fa-circle-check" aria-hidden="true"></i> {{ 'landing.hero.hint'|trans }}</p>
+      <div class="trust" data-reveal style="--d:5" aria-label="{{ 'landing.hero.trust_aria'|trans }}">
+        <div class="trust-item"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>{{ 'landing.hero.trust.aes'|trans }}</span></div>
+        <div class="trust-item"><i class="fas fa-user-lock" aria-hidden="true"></i><span>{{ 'landing.hero.trust.zeroknowledge'|trans }}</span></div>
+        <div class="trust-item"><i class="fas fa-puzzle-piece" aria-hidden="true"></i><span>{{ 'landing.hero.trust.hashed'|trans }}</span></div>
       </div>
     </div>
 
+    {# Animated scene: a contractor signs in through the extension without seeing the password #}
     <div class="hero-vis" aria-hidden="true">
-      <div class="visual-orbit"></div>
-      <div class="sec-pill"><i class="fas fa-shield-halved"></i> {{ app.request.locale == 'en' ? 'Encrypted vault' : 'Coffre-fort chiffré' }} <span>AES-256</span></div>
-      <div class="vault">
-        <div class="vault-bar">
-          <div class="vdots"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div>
-          <span class="vault-title"><i class="fas fa-lock"></i> mykeynest / {{ app.request.locale == 'en' ? 'workspace' : 'espace de travail' }}</span>
+      <div class="hv-browser">
+        <div class="hv-bar">
+          <div class="hv-dots"><span></span><span></span><span></span></div>
+          <div class="hv-url"><i class="fas fa-lock"></i> shop-client.com/admin/login</div>
+          <span class="hv-ext"><i class="fas fa-key"></i><em>1</em></span>
         </div>
-        <div class="vault-workspace">
-          <div class="vault-sidebar">
-            <div class="vault-brand"><i class="fas fa-layer-group"></i><span>MYKEYNEST<small>{{ app.request.locale == 'en' ? 'Team workspace' : 'Espace équipe' }}</small></span></div>
-            <div class="vault-nav-item is-current"><i class="fas fa-key"></i> {{ app.request.locale == 'en' ? 'My vault' : 'Mon coffre' }}</div>
-            <div class="vault-nav-item"><i class="fas fa-share-nodes"></i> {{ app.request.locale == 'en' ? 'Shared access' : 'Partages' }}</div>
-            <div class="vault-nav-item"><i class="fas fa-users"></i> {{ app.request.locale == 'en' ? 'My team' : 'Mon équipe' }}</div>
-            <div class="vault-sidebar-note"><i class="fas fa-shield-halved"></i><span>{{ app.request.locale == 'en' ? 'Your access. Your rules.' : 'Vos accès. Vos règles.' }}</span></div>
+        <div class="hv-page">
+          <div class="hv-login">
+            <div class="hv-logo"><i class="fab fa-shopify"></i></div>
+            <p class="hv-login-title">{{ en ? 'Sign in to the store' : 'Connexion à la boutique' }}</p>
+            <span class="hv-label">{{ en ? 'Email' : 'E-mail' }}</span>
+            <div class="hv-field"><span class="hv-type hv-type-user">admin@shop-client.com</span></div>
+            <span class="hv-label">{{ en ? 'Password' : 'Mot de passe' }}</span>
+            <div class="hv-field"><span class="hv-type hv-type-pass">••••••••••••••</span><i class="fas fa-eye-slash"></i></div>
+            <div class="hv-submit">
+              <span class="hv-submit-l">{{ en ? 'Sign in' : 'Se connecter' }}</span>
+              <span class="hv-submit-ok"><i class="fas fa-check"></i> {{ en ? 'Signed in' : 'Connecté' }}</span>
+            </div>
           </div>
-          <div class="vault-content">
-            <div class="vault-heading"><div><span>{{ app.request.locale == 'en' ? 'YOUR WORKSPACE' : 'VOTRE ESPACE' }}</span><strong>{{ app.request.locale == 'en' ? 'Team vault' : 'Coffre d’équipe' }}</strong></div><div class="vault-avatar">MN</div></div>
-        <div class="vault-search">
-          <i class="fas fa-magnifying-glass"></i>
-          <span>{{ app.request.locale == 'en' ? 'Search an access…' : 'Rechercher un accès…' }}</span>
-          <span class="vault-shortcut">⌘ K</span>
-        </div>
-        <div class="cred-list">
-          <div class="cred">
-            <div class="cred-logo g"><i class="fab fa-google"></i></div>
-            <div class="cred-body"><b>{{ 'landing.hero.mock.gmail'|trans }}</b><span>••••••••••••</span></div>
-            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
-            <i class="fas fa-lock cred-lock"></i>
+          <div class="hv-popup">
+            <div class="hv-popup-head"><i class="fas fa-key"></i> MYKEYNEST <span>{{ en ? '1 match' : '1 accès' }}</span></div>
+            <div class="hv-popup-item">
+              <span class="hv-popup-ico"><i class="fab fa-shopify"></i></span>
+              <div><b>{{ en ? 'Client store' : 'Boutique client' }}</b><small>{{ en ? 'Shared by Sarah · sign-in only' : 'Partagé par Sarah · connexion seule' }}</small></div>
+            </div>
+            <div class="hv-popup-btn"><i class="fas fa-bolt"></i> {{ en ? 'Fill in' : 'Remplir' }}</div>
           </div>
-          <div class="cred">
-            <div class="cred-logo f"><i class="fab fa-facebook"></i></div>
-            <div class="cred-body"><b>{{ 'landing.hero.mock.facebook'|trans }}</b><span>••••••••••••</span></div>
-            <div class="sdots"><div class="sd mid"></div><div class="sd mid"></div><div class="sd mid"></div><div class="sd"></div></div>
-            <i class="fas fa-lock cred-lock"></i>
-          </div>
-          <div class="cred">
-            <div class="cred-logo gh"><i class="fab fa-github"></i></div>
-            <div class="cred-body"><b>{{ 'landing.hero.mock.github'|trans }}</b><span>••••••••••••</span></div>
-            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
-            <i class="fas fa-lock cred-lock"></i>
-          </div>
-          <div class="cred cred-extra">
-            <div class="cred-logo s"><i class="fab fa-stripe-s"></i></div>
-            <div class="cred-body"><b>Stripe Dashboard</b><span>••••••••••••</span></div>
-            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
-            <i class="fas fa-lock cred-lock"></i>
-          </div>
-          <div class="cred cred-extra">
-            <div class="cred-logo a"><i class="fab fa-aws"></i></div>
-            <div class="cred-body"><b>AWS Console</b><span>••••••••••••</span></div>
-            <div class="sdots"><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div><div class="sd ok"></div></div>
-            <i class="fas fa-lock cred-lock"></i>
-          </div>
-        </div>
-            <div class="vault-footer"><i class="fas fa-lock"></i> {{ app.request.locale == 'en' ? 'Encrypted credentials · Controlled access' : 'Identifiants chiffrés · Accès contrôlés' }}</div>
-          </div>
+          <div class="hv-cursor"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 2l15 11.2-6.6.9 3.9 7.4-3 1.5-3.8-7.5L4 20z" fill="#0d1f18" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
         </div>
       </div>
-      <div class="share-notice"><span class="share-notice-icon"><i class="fas fa-user-check"></i></span><div><strong>{{ app.request.locale == 'en' ? 'Access shared. Secret protected.' : 'Accès partagé. Secret préservé.' }}</strong><span>{{ app.request.locale == 'en' ? 'Sign-in allowed · Password hidden' : 'Connexion autorisée · Mot de passe masqué' }}</span></div><i class="fas fa-circle-check"></i></div>
-      <span class="visual-caption">{{ app.request.locale == 'en' ? 'ILLUSTRATIVE VAULT PREVIEW' : 'APERÇU ILLUSTRATIF DU COFFRE' }}</span>
+      <div class="hv-chip hv-chip-a"><span><i class="fas fa-eye-slash"></i></span><div><b>{{ en ? 'Password never shown' : 'Mot de passe jamais affiché' }}</b><small>{{ en ? 'Léa signs in without seeing it' : 'Léa se connecte sans le voir' }}</small></div></div>
+      <div class="hv-chip hv-chip-b"><span><i class="fas fa-clock-rotate-left"></i></span><div><b>{{ en ? 'Revocable anytime' : 'Révocable à tout moment' }}</b><small>{{ en ? 'or expires at the end of the job' : 'ou expire en fin de mission' }}</small></div></div>
     </div>
   </div>
 </section>
 
-{% include 'components/seo/_product_definition.html.twig' %}
-
-
-{# STRIP #}
-<div class="strip">
-  <div class="strip-inner">
-    <div class="s-item"><i class="fas fa-certificate"></i> {{ app.request.locale == 'en' ? 'Encrypted credentials' : 'Identifiants chiffrés' }}</div>
-    <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-user-shield"></i> {{ app.request.locale == 'en' ? 'Controlled sharing' : 'Partage contrôlé' }}</div>
-    <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-puzzle-piece"></i> {{ app.request.locale == 'en' ? 'Browser extension' : 'Extension navigateur' }}</div>
-    <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-building-user"></i> {{ app.request.locale == 'en' ? 'Team management' : 'Gestion d’équipe' }}</div>
-    <div class="s-div"></div>
-    <div class="s-item"><i class="fas fa-check-double"></i> {{ app.request.locale == 'en' ? 'Access revocation' : 'Révocation des accès' }}</div>
+{# ======================== LOGOS ======================== #}
+{% set tools = [['fab fa-google','Google Workspace'],['fab fa-wordpress','WordPress'],['fab fa-shopify','Shopify'],['fab fa-aws','AWS'],['fab fa-github','GitHub'],['fab fa-stripe','Stripe'],['fab fa-meta','Meta Business'],['fab fa-linkedin','LinkedIn'],['fab fa-mailchimp','Mailchimp'],['fab fa-figma','Figma'],['fab fa-slack','Slack'],['fab fa-microsoft','Microsoft 365']] %}
+<div class="logos">
+  <p class="logos-title">{{ en ? 'Every login your team uses, in one vault' : 'Tous les accès de votre équipe, dans un seul coffre' }}</p>
+  <div class="logos-track" aria-hidden="true">
+    <div class="logos-row">
+      {% for round in 1..2 %}{% for tool in tools %}<span class="logo-item"><i class="{{ tool[0] }}"></i>{{ tool[1] }}</span>{% endfor %}{% endfor %}
+    </div>
   </div>
 </div>
 
+{% include 'components/seo/_product_definition.html.twig' %}
 
-
-{# ======================== FEATURES ======================== #}
-<section class="feat-section" id="features">
+{# ======================== PROBLEM / SOLUTION ======================== #}
+<section class="problem" id="problem" aria-labelledby="problem-title">
   <div class="wrap">
-    <div class="sh">
-      <span class="sh-label"><i class="fas fa-bolt"></i> {{ 'landing.features.label'|trans }}</span>
-      <h2>{{ 'landing.features.title'|trans }}</h2>
-      <p>{{ 'landing.features.subtitle'|trans }}</p>
+    <div class="sh" data-reveal>
+      <span class="sh-label"><i class="fas fa-triangle-exclamation"></i> {{ en ? 'The problem' : 'Le problème' }}</span>
+      <h2 id="problem-title">{{ en ? 'Your passwords are already everywhere.' : 'Vos mots de passe circulent déjà partout.' }}</h2>
+      <p>{{ en ? 'Slack, emails, spreadsheets, sticky notes… Every improvised share is an access you no longer control.' : 'Slack, e-mails, fichiers Excel, post-it… Chaque partage improvisé est un accès que vous ne contrôlez plus.' }}</p>
     </div>
-    <div class="feat-layout">
-      <div class="fhero">
-        <div class="fhero-icon"><i class="fas fa-fingerprint"></i></div>
-        <span class="fhero-tag"><i class="fas fa-star"></i> {{ 'landing.features.cards.hashed_tag'|trans }}</span>
-        <h3>{{ 'landing.features.cards.hashed_title'|trans }}</h3>
-        <p>{{ 'landing.features.cards.hashed_text'|trans }}</p>
-        <div class="fhero-term" aria-hidden="true">
-          <div class="ftl"><i class="fas fa-puzzle-piece"></i><span>MYKEYNEST / {{ app.request.locale == 'en' ? 'Browser extension' : 'Extension navigateur' }}</span></div>
-          <div class="ftl"><i class="fas fa-circle-check"></i><span>{{ app.request.locale == 'en' ? 'Associated with your account' : 'Associée à votre compte' }}</span></div>
-          <div class="ftl"><i class="fas fa-sliders"></i><span>{{ app.request.locale == 'en' ? 'Manage your installations' : 'Gérez vos installations' }}</span></div>
-        </div>
-      </div>
-      <div class="feat-grid">
-        <div class="fc accent">
-          <div class="fci"><i class="fas fa-shield-halved"></i></div>
-          <div><h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3><p>{{ 'landing.features.cards.e2e_text'|trans }}</p></div>
-        </div>
-        <div class="fc dark">
-          <div class="fci"><i class="fas fa-mobile-screen-button"></i></div>
-          <div><h3>{{ 'landing.features.cards.twofactor_title'|trans }}</h3><p>{{ 'landing.features.cards.twofactor_text'|trans }}</p></div>
-        </div>
-        <div class="fc">
-          <div class="fci"><i class="fas fa-wand-magic-sparkles"></i></div>
-          <div><h3>{{ 'landing.features.cards.generator_title'|trans }}</h3><p>{{ 'landing.features.cards.generator_text'|trans }}</p></div>
-        </div>
-        <div class="fc">
-          <div class="fci"><i class="fas fa-shield-heart"></i></div>
-          <div><h3>{{ 'landing.features.cards.audit_title'|trans }}</h3><p>{{ 'landing.features.cards.audit_text'|trans }}</p></div>
-        </div>
-        <div class="fc wide">
-          <div class="fci"><i class="fas fa-bolt"></i></div>
-          <div class="fc-bdy"><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-puzzle-piece"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'extension' : 'extension' }}</span></div>
-        </div>
-        <div class="fc wide accent">
-          <div class="fci"><i class="fas fa-share-nodes"></i></div>
-          <div class="fc-bdy"><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
-          <div class="fc-stat"><span class="fc-stat-n"><i class="fas fa-user-shield"></i></span><span class="fc-stat-l">{{ app.request.locale == 'en' ? 'controlled' : 'contrôlé' }}</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-{# ======================== SECURITY ======================== #}
-<section class="sec-section" id="security" aria-labelledby="sec-h2">
-  <div class="wrap">
-    <div class="sec-inner">
-      <div class="sec-text">
-        <span class="sh-label"><i class="fas fa-fingerprint"></i> {{ 'landing.security.label'|trans }}</span>
-        <h2 class="sec-h2" id="sec-h2">{{ 'landing.security.title'|trans }}</h2>
-        <p class="sec-intro">{{ 'landing.security.intro'|trans }}</p>
-        <div class="sec-pts">
-          <div class="sp">
-            <div class="sp-ico"><i class="fas fa-fingerprint"></i></div>
-            <div class="sp-body"><b>{{ 'landing.security.points.p1_title'|trans }}</b><p>{{ 'landing.security.points.p1_text'|trans }}</p></div>
+    <div class="ba">
+      <div class="ba-card ba-before" data-reveal>
+        <span class="ba-tag bad"><i class="fas fa-circle-xmark"></i> {{ en ? 'Today' : 'Aujourd’hui' }}</span>
+        <div class="mess">
+          <div class="mess-item m1">
+            <span class="mess-ico"><i class="fab fa-slack"></i></span>
+            <div><small>#general · Thomas</small><p>{{ en ? 'the hosting password is' : 'le mdp de l’hébergeur c’est' }} <mark>Agency2024!</mark></p></div>
+            <span class="risk">{{ en ? 'Seen by 23 people' : 'Lu par 23 personnes' }}</span>
           </div>
-          <div class="sp">
-            <div class="sp-ico"><i class="fas fa-link-slash"></i></div>
-            <div class="sp-body"><b>{{ 'landing.security.points.p2_title'|trans }}</b><p>{{ 'landing.security.points.p2_text'|trans }}</p></div>
+          <div class="mess-item m2">
+            <span class="mess-ico xl"><i class="fas fa-file-excel"></i></span>
+            <div><small>{{ en ? 'Shared drive' : 'Drive partagé' }}</small><p>passwords_FINAL_v3.xlsx</p></div>
+            <span class="risk">{{ en ? 'Never updated' : 'Jamais à jour' }}</span>
           </div>
-          <div class="sp">
-            <div class="sp-ico"><i class="fas fa-database"></i></div>
-            <div class="sp-body"><b>{{ 'landing.security.points.p3_title'|trans }}</b><p>{{ 'landing.security.points.p3_text'|trans }}</p></div>
-          </div>
-          <div class="sp">
-            <div class="sp-ico"><i class="fas fa-file-shield"></i></div>
-            <div class="sp-body"><b>{{ 'landing.security.points.p4_title'|trans }}</b><p>{{ 'landing.security.points.p4_text'|trans }}</p></div>
+          <div class="mess-item m3 postit"><p>admin<br>Azerty123</p><span class="risk">{{ en ? 'Stuck on a screen' : 'Collé sur l’écran' }}</span></div>
+          <div class="mess-item m4">
+            <span class="mess-ico"><i class="fas fa-envelope"></i></span>
+            <div><small>Re: Re: {{ en ? 'Shopify access' : 'accès Shopify' }}</small><p>{{ en ? 'Here are the account credentials…' : 'Voici les identifiants du compte…' }}</p></div>
+            <span class="risk">{{ en ? 'Former contractor still has it' : 'L’ex-prestataire l’a toujours' }}</span>
           </div>
         </div>
       </div>
-      <div class="access-visual" aria-hidden="true">
-        <div class="access-visual-top"><span>MYKEYNEST / {{ app.request.locale == 'en' ? 'ACCESS CONTROL' : 'CONTRÔLE DES ACCÈS' }}</span><i class="fas fa-ellipsis"></i></div>
-        <div class="access-lock"><i class="fas fa-shield-halved"></i><span class="access-lock-check"><i class="fas fa-check"></i></span></div>
-        <h3>{{ app.request.locale == 'en' ? 'You hold the keys.' : 'Les clés restent entre vos mains.' }}</h3>
-        <p>{{ app.request.locale == 'en' ? 'One vault. The right permissions for everyone.' : 'Un coffre. Les bons droits pour chacun.' }}</p>
-        <div class="access-person"><span class="access-person-icon"><i class="fas fa-user-tie"></i></span><div><strong>{{ app.request.locale == 'en' ? 'Owner' : 'Propriétaire' }}</strong><span>{{ app.request.locale == 'en' ? 'Full control' : 'Contrôle complet' }}</span></div><span class="access-role">Admin</span></div>
-        <div class="access-person"><span class="access-person-icon"><i class="fas fa-user"></i></span><div><strong>{{ app.request.locale == 'en' ? 'Collaborator' : 'Collaborateur' }}</strong><span>{{ app.request.locale == 'en' ? 'Password hidden' : 'Mot de passe masqué' }}</span></div><span class="access-role">{{ app.request.locale == 'en' ? 'Sign-in only' : 'Connexion seule' }}</span></div>
-        <div class="access-control-note"><i class="fas fa-sliders"></i> {{ app.request.locale == 'en' ? 'Permissions managed by you, at any time.' : 'Des permissions que vous gérez à tout moment.' }}</div>
+      <div class="ba-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></div>
+      <div class="ba-card ba-after" data-reveal style="--d:2">
+        <span class="ba-tag good"><i class="fas fa-circle-check"></i> {{ en ? 'With MYKEYNEST' : 'Avec MYKEYNEST' }}</span>
+        <ul class="tidy">
+          <li style="--i:0"><span class="tidy-ico"><i class="fas fa-server"></i></span><div><b>{{ en ? 'Hosting' : 'Hébergeur' }}</b><small>{{ en ? 'Tech team · sign-in only' : 'Équipe tech · connexion seule' }}</small></div><span class="pill ok"><i class="fas fa-lock"></i> {{ en ? 'Encrypted' : 'Chiffré' }}</span></li>
+          <li style="--i:1"><span class="tidy-ico"><i class="fab fa-google"></i></span><div><b>Google Workspace</b><small>{{ en ? 'You + 2 admins' : 'Vous + 2 admins' }}</small></div><span class="pill">{{ en ? 'Owner' : 'Propriétaire' }}</span></li>
+          <li style="--i:2"><span class="tidy-ico"><i class="fab fa-shopify"></i></span><div><b>Shopify</b><small>{{ en ? 'Léa (contractor) · password hidden' : 'Léa (prestataire) · mot de passe masqué' }}</small></div><span class="pill warn"><i class="fas fa-hourglass-half"></i> {{ en ? 'Ends Jun 30' : 'Fin 30/06' }}</span></li>
+          <li style="--i:3" class="is-revoked"><span class="tidy-ico"><i class="fas fa-user"></i></span><div><b>{{ en ? 'Marc (former contractor)' : 'Marc (ex-prestataire)' }}</b><small>{{ en ? 'All shares removed' : 'Tous les partages retirés' }}</small></div><span class="pill bad">{{ en ? 'Revoked' : 'Révoqué' }}</span></li>
+        </ul>
+        <p class="tidy-foot"><i class="fas fa-shield-halved"></i> {{ en ? 'One place, clear permissions — you always know who can use what.' : 'Un seul endroit, des droits clairs — vous savez toujours qui peut utiliser quoi.' }}</p>
       </div>
     </div>
   </div>
 </section>
 
-{# ======================== HOW IT WORKS ======================== #}
-<section class="how" id="how-it-works">
+{# ======================== HOW IT WORKS (interactive) ======================== #}
+{% set flowSteps = [
+  {icon: 'fa-file-import', title: en ? 'Add your logins' : 'Ajoutez vos accès', text: en ? 'Import a compatible file or save them one by one. Everything is encrypted.' : 'Importez un fichier compatible ou enregistrez-les un par un. Tout est chiffré.'},
+  {icon: 'fa-user-plus', title: en ? 'Share with the right rights' : 'Partagez avec les bons droits', text: en ? 'Pick the person, then choose: full view or sign-in only.' : 'Choisissez la personne, puis : consultation complète ou connexion seule.'},
+  {icon: 'fa-bolt', title: en ? 'They sign in, in one click' : 'Connexion en un clic', text: en ? 'The extension fills the form. The password stays hidden.' : 'L’extension remplit le formulaire. Le mot de passe reste masqué.'},
+  {icon: 'fa-user-xmark', title: en ? 'Take it back anytime' : 'Reprenez la main', text: en ? 'Revoke a share in one click, or let it expire on the date you set.' : 'Révoquez un partage en un clic, ou laissez-le expirer à la date choisie.'}
+] %}
+<section class="how" id="how-it-works" aria-labelledby="how-title">
   <div class="wrap">
-    <div class="sh">
-      <span class="sh-label"><i class="fas fa-map"></i> {{ 'landing.how.label'|trans }}</span>
-      <h2>{{ 'landing.how.title'|trans }}</h2>
-      <p>{{ 'landing.how.subtitle'|trans }}</p>
+    <div class="sh" data-reveal>
+      <span class="sh-label"><i class="fas fa-route"></i> {{ 'landing.how.label'|trans }}</span>
+      <h2 id="how-title">{{ en ? 'How it works — 4 steps, 5 minutes' : 'Comment ça marche — 4 étapes, 5 minutes' }}</h2>
+      <p>{{ en ? 'Follow a real case: Sarah runs an agency and gives Léa, a freelancer, access to a client’s store.' : 'Suivez un cas concret : Sarah dirige une agence et donne à Léa, freelance, l’accès à la boutique d’un client.' }}</p>
     </div>
-    <div class="how-demo">
+
+    <div class="flow" data-reveal data-landing-target="flow" data-action="mouseenter->landing#pauseFlow mouseleave->landing#resumeFlow">
+      <div class="flow-tabs" role="tablist" aria-label="{{ en ? 'Steps' : 'Étapes' }}" data-action="keydown->landing#tabKeys">
+        {% for step in flowSteps %}
+          <button type="button" class="flow-tab" role="tab" id="flow-tab-{{ loop.index }}" aria-controls="flow-panel-{{ loop.index }}" aria-selected="{{ loop.first ? 'true' : 'false' }}" tabindex="{{ loop.first ? '0' : '-1' }}" data-landing-target="stepTab" data-action="landing#selectStep" data-index="{{ loop.index0 }}">
+            <span class="flow-n"><i class="fas {{ step.icon }}" aria-hidden="true"></i></span>
+            <span class="flow-txt"><small>{{ en ? 'Step' : 'Étape' }} {{ loop.index }}</small><b>{{ step.title }}</b><span>{{ step.text }}</span></span>
+            <span class="flow-progress" aria-hidden="true"><i data-action="animationend->landing#nextStep"></i></span>
+          </button>
+        {% endfor %}
+      </div>
+
+      <div class="flow-stage" aria-live="polite">
+        <div class="stage-bar"><div class="hv-dots"><span></span><span></span><span></span></div><span>app.key-nest.com</span></div>
+
+        {# Step 1 — add #}
+        <div class="flow-panel" role="tabpanel" id="flow-panel-1" aria-labelledby="flow-tab-1" data-landing-target="stepPanel">
+          <div class="sc">
+            <div class="sc-head"><div><small>{{ en ? 'Sarah’s vault' : 'Coffre de Sarah' }}</small><b>{{ en ? 'Import your logins' : 'Importer vos accès' }}</b></div><span class="sc-badge"><i class="fas fa-lock"></i> AES-256</span></div>
+            <div class="sc-import">
+              <i class="fas fa-file-csv"></i>
+              <div><b>export_logins.csv</b><span class="sc-bar"><i></i></span></div>
+              <span class="sc-done"><i class="fas fa-check"></i></span>
+            </div>
+            <ul class="sc-list">
+              <li style="--i:0"><span class="tidy-ico"><i class="fab fa-shopify"></i></span><b>{{ en ? 'Client store' : 'Boutique client' }}</b><em>••••••••</em></li>
+              <li style="--i:1"><span class="tidy-ico"><i class="fab fa-wordpress"></i></span><b>{{ en ? 'Agency website' : 'Site de l’agence' }}</b><em>••••••••</em></li>
+              <li style="--i:2"><span class="tidy-ico"><i class="fab fa-google"></i></span><b>Google Ads</b><em>••••••••</em></li>
+              <li style="--i:3"><span class="tidy-ico"><i class="fas fa-server"></i></span><b>{{ en ? 'Hosting' : 'Hébergeur' }}</b><em>••••••••</em></li>
+            </ul>
+          </div>
+        </div>
+
+        {# Step 2 — share #}
+        <div class="flow-panel" role="tabpanel" id="flow-panel-2" aria-labelledby="flow-tab-2" data-landing-target="stepPanel" hidden>
+          <div class="sc">
+            <div class="sc-head"><div><small>{{ en ? 'Share' : 'Partager' }}</small><b>{{ en ? 'Client store' : 'Boutique client' }}</b></div><span class="sc-badge"><i class="fab fa-shopify"></i></span></div>
+            <div class="sc-input"><span class="sc-avatar">L</span><b>Léa Martin</b><small>{{ en ? 'Freelancer' : 'Freelance' }}</small><i class="fas fa-check"></i></div>
+            <p class="sc-label">{{ en ? 'What can Léa do?' : 'Que peut faire Léa ?' }}</p>
+            <div class="sc-opt sc-opt-a"><span class="sc-radio"></span><div><b>{{ en ? 'Full view' : 'Consultation complète' }}</b><small>{{ en ? 'Can display and copy the password' : 'Peut afficher et copier le mot de passe' }}</small></div></div>
+            <div class="sc-opt sc-opt-b"><span class="sc-radio"></span><div><b>{{ en ? 'Sign-in only' : 'Connexion seule' }}</b><small>{{ en ? 'Signs in via the extension, password hidden' : 'Se connecte via l’extension, mot de passe masqué' }}</small></div><span class="pill ok">{{ en ? 'Recommended' : 'Recommandé' }}</span></div>
+            <div class="sc-row"><span><i class="fas fa-calendar"></i> {{ en ? 'Expires on' : 'Expire le' }} <b>30/06</b></span><span class="sc-cta">{{ en ? 'Share access' : 'Partager l’accès' }}</span></div>
+            <div class="sc-toast"><i class="fas fa-circle-check"></i> {{ en ? 'Access shared with Léa' : 'Accès partagé avec Léa' }}</div>
+          </div>
+        </div>
+
+        {# Step 3 — sign in #}
+        <div class="flow-panel" role="tabpanel" id="flow-panel-3" aria-labelledby="flow-tab-3" data-landing-target="stepPanel" hidden>
+          <div class="sc sc-split">
+            <div class="sc-mini-login">
+              <div class="hv-logo"><i class="fab fa-shopify"></i></div>
+              <span class="hv-label">{{ en ? 'Email' : 'E-mail' }}</span>
+              <div class="hv-field"><span class="sc-type sc-type-user">admin@shop-client.com</span></div>
+              <span class="hv-label">{{ en ? 'Password' : 'Mot de passe' }}</span>
+              <div class="hv-field"><span class="sc-type sc-type-pass">••••••••••••</span><i class="fas fa-eye-slash"></i></div>
+              <div class="sc-signed"><i class="fas fa-check"></i> {{ en ? 'Léa is signed in' : 'Léa est connectée' }}</div>
+            </div>
+            <div class="sc-ext">
+              <div class="hv-popup-head"><i class="fas fa-key"></i> MYKEYNEST</div>
+              <div class="hv-popup-item"><span class="hv-popup-ico"><i class="fab fa-shopify"></i></span><div><b>{{ en ? 'Client store' : 'Boutique client' }}</b><small>{{ en ? 'Shared by Sarah' : 'Partagé par Sarah' }}</small></div></div>
+              <div class="hv-popup-btn"><i class="fas fa-bolt"></i> {{ en ? 'Fill in' : 'Remplir' }}</div>
+              <p class="sc-note"><i class="fas fa-eye-slash"></i> {{ en ? 'Password not viewable' : 'Mot de passe non consultable' }}</p>
+            </div>
+          </div>
+        </div>
+
+        {# Step 4 — revoke #}
+        <div class="flow-panel" role="tabpanel" id="flow-panel-4" aria-labelledby="flow-tab-4" data-landing-target="stepPanel" hidden>
+          <div class="sc">
+            <div class="sc-head"><div><small>{{ en ? 'Shared access' : 'Partages' }}</small><b>{{ en ? 'Who can use what' : 'Qui utilise quoi' }}</b></div><span class="sc-badge"><i class="fas fa-users"></i> 3</span></div>
+            <ul class="sc-people">
+              <li><span class="sc-avatar">T</span><div><b>Thomas</b><small>{{ en ? 'Agency website · full view' : 'Site de l’agence · consultation' }}</small></div><span class="pill">{{ en ? 'Active' : 'Actif' }}</span></li>
+              <li class="sc-revoke"><span class="sc-avatar">L</span><div><b>Léa Martin</b><small>{{ en ? 'Client store · sign-in only' : 'Boutique client · connexion seule' }}</small></div><span class="sc-revoke-btn">{{ en ? 'Revoke' : 'Révoquer' }}</span><span class="pill bad sc-revoked">{{ en ? 'Revoked' : 'Révoqué' }}</span></li>
+              <li><span class="sc-avatar">N</span><div><b>Nina</b><small>{{ en ? 'Google Ads · sign-in only' : 'Google Ads · connexion seule' }}</small></div><span class="pill">{{ en ? 'Active' : 'Actif' }}</span></li>
+            </ul>
+            <div class="sc-toast"><i class="fas fa-user-lock"></i> {{ en ? 'Léa can no longer sign in to the store' : 'Léa ne peut plus se connecter à la boutique' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="how-demo" data-reveal>
       <div class="how-demo-copy">
         <span class="how-demo-eyebrow"><i class="fas fa-play-circle"></i> {{ 'landing.how.demo.eyebrow'|trans }}</span>
         <h3>{{ 'landing.how.demo.title'|trans }}</h3>
         <p>{{ 'landing.how.demo.text'|trans }}</p>
       </div>
       <div class="how-demo-shell">
-        <div class="how-demo-bar">
-          <div class="how-demo-dots"><span></span><span></span><span></span></div>
-          <span>mykeynest://demo/onboarding</span>
-        </div>
         <div class="how-demo-screen">
           <iframe
             src="https://www.youtube-nocookie.com/embed/IS4YgAdW-H8?rel=0"
@@ -253,22 +269,196 @@
         </div>
       </div>
     </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">1</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s1_title'|trans }}</h3><p>{{ 'landing.how.steps.s1_text'|trans }}</p></div>
+  </div>
+</section>
+
+{# ======================== USE CASES ======================== #}
+<section class="cases" id="use-cases" aria-labelledby="cases-title">
+  <div class="wrap">
+    <div class="sh" data-reveal>
+      <span class="sh-label"><i class="fas fa-briefcase"></i> {{ en ? 'Use cases' : 'Cas d’usage' }}</span>
+      <h2 id="cases-title">{{ en ? 'Built for the way your team really works' : 'Pensé pour la façon dont votre équipe travaille vraiment' }}</h2>
+      <p>{{ en ? 'Pick your situation and see what changes on day one.' : 'Choisissez votre situation et voyez ce qui change dès le premier jour.' }}</p>
+    </div>
+
+    <div class="case-tabs" role="tablist" aria-label="{{ en ? 'Use cases' : 'Cas d’usage' }}" data-reveal data-action="keydown->landing#tabKeys">
+      {% set caseTabs = [
+        ['fa-pen-ruler', en ? 'Web agencies' : 'Agences web'],
+        ['fa-building', en ? 'SMBs' : 'PME'],
+        ['fa-handshake', en ? 'Contractors' : 'Prestataires'],
+        ['fa-people-arrows', en ? 'Arrivals & departures' : 'Arrivées & départs']
+      ] %}
+      {% for tab in caseTabs %}
+        <button type="button" class="case-tab" role="tab" id="case-tab-{{ loop.index }}" aria-controls="case-panel-{{ loop.index }}" aria-selected="{{ loop.first ? 'true' : 'false' }}" tabindex="{{ loop.first ? '0' : '-1' }}" data-landing-target="caseTab" data-action="landing#selectCase" data-index="{{ loop.index0 }}">
+          <i class="fas {{ tab[0] }}" aria-hidden="true"></i> {{ tab[1] }}
+        </button>
+      {% endfor %}
+    </div>
+
+    {% set cases = [
+      {
+        kicker: en ? 'Agencies & studios' : 'Agences & studios',
+        title: en ? 'Your clients trust you with their logins. Treat them that way.' : 'Vos clients vous confient leurs accès. Traitez-les comme tels.',
+        pain: en ? '“The client’s WordPress password is in the project channel, and three freelancers have it.”' : '« Le mot de passe WordPress du client est dans le canal du projet, et trois freelances l’ont. »',
+        points: en
+          ? ['One folder per client: CMS, hosting, ads, social accounts', 'Freelancers sign in without seeing the password', 'Project over? Remove everyone’s access in a few clicks']
+          : ['Un espace par client : CMS, hébergeur, régies pub, réseaux sociaux', 'Les freelances se connectent sans voir le mot de passe', 'Projet terminé ? Retirez les accès de chacun en quelques clics']
+      },
+      {
+        kicker: en ? 'Small & mid-sized businesses' : 'PME & TPE',
+        title: en ? 'Shared company accounts, without the shared spreadsheet.' : 'Les comptes partagés de l’entreprise, sans le fichier Excel.',
+        pain: en ? '“Who changed the supplier portal password? Nobody can log in anymore.”' : '« Qui a changé le mot de passe du portail fournisseur ? Plus personne ne peut se connecter. »',
+        points: en
+          ? ['Accounting, social media, suppliers: one vault for the company', 'Each person gets the rights their job requires', 'Spot weak or reused passwords before they become a problem']
+          : ['Compta, réseaux sociaux, fournisseurs : un coffre pour l’entreprise', 'Chacun reçoit les droits dont son poste a besoin', 'Repérez les mots de passe faibles ou réutilisés avant qu’ils posent problème']
+      },
+      {
+        kicker: en ? 'Contractors & freelancers' : 'Prestataires & freelances',
+        title: en ? 'Give access for the job. Not forever.' : 'Donnez l’accès pour la mission. Pas pour toujours.',
+        pain: en ? '“Our former web agency still had admin access to our site, two years later.”' : '« Notre ancienne agence web avait encore l’accès admin à notre site, deux ans après. »',
+        points: en
+          ? ['Share only the logins needed for the job', 'Set an end date: the access expires automatically', 'Sign-in only: the password never leaves your vault']
+          : ['Partagez uniquement les accès nécessaires à la mission', 'Fixez une date de fin : l’accès expire automatiquement', 'Connexion seule : le mot de passe ne quitte jamais votre coffre']
+      },
+      {
+        kicker: en ? 'Onboarding & offboarding' : 'Onboarding & offboarding',
+        title: en ? 'Ready on day one. Clean on the last day.' : 'Prêt dès le premier jour. Propre le dernier.',
+        pain: en ? '“When someone leaves, we spend a day hunting down every account they used.”' : '« Quand quelqu’un part, on passe une journée à retrouver tous les comptes qu’il utilisait. »',
+        points: en
+          ? ['Newcomer: share the right logins in minutes', 'Departure: see everything they had access to, in one list', 'Revoke shares in one click — no hunt, no forgotten account']
+          : ['Arrivée : partagez les bons accès en quelques minutes', 'Départ : voyez tout ce à quoi la personne avait accès, sur une seule liste', 'Révoquez les partages en un clic — sans chasse aux comptes oubliés']
+      }
+    ] %}
+
+    {% for case in cases %}
+      <div class="case-panel" role="tabpanel" id="case-panel-{{ loop.index }}" aria-labelledby="case-tab-{{ loop.index }}" data-landing-target="casePanel" {% if not loop.first %}hidden{% endif %}>
+        <div class="case-copy">
+          <span class="case-kicker">{{ case.kicker }}</span>
+          <h3>{{ case.title }}</h3>
+          <blockquote class="case-pain"><i class="fas fa-quote-left" aria-hidden="true"></i> {{ case.pain }}</blockquote>
+          <ul class="case-points">
+            {% for point in case.points %}<li style="--i:{{ loop.index0 }}"><i class="fas fa-circle-check" aria-hidden="true"></i> {{ point }}</li>{% endfor %}
+          </ul>
+          <a href="{{ registerUrl }}" class="case-link">{{ en ? 'Try it for free' : 'Essayer gratuitement' }} <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="case-vis" aria-hidden="true">
+          {% if loop.index == 1 %}
+            <div class="cv-card">
+              <div class="cv-head"><b>{{ en ? 'Clients' : 'Clients' }}</b><span>3 {{ en ? 'workspaces' : 'espaces' }}</span></div>
+              <div class="cv-row" style="--i:0"><span class="cv-ico c1"><i class="fas fa-bread-slice"></i></span><div><b>{{ en ? 'Martin Bakery' : 'Boulangerie Martin' }}</b><small><i class="fab fa-wordpress"></i> <i class="fas fa-server"></i> <i class="fab fa-google"></i> · 6 {{ en ? 'logins' : 'accès' }}</small></div><span class="cv-avatars"><i>S</i><i>L</i><i>+1</i></span></div>
+              <div class="cv-row" style="--i:1"><span class="cv-ico c2"><i class="fas fa-scale-balanced"></i></span><div><b>{{ en ? 'Dupont Law Firm' : 'Cabinet Dupont' }}</b><small><i class="fab fa-wordpress"></i> <i class="fab fa-linkedin"></i> · 4 {{ en ? 'logins' : 'accès' }}</small></div><span class="cv-avatars"><i>S</i><i>T</i></span></div>
+              <div class="cv-row" style="--i:2"><span class="cv-ico c3"><i class="fas fa-shirt"></i></span><div><b>Studio Kali</b><small><i class="fab fa-shopify"></i> <i class="fab fa-meta"></i> <i class="fab fa-mailchimp"></i> · 9 {{ en ? 'logins' : 'accès' }}</small></div><span class="cv-avatars"><i>S</i><i>L</i><i>N</i></span></div>
+            </div>
+            <div class="cv-float"><i class="fas fa-eye-slash"></i> {{ en ? 'Freelancers: sign-in only' : 'Freelances : connexion seule' }}</div>
+          {% elseif loop.index == 2 %}
+            <div class="cv-card">
+              <div class="cv-head"><b>{{ en ? 'Company vault' : 'Coffre de l’entreprise' }}</b><span>{{ en ? 'by team' : 'par équipe' }}</span></div>
+              <div class="cv-row" style="--i:0"><span class="cv-ico c1"><i class="fas fa-calculator"></i></span><div><b>{{ en ? 'Accounting' : 'Comptabilité' }}</b><small>{{ en ? 'Finance team' : 'Équipe finance' }}</small></div><span class="pill">2 {{ en ? 'people' : 'pers.' }}</span></div>
+              <div class="cv-row" style="--i:1"><span class="cv-ico c2"><i class="fas fa-hashtag"></i></span><div><b>{{ en ? 'Social media' : 'Réseaux sociaux' }}</b><small>Marketing</small></div><span class="pill">3 {{ en ? 'people' : 'pers.' }}</span></div>
+              <div class="cv-row" style="--i:2"><span class="cv-ico c3"><i class="fas fa-truck"></i></span><div><b>{{ en ? 'Supplier portals' : 'Portails fournisseurs' }}</b><small>{{ en ? 'Purchasing' : 'Achats' }}</small></div><span class="pill">2 {{ en ? 'people' : 'pers.' }}</span></div>
+            </div>
+            <div class="cv-float cv-score"><span class="cv-ring"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.9"/><circle class="cv-ring-v" cx="18" cy="18" r="15.9"/></svg><b>86</b></span> {{ en ? 'Password health score' : 'Score de santé des mots de passe' }}</div>
+          {% elseif loop.index == 3 %}
+            <div class="cv-card">
+              <div class="cv-head"><b>{{ en ? 'Léa · website redesign' : 'Léa · refonte du site' }}</b><span>{{ en ? 'freelancer' : 'freelance' }}</span></div>
+              <ol class="cv-timeline">
+                <li class="done" style="--i:0"><b>{{ en ? 'Jun 1 · Job starts' : '1er juin · Début de mission' }}</b><small>{{ en ? '3 logins shared · sign-in only' : '3 accès partagés · connexion seule' }}</small></li>
+                <li class="done" style="--i:1"><b>{{ en ? 'During the job' : 'Pendant la mission' }}</b><small>{{ en ? 'Léa signs in via the extension' : 'Léa se connecte via l’extension' }}</small></li>
+                <li class="end" style="--i:2"><b>{{ en ? 'Jun 30 · Job ends' : '30 juin · Fin de mission' }}</b><small>{{ en ? 'Access expired automatically' : 'Accès expiré automatiquement' }}</small></li>
+              </ol>
+            </div>
+            <div class="cv-float"><i class="fas fa-hourglass-end"></i> {{ en ? 'No reminder needed' : 'Aucun rappel nécessaire' }}</div>
+          {% else %}
+            <div class="cv-card">
+              <div class="cv-head"><b>{{ en ? 'Thomas is leaving' : 'Thomas quitte l’équipe' }}</b><span>{{ en ? 'offboarding' : 'départ' }}</span></div>
+              <div class="cv-row is-off" style="--i:0"><span class="cv-ico c1"><i class="fab fa-google"></i></span><div><b>Google Ads</b><small>{{ en ? 'share removed' : 'partage retiré' }}</small></div><i class="fas fa-circle-check cv-ok"></i></div>
+              <div class="cv-row is-off" style="--i:1"><span class="cv-ico c2"><i class="fab fa-wordpress"></i></span><div><b>{{ en ? 'Agency website' : 'Site de l’agence' }}</b><small>{{ en ? 'share removed' : 'partage retiré' }}</small></div><i class="fas fa-circle-check cv-ok"></i></div>
+              <div class="cv-row is-off" style="--i:2"><span class="cv-ico c3"><i class="fab fa-meta"></i></span><div><b>Meta Business</b><small>{{ en ? 'share removed' : 'partage retiré' }}</small></div><i class="fas fa-circle-check cv-ok"></i></div>
+            </div>
+            <div class="cv-float"><i class="fas fa-broom"></i> {{ en ? 'Done in under a minute' : 'Fait en moins d’une minute' }}</div>
+          {% endif %}
+        </div>
       </div>
-      <div class="step">
-        <div class="step-n">2</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s2_title'|trans }}</h3><p>{{ 'landing.how.steps.s2_text'|trans }}</p></div>
+    {% endfor %}
+  </div>
+</section>
+
+{# ======================== FEATURES (bento) ======================== #}
+<section class="feat-section" id="features" aria-labelledby="features-title">
+  <div class="wrap">
+    <div class="sh" data-reveal>
+      <span class="sh-label"><i class="fas fa-bolt"></i> {{ 'landing.features.label'|trans }}</span>
+      <h2 id="features-title">{{ 'landing.features.title'|trans }}</h2>
+      <p>{{ 'landing.features.subtitle'|trans }}</p>
+    </div>
+    <div class="bento">
+      <article class="bx bx-share bx-wide" data-reveal>
+        <div class="bx-vis" aria-hidden="true">
+          <div class="net">
+            <span class="net-node net-owner"><i class="fas fa-user-tie"></i><small>{{ en ? 'You' : 'Vous' }}</small></span>
+            <svg class="net-lines" viewBox="0 0 300 120" preserveAspectRatio="none"><path d="M60 60 C 140 60, 160 22, 240 22"/><path d="M60 60 C 140 60, 160 98, 240 98"/></svg>
+            <span class="net-node net-a"><i class="fas fa-user"></i><em class="pill ok">{{ en ? 'Sign-in only' : 'Connexion seule' }}</em></span>
+            <span class="net-node net-b"><i class="fas fa-user"></i><em class="pill">{{ en ? 'Full view' : 'Consultation' }}</em></span>
+          </div>
+        </div>
+        <div class="bx-body"><span class="bx-ico"><i class="fas fa-share-nodes"></i></span><h3>{{ 'landing.features.cards.share_title'|trans }}</h3><p>{{ 'landing.features.cards.share_text'|trans }}</p></div>
+      </article>
+      <article class="bx bx-dark" data-reveal style="--d:1">
+        <div class="bx-vis" aria-hidden="true"><div class="cipher"><span>a9F$k2…Lq7</span><span>Zx8!pW…m3R</span><span>Qe4#tY…v0N</span><i class="fas fa-lock"></i></div></div>
+        <div class="bx-body"><span class="bx-ico"><i class="fas fa-shield-halved"></i></span><h3>{{ 'landing.features.cards.e2e_title'|trans }}</h3><p>{{ 'landing.features.cards.e2e_text'|trans }}</p></div>
+      </article>
+      <article class="bx" data-reveal>
+        <div class="bx-vis" aria-hidden="true"><div class="gen"><code data-landing-target="genOutput">vT8#qL2!xR9@mK4p</code><span class="gen-meter"><i></i><i></i><i></i><i></i></span></div></div>
+        <div class="bx-body"><span class="bx-ico"><i class="fas fa-wand-magic-sparkles"></i></span><h3>{{ 'landing.features.cards.generator_title'|trans }}</h3><p>{{ 'landing.features.cards.generator_text'|trans }}</p></div>
+      </article>
+      <article class="bx" data-reveal style="--d:1">
+        <div class="bx-vis" aria-hidden="true"><div class="audit"><span class="cv-ring big"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.9"/><circle class="cv-ring-v" cx="18" cy="18" r="15.9"/></svg><b>86</b></span><ul><li><i class="dot bad"></i>{{ en ? '2 weak' : '2 faibles' }}</li><li><i class="dot warn"></i>{{ en ? '3 reused' : '3 réutilisés' }}</li><li><i class="dot ok"></i>{{ en ? '41 strong' : '41 robustes' }}</li></ul></div></div>
+        <div class="bx-body"><span class="bx-ico"><i class="fas fa-shield-heart"></i></span><h3>{{ 'landing.features.cards.audit_title'|trans }}</h3><p>{{ 'landing.features.cards.audit_text'|trans }}</p></div>
+      </article>
+      <article class="bx" data-reveal style="--d:2">
+        <div class="bx-vis" aria-hidden="true"><div class="fill"><span class="fill-f"><i></i></span><span class="fill-f"><i></i></span><span class="fill-btn"><i class="fas fa-bolt"></i></span></div></div>
+        <div class="bx-body"><span class="bx-ico"><i class="fas fa-bolt"></i></span><h3>{{ 'landing.features.cards.autofill_title'|trans }}</h3><p>{{ 'landing.features.cards.autofill_text'|trans }}</p></div>
+      </article>
+      <article class="bx" data-reveal>
+        <div class="bx-vis" aria-hidden="true"><div class="devices"><span><i class="fab fa-chrome"></i> Chrome · {{ en ? 'Office' : 'Bureau' }}<em class="pill ok">OK</em></span><span><i class="fab fa-firefox-browser"></i> Firefox · {{ en ? 'Laptop' : 'Portable' }}<em class="pill ok">OK</em></span><span class="is-off"><i class="fab fa-edge"></i> Edge · {{ en ? 'Old PC' : 'Ancien PC' }}<em class="pill bad">{{ en ? 'Revoked' : 'Révoquée' }}</em></span></div></div>
+        <div class="bx-body"><span class="bx-ico"><i class="fas fa-puzzle-piece"></i></span><h3>{{ 'landing.features.cards.hashed_title'|trans }}</h3><p>{{ 'landing.features.cards.hashed_text'|trans }}</p></div>
+      </article>
+      <article class="bx bx-wide bx-row" data-reveal style="--d:1">
+        <div class="bx-body"><span class="bx-ico"><i class="fas fa-laptop-code"></i></span><h3>{{ 'landing.features.cards.twofactor_title'|trans }}</h3><p>{{ 'landing.features.cards.twofactor_text'|trans }}</p></div>
+        <div class="bx-vis" aria-hidden="true"><div class="sessions"><span><i class="fas fa-circle live"></i> Paris · {{ en ? 'this device' : 'cet appareil' }}</span><span><i class="fas fa-circle"></i> Lyon · {{ en ? '2 days ago' : 'il y a 2 jours' }}<em>{{ en ? 'Close' : 'Fermer' }}</em></span></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# ======================== SECURITY ======================== #}
+<section class="sec-section" id="security" aria-labelledby="sec-h2">
+  <div class="wrap">
+    <div class="sec-inner">
+      <div class="sec-text" data-reveal>
+        <span class="sh-label"><i class="fas fa-fingerprint"></i> {{ 'landing.security.label'|trans }}</span>
+        <h2 class="sec-h2" id="sec-h2">{{ 'landing.security.title'|trans }}</h2>
+        <p class="sec-intro">{{ 'landing.security.intro'|trans }}</p>
+        <div class="sec-pts">
+          <div class="sp"><div class="sp-ico"><i class="fas fa-fingerprint"></i></div><div class="sp-body"><b>{{ 'landing.security.points.p1_title'|trans }}</b><p>{{ 'landing.security.points.p1_text'|trans }}</p></div></div>
+          <div class="sp"><div class="sp-ico"><i class="fas fa-link-slash"></i></div><div class="sp-body"><b>{{ 'landing.security.points.p2_title'|trans }}</b><p>{{ 'landing.security.points.p2_text'|trans }}</p></div></div>
+          <div class="sp"><div class="sp-ico"><i class="fas fa-database"></i></div><div class="sp-body"><b>{{ 'landing.security.points.p3_title'|trans }}</b><p>{{ 'landing.security.points.p3_text'|trans }}</p></div></div>
+          <div class="sp"><div class="sp-ico"><i class="fas fa-file-shield"></i></div><div class="sp-body"><b>{{ 'landing.security.points.p4_title'|trans }}</b><p>{{ 'landing.security.points.p4_text'|trans }}</p></div></div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-n">3</div>
-        <div class="step-body"><h3>{{ 'landing.how.steps.s3_title'|trans }}</h3><p>{{ 'landing.how.steps.s3_text'|trans }}</p></div>
+      <div class="access-visual" data-reveal style="--d:2" aria-hidden="true">
+        <div class="access-visual-top"><span>MYKEYNEST / {{ en ? 'ACCESS CONTROL' : 'CONTRÔLE DES ACCÈS' }}</span><i class="fas fa-ellipsis"></i></div>
+        <div class="access-lock"><span class="access-ring r1"></span><span class="access-ring r2"></span><i class="fas fa-shield-halved"></i><span class="access-lock-check"><i class="fas fa-check"></i></span></div>
+        <h3>{{ en ? 'You hold the keys.' : 'Les clés restent entre vos mains.' }}</h3>
+        <p>{{ en ? 'One vault. The right permissions for everyone.' : 'Un coffre. Les bons droits pour chacun.' }}</p>
+        <div class="access-person"><span class="access-person-icon"><i class="fas fa-user-tie"></i></span><div><strong>{{ en ? 'Owner' : 'Propriétaire' }}</strong><span>{{ en ? 'Full control' : 'Contrôle complet' }}</span></div><span class="access-role">Admin</span></div>
+        <div class="access-person"><span class="access-person-icon"><i class="fas fa-user"></i></span><div><strong>{{ en ? 'Collaborator' : 'Collaborateur' }}</strong><span>{{ en ? 'Password hidden' : 'Mot de passe masqué' }}</span></div><span class="access-role">{{ en ? 'Sign-in only' : 'Connexion seule' }}</span></div>
+        <div class="access-control-note"><i class="fas fa-sliders"></i> {{ en ? 'Permissions managed by you, at any time.' : 'Des permissions que vous gérez à tout moment.' }}</div>
       </div>
     </div>
   </div>
 </section>
+
 {# ======================== PRICING ======================== #}
 <section class="pricing" id="pricing" aria-label="{{ 'landing.pricing.aria'|trans }}">
   <div class="wrap">
@@ -421,7 +611,8 @@
 {# ======================== CTA ======================== #}
 <section class="cta-sec">
   <div class="wrap">
-    <div class="cta-box">
+    <div class="cta-box" data-reveal>
+      <div class="cta-keys" aria-hidden="true"><i class="fas fa-key k1"></i><i class="fas fa-lock k2"></i><i class="fas fa-shield-halved k3"></i><i class="fas fa-user-check k4"></i></div>
       <div class="cta-icon" aria-hidden="true"><i class="fas fa-key"></i></div>
       <h2>{{ 'landing.cta.title'|trans }}</h2>
       <p>{{ 'landing.cta.subtitle'|trans }}</p>
